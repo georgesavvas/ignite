@@ -37,6 +37,8 @@ def validate_dirname(name, extra_chars=""):
 
 def create_anchor(path, name):
     ensure_directory(path)
+    if not name.startswith(".ign_"):
+        name = ".ign_" + name
     if not name.startswith("."):
         name = "." + name
     full_path = Path(path / name)

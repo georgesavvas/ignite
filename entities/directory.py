@@ -35,7 +35,7 @@ class Directory():
         self.project = project
         self.name = split2[-1]
     
-    def create_dir(self, name, recursive=False):
+    def create_dir(self, name, anchor="dir", recursive=False):
         extra_chars = "/" if recursive else ""
         if not utils.validate_dirname(name, extra_chars=extra_chars):
             raise Exception(
@@ -43,7 +43,11 @@ class Directory():
             )
         path = self.path / name
         utils.ensure_directory(path)
+        utils.create_anchor(path, anchor)
         return path
+    
+    def create_task(self, name):
+        path = self.create_dir(name, "task")
     
     def children(self):
         path = Path(self.path)

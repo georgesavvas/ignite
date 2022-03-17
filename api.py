@@ -5,6 +5,7 @@ from ignite import utils
 
 
 CONFIG = utils.get_config()
+PROJECT_ANCHOR = CONFIG["anchors"]["project"]
 ROOT = PurePath(CONFIG["root"])
 if not Path(ROOT).is_dir():
     os.makedirs(ROOT)
@@ -25,11 +26,14 @@ def create_project(name: str):
 
 def get_project_names() -> list:
     projects = Path(ROOT).iterdir()
-    projects = [p for p in projects if not p.startswith(".")]
+    projects = [p for p in projects if not p.name.startswith(".")]
+    projects = [p.name for p in projects if (Path(p) / PROJECT_ANCHOR).exists()]
     return projects
 
 
 def get_project(name):
+    if not name:
+        return None
     from ignite.entities.project import Project
     path = ROOT / name
     if not Path(ROOT).is_dir():

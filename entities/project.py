@@ -15,12 +15,9 @@ PROJECT_CONFIG_FILE = "project.yaml"
 
 class Project(Directory):
     def __init__(self, name="", path="") -> None:
-        if path:
-            self.path = PurePath(path)
-        elif name:
-            self.path = ROOT / name
-        if self.path:
-            self.load_from_path()
+        super().__init__(path)
+        self.dir_kind = "project"
+        
 
     def create_dir(self, name, recursive=False):
         raise NotImplemented("create_dir not allowed for projects.")
@@ -89,24 +86,28 @@ class Project(Directory):
         kinds = {v: k for k, v in CONFIG["anchors"].items()}
         anchors = kinds.keys()
 
-        def walk_project(path, d={}, _id=0):
+        def walk_project(path, d={}, _id=[0]):
             name = path.name
             if path.is_dir():
-                d["id"] = str(_id or "root")
+                d["id"] = str(_id[0] or "root")
                 d["name"] = name
-                d["kind"] = "Unknown"
+                d["path"] = path.as_posix()
+                d["kind"] = ""
                 d["children"] = []
                 for x in path.iterdir():
-                    _id += 1
+                    _id[0] += 1
                     name = x.name
                     if name in (".config", "common"):
                         continue
                     if name in anchors:
                         d["kind"] = kinds[name]
                         continue
+                    elif not d["kind"]:
+                        return
                     child_d = {}
                     d["children"].append(child_d)
                     walk_project(x, child_d, _id)
+                d["children"] = [child for child in d["children"] if child["kind"]]
             return d
 
         path = Path(self.path)
