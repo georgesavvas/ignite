@@ -1,4 +1,6 @@
 import ReactSplit, { SplitDirection } from '@devbookhq/splitter'
+import ProjectTree from '../components/ProjectTree';
+import ProjectBar from "../components/ProjectBar";
 import styles from "./Home.module.css" 
 
 export default function Home() {
@@ -10,14 +12,16 @@ export default function Home() {
         gutterClassName={styles.gutterVertical}
         draggerClassName={styles.dragger}
       >
-        <div className={styles.projectBar}>sup</div>
+        <ProjectBar />
         <ReactSplit 
           direction={SplitDirection.Horizontal}
           initialSizes={[20, 50, 30]}
           gutterClassName={styles.gutterHorizontal}
           draggerClassName={styles.dragger}
         >
-          <div className={styles.projectTree} />
+          <div className={styles.projectTree}>
+            <ProjectTree />
+          </div>
           <div className={styles.explorer} />
           <div className={styles.assetViewer} />
         </ReactSplit>

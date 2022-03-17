@@ -16,9 +16,7 @@ class Phase(Directory):
         self.dir_kind = "phase"
     
     def create_build(self, name):
-        path = self.create_dir(name)
-        utils.create_anchor(path, "build")
+        path = self.create_dir(name, "build")
     
     def create_sequence(self, name):
-        path = self.create_dir(name)
-        utils.create_anchor(path, "sequence")
+        path = self.create_dir(name, "sequence")

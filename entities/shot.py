@@ -11,3 +11,6 @@ class Shot(Directory):
     def __init__(self, path="") -> None:
         super().__init__(path)
         self.dir_kind = "shot"
+
+    def create_task(self, name):
+        path = self.create_dir(name, "task")
