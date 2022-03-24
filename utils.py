@@ -19,6 +19,11 @@ def get_config() -> dict:
     return config
 
 
+CONFIG = get_config()
+ROOT = PurePath(CONFIG["root"])
+ANCHORS = CONFIG["anchors"]
+
+
 def ensure_directory(path: Path) -> int:
     path = Path(path)
     if path.is_file():
@@ -37,11 +42,10 @@ def validate_dirname(name, extra_chars=""):
 
 def create_anchor(path, name):
     ensure_directory(path)
-    if not name.startswith(".ign_"):
-        name = ".ign_" + name
-    if not name.startswith("."):
-        name = "." + name
-    full_path = Path(path / name)
+    anchor = ANCHORS.get(name)
+    if not anchor:
+        raise Exception(f"Invalid anchor name: {name}")
+    full_path = Path(path / anchor)
     if not full_path.exists():
         full_path.touch()
     return full_path

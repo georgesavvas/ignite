@@ -12,11 +12,4 @@ ANCHOR = CONFIG["anchors"]["phase"]
 
 class Phase(Directory):
     def __init__(self, path="") -> None:
-        super().__init__(path)
-        self.dir_kind = "phase"
-    
-    def create_build(self, name):
-        path = self.create_dir(name, "build")
-    
-    def create_sequence(self, name):
-        path = self.create_dir(name, "sequence")
+        super().__init__(path, dir_kind = "phase")

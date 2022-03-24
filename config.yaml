@@ -1,11 +1,22 @@
 root: "D:/projects"
+
 anchors:
-  project: ".ign_project"
-  phase: ".ign_phase"
-  directory: ".ign_dir"
-  build: ".ign_build"
-  sequence: ".ign_sequence"
-  shot: ".ign_shot"
-  task: ".ign_task"
-  asset: ".ign_asset"
-  assetversion: ".ign_assetversion"
+  project: ".ign_project.yaml"
+  phase: ".ign_phase.yaml"
+  directory: ".ign_dir.yaml"
+  build: ".ign_build.yaml"
+  sequence: ".ign_sequence.yaml"
+  shot: ".ign_shot.yaml"
+  task: ".ign_task.yaml"
+  asset: ".ign_asset.yaml"
+  scene: ".ign_scene.yaml"
+  assetversion: ".ign_assetversion.yaml"
+
+dcc_extensions:
+  houdini: ["hip", "hipnc"]
+  maya: ["ma"]
+  nuke: ["nk"]
+  natron: []
+  substance_designer: ["sbs"]
+  substance_painter: []
+  blender: []

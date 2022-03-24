@@ -15,9 +15,7 @@ PROJECT_CONFIG_FILE = "project.yaml"
 
 class Project(Directory):
     def __init__(self, name="", path="") -> None:
-        super().__init__(path)
-        self.dir_kind = "project"
-        
+        super().__init__(path, dir_kind = "project")
 
     def create_dir(self, name, recursive=False):
         raise NotImplemented("create_dir not allowed for projects.")
@@ -29,13 +27,12 @@ class Project(Directory):
             utils.ensure_directory(path)
             if d in ("global", "rnd", "assets", "shots"):
                 utils.create_anchor(path, PHASE_ANCHOR)
-        config_path = self.path / ".config" / PROJECT_CONFIG_FILE
         config = {
             "status": "open",
             "short_name": "",
             "created": time.time()
         }
-        with open(config_path, "w") as f:
+        with open(self.anchor, "w") as f:
             yaml.safe_dump(config, f)
         self.load_from_path()
 
@@ -82,7 +79,6 @@ class Project(Directory):
             yaml.safe_dump(new_config, f)
 
     def get_project_tree(self):
-
         kinds = {v: k for k, v in CONFIG["anchors"].items()}
         anchors = kinds.keys()
 
@@ -92,22 +88,34 @@ class Project(Directory):
                 d["id"] = str(_id[0] or "root")
                 d["name"] = name
                 d["path"] = path.as_posix()
-                d["kind"] = ""
+                d["dir_kind"] = ""
+                d["task_type"] = ""
                 d["children"] = []
+                d["anchor"] = None
                 for x in path.iterdir():
                     _id[0] += 1
                     name = x.name
                     if name in (".config", "common"):
                         continue
                     if name in anchors:
-                        d["kind"] = kinds[name]
+                        d["dir_kind"] = kinds[name]
+                        d["anchor"] = x
                         continue
-                    elif not d["kind"]:
+                    elif not d["dir_kind"]:
                         return
+                    if d["dir_kind"] == "task" and d["anchor"]:
+                        with open(d["anchor"], "r") as f:
+                            config = yaml.safe_load(f)
+                            config = config or {}
+                            d["task_type"] = config.get("task_type")
                     child_d = {}
                     d["children"].append(child_d)
                     walk_project(x, child_d, _id)
-                d["children"] = [child for child in d["children"] if child["kind"]]
+                del d["anchor"]
+                d["children"] = [child for child in d["children"] if child["dir_kind"]]
+                d["icon"] = d["dir_kind"]
+                if d["task_type"]:
+                    d["icon"] = d["icon"] + "_" + d["task_type"]
             return d
 
         path = Path(self.path)

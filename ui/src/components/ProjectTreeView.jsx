@@ -20,10 +20,17 @@ import LocalMoviesIcon from '@mui/icons-material/LocalMovies';
 import MovieIcon from '@mui/icons-material/Movie';
 import ConstructionIcon from '@mui/icons-material/Construction';
 import FolderIcon from '@mui/icons-material/Folder';
+import FortIcon from '@mui/icons-material/Fort';
+import FormatPaintIcon from '@mui/icons-material/FormatPaint';
+import LightbulbIcon from '@mui/icons-material/Lightbulb';
+import DirectionsRunIcon from '@mui/icons-material/DirectionsRun';
+import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturing';
+import UnarchiveIcon from '@mui/icons-material/Unarchive';
+import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
 import {ContextContext} from "../contexts/ContextContext";
-import TextFieldDialogue from "./TextFieldDialogue";
+import CreateDirDialogue from "./CreateDirDialogue";
 
-const labels = {
+const labelIcons = {
   directory: FolderIcon,
   project: MovieIcon,
   phase: MovieIcon,
@@ -31,6 +38,14 @@ const labels = {
   sequence: LocalMoviesIcon,
   shot: CameraIcon,
   task: AssignmentIcon,
+  task_generic: AssignmentIcon,
+  task_model: FortIcon,
+  task_look: FormatPaintIcon,
+  task_light: LightbulbIcon,
+  task_anim: DirectionsRunIcon,
+  task_rig: PrecisionManufacturingIcon,
+  task_asset: UnarchiveIcon,
+  task_fx: LocalFireDepartmentIcon,
   rnd: ScienceIcon,
 }
 
@@ -68,16 +83,16 @@ const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
 }));
 
 const cOpts = {
-  create_directory: {name: "create_dir", label: "Create directory"},
-  create_build: {name: "create_build", label: "Create build"},
-  create_sequence: {name: "create_sequence", label: "Create sequence"},
-  create_shot: {name: "create_shot", label: "Create shot"},
-  create_task: {name: "create_task", label: "Create task"}
+  create_directory: {name: "create_dir", label: "Create directory", dir_kind: "directory"},
+  create_build: {name: "create_build", label: "Create build", dir_kind: "build"},
+  create_sequence: {name: "create_sequence", label: "Create sequence", dir_kind: "sequence"},
+  create_shot: {name: "create_shot", label: "Create shot", dir_kind: "shot"},
+  create_task: {name: "create_task", label: "Create task", dir_kind: "task"}
 };
 
 const dirContextOptions = {
   "project": [],
-  "task": [cOpts.create_directory],
+  "task": [cOpts.create_task],
   "directory": [cOpts.create_directory, cOpts.create_sequence, cOpts.create_shot, cOpts.create_build, cOpts.create_task],
   "phase": [cOpts.create_directory, cOpts.create_sequence, cOpts.create_shot, cOpts.create_build],
   "build": [cOpts.create_directory, cOpts.create_task],
@@ -133,8 +148,8 @@ function StyledTreeItem(props) {
     );
   };
 
-  const handleClick = (dir_path, dir_kind) => {
-    props.onContextOpen(dir_path, dir_kind);
+  const handleClick = (dir_path, contextOption) => {
+    props.onContextOpen(dir_path, contextOption);
     handleClose();
   }
 
@@ -155,7 +170,17 @@ function StyledTreeItem(props) {
         }
       >
         {dirContextOptions[props.dir_kind].map(contextOption => (
-            <MenuItem key={contextOption.name} value={contextOption.name} dir_path={props.dir_path} onClick={(() => handleClick(props.dir_path, contextOption.name))}>{contextOption.label}</MenuItem>
+            <MenuItem
+              key={contextOption.name}
+              value={contextOption.name}
+              dir_path={props.dir_path}
+              onClick={(() => handleClick(
+                props.dir_path,
+                contextOption
+              ))}
+            >
+              {contextOption.label}
+            </MenuItem>
           ))}
       </Menu>
       <StyledTreeItemRoot
@@ -201,7 +226,8 @@ export default function ProjectTreeView(props) {
         return;
       }
       for(var i=0; i<Object.keys(object).length; i++){
-          if(typeof object[Object.keys(object)[i]] === "object"){
+        const child = object[Object.keys(object)[i]]
+          if(child !== null && typeof child === "object"){
               findNodeById(object[Object.keys(object)[i]], result, value);
           }
       }
@@ -212,21 +238,23 @@ export default function ProjectTreeView(props) {
     setCurrentContext({
       path: result.path,
       name: result.name,
-      kind: result.kind
+      kind: result.dir_kind
     });
   };
 
-  const handleContextMenuSelection = (dir_path, method) => {
+  const handleContextMenuSelection = (dir_path, contextOption) => {
     const data = {
       path: dir_path,
-      method: method
+      dir_kind: contextOption.dir_kind,
+      method: contextOption.name,
+      modal_title: contextOption.label
     };
     setNewDirData(data);
     setOpenDialogue(true);
   };
 
-  const handleOnCreate = (dir_name, data) => {
-    data.dir_name = dir_name;
+  const handleOnCreate = (dialogueData, meta) => {
+    const data = {...meta, ...dialogueData};
     requestCreateDir(data).then((resp => {
       props.shouldUpdate(prevState => prevState + 1);
     }));
@@ -237,9 +265,9 @@ export default function ProjectTreeView(props) {
       key={nodes.id}
       nodeId={nodes.id}
       labelText={nodes.name}
-      labelIcon={labels[nodes.kind]}
-      labelInfo={nodes.kind}
-      dir_kind={nodes.kind}
+      labelIcon={labelIcons[nodes.icon]}
+      labelInfo={nodes.dir_kind}
+      dir_kind={nodes.dir_kind}
       dir_path={nodes.path}
       onContextOpen={handleContextMenuSelection}
     >
@@ -251,14 +279,11 @@ export default function ProjectTreeView(props) {
 
   return (
     <div className={styles.container}>
-      <TextFieldDialogue
+      <CreateDirDialogue
         open={openDialogue}
         meta={newDirData}
         onCreate={(v, data) => handleOnCreate(v, data)}
         onClose={() => setOpenDialogue(false)}
-        title={"Create directory"}
-        info="Info"
-        label="Directory name:"
       />
       <div className={styles.treeContainer}>
         <TreeView

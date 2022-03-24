@@ -39,6 +39,7 @@ export default function ProjectBar() {
     .then((resp) => {
       setIsLoading(false);
       setProjects(resp.data);
+      if (selectedProject === "" && resp.data.length > 0) setSelectedProject(resp.data[0])
     });
   }, []);
 

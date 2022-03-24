@@ -8,7 +8,7 @@ export default function Home() {
     <div className={styles.container}>
       <ReactSplit
         direction={SplitDirection.Vertical}
-        initialSizes={[5, 95]}
+        initialSizes={[8, 92]}
         gutterClassName={styles.gutterVertical}
         draggerClassName={styles.dragger}
       >
