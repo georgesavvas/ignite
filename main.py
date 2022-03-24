@@ -39,6 +39,7 @@ async def get_project_tree(request: Request):
 @app.post("/api/v1/create_dir")
 async def create_dir(request: Request):
     result = await request.json()
+    pprint(result)
     path = result.get("path")
     method = result.get("method")
     dir_name = result.get("dir_name")
@@ -46,12 +47,42 @@ async def create_dir(request: Request):
         print("something missing")
         return {"success": False}
     entity = api.find(path)
+    if method == "create_task":
+        entity.create_task(dir_name, task_type=result["task_type"])
+        return {"success": True}
     if not hasattr(entity, method):
         print(entity, "has no method", method)
         return {"success": False}
     getattr(entity, method)(dir_name)
-    print(entity, method, dir_name)
     return {"success": True}
+
+
+@app.post("/api/v1/get_contents")
+async def get_contents(request: Request):
+    result = await request.json()
+    data = api.get_contents(result.get("path"), as_dict=True)
+    return {"data": data}
+
+
+@app.post("/api/v1/get_tasks")
+async def get_tasks(request: Request):
+    result = await request.json()
+    data = api.discover_tasks(result.get("path"), as_dict=True)
+    return {"data": data}
+
+
+@app.post("/api/v1/get_assets")
+async def get_assets(request: Request):
+    result = await request.json()
+    data = api.discover_assets(result.get("path"), as_dict=True)
+    return {"data": data}
+
+
+@app.post("/api/v1/get_assetversions")
+async def get_assetversions(request: Request):
+    result = await request.json()
+    data = api.discover_assetversions(result.get("path"), as_dict=True)
+    return {"data": data}
 
 
 if __name__ == "__main__":
