@@ -60,7 +60,9 @@ async def create_dir(request: Request):
 @app.post("/api/v1/get_contents")
 async def get_contents(request: Request):
     result = await request.json()
-    data = api.get_contents(result.get("path"), as_dict=True)
+    data = api.get_contents(result.get("path", ""), as_dict=True)
+    for i, d in enumerate(data):
+        d["result_id"] = i 
     return {"data": data}
 
 
@@ -68,6 +70,8 @@ async def get_contents(request: Request):
 async def get_tasks(request: Request):
     result = await request.json()
     data = api.discover_tasks(result.get("path"), as_dict=True)
+    for i, d in enumerate(data):
+        d["result_id"] = i
     return {"data": data}
 
 
@@ -75,6 +79,8 @@ async def get_tasks(request: Request):
 async def get_assets(request: Request):
     result = await request.json()
     data = api.discover_assets(result.get("path"), as_dict=True)
+    for i, d in enumerate(data):
+        d["result_id"] = i
     return {"data": data}
 
 
@@ -82,6 +88,8 @@ async def get_assets(request: Request):
 async def get_assetversions(request: Request):
     result = await request.json()
     data = api.discover_assetversions(result.get("path"), as_dict=True)
+    for i, d in enumerate(data):
+        d["result_id"] = i
     return {"data": data}
 
 

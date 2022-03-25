@@ -70,6 +70,9 @@ def find(path):
         "assetversion": AssetVersion
     }
     path = Path(path)
+    if not path.is_dir():
+        logging.error(f"Invalid path: {path}")
+        return None
     for d in path.iterdir():
         name = d.name
         if name in anchors:
@@ -82,13 +85,18 @@ def find(path):
 
 def get_contents(path, as_dict=False):
     path = Path(path)
+    exp = path / "exports"
+    if exp.is_dir():
+        path = exp
     contents = []
     for x in path.iterdir():
+        if not x.is_dir():
+            continue
         entity = find(x)
         if not entity:
             continue
         if as_dict:
-            if not hasattr(entity, "as_dir"):
+            if not hasattr(entity, "as_dict"):
                 logging.warning(f"Directory entity has no as_dict method: {x}")
                 continue
             contents.append(entity.as_dict())
@@ -133,7 +141,7 @@ def get_build(path):
     return build
 
 
-def get_project(path):
+def _get_project(path):
     project = get_dir_type(path, "project")
     return project
 

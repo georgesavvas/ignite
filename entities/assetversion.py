@@ -16,6 +16,7 @@ class AssetVersion(Directory):
         self.components = []
         self.asset = self.path.parent
         self.source = ""
+        self.thumbnail = ""
         self._fetch_components()
 
     def _fetch_components(self):
@@ -31,6 +32,9 @@ class AssetVersion(Directory):
             if x.stem == "source":
                 self.source = x
                 continue
+            if x.stem == "thumbnail":
+                self.thumbnail = x
+                continue
             c = {}
             c["name"] = name
             c["path"] = x
@@ -41,7 +45,7 @@ class AssetVersion(Directory):
         d = {}
         for s in (
                 "path", "dir_kind", "anchor", "project", "name", "version",
-                "components", "asset", "source"
+                "components", "asset", "source", "thumbnail"
             ):
             d[s] = getattr(self, s)
         return d
