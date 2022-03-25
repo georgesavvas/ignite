@@ -36,11 +36,14 @@ class Asset(Directory):
         if versions:
             self.latest_v = versions[-1]
             self.latest_av = assetversions[-1]
-    
+
     def as_dict(self):
         d = {}
         for s in (
-                "path", "dir_kind", "anchor", "project", "name", "versions", "latest_v"
-            ):
+            "path", "dir_kind", "anchor", "project", "name", "versions", "latest_v"
+        ):
             d[s] = getattr(self, s)
+        if self.latest_av:
+            d["latest_av"] = self.latest_av.as_dict()
+            d["thumbnail"] = d["latest_av"]["thumbnail"].as_posix()
         return d

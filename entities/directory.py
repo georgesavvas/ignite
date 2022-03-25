@@ -21,7 +21,9 @@ class Directory():
             anchor = ANCHORS[dir_kind]
             self.anchor = path / anchor
             if not self.anchor.is_file():
-                raise Exception(f"Invalid directory kind or missing {anchor} anchor.")
+                raise Exception(
+                    f"Invalid directory kind or missing anchor: {self.anchor}"
+                )
         if self.path:
             self.load_from_path()
 

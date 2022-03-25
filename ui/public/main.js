@@ -1,10 +1,10 @@
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, protocol } = require('electron')
 
 function createWindow () {
   // Create the browser window.
   const win = new BrowserWindow({
-    width: 1890,
-    height: 850,
+    width: 1280,
+    height: 720,
     webPreferences: {
       nodeIntegration: true
     }
@@ -14,13 +14,28 @@ function createWindow () {
   win.loadURL('http://localhost:3000');
 
   // Open the DevTools.
-  win.webContents.openDevTools()
+  win.webContents.openDevTools();
 }
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(createWindow)
+app.on('ready', async () => {
+  // Name the protocol whatever you want.
+  const protocolName = "ign";
+
+  protocol.registerFileProtocol(protocolName, (request, callback) => {
+    const url = request.url.replace(`${protocolName}://`, '');
+    try {
+      return callback(decodeURIComponent(url));
+    }
+    catch (error) {
+      // Handle the error as needed
+      console.error(error);
+    }
+  })
+})
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits

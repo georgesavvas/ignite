@@ -1,7 +1,8 @@
 import ReactSplit, { SplitDirection } from '@devbookhq/splitter'
 import ProjectTree from '../components/ProjectTree';
 import ProjectBar from "../components/ProjectBar";
-import styles from "./Home.module.css" 
+import styles from "./Home.module.css";
+import Explorer from "../components/Explorer";
 
 export default function Home() {
   return (
@@ -22,7 +23,9 @@ export default function Home() {
           <div className={styles.projectTree}>
             <ProjectTree />
           </div>
-          <div className={styles.explorer} />
+          <div className={styles.explorer}>
+            <Explorer />
+          </div>
           <div className={styles.assetViewer} />
         </ReactSplit>
       </ReactSplit>

@@ -1,3 +1,6 @@
 .container {
-    border: solid black 5px;
+    border: solid whitesmoke 2px;
+    border-radius: 30px;
+    width: 100px;
+    height: 100px;
 }
