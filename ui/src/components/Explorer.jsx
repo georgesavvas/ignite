@@ -7,8 +7,8 @@ import AssetTile, {HiddenTile} from "./AssetTile";
 import Skeleton from '@mui/material/Skeleton';
 import Divider from '@mui/material/Divider';
 import Paper from '@mui/material/Paper';
-// import FilterBar from "./FilterBar";
-// import PageBar from "./PageBar";
+import FilterBar from "./FilterBar";
+import PageBar from "./PageBar";
 import {ContextContext} from "../contexts/ContextContext";
 
 function Explorer() {
@@ -20,7 +20,15 @@ function Explorer() {
   const [tileSize, setTileSize] = useState(100);
   const [tilesPerPage, setTilesPerPage] = useState(50);
   const [selectedAsset, setSelectedAsset] = useState({});
+  const [resultType, setResultType] = useState("dynamic");
+  const [viewType, setViewType] = useState("grid");
   const [currentContext, setCurrentContext] = useContext(ContextContext);
+
+  const methods = {
+    dynamic: "get_contents",
+    assets: "get_assetversions",
+    scenes: "get_scenes"
+  }
 
   const handleAssetSelected = (asset) => {
     setSelectedAsset(asset)
@@ -35,7 +43,7 @@ function Explorer() {
     };
     setIsLoading(true);
     fetch(
-      "http://127.0.0.1:5000/api/v1/get_contents", {
+      `http://127.0.0.1:5000/api/v1/${methods[resultType]}`, {
         method: "POST",
         headers: {
           'Accept': 'application/json, text/plain, */*',
@@ -50,30 +58,29 @@ function Explorer() {
       .then((resp) => {
         setIsLoading(false);
         setLoadedData(resp.data);
-        console.log(resp.data);
-        // setPages((prevPages) => ({...prevPages, total: resp.pages.total}));
+        setPages((prevPages) => ({...prevPages, total: resp.pages.total}));
       });
-  }, [pages.current, refreshValue, currentContext, tilesPerPage]);
+  }, [pages.current, resultType, refreshValue, currentContext, tilesPerPage]);
 
   var tiles = {};
   var hiddenTiles = {}
   if (isLoading) {
       {tiles = [...Array(tilesPerPage).keys()].reduce(function(obj, index) {
         obj[index] = <Skeleton key={index} variant="rectangular" animation="wave" className={classes.skeleton}>
-            <Paper elevation={3} style={{borderRadius: "20px", width: tileSize, height: tileSize}} />
+            <Paper elevation={3} style={{borderRadius: "10px", width: tileSize, height: tileSize * 0.5625}} />
           </Skeleton>
         return obj;
       }, {});}
   } else {
     {
       tiles = loadedData.reduce(function(obj, asset) {
-      obj[asset.id] = <AssetTile key={asset.result_id} asset={asset} onSelected={handleAssetSelected} selectedAsset={selectedAsset} size={tileSize}/>;
+      obj[asset.result_id] = <AssetTile key={asset.result_id} asset={asset} onSelected={handleAssetSelected} selectedAsset={selectedAsset} size={tileSize} viewType={viewType} />;
       return obj;
       }, {});
-      // for (var i = 0; i < 10; i++) {
-      //   hiddenTiles[`_${i}`] = <HiddenTile key={`_${i}`} size={tileSize} />;
-      // }
-      // tiles = {...tiles, ...hiddenTiles};
+      for (var i = 0; i < 10; i++) {
+        hiddenTiles[`_${i}`] = <HiddenTile key={`_${i}`} size={tileSize} />;
+      }
+      tiles = {...tiles, ...hiddenTiles};
     }
   }
 
@@ -106,13 +113,20 @@ function Explorer() {
 
   return (
     <div className={classes.container}>
-      {/* <FilterBar onRefresh={forceUpdate} onFilterChange={handleFilterChange} /> */}
+      <FilterBar
+        onRefresh={forceUpdate}
+        onFilterChange={handleFilterChange}
+        resultType={resultType}
+        onResultTypeChange={setResultType}
+        viewType={viewType}
+        onViewTypeChange={setViewType}
+      />
       <Divider />
       <Box className={classes.tileContainer}>
         {Object.keys(tiles).map((k) => tiles[k])}
       </Box>
       <Divider />
-      {/* <PageBar pages={pages.total} onChange={handlePageChange} onTilesPerPageChange={handleTilesPerPageChange} onTileSizeChange={handleTileSizeChange}/> */}
+      <PageBar pages={pages.total} onChange={handlePageChange} onTilesPerPageChange={handleTilesPerPageChange} onTileSizeChange={handleTileSizeChange}/>
     </div>
   )
 }
