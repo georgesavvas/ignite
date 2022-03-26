@@ -16,7 +16,7 @@ class AssetVersion(Directory):
         self.components = []
         self.asset = self.path.parent
         self.source = ""
-        self.thumbnail = ""
+        self.thumbnail = PurePath()
         self._fetch_components()
 
     def _fetch_components(self):
@@ -45,7 +45,8 @@ class AssetVersion(Directory):
         d = {}
         for s in (
                 "path", "dir_kind", "anchor", "project", "name", "version",
-                "components", "asset", "source", "thumbnail"
+                "components", "asset", "source"
             ):
             d[s] = getattr(self, s)
+        d["thumbnail"] = self.thumbnail.as_posix()
         return d

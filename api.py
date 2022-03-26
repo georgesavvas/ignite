@@ -248,7 +248,7 @@ def discover_assetversions(path, asset_kinds=[], as_dict=False):
                     d["dir_kind"] = KINDS[name]
                     d["anchor"] = x
                     continue
-                elif not d["dir_kind"] and d["name"] not in ("exports", "scenes"):
+                elif not d["dir_kind"] and d["name"] != "exports":
                     return []
                 if d["dir_kind"] == "assetversion" and d["anchor"]:
                     with open(d["anchor"], "r") as f:
@@ -286,7 +286,7 @@ def discover_scenes(path, dcc=[], latest=True, as_dict=False):
                     d["dir_kind"] = KINDS[name]
                     d["anchor"] = x
                     continue
-                elif not d["dir_kind"] and name not in ("exports", "scenes"):
+                elif not d["dir_kind"] and name != "scenes":
                     return []
                 if d["dir_kind"] == "scene" and d["anchor"]:
                     with open(d["anchor"], "r") as f:
