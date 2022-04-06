@@ -10,11 +10,13 @@ const style = {
   padding: "10px",
   paddingLeft: "20px",
   paddingRight: "20px",
-  maxHeight: "70px",
+  maxHeight: "60px",
+  width: "100%",
   display: "flex",
   flex: "1",
   justifyContent: "space-between",
-  alignItems: "center"
+  alignItems: "center",
+  border: "solid 1px white"
 }
 
 function PageBar(props) {

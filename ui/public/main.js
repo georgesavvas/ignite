@@ -1,15 +1,16 @@
-const { app, BrowserWindow, protocol } = require('electron')
+const { app, BrowserWindow, protocol } = require('electron');
+const path = require("path");
 
 function createWindow () {
   // Create the browser window.
   const win = new BrowserWindow({
     width: 1280,
     height: 720,
+    icon: __dirname + "/icons/ignite_logo.png",
     webPreferences: {
       nodeIntegration: true
     }
   })
-
   //load the index.html from a url
   win.loadURL('http://localhost:3000');
 

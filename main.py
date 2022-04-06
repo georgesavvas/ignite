@@ -139,8 +139,11 @@ async def get_assets(request: Request):
 @app.post("/api/v1/get_assetversions")
 async def get_assetversions(request: Request):
     result = await request.json()
-    data = api.discover_assetversions(result.get("path"), as_dict=True)
-    pprint(data)
+    data = api.discover_assetversions(
+        result.get("path"),
+        latest=result.get("latest", 0),
+        as_dict=True
+    )
     limit = result.get("limit", 20)
     total = len(data)
     pages = int(math.ceil(total/limit))
@@ -173,7 +176,8 @@ async def get_scenes(request: Request):
     end = start + limit
     to_return = data[start:end]
     for i, d in enumerate(to_return):
-        d["result_id"] = i 
+        d["result_id"] = i
+    pprint(to_return)
     return {
         "ok": True,
         "pages": {

@@ -6,18 +6,29 @@ from ignite.entities.asset import Asset
 
 CONFIG = utils.get_config()
 ROOT = PurePath(CONFIG["root"])
+COMP_TYPES = {}
+for name, exts in CONFIG["comp_types"].items():
+    for ext in exts:
+        COMP_TYPES[ext] = name
 
 
 class AssetVersion(Directory):
     def __init__(self, path="") -> None:
         super().__init__(path, dir_kind="assetversion")
         self.version = self.name
+        self.version_int = 0
+        if self.version.startswith("v"):
+            int(self.version.lstrip("v"))
         self.name = self.path.parent.name
         self.components = []
         self.asset = self.path.parent
+        self.task = self.asset.parent.parent
         self.source = ""
         self.thumbnail = PurePath()
         self._fetch_components()
+
+    def __lt__(self, other):
+        return self.version_int < other.version_int
 
     def _fetch_components(self):
         path = Path(self.path)
@@ -38,6 +49,7 @@ class AssetVersion(Directory):
             c = {}
             c["name"] = name
             c["path"] = x
+            c["ext"] = x.suffix
             comps.append(c)
         self.components = comps
 
@@ -49,4 +61,15 @@ class AssetVersion(Directory):
             ):
             d[s] = getattr(self, s)
         d["thumbnail"] = self.thumbnail.as_posix()
+        project_path = ROOT / self.project
+        # d["context"] = self.asset.as_posix().replace(project_path.as_posix() + "/", "")
+        d["context"] = self.task.as_posix().replace(project_path.as_posix() + "/", "")
+        d["default_name"] = ""
+        if self.components:
+            c = self.components[0]
+            d["default_name"] = c["name"]
+            ext = c["ext"]
+            d["default_type"] = ""
+            if ext in COMP_TYPES.keys():
+                d["default_type"] = COMP_TYPES[ext]
         return d

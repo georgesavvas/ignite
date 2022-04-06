@@ -28,14 +28,14 @@ class Asset(Directory):
                 continue
             v = AssetVersion(x)
             versions.append(name)
-        versions = sorted(versions)
+        versions = sorted(versions, reverse=True)
         assetversions = [AssetVersion(path / v) for v in versions]
         assetversions = [av for av in assetversions if av]
         self.versions = versions
         self.assetversions = assetversions
         if versions:
-            self.latest_v = versions[-1]
-            self.latest_av = assetversions[-1]
+            self.latest_v = versions[0]
+            self.latest_av = assetversions[0]
 
     def as_dict(self):
         d = {}

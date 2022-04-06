@@ -30,7 +30,7 @@ class Scene:
         root = ROOT.as_posix()
         if not path_str.startswith(root):
             raise Exception(f"Invalid project dir: {path}")
-        if not Path(path).is_file():
+        if not Path(path).is_dir():
             raise Exception(f"Invalid path: {path}")
         split = path_str.split(root)
         if split == 1:
@@ -50,7 +50,7 @@ class Scene:
         ext = path.suffix[1:]
         self.extension = ext
         self.version = path.parent.name
-        self.task = Task(path=path.parent.parent.parent)
+        self.task = Task(path=path.parent.parent)
         self.dcc = ext_dcc.get(ext, "")
     
     def is_valid(self):
@@ -63,4 +63,5 @@ class Scene:
         for s in ("path", "dcc", "extension", "version"):
             d[s] = getattr(self, s)
         d["task"] = self.task.as_dict()
+        d["thumbnail"] = self.dcc
         return d

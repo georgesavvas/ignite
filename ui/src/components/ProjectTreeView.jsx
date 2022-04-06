@@ -190,7 +190,7 @@ function StyledTreeItem(props) {
             <Typography variant="body2" sx={{ textAlign: 'left', fontWeight: 'inherit', flexGrow: 1 }}>
               {labelText}
             </Typography>
-            <Typography variant="caption" color="inherit">
+            <Typography variant="caption" color="rgb(100,100,100)">
               {labelInfo}
             </Typography>
           </Box>

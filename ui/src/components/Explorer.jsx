@@ -7,7 +7,7 @@ import AssetTile, {HiddenTile} from "./AssetTile";
 import Skeleton from '@mui/material/Skeleton';
 import Divider from '@mui/material/Divider';
 import Paper from '@mui/material/Paper';
-import FilterBar from "./FilterBar";
+import ExplorerBar from "./ExplorerBar";
 import PageBar from "./PageBar";
 import {ContextContext} from "../contexts/ContextContext";
 
@@ -19,10 +19,12 @@ function Explorer() {
   const [query, setQuery] = useState({filter_string: ""});
   const [tileSize, setTileSize] = useState(100);
   const [tilesPerPage, setTilesPerPage] = useState(50);
-  const [selectedAsset, setSelectedAsset] = useState({});
+  const [selectedEntity, setSelectedEntity] = useState({});
   const [resultType, setResultType] = useState("dynamic");
   const [viewType, setViewType] = useState("grid");
+  const [latest, setLatest] = useState(0);
   const [currentContext, setCurrentContext] = useContext(ContextContext);
+  // const [tiles, setTiles] = useState([]);
 
   const methods = {
     dynamic: "get_contents",
@@ -30,16 +32,17 @@ function Explorer() {
     scenes: "get_scenes"
   }
 
-  const handleAssetSelected = (asset) => {
-    setSelectedAsset(asset)
-    console.log(asset.name, "was selected!")
+  const handleEntitySelection = (entity) => {
+    setSelectedEntity(entity)
+    console.log(entity.name, "was selected!")
   }
 
   useEffect(() => {
     const data = {
       page: pages.current,
       limit: tilesPerPage,
-      path: currentContext.path
+      path: currentContext.path,
+      latest: latest
     };
     setIsLoading(true);
     fetch(
@@ -59,8 +62,13 @@ function Explorer() {
         setIsLoading(false);
         setLoadedData(resp.data);
         setPages((prevPages) => ({...prevPages, total: resp.pages.total}));
+        // const _tiles = resp.data.reduce(function(obj, asset) {
+        // obj[asset.result_id] = <AssetTile key={asset.result_id} asset={asset} onSelected={handleEntitySelection} selected={selectedEntity.path == asset.path} size={tileSize} viewType={viewType} />;
+        // return obj;
+        // }, {});
+        // setTiles(_tiles);
       });
-  }, [pages.current, resultType, refreshValue, currentContext, tilesPerPage]);
+  }, [pages.current, resultType, refreshValue, currentContext, tilesPerPage, latest]);
 
   var tiles = {};
   var hiddenTiles = {}
@@ -74,7 +82,7 @@ function Explorer() {
   } else {
     {
       tiles = loadedData.reduce(function(obj, asset) {
-      obj[asset.result_id] = <AssetTile key={asset.result_id} asset={asset} onSelected={handleAssetSelected} selectedAsset={selectedAsset} size={tileSize} viewType={viewType} />;
+      obj[asset.result_id] = <AssetTile key={asset.result_id} asset={asset} onSelected={handleEntitySelection} selected={selectedEntity.path == asset.path} size={tileSize} viewType={viewType} />;
       return obj;
       }, {});
       for (var i = 0; i < 10; i++) {
@@ -83,6 +91,14 @@ function Explorer() {
       tiles = {...tiles, ...hiddenTiles};
     }
   }
+
+  // if (!isLoading) {
+  //   const _tiles = loadedData.reduce(function(obj, asset) {
+  //   obj[asset.result_id] = <AssetTile key={asset.result_id} asset={asset} onSelected={handleEntitySelection} selected={selectedEntity.path == asset.path} size={tileSize} viewType={viewType} />;
+  //   return obj;
+  //   }, {});
+  //   setTiles(_tiles);
+  // }
 
   const forceUpdate = (event, value) => {
     setRefreshValue((prevRefresh) => (prevRefresh + 1))
@@ -106,23 +122,26 @@ function Explorer() {
     setTileSize(event.target.value * 40);
   }
 
-  const style = {
-    "width": "200px",
-    "height": "200px"
+  const tileContainerStyle = {
+    "flexDirection": viewType == "grid" ? "row" : "column",
+    "flexWrap": viewType == "grid" ? "wrap" : "nowrap",
+    "justifyContent": viewType == "grid" ? "space-evenly" : "flex-start",
+    "gap": (tileSize * 0.5625 * 0.1).toString() + "px"
   }
 
   return (
     <div className={classes.container}>
-      <FilterBar
+      <ExplorerBar
         onRefresh={forceUpdate}
         onFilterChange={handleFilterChange}
         resultType={resultType}
         onResultTypeChange={setResultType}
         viewType={viewType}
+        onLatestChange={e => setLatest(e.target.checked)}
         onViewTypeChange={setViewType}
       />
       <Divider />
-      <Box className={classes.tileContainer}>
+      <Box className={classes.tileContainer} style={tileContainerStyle}>
         {Object.keys(tiles).map((k) => tiles[k])}
       </Box>
       <Divider />
