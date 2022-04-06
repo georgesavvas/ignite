@@ -6,21 +6,19 @@ import InputLabel from '@mui/material/InputLabel';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
-import styles from "./ProjectBar.module.css";
+import styles from "./TopBar.module.css";
+import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import IconButton from '@mui/material/IconButton';
 import HelpIcon from '@mui/icons-material/Help';
 import BugReportIcon from '@mui/icons-material/BugReport';
 import ThumbsUpDownIcon from '@mui/icons-material/ThumbsUpDown';
 import {ProjectContext} from "../contexts/ProjectContext";
-import {ContextContext} from "../contexts/ContextContext";
 
-export default function ProjectBar() {
+export default function TopBar() {
   const [isLoading, setIsLoading] = useState(true);
   const [projects, setProjects] = useState([]);
-  const [currentLocation, setCurrentLocation] = useState("");
   const [selectedProject, setSelectedProject] = useContext(ProjectContext);
-  const [currentContext, setCurrentContext] = useContext(ContextContext);
 
   useEffect(() => {
     setIsLoading(true);
@@ -43,23 +41,13 @@ export default function ProjectBar() {
     });
   }, []);
 
-  useEffect(() => {
-    if (currentContext.path !== undefined) {
-      setCurrentLocation(currentContext.path);
-    }
-  },[currentContext]);
-
   const handleChange = (event) => {
     setSelectedProject(event.target.value);
   };
 
-  const handleLocationChange = (event) => {
-    setCurrentLocation(event.target.value);
-  }
-
   return (
     <div className={styles.container}>
-      <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
+      {/* <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
         <Select
           labelId="demo-simple-select-standard-label"
           id="demo-simple-select-standard"
@@ -71,17 +59,13 @@ export default function ProjectBar() {
             <MenuItem key={project} value={project}>{project}</MenuItem>
           ))}
         </Select>
-      </FormControl>
-      <div className={styles.filterBarContainer}>
-        <TextField
-          id="outlined-basic"
-          size="small"
-          fullWidth={true}
-          placeholder="Location"
-          variant="outlined"
-          value={currentLocation}
-          onChange={handleLocationChange}
-        />
+      </FormControl> */}
+      <div className={styles.buttonsRight}>
+        <Button variant="outlined">Project Browser</Button>
+        <Button variant="outlined">Vault</Button>
+      </div>
+      <div className={styles.logoContainer}>
+        <img src="media/ignite_header.png" className={styles.logo} />
       </div>
       <ButtonGroup variant="text" style={{width: "300px", justifyContent: "flex-end"}}>
         <IconButton aria-label="docs">

@@ -1,4 +1,5 @@
 import os
+from re import A
 import yaml
 import logging
 from pathlib import Path, PurePath
@@ -229,7 +230,7 @@ def discover_assets(path, asset_kinds=[], as_dict=False):
     return assets
 
 
-def discover_assetversions(path, asset_kinds=[], as_dict=False):
+def _discover_assetversions(path, asset_kinds=[], as_dict=False):
     from ignite.entities.assetversion import AssetVersion
 
     def discover(path, l=[]):
@@ -267,9 +268,28 @@ def discover_assetversions(path, asset_kinds=[], as_dict=False):
     return assetversions
 
 
+def discover_assetversions(path, asset_kinds=[], latest=False, as_dict=False):
+    from ignite.entities.assetversion import AssetVersion
+
+    assetversions = []
+    assets = discover_assets(path, asset_kinds=asset_kinds)
+    for asset in assets:
+        avs = asset.assetversions
+        if not avs:
+            continue
+        if latest:
+            assetversions.append(asset.latest_av)
+            continue
+        assetversions += avs
+    if as_dict:
+        assetversions = [av.as_dict() for av in assetversions]
+    return assetversions
+
+
 def discover_scenes(path, dcc=[], latest=True, as_dict=False):
     from ignite.entities.scene import Scene
 
+    path = Path(path)
     def discover(path, l=[]):
         name = path.name
         if path.is_dir():
@@ -286,7 +306,7 @@ def discover_scenes(path, dcc=[], latest=True, as_dict=False):
                     d["dir_kind"] = KINDS[name]
                     d["anchor"] = x
                     continue
-                elif not d["dir_kind"] and name != "scenes":
+                elif not d["dir_kind"] and d["name"] != "scenes":
                     return []
                 if d["dir_kind"] == "scene" and d["anchor"]:
                     with open(d["anchor"], "r") as f:

@@ -20,3 +20,6 @@ dcc_extensions:
   substance_designer: ["sbs"]
   substance_painter: []
   blender: []
+
+comp_types:
+  usd: ["usd", "usdz", "usdc", "usda"]

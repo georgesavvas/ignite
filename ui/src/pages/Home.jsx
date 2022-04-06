@@ -1,33 +1,29 @@
 import ReactSplit, { SplitDirection } from '@devbookhq/splitter'
 import ProjectTree from '../components/ProjectTree';
-import ProjectBar from "../components/ProjectBar";
+import TopBar from "../components/TopBar";
 import styles from "./Home.module.css";
 import Explorer from "../components/Explorer";
+import { Divider } from '@mui/material';
 
 export default function Home() {
   return (
     <div className={styles.container}>
-      <ReactSplit
-        direction={SplitDirection.Vertical}
-        initialSizes={[8, 92]}
-        gutterClassName={styles.gutterVertical}
+      <TopBar />
+      <Divider />
+      <ReactSplit 
+        direction={SplitDirection.Horizontal}
+        initialSizes={[20, 50, 30]}
+        minWidths={[300, 650, 400]}
+        gutterClassName={styles.gutterHorizontal}
         draggerClassName={styles.dragger}
       >
-        <ProjectBar />
-        <ReactSplit 
-          direction={SplitDirection.Horizontal}
-          initialSizes={[20, 50, 30]}
-          gutterClassName={styles.gutterHorizontal}
-          draggerClassName={styles.dragger}
-        >
-          <div className={styles.projectTree}>
-            <ProjectTree />
-          </div>
-          <div className={styles.explorer}>
-            <Explorer />
-          </div>
-          <div className={styles.assetViewer} />
-        </ReactSplit>
+        <div className={styles.projectTree}>
+          <ProjectTree />
+        </div>
+        <div className={styles.explorer}>
+          <Explorer />
+        </div>
+        <div className={styles.assetViewer} />
       </ReactSplit>
     </div>
   );

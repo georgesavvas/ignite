@@ -1,4 +1,5 @@
 import './App.css';
+import 'react-reflex/styles.css'
 import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
 import darkScrollbar from '@mui/material/darkScrollbar';
 import GlobalStyles from '@mui/material/GlobalStyles';
