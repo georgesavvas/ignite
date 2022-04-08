@@ -15,8 +15,7 @@ const style = {
   display: "flex",
   flex: "1",
   justifyContent: "space-between",
-  alignItems: "center",
-  border: "solid 1px white"
+  alignItems: "center"
 }
 
 function PageBar(props) {

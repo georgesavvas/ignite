@@ -1,37 +1,18 @@
 .container {
-  /* border: solid whitesmoke; */
   box-sizing: border-box;
-  width: 100vw;
   height: 100vh;
+  width: 100vw;
   margin: 0px;
   padding: 0px;
+  display: flex;
+  flex-direction: column;
 }
 
-.gutterHorizontal {
-  background-color: rgb(32, 32, 32);
-  width: 1px;
+.topBar {
+  max-height: 70px;
 }
 
-.gutterVertical {
-  background-color: rgb(32, 32, 32);
-  height: 1px;
-}
-
-.dragger {
-  display: none;
-}
-
-.projectTree {
-  box-sizing: border-box;
-  height: 100%;
-  width: 100%;
-  padding-bottom: 15px;
-  margin: 0px;
-}
-
-.explorer {
-  box-sizing: border-box;
-  height: 100%;
-  width: 100%;
-  margin: 0px;
+.contents {
+  flex-grow: 1;
+  overflow: auto;
 }

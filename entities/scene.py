@@ -13,9 +13,11 @@ class Scene:
         self.project_name = ""
         self.name = ""
         self.extension = ""
+        self.dir_kind = "scene"
         self.dcc = ""
         self.version = ""
         self.path = path
+        self.scene = PurePath()
         self.task = None
         if self.path:
             self.path = PurePath(self.path)
@@ -39,6 +41,10 @@ class Scene:
         project = split2[0]
         self.project = project
         self.name = path.name
+        for file in Path(path).iterdir():
+            if file.stem == "scene":
+                self.scene = PurePath(file)
+                break
 
         extensions = []
         ext_dcc = {}
@@ -47,7 +53,7 @@ class Scene:
             for ext in exts:
                 ext_dcc[ext] = dcc
 
-        ext = path.suffix[1:]
+        ext = self.scene.suffix[1:]
         self.extension = ext
         self.version = path.parent.name
         self.task = Task(path=path.parent.parent)
@@ -60,7 +66,7 @@ class Scene:
 
     def as_dict(self):
         d = {}
-        for s in ("path", "dcc", "extension", "version"):
+        for s in ("path", "dcc", "extension", "version", "dir_kind"):
             d[s] = getattr(self, s)
         d["task"] = self.task.as_dict()
         d["thumbnail"] = self.dcc

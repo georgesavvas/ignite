@@ -1,6 +1,7 @@
 .container {
     /* border: solid whitesmoke; */
-    height: 70px;
+    min-height: 70px;
+    max-height: 70px;
     margin: 0px;
     padding: 0px 25px;
     display: flex;

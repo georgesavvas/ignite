@@ -6,7 +6,7 @@ import GlobalStyles from '@mui/material/GlobalStyles';
 import Home from './pages/Home';
 import {ProjectProvider} from "./contexts/ProjectContext";
 import {ContextProvider} from "./contexts/ContextContext";
-import {AssetProvider} from "./contexts/AssetContext";
+import {EntityProvider} from "./contexts/EntityContext";
 
 const darkTheme = createTheme({
   palette: {
@@ -26,9 +26,9 @@ function App() {
       <div className="App">
         <ProjectProvider>
           <ContextProvider>
-            <AssetProvider>
+            <EntityProvider>
               <Home />
-            </AssetProvider>
+            </EntityProvider>
           </ContextProvider>
         </ProjectProvider>
       </div>

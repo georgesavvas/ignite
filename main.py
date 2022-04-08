@@ -37,6 +37,7 @@ async def get_project_tree(request: Request):
     result = await request.json()
     project = api.get_project(result.get("project"))
     data = project.get_project_tree() if project else {}
+    pprint(data)
     return {
         "ok": True,
         "data": data
@@ -46,7 +47,6 @@ async def get_project_tree(request: Request):
 @app.post("/api/v1/create_dir")
 async def create_dir(request: Request):
     result = await request.json()
-    pprint(result)
     path = result.get("path")
     method = result.get("method")
     dir_name = result.get("dir_name")

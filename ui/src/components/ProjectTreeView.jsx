@@ -30,9 +30,15 @@ import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
 import {ContextContext} from "../contexts/ContextContext";
 import CreateDirDialogue from "./CreateDirDialogue";
 
+const projectIcon = () => {
+  return (
+    <Typography variant="h6" style={{marginRight: "6px"}}>/</Typography>
+  )
+}
+
 const labelIcons = {
   directory: FolderIcon,
-  project: MovieIcon,
+  project: projectIcon,
   phase: MovieIcon,
   build: ConstructionIcon,
   sequence: LocalMoviesIcon,
@@ -216,10 +222,45 @@ StyledTreeItem.propTypes = {
 export default function ProjectTreeView(props) {
   const [isLoading, setIsLoading] = useState(true);
   const [openDialogue, setOpenDialogue] = useState(false);
+  const [expandedItems, setExpandedItems] = useState(["root"]);
+  const [selectedItems, setSelectedItems] = useState("root");
   const [newDirData, setNewDirData] = useState({});
   const [currentContext, setCurrentContext] = useContext(ContextContext);
 
-  const handleNodeSelect = (event, nodeIds) => {
+  useEffect(() => {
+    if (!currentContext.path) {
+      handleNodeSelect(null, "root")
+    }
+  }, [])
+
+  useEffect(() => {
+    function findNodeByPath(object, result, value){
+      if(object.hasOwnProperty("path") && object.path === value) {
+        result.push(object);
+        return;
+      }
+      for(var i=0; i<Object.keys(object).length; i++){
+        const child = object[Object.keys(object)[i]]
+          if(child !== null && typeof child === "object"){
+              findNodeByPath(object[Object.keys(object)[i]], result, value);
+          }
+      }
+    }
+
+    const newPath = currentContext.path;
+    var result = [];
+    findNodeByPath(props.data.children, result, newPath);
+    result = result[0];
+    if (result) {
+      const nodeId = result.id;
+      setSelectedItems(nodeId);
+      // if (!expandedItems.includes(nodeId)) {
+      //   setExpandedItems(prevState => [...prevState, nodeId]);
+      // }
+    }
+  }, [currentContext])
+
+  const handleNodeSelect = (event, nodeId) => {
     function findNodeById(object, result, value){
       if(object.hasOwnProperty('id') && object.id === value) {
         result.push(object);
@@ -233,14 +274,20 @@ export default function ProjectTreeView(props) {
       }
     }
     var result = [];
-    findNodeById(props.data.children, result, nodeIds);
+    findNodeById(props.data, result, nodeId);
     result = result[0];
+    console.log(props.data);
     setCurrentContext({
       path: result.path,
       name: result.name,
       kind: result.dir_kind
     });
+    setSelectedItems(nodeId);
   };
+
+  const handleNodeToggle = (event, nodeIds) => {
+    setExpandedItems(nodeIds);
+  }
 
   const handleContextMenuSelection = (dir_path, contextOption) => {
     const data = {
@@ -291,9 +338,13 @@ export default function ProjectTreeView(props) {
           defaultCollapseIcon={<ExpandMoreIcon />}
           defaultExpandIcon={<ChevronRightIcon />}
           onNodeSelect={handleNodeSelect}
+          onNodeToggle={handleNodeToggle}
+          expanded={expandedItems}
+          selected={selectedItems}
           sx={{ flexGrow: 1, maxWidth: 800, overflowX: "hidden", overflowY: 'auto' }}
         >
-          {props.data.children.map((node) => renderTree(node))}
+          {/* {props.data.children.map((node) => renderTree(node))} */}
+          {renderTree(props.data)}
         </TreeView>
       </div>
     </div>
