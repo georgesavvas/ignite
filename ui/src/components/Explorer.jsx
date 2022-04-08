@@ -3,12 +3,14 @@ import classes from "./Explorer.module.css";
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
-import AssetTile, {HiddenTile} from "./AssetTile";
+import AssetTile from "./AssetTile";
+import DirectoryTile from "./DirectoryTile";
 import Skeleton from '@mui/material/Skeleton';
 import Divider from '@mui/material/Divider';
 import Paper from '@mui/material/Paper';
 import ExplorerBar from "./ExplorerBar";
 import PageBar from "./PageBar";
+import {EntityContext} from "../contexts/EntityContext";
 import {ContextContext} from "../contexts/ContextContext";
 
 function Explorer() {
@@ -17,14 +19,14 @@ function Explorer() {
   const [loadedData, setLoadedData] = useState([]);
   const [pages, setPages] = useState({total: 1, current: 1});
   const [query, setQuery] = useState({filter_string: ""});
-  const [tileSize, setTileSize] = useState(100);
+  const [tileSize, setTileSize] = useState(200);
   const [tilesPerPage, setTilesPerPage] = useState(50);
-  const [selectedEntity, setSelectedEntity] = useState({});
   const [resultType, setResultType] = useState("dynamic");
   const [viewType, setViewType] = useState("grid");
   const [latest, setLatest] = useState(0);
+  const [tiles, setTiles] = useState([]);
+  const [selectedEntity, setSelectedEntity] = useContext(EntityContext);
   const [currentContext, setCurrentContext] = useContext(ContextContext);
-  // const [tiles, setTiles] = useState([]);
 
   const methods = {
     dynamic: "get_contents",
@@ -33,8 +35,7 @@ function Explorer() {
   }
 
   const handleEntitySelection = (entity) => {
-    setSelectedEntity(entity)
-    console.log(entity.name, "was selected!")
+    setSelectedEntity(entity);
   }
 
   useEffect(() => {
@@ -62,43 +63,20 @@ function Explorer() {
         setIsLoading(false);
         setLoadedData(resp.data);
         setPages((prevPages) => ({...prevPages, total: resp.pages.total}));
-        // const _tiles = resp.data.reduce(function(obj, asset) {
-        // obj[asset.result_id] = <AssetTile key={asset.result_id} asset={asset} onSelected={handleEntitySelection} selected={selectedEntity.path == asset.path} size={tileSize} viewType={viewType} />;
-        // return obj;
-        // }, {});
-        // setTiles(_tiles);
       });
   }, [pages.current, resultType, refreshValue, currentContext, tilesPerPage, latest]);
 
-  var tiles = {};
-  var hiddenTiles = {}
-  if (isLoading) {
-      {tiles = [...Array(tilesPerPage).keys()].reduce(function(obj, index) {
-        obj[index] = <Skeleton key={index} variant="rectangular" animation="wave" className={classes.skeleton}>
-            <Paper elevation={3} style={{borderRadius: "10px", width: tileSize, height: tileSize * 0.5625}} />
-          </Skeleton>
-        return obj;
-      }, {});}
-  } else {
-    {
-      tiles = loadedData.reduce(function(obj, asset) {
-      obj[asset.result_id] = <AssetTile key={asset.result_id} asset={asset} onSelected={handleEntitySelection} selected={selectedEntity.path == asset.path} size={tileSize} viewType={viewType} />;
-      return obj;
-      }, {});
-      for (var i = 0; i < 10; i++) {
-        hiddenTiles[`_${i}`] = <HiddenTile key={`_${i}`} size={tileSize} />;
+  useEffect(() => {
+    const _tiles = loadedData.reduce(function(obj, entity) {
+      if (entity.dir_kind === "assetversion") {
+        obj[entity.result_id] = <AssetTile key={entity.result_id} entity={entity} onSelected={handleEntitySelection} selected={selectedEntity.path === entity.path} size={tileSize} viewType={viewType} />;
+      } else {
+        obj[entity.result_id] = <DirectoryTile key={entity.result_id} entity={entity} onSelected={handleEntitySelection} selected={selectedEntity.path === entity.path} size={tileSize} viewType={viewType} />;
       }
-      tiles = {...tiles, ...hiddenTiles};
-    }
-  }
-
-  // if (!isLoading) {
-  //   const _tiles = loadedData.reduce(function(obj, asset) {
-  //   obj[asset.result_id] = <AssetTile key={asset.result_id} asset={asset} onSelected={handleEntitySelection} selected={selectedEntity.path == asset.path} size={tileSize} viewType={viewType} />;
-  //   return obj;
-  //   }, {});
-  //   setTiles(_tiles);
-  // }
+      return obj;
+    }, {});
+    setTiles(_tiles);
+  }, [loadedData, selectedEntity, viewType, tileSize])
 
   const forceUpdate = (event, value) => {
     setRefreshValue((prevRefresh) => (prevRefresh + 1))
@@ -123,10 +101,18 @@ function Explorer() {
   }
 
   const tileContainerStyle = {
-    "flexDirection": viewType == "grid" ? "row" : "column",
-    "flexWrap": viewType == "grid" ? "wrap" : "nowrap",
-    "justifyContent": viewType == "grid" ? "space-evenly" : "flex-start",
-    "gap": (tileSize * 0.5625 * 0.1).toString() + "px"
+    flexGrow: 1,
+    display: "grid",
+    overflowY: "auto",
+    gridTemplateColumns: `repeat(auto-fit, minmax(${tileSize}px, 1fr))`,
+    // gridGap: `${tileSize * 0.06}px`,
+    // padding: `${tileSize * 0.06}px`
+    gridGap: "10px",
+    padding: "10px"
+  }
+
+  if (viewType === "row") {
+    tileContainerStyle.gridTemplateColumns = `repeat(1, 1fr)`;
   }
 
   return (
@@ -141,9 +127,10 @@ function Explorer() {
         onViewTypeChange={setViewType}
       />
       <Divider />
-      <Box className={classes.tileContainer} style={tileContainerStyle}>
+      <div style={tileContainerStyle}>
         {Object.keys(tiles).map((k) => tiles[k])}
-      </Box>
+      </div>
+      <div className={classes.layoutHelper} />
       <Divider />
       <PageBar pages={pages.total} onChange={handlePageChange} onTilesPerPageChange={handleTilesPerPageChange} onTileSizeChange={handleTileSizeChange}/>
     </div>

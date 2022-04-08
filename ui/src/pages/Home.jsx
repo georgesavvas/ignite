@@ -3,28 +3,41 @@ import ProjectTree from '../components/ProjectTree';
 import TopBar from "../components/TopBar";
 import styles from "./Home.module.css";
 import Explorer from "../components/Explorer";
-import { Divider } from '@mui/material';
+import Divider from '@mui/material/Divider';
+import Details from '../components/Details';
+import {
+  ReflexContainer,
+  ReflexSplitter,
+  ReflexElement
+} from 'react-reflex'
 
 export default function Home() {
+  const splitterStyle = {
+    borderColor: "rgb(80,80,80)",
+    backgroundColor: "rgb(80,80,80)"
+  }
+
   return (
     <div className={styles.container}>
-      <TopBar />
-      <Divider />
-      <ReactSplit 
-        direction={SplitDirection.Horizontal}
-        initialSizes={[20, 50, 30]}
-        minWidths={[300, 650, 400]}
-        gutterClassName={styles.gutterHorizontal}
-        draggerClassName={styles.dragger}
-      >
-        <div className={styles.projectTree}>
-          <ProjectTree />
-        </div>
-        <div className={styles.explorer}>
-          <Explorer />
-        </div>
-        <div className={styles.assetViewer} />
-      </ReactSplit>
+      <div className={styles.topBar}>
+        <TopBar />
+        <Divider />
+      </div>
+      <div className={styles.contents}>
+        <ReflexContainer orientation="vertical">
+          <ReflexElement flex={0.2}>
+            <ProjectTree />
+          </ReflexElement>
+          <ReflexSplitter style={splitterStyle} />
+          <ReflexElement flex={0.5}>
+            <Explorer />
+          </ReflexElement>
+          <ReflexSplitter style={splitterStyle} />
+          <ReflexElement flex={0.3}>
+            <Details />
+          </ReflexElement>
+        </ReflexContainer>
+      </div>
     </div>
   );
-  }
+}

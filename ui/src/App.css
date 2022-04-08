@@ -1,5 +1,5 @@
 .App {
-  text-align: center;
+  /* text-align: center; */
   background-color: rgb(20, 20, 20);
   color: rgb(200, 200, 200);
   height: 100vh;
@@ -7,4 +7,5 @@
   box-sizing: border-box;
   margin: 0px;
   padding: 0px;
+  /* overflow-y: auto; */
 }

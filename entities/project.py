@@ -87,7 +87,7 @@ class Project(Directory):
             if path.is_dir():
                 d["id"] = str(_id[0] or "root")
                 d["name"] = name
-                d["path"] = path.as_posix()
+                d["path"] = str(path)
                 d["dir_kind"] = ""
                 d["task_type"] = ""
                 d["children"] = []

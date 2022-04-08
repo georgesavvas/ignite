@@ -13,11 +13,14 @@ import IconButton from '@mui/material/IconButton';
 import HelpIcon from '@mui/icons-material/Help';
 import BugReportIcon from '@mui/icons-material/BugReport';
 import ThumbsUpDownIcon from '@mui/icons-material/ThumbsUpDown';
+import SettingsIcon from '@mui/icons-material/Settings';
+import SettingsDialog from "./SettingsDialog.jsx";
 import {ProjectContext} from "../contexts/ProjectContext";
 
 export default function TopBar() {
   const [isLoading, setIsLoading] = useState(true);
   const [projects, setProjects] = useState([]);
+  const [settingsOpen, setSettingsOpen] = React.useState(false);
   const [selectedProject, setSelectedProject] = useContext(ProjectContext);
 
   useEffect(() => {
@@ -47,6 +50,7 @@ export default function TopBar() {
 
   return (
     <div className={styles.container}>
+      <SettingsDialog open={settingsOpen} onClose={() => setSettingsOpen(false)} />
       {/* <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
         <Select
           labelId="demo-simple-select-standard-label"
@@ -76,6 +80,9 @@ export default function TopBar() {
         </IconButton>
         <IconButton aria-label="feedback">
           <ThumbsUpDownIcon />
+        </IconButton>
+        <IconButton aria-label="settings" onClick={() => setSettingsOpen(true)}>
+          <SettingsIcon fontSize="large"/>
         </IconButton>
       </ButtonGroup>
     </div>

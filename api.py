@@ -90,19 +90,23 @@ def get_contents(path, as_dict=False):
     if exp.is_dir():
         path = exp
     contents = []
+    print(path)
     for x in path.iterdir():
         if not x.is_dir():
             continue
         entity = find(x)
-        if not entity:
+        if not entity and x.name in ("exports", "scenes"):
+            if x.name == "scenes":
+                scenes = discover_scenes(x)
+                contents.append(scenes)
+            elif x.name == "exports":
+                avs = discover_assetversions(x)
+                contents.append(avs)
             continue
-        if as_dict:
-            if not hasattr(entity, "as_dict"):
-                logging.warning(f"Directory entity has no as_dict method: {x}")
-                continue
-            contents.append(entity.as_dict())
-        else:
-            contents.append(entity)
+        contents.append(entity)
+    print(contents)
+    if as_dict:
+        contents = [c.as_dict() for c in contents if hasattr(c, "as_dict")]
     return contents
 
 
@@ -160,7 +164,7 @@ def discover_tasks(path, task_types=[], as_dict=False):
         if path.is_dir():
             d = {}
             d["name"] = name
-            d["path"] = path.as_posix()
+            d["path"] = path
             d["dir_kind"] = ""
             d["task_type"] = ""
             d["anchor"] = None
@@ -200,7 +204,7 @@ def discover_assets(path, asset_kinds=[], as_dict=False):
         if path.is_dir():
             d = {}
             d["name"] = name
-            d["path"] = path.as_posix()
+            d["path"] = str(path)
             d["dir_kind"] = ""
             d["anchor"] = None
             for x in path.iterdir():
@@ -238,7 +242,7 @@ def _discover_assetversions(path, asset_kinds=[], as_dict=False):
         if path.is_dir():
             d = {}
             d["name"] = name
-            d["path"] = path.as_posix()
+            d["path"] = str(path)
             d["dir_kind"] = ""
             d["anchor"] = None
             for x in path.iterdir():
@@ -295,7 +299,7 @@ def discover_scenes(path, dcc=[], latest=True, as_dict=False):
         if path.is_dir():
             d = {}
             d["name"] = name
-            d["path"] = path.as_posix()
+            d["path"] = str(path)
             d["dir_kind"] = ""
             d["anchor"] = None
             for x in path.iterdir():
