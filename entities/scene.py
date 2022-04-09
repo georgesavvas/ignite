@@ -66,7 +66,7 @@ class Scene:
 
     def as_dict(self):
         d = {}
-        for s in ("path", "dcc", "extension", "version", "dir_kind"):
+        for s in ("path", "dcc", "extension", "version", "dir_kind", "scene"):
             d[s] = getattr(self, s)
         d["task"] = self.task.as_dict()
         d["thumbnail"] = self.dcc

@@ -1,4 +1,6 @@
-const { app, BrowserWindow, protocol } = require('electron');
+const { app, electron, BrowserWindow, protocol, ipcMain } = require('electron');
+// const os = window.require('os');
+// const fs = window.require('fs');
 const path = require("path");
 
 function createWindow () {
@@ -6,9 +8,11 @@ function createWindow () {
   const win = new BrowserWindow({
     width: 1280,
     height: 720,
-    icon: __dirname + "/icons/ignite_logo.png",
+    icon: path.join(__dirname, "media/ignite_logo.png"),
     webPreferences: {
-      nodeIntegration: true
+      nodeIntegration: true,
+      contextIsolation: true,
+      preload: path.join(__dirname, "preload.js")
     }
   })
   //load the index.html from a url
@@ -16,6 +20,34 @@ function createWindow () {
 
   // Open the DevTools.
   win.webContents.openDevTools();
+
+  // ipcMain.on("store_data", (event, data, filename) => {
+  //   const filepath = path.join(os.homedir(), ".ignite", filename);
+  //   fs.writeFile(filepath, data, (err) => {
+  //     if (err) {
+  //       throw err;
+  //       return false;
+  //     }
+  //     else return true
+  //   });
+  // });
+
+  // ipcMain.on("load_data", (event, filename) => {
+  //   const filepath = path.join(os.homedir(), ".ignite", filename);
+  //   fs.readFile(filepath, (err, data) => {
+  //     if (err) throw err;
+  //     return JSON.parse(data);
+  //   });
+  // });
+
+  ipcMain.on("launch_dcc", (event, filepath, args=[], env={}) => {
+    console.log("Launching DCC:");
+    console.log(filepath, args, env);
+    var subpy = require('child_process').spawn(filepath, args, {env: {...process.env, ...env}, detached: true});
+  });
+
+  
+
 }
 
 // This method will be called when Electron has finished
