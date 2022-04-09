@@ -276,7 +276,6 @@ export default function ProjectTreeView(props) {
     var result = [];
     findNodeById(props.data, result, nodeId);
     result = result[0];
-    console.log(props.data);
     setCurrentContext({
       path: result.path,
       name: result.name,

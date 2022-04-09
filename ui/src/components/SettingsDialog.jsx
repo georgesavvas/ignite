@@ -1,4 +1,7 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
+// import { ipcRenderer } from 'electron';
+import { styled } from '@mui/material/styles';
+import styles from "./SettingsDialog.module.css";
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
@@ -13,36 +16,38 @@ import ListItemText from '@mui/material/ListItemText';
 import ListSubheader from '@mui/material/ListSubheader';
 import IconButton from '@mui/material/IconButton';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
-import { Divider, Typography } from '@mui/material';
+import { Divider, Stack, Typography } from '@mui/material';
+
+const Input = styled('input')({
+  display: 'none',
+});
 
 export default function SettingsDialog(props) {
-  const dccList = [
+  const defaultDccConfig = [
     {
-      name: "houdini1",
-      path: "C:\\Program Files\\Side Effects Software\\Houdini 19.0.506\\bin\\hmaster.exe"
+      name: "Houdini 19",
+      path: "C:\\Program Files\\Side Effects Software\\Houdini 19.0.506\\bin\\hmaster.exe",
+      exts: ["hip, hipnc"]
     },
     {
-      name: "houdini2",
-      path: "C:\\Program Files\\Side Effects Software\\Houdini 19.0.506\\bin\\hmaster.exe"
-    },
-    {
-      name: "houdini3",
-      path: "C:\\Program Files\\Side Effects Software\\Houdini 19.0.506\\bin\\hmaster.exe"
-    },
-    {
-      name: "houdini4",
-      path: "C:\\Program Files\\Side Effects Software\\Houdini 19.0.506\\bin\\hmaster.exe"
-    },
-    {
-      name: "houdini4",
-      path: "C:\\Program Files\\Side Effects Software\\Houdini 19.0.506\\bin\\hmaster.exe"
-    },
-    {
-      name: "houdini4",
-      path: "C:\\Program Files\\Side Effects Software\\Houdini 19.0.506\\bin\\hmaster.exe"
-    },
+      name: "Maya",
+      path: "C:\\Program Files\\Autodesk\\Maya2023\\bin\\maya.exe",
+      exts: ["ma"]
+    }
   ]
-  const [dccConfig, setDccConfig] = useState(dccList)
+  const [dccConfig, setDccConfig] = useState(defaultDccConfig)
+
+  useEffect(() => {
+    const data = localStorage.getItem("dcc_config");
+    if (data !== null) {
+      const storedDccConfig = JSON.parse(data);
+      setDccConfig(storedDccConfig);
+    }
+  }, [])
+
+  useEffect(() => {
+    localStorage.setItem("dcc_config", JSON.stringify(dccConfig));
+  }, [dccConfig])
 
   function editDccConfig(config, index, property, value) {
     let cc = [...config];
@@ -50,37 +55,96 @@ export default function SettingsDialog(props) {
     return cc;
   }
 
+  function removeFromDccConfig(config, index) {
+    let cc = [...config];
+    cc.splice(index, 1);
+    return cc;
+  }
+
   const handleDccConfigChange = (e) => {
-    const s = e.target.id.split("-");
+    const s = e.currentTarget.id.split("-");
     const target_id = s[1];
     const target_field = s[0];
-    // console.log(target_id, target_field, e.target.value);
     setDccConfig(prevState => editDccConfig(prevState, target_id, target_field, e.target.value));
+  }
+
+  const handleRemoveDcc = (e) => {
+    const target_id = e.currentTarget.id.split("-")[1];
+    setDccConfig(prevState => removeFromDccConfig(prevState, target_id));
+  }
+
+  const handleFileSelected = (e) => {
+    const value = e.target.files[0].path;
+    const s = e.currentTarget.id.split("-");
+    const target_id = s[1];
+    setDccConfig(prevState => editDccConfig(prevState, target_id, "path", value));
   }
 
   function renderDcc(dcc, index) {
     return (
-      <ListItem>
-        <TextField
-          margin="dense"
-          id={"name-" + index}
-          // label="Name"
-          variant="outlined"
-          value={dccConfig[index].name}
-          onChange={handleDccConfigChange}
-        />
-        <TextField
-          margin="dense"
-          id={"path-" + index}
-          // label="Executable"
-          fullWidth
-          variant="outlined"
-          value={dccConfig[index].path}
-          onChange={handleDccConfigChange}
-        />
-        <IconButton color="primary" aria-label="upload picture" component="span">
+      <ListItem key={index}>
+        <IconButton
+          color="primary"
+          component="span"
+          id={"remove-" + index}
+          onClick={handleRemoveDcc}
+        >
           <RemoveCircleOutlineIcon style={{color: "red", fontSize: "2rem"}} />
         </IconButton>
+        <div className={styles.gridContainer}>
+          <div className={styles.gridItemPath}>
+            <TextField
+              margin="dense"
+              id={"path-" + index}
+              label="Executable"
+              fullWidth
+              variant="outlined"
+              value={dcc.path}
+              size="small"
+              onChange={handleDccConfigChange}
+              className={styles.textField}
+              InputProps={{
+                className: styles.input
+              }}
+            />
+            <label htmlFor={"file-" + index} className={styles.label}>
+              <Input onChange={handleFileSelected} id={"file-" + index} type="file" />
+              <Button variant="outlined" className={styles.browse} component="span">...</Button>
+            </label>
+          </div>
+          <div className={styles.gridItemName}>
+            <TextField
+              margin="dense"
+              id={"name-" + index}
+              label="Name"
+              variant="outlined"
+              fullWidth
+              value={dcc.name}
+              size="small"
+              onChange={handleDccConfigChange}
+              className={styles.textField}
+              InputProps={{
+                className: styles.input
+              }}
+            />
+          </div>
+          <div className={styles.gridItemExts}>
+            <TextField
+              margin="dense"
+              id={"exts-" + index}
+              label="Extensions"
+              fullWidth
+              variant="outlined"
+              value={dcc.exts}
+              size="small"
+              onChange={handleDccConfigChange}
+              className={styles.textField}
+              InputProps={{
+                className: styles.input
+              }}
+            />
+          </div>
+        </div>
       </ListItem>
     )
   }
@@ -89,15 +153,28 @@ export default function SettingsDialog(props) {
     "& .MuiDialog-container": {
       "& .MuiPaper-root": {
         width: "100%",
-        maxWidth: "80vw",  // Set your width here
+        maxWidth: "80vw",
       },
     },
+  }
+
+  const dccBar = {
+    display: "flex",
+    justifyContent: "space-between"
+  }
+
+  const handleAddDcc = (e) => {
+    setDccConfig(prevState => [...prevState, {name: "", path: ""}]);
+  }
+
+  const handleRevertDefaultsDcc = (e) => {
+    setDccConfig(defaultDccConfig);
   }
 
   return (
     <Dialog open={props.open} onClose={props.onClose} sx={dialogStyle}>
       <DialogTitle>Settings</DialogTitle>
-      <DialogContent style={{margin: "20px", padding: "20px", border: "solid darkgrey 1px", borderRadius: "10px"}}>
+      <DialogContent style={{height: "350px", margin: "20px", padding: "20px", border: "solid darkgrey 1px", borderRadius: "10px"}}>
         <DialogContentText>Server Details</DialogContentText>
         <TextField
           margin="dense"
@@ -118,11 +195,17 @@ export default function SettingsDialog(props) {
         />
       </DialogContent>
       <DialogContent style={{margin: "20px", padding: "20px", border: "solid darkgrey 1px", borderRadius: "10px"}}>
-        <DialogContentText>DCC config</DialogContentText>
+        <div style={dccBar}>
+          <DialogContentText>DCC config</DialogContentText>
+          <Stack direction="row" alignItems="center" spacing={2}>
+            <Button variant="outlined" onClick={handleAddDcc}>Add</Button>
+            <Button variant="outlined" onClick={handleRevertDefaultsDcc}>Revert to defaults</Button>
+          </Stack>
+        </div>
         <List
           sx={{ width: '100%' }}
         >
-          {dccList.map((dcc, index) => renderDcc(dcc, index))}
+          {dccConfig.map((dcc, index) => renderDcc(dcc, index))}
         </List>
       </DialogContent>
       <DialogActions>

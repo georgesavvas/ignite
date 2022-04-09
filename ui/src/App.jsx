@@ -11,6 +11,9 @@ import {EntityProvider} from "./contexts/EntityContext";
 const darkTheme = createTheme({
   palette: {
     mode: 'dark',
+    ignite: {
+      main: "rgb(252, 140, 3)",
+    },
   },
   typography: {
     allVariants: {
