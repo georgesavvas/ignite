@@ -50,7 +50,6 @@ function DirectoryTileGrid(props) {
   };
 
   const thumbnailStyle = {
-    aspectRatio: 16 / 9,
     width: isScene ? "100%" : "50%",
     height: "auto",
     margin: "auto",
@@ -72,6 +71,7 @@ function DirectoryTileGrid(props) {
   }
 
   const handleClick = (e) => {
+    console.log(props.entity);
     if (e.detail === 2) {
       var path = props.entity.path;
       if (props.entity.hasOwnProperty("task")) {
@@ -92,6 +92,8 @@ function DirectoryTileGrid(props) {
     return <img src={path} style={thumbnailStyle} />;
   }
 
+  const name = isScene ? props.entity.dcc : props.entity.name;
+
   return (
     <div style={tileStyle} className={styles.tile} onClick={handleClick} >
       {renderThumbnail(props.entity)}
@@ -99,8 +101,8 @@ function DirectoryTileGrid(props) {
         <div className={styles.overlay}>
           <div className={styles.topGrad} />
           <div className={styles.bottomGrad} />
-          <Typography style={{"position": "absolute", "top": "5px", "left": "10px"}}>{props.entity.context}</Typography>
-          <Typography style={{"position": "absolute", "bottom": "5px", "left": "10px"}}>{props.entity.name}</Typography>
+          <Typography variant="context" style={{"position": "absolute", "top": "5px", "left": "10px"}}>{props.entity.context}</Typography>
+          <Typography style={{"position": "absolute", "bottom": "5px", "left": "10px"}}>{name}</Typography>
           <Typography style={{"position": "absolute", "bottom": "5px", "right": "10px"}}>{props.entity.version}</Typography>
         </div>
         <div className={styles.bar} style={barStyle} />

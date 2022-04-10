@@ -10,9 +10,19 @@ const style = {
   height: "100%"
 }
 
-const dccIcons = {
-  "houdini": ["hmaster", "hescape", "houdini", "houdinicore", "houdinifx"],
-  "maya": ["maya"]
+const dccNames = {
+  houdini: ["hmaster", "hescape", "houdini", "houdinicore", "houdinifx"],
+  maya: ["maya"],
+  blender: ["blender"],
+  nuke: ["nuke"]
+}
+
+const envs = {
+  houdini: {
+    HOUDINI_MENU_PATH: "C:\\dev\\ignite\\cg\\houdini;&;",
+    HOUDINI_OTLSCAN_PATH: "&;C:\\dev\\ignite\\cg\\houdini\\otls;",
+    OCIO: "C:\\dev\\ignite\\cg\\config"
+  }
 }
 
 function DccSelector(props) {
@@ -37,15 +47,15 @@ function DccSelector(props) {
     }
   }
 
-  const getIcon = (dcc) => {
-    for(const _dcc of Object.keys(dccIcons)) {
-      if (dccIcons[_dcc].includes(dcc)) return _dcc;
+  const getDccName = (dcc) => {
+    for(const _dcc of Object.keys(dccNames)) {
+      if (dccNames[_dcc].includes(dcc)) return _dcc;
     }
     return "unknown";
   }
 
   function formatDcc(dcc, index) {
-    const dcc_name = getIcon(dcc.path.split("/").at(-1).split("\\").at(-1).split(".")[0]);
+    const dcc_name = getDccName(dcc.path.split("/").at(-1).split("\\").at(-1).split(".")[0]);
     const dccIcon = `url(media/dcc/${dcc_name}.png)`;
     const containerStyle = {
       borderColor: dcc.name === selectedDcc ? "rgb(252, 140, 3)" : "rgb(70,70,70)"
@@ -61,7 +71,9 @@ function DccSelector(props) {
 
   const handleLaunchClick = (e) => {
     const dcc = getDcc();
-    window.electron.launcherAPI.launch(dcc.path, [selectedEntity.scene]);
+    const dcc_name = getDccName(dcc.path.split("/").at(-1).split("\\").at(-1).split(".")[0]);
+    const env = envs[dcc_name];
+    window.electron.launcherAPI.launch(dcc.path, [selectedEntity.scene], env);
   }
 
   return (

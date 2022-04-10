@@ -1,5 +1,4 @@
-import ReactSplit, { SplitDirection } from '@devbookhq/splitter'
-import ProjectTree from '../components/ProjectTree';
+import ProjectTree from '../components/TreeView/ProjectTree';
 import TopBar from "../components/TopBar";
 import styles from "./Home.module.css";
 import Explorer from "../components/Explorer";
@@ -11,12 +10,12 @@ import {
   ReflexElement
 } from 'react-reflex'
 
-export default function Home() {
-  const splitterStyle = {
-    borderColor: "rgb(80,80,80)",
-    backgroundColor: "rgb(80,80,80)"
-  }
+const splitterStyle = {
+  borderColor: "rgb(80,80,80)",
+  backgroundColor: "rgb(80,80,80)"
+}
 
+export default function Home() {
   return (
     <div className={styles.container}>
       <div className={styles.topBar}>

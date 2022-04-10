@@ -57,7 +57,7 @@ class AssetVersion(Directory):
         d = {}
         for s in (
                 "path", "dir_kind", "anchor", "project", "name", "version",
-                "components", "asset", "source"
+                "components", "asset", "source", "task"
             ):
             d[s] = getattr(self, s)
         d["thumbnail"] = self.thumbnail.as_posix()

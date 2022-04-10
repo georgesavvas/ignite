@@ -15,9 +15,8 @@ function SceneDetails(props) {
         <DccSelector entity={props.entity} />
         <Divider style={{margin: "20px 0 20px 0"}} />
         <Typography variant="h5">Scene Details</Typography>
-        <Typography>{props.entity.dir_kind}</Typography>
-        <Typography>{props.entity.path}</Typography>
         <Typography>{props.entity.dcc}</Typography>
+        <Typography>{props.entity.path}</Typography>
         <Typography>{props.entity.scene}</Typography>
       </div>
     </div>

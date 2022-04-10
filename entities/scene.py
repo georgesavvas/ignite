@@ -8,7 +8,7 @@ CONFIG = utils.get_config()
 ROOT = PurePath(CONFIG["root"])
 
 
-class Scene:
+class Scene(Directory):
     def __init__(self, path="") -> None:
         self.project_name = ""
         self.name = ""
@@ -37,13 +37,14 @@ class Scene:
         split = path_str.split(root)
         if split == 1:
             raise Exception(f"Error parsing path: {path}")
-        split2 = split[1].split("/")
+        split2 = split[1].lstrip("/").split("/")
         project = split2[0]
         self.project = project
         self.name = path.name
         for file in Path(path).iterdir():
             if file.stem == "scene":
                 self.scene = PurePath(file)
+                self.version = self.scene.parent.name
                 break
 
         extensions = []
@@ -55,9 +56,9 @@ class Scene:
 
         ext = self.scene.suffix[1:]
         self.extension = ext
-        self.version = path.parent.name
-        self.task = Task(path=path.parent.parent)
+        self.task = path=path.parent.parent
         self.dcc = ext_dcc.get(ext, "")
+        self.context = self._get_context()
     
     def is_valid(self):
         if not self.task or not self.version or not self.task or not self.extension:
@@ -66,8 +67,17 @@ class Scene:
 
     def as_dict(self):
         d = {}
-        for s in ("path", "dcc", "extension", "version", "dir_kind", "scene"):
+        for s in ("path", "dcc", "extension", "version", "dir_kind", "scene", "context", "task"):
             d[s] = getattr(self, s)
-        d["task"] = self.task.as_dict()
         d["thumbnail"] = self.dcc
         return d
+
+    def next_version(self):
+        version = int(self.version.lstrip("v"))
+        version += 1
+        return str(version).zfill(3)
+    
+    def next_filepath(self):
+        next_v = self.next_version()
+        filename = self.scene.name
+        return self.path / next_v / filename
