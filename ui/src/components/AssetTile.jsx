@@ -4,8 +4,6 @@ import Typography from '@mui/material/Typography';
 
 const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 
-
-
 function AssetTileGrid(props) {
   const [progress, setProgress] = useState(0);
   const hoverArea = createRef();
@@ -15,7 +13,6 @@ function AssetTileGrid(props) {
   };
 
   const thumbnailStyle = {
-    aspectRatio: 16 / 9,
     width: "100%",
     height: "auto",
     margin: "auto",

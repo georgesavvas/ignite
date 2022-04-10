@@ -15,6 +15,7 @@ class Directory():
         self.project = ""
         self.name = ""
         self.dir_kind = dir_kind
+        self.context = ""
         if path:
             path = Path(path)
             self.path = path
@@ -44,8 +45,17 @@ class Directory():
         project = split2[0]
         self.project = project
         self.name = split2[-1]
+        self.context = self._get_context()
         self.load_from_config()
-    
+
+    def _get_context(self):
+        project_path = ROOT / self.project
+        if hasattr(self, "task"):
+            context = self.task.as_posix()
+        else:
+            context = self.path.as_posix()
+        return context.replace(project_path.as_posix() + "/", "")
+
     def load_from_config(self):
         with open(self.anchor, "r") as f:
             config = yaml.safe_load(f) or {}
@@ -54,7 +64,7 @@ class Directory():
 
     def as_dict(self):
         d = {}
-        for s in ("path", "dir_kind", "anchor", "project", "name"):
+        for s in ("path", "dir_kind", "anchor", "project", "name", "context"):
             d[s] = getattr(self, s)
         # d["task"] = self.task.as_dict()
         return d

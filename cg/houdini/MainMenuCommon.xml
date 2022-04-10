@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mainMenu>
+  <addScriptItem id="h.ignite_save">
+    <label>Save As Next Version (Ignite)</label>
+    <parent>file_menu</parent>
+    <insertBefore>h.save_as</insertBefore>
+    <scriptPath>C:\dev\ignite\cg\houdini\python\ign_save_next_version.py</scriptPath>
+  </addScriptItem>
+</mainMenu>

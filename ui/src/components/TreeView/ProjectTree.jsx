@@ -4,7 +4,7 @@ import Skeleton from '@mui/material/Skeleton';
 import FormControl from '@mui/material/FormControl';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import styles from "./ProjectTree.module.css";
-import {ProjectContext} from "../contexts/ProjectContext";
+import {ProjectContext} from "../../contexts/ProjectContext";
 
 export default function ProjectTree() {
   const [isLoading, setIsLoading] = useState(true);
