@@ -3,7 +3,8 @@ import styles from "./DccSelector.module.css";
 import Typography from '@mui/material/Typography';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import { Button } from "@mui/material";
-import {EntityContext} from "../contexts/EntityContext";
+import {DccContext} from "../contexts/DccContext";
+import {ContextContext} from "../contexts/ContextContext";
 
 const style = {
   width: "100%",
@@ -17,23 +18,12 @@ const dccNames = {
   nuke: ["nuke"]
 }
 
-const generic_env = {
-  OCIO: "C:\\dev\\ignite\\cg\\config"
-}
-
-const dcc_envs = {
-  houdini: {
-    HOUDINI_MENU_PATH: "C:\\dev\\ignite\\cg\\houdini;&;",
-    HOUDINI_OTLSCAN_PATH: "&;C:\\dev\\ignite\\cg\\houdini\\otls;",
-  }
-}
-
 function DccSelector(props) {
-  const dir_kind = props.entity.dir_kind;
-  const dir_kind_formatted = dir_kind.charAt(0).toUpperCase() + dir_kind.slice(1)
-  const [dccConfig, setDccConfig] = useState([]);
+  // const dir_kind = props.entity.dir_kind;
+  // const dir_kind_formatted = dir_kind.charAt(0).toUpperCase() + dir_kind.slice(1)
+  const [dccConfig, setDccConfig] = useContext(DccContext);
   const [selectedDcc, setSelectedDcc] = useState("");
-  const [selectedEntity, setSelectedEntity] = useContext(EntityContext);
+  const [currentContext, setCurrentContext] = useContext(ContextContext);
 
   // useEffect(() => {
   //   // const data = localStorage.getItem("dcc_config");
@@ -79,16 +69,43 @@ function DccSelector(props) {
   const handleLaunchClick = (e) => {
     const dcc = getDcc();
     const dcc_name = getDccName(dcc.path.split("/").at(-1).split("\\").at(-1).split(".")[0]);
-    const env = {
-      ...generic_env,
-      ...dcc_envs[dcc_name],
-      PROJECT: selectedEntity.project,
-      PHASE: selectedEntity.phase,
-      CONTEXT: selectedEntity.context,
-      TASK: selectedEntity.task,
-      EXPORTS: selectedEntity.exports
-    }
-    window.api.launchDcc(dcc.path, [selectedEntity.scene], env);
+    const data = {
+      dcc: dcc_name,
+      dcc_name: dcc.name,
+      task: props.task,
+      scene: props.scene,
+      new_scene: props.newScene
+    };
+    fetch(
+      "http://127.0.0.1:9091/api/v1/launch_dcc", {
+        method: "POST",
+        headers: {
+          'Accept': 'application/json, text/plain, */*',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      }
+    ).then((resp) => {
+      return resp.json();
+    }).then((resp) => {
+      if (resp.ok) console.log("Launched!")
+      else console.log("Failed launching...")
+      setCurrentContext(prevState => {
+        const cc = {...prevState};
+        cc.update += 1;
+        return cc
+      });
+    });
+    // const env = {
+    //   ...generic_env,
+    //   ...dcc_envs[dcc_name],
+    //   PROJECT: selectedEntity.project,
+    //   PHASE: selectedEntity.phase,
+    //   CONTEXT: selectedEntity.context,
+    //   TASK: selectedEntity.task,
+    //   EXPORTS: selectedEntity.exports
+    // }
+    // window.api.launchDcc(dcc.path, [selectedEntity.scene], env);
   }
 
   return (

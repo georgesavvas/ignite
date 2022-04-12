@@ -10,7 +10,13 @@ import GridViewIcon from "../icons/GridViewIcon";
 import RowViewIcon from "../icons/RowViewIcon";
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 import {ContextContext} from "../contexts/ContextContext";
+import DccSelector from "./DccSelector";
 
 const style = {
   display: "flex",
@@ -22,8 +28,20 @@ const style = {
   gap: "10px"
 }
 
+const dialogStyle = {
+  "& .MuiDialog-container": {
+    "& .MuiPaper-root": {
+      width: "100%",
+      maxWidth: "30vw",
+      backgroundColor: "rgb(0,0,0)",
+    },
+  },
+}
+
 function ExplorerBar(props) {
   const [currentLocation, setCurrentLocation] = useState("");
+  const [newSceneOpen, setNewSceneOpen] = useState(false);
+  const [newAssetOpen, setNewAssetOpen] = useState(false);
   const [currentContext, setCurrentContext] = useContext(ContextContext);
 
   useEffect(() => {
@@ -47,6 +65,9 @@ function ExplorerBar(props) {
   return (
     <div>
       <div style={style}>
+      <Dialog open={newSceneOpen} onClose={() => setNewSceneOpen(false)} sx={dialogStyle}>
+        <DccSelector task={currentContext.path} newScene={true} />
+      </Dialog>
         <Stack direction="row" spacing={1} >
           <ToggleButtonGroup
             color="primary"
@@ -84,7 +105,7 @@ function ExplorerBar(props) {
         <FormControlLabel control={<Checkbox defaultChecked onChange={props.onLatestChange} />} label="Latest" />
         <Button variant="outlined" onClick={props.onRefresh}>Refresh</Button>
       </div>
-      <div style={{padding: "20px", paddingTop: 0, paddingBottom: 10}}>
+      <div style={{...style, padding: "20px", paddingTop: 0, paddingBottom: 10}}>
         <TextField
           id="outlined-basic"
           size="small"
@@ -94,6 +115,15 @@ function ExplorerBar(props) {
           value={currentLocation}
           onChange={handleLocationChange}
         />
+        <Button
+          style={{width: "150px"}}
+          color="ignite"
+          variant="outlined"
+          onClick={() => setNewSceneOpen(true)}
+        >
+          New Scene
+        </Button>
+        <Button style={{width: "150px"}} color="ignite" variant="outlined">New Asset</Button>
       </div>
     </div>
   )

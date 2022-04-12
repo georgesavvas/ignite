@@ -55,6 +55,7 @@ def find(path):
     from ignite.entities.task import Task
     from ignite.entities.asset import Asset
     from ignite.entities.assetversion import AssetVersion
+    from ignite.entities.scene import Scene
 
     config = utils.get_config()
     kinds = {v: k for k, v in config["anchors"].items()}
@@ -68,9 +69,12 @@ def find(path):
         "shot": Shot,
         "task": Task,
         "asset": Asset,
-        "assetversion": AssetVersion
+        "assetversion": AssetVersion,
+        "scene": Scene
     }
     path = Path(path)
+    if not path.is_dir():
+        path = path.parent
     if not path.is_dir():
         logging.error(f"Invalid path: {path}")
         return None
@@ -90,7 +94,6 @@ def get_contents(path, as_dict=False):
     if exp.is_dir():
         path = exp
     contents = []
-    print(path)
     for x in path.iterdir():
         if not x.is_dir():
             continue
@@ -104,7 +107,6 @@ def get_contents(path, as_dict=False):
                 contents.append(avs)
             continue
         contents.append(entity)
-    print(contents)
     if as_dict:
         contents = [c.as_dict() for c in contents if hasattr(c, "as_dict")]
     return contents
@@ -302,7 +304,12 @@ def discover_scenes(path, dcc=[], latest=False, as_dict=False):
             d["path"] = str(path)
             d["dir_kind"] = ""
             d["anchor"] = None
-            for x in path.iterdir():
+            contents = list(path.iterdir())
+            if contents and path.name == "scenes":
+                contents = sorted(contents, reverse=True)
+                if latest:
+                    contents = [contents[0]]
+            for x in contents:
                 name = x.name
                 if name in (".config", "common"):
                     continue

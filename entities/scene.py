@@ -18,6 +18,7 @@ class Scene(Directory):
         self.dir_kind = "scene"
         self.dcc = ""
         self.version = ""
+        self.vsn = 0
         self.path = path
         self.scene = PurePath()
         self.task = None
@@ -47,6 +48,7 @@ class Scene(Directory):
             if file.stem == "scene":
                 self.scene = PurePath(file)
                 self.version = self.scene.parent.name
+                self.vsn = int(self.version.lstrip("v"))
                 break
 
         extensions = []
@@ -69,7 +71,8 @@ class Scene(Directory):
 
     def as_dict(self):
         d = {}
-        for s in ("path", "project", "name", "phase" ,"dcc", "extension", "version", "dir_kind", "scene", "context", "task"):
+        for s in ("path", "project", "name", "phase" ,"dcc", "extension", "version",
+                "dir_kind", "scene", "context", "task", "version", "vsn"):
             d[s] = getattr(self, s)
         d["thumbnail"] = self.dcc
         d["full_context"] = f"{self.phase}/{self.context}"

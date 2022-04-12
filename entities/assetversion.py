@@ -1,4 +1,5 @@
 import os
+import clique
 from pathlib import Path, PurePath
 from ignite import utils
 from ignite.entities.directory import Directory
@@ -25,6 +26,7 @@ class AssetVersion(Directory):
         self.task = self.asset.parent.parent
         self.source = ""
         self.thumbnail = PurePath()
+        self.preview = PurePath()
         self._fetch_components()
 
     def __lt__(self, other):
@@ -34,23 +36,39 @@ class AssetVersion(Directory):
         path = Path(self.path)
         anchor = CONFIG["anchors"]["assetversion"]
         comps = []
-        for x in path.iterdir():
-            name = x.name
-            if name.startswith("."):
-                continue
-            if name == anchor:
-                continue
-            if x.stem == "source":
-                self.source = x
-                continue
-            if x.stem == "thumbnail":
-                self.thumbnail = x
-                continue
-            c = {}
-            c["name"] = name
-            c["path"] = x
-            c["ext"] = x.suffix
-            comps.append(c)
+        collections, remainder = clique.assemble([str(path / d.name) for d in path.iterdir()])
+        # comps += [c.format("{head}####{tail}") for c in collections]
+        # comps += [r for r in remainder if not r == anchor]
+        for c in collections:
+            comps.append({
+                "path": self.path / c.format("{head}####{tail}"),
+                "name": c.head.rstrip("."),
+                "ext": c.tail.lstrip(".")
+            })
+        for r in remainder:
+            r2 = PurePath(r)
+            comps.append({
+                "path": self.path / r2.name,
+                "name": r2.stem,
+                "ext": r2.suffix
+            })
+        # for x in path.iterdir():
+        #     name = x.name
+        #     if name.startswith("."):
+        #         continue
+        #     if name == anchor:
+        #         continue
+        #     if x.stem == "source":
+        #         self.source = x
+        #         continue
+        #     if x.stem == "thumbnail":
+        #         self.thumbnail = x
+        #         continue
+        #     c = {}
+        #     c["name"] = name
+        #     c["path"] = x
+        #     c["ext"] = x.suffix
+        #     comps.append(c)
         self.components = comps
 
     def as_dict(self):

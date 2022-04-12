@@ -108,7 +108,7 @@ const dirContextOptions = {
 
 function requestCreateDir(data) {
   const promise = fetch(
-    "http://127.0.0.1:5000/api/v1/create_dir", {
+    "http://127.0.0.1:9090/api/v1/create_dir", {
       method: "POST",
       headers: {
         'Accept': 'application/json, text/plain, */*',
