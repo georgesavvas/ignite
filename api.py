@@ -290,7 +290,7 @@ def discover_assetversions(path, asset_kinds=[], latest=False, as_dict=False):
     return assetversions
 
 
-def discover_scenes(path, dcc=[], latest=True, as_dict=False):
+def discover_scenes(path, dcc=[], latest=False, as_dict=False):
     from ignite.entities.scene import Scene
 
     path = Path(path)

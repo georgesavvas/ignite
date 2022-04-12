@@ -19,7 +19,7 @@ export default function ProjectTree() {
     };
     setIsLoading(true);
     fetch(
-      "http://127.0.0.1:5000/api/v1/get_project_tree", {
+      "http://127.0.0.1:9090/api/v1/get_project_tree", {
         method: "POST",
         headers: {
           'Accept': 'application/json, text/plain, */*',

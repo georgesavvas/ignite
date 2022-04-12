@@ -13,6 +13,7 @@ ANCHORS = CONFIG["anchors"]
 class Directory():
     def __init__(self, path="", dir_kind="directory") -> None:
         self.project = ""
+        self.phase = ""
         self.name = ""
         self.dir_kind = dir_kind
         self.context = ""
@@ -45,7 +46,7 @@ class Directory():
         project = split2[0]
         self.project = project
         self.name = split2[-1]
-        self.context = self._get_context()
+        self.phase, self.context = self._get_context()
         self.load_from_config()
 
     def _get_context(self):
@@ -54,7 +55,10 @@ class Directory():
             context = self.task.as_posix()
         else:
             context = self.path.as_posix()
-        return context.replace(project_path.as_posix() + "/", "")
+        values = context.replace(project_path.as_posix() + "/", "").split("/", 1)
+        if not values or len(values) < 2:
+            values = ["", ""]
+        return values
 
     def load_from_config(self):
         with open(self.anchor, "r") as f:
