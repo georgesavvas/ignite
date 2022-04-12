@@ -12,7 +12,7 @@ function SceneDetails(props) {
   return (
     <div style={style}>
       <div style={{margin: "10px", overflow: "hidden"}}>
-        <DccSelector entity={props.entity} />
+        <DccSelector scene={props.entity.scene} />
         <Divider style={{margin: "20px 0 20px 0"}} />
         <Typography variant="h5">Scene Details</Typography>
         <Typography>{props.entity.dcc}</Typography>

@@ -23,7 +23,7 @@ function Explorer() {
   const [tilesPerPage, setTilesPerPage] = useState(50);
   const [resultType, setResultType] = useState("dynamic");
   const [viewType, setViewType] = useState("grid");
-  const [latest, setLatest] = useState(0);
+  const [latest, setLatest] = useState(1);
   const [tiles, setTiles] = useState([]);
   const [selectedEntity, setSelectedEntity] = useContext(EntityContext);
   const [currentContext, setCurrentContext] = useContext(ContextContext);

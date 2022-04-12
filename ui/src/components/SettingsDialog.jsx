@@ -194,6 +194,6 @@ export default function SettingsDialog(props) {
       <DialogActions>
         <Button onClick={props.onClose}>Close</Button>
       </DialogActions>
-  </Dialog>
+    </Dialog>
   )
 }

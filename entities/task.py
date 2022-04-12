@@ -11,6 +11,10 @@ class Task(Directory):
     def __init__(self, path="") -> None:
         self.task_type = "generic"
         super().__init__(path, dir_kind="task")
+        self.scenes = self.path / "scenes"
+        self.exports = self.path / "exports"
+        utils.ensure_directory(self.scenes)
+        utils.ensure_directory(self.exports)
 
     def __repr__(self):
         return f"{self.name} ({self.task_type} {self.dir_kind})"
@@ -73,3 +77,13 @@ class Task(Directory):
         if as_dict:
             scenes = [s.as_dict() for s in scenes]
         return scenes
+
+    def get_next_scene(self):
+        existing = [d.name for d in self.scenes.iterdir()]
+        if not existing:
+            return self.scenes / "v001"
+        latest = sorted(existing, reverse=True)[0]
+        version = int(latest.lstrip("v"))
+        version += 1
+        next_v = "v" + str(version).zfill(3)
+        return self.scenes / next_v
