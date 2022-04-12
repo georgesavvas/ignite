@@ -26,7 +26,7 @@ export default function TopBar() {
   useEffect(() => {
     setIsLoading(true);
     fetch(
-      "http://127.0.0.1:5000/api/v1/get_projects", {
+      "http://127.0.0.1:9090/api/v1/get_projects", {
         method: "GET",
         headers: {
           'Accept': 'application/json, text/plain, */*',

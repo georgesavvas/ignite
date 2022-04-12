@@ -17,11 +17,14 @@ const dccNames = {
   nuke: ["nuke"]
 }
 
-const envs = {
+const generic_env = {
+  OCIO: "C:\\dev\\ignite\\cg\\config"
+}
+
+const dcc_envs = {
   houdini: {
     HOUDINI_MENU_PATH: "C:\\dev\\ignite\\cg\\houdini;&;",
     HOUDINI_OTLSCAN_PATH: "&;C:\\dev\\ignite\\cg\\houdini\\otls;",
-    OCIO: "C:\\dev\\ignite\\cg\\config"
   }
 }
 
@@ -32,10 +35,14 @@ function DccSelector(props) {
   const [selectedDcc, setSelectedDcc] = useState("");
   const [selectedEntity, setSelectedEntity] = useContext(EntityContext);
 
-  useEffect(() => {
-    const data = localStorage.getItem("dcc_config");
-    setDccConfig(JSON.parse(data));
-  }, [])
+  // useEffect(() => {
+  //   // const data = localStorage.getItem("dcc_config");
+  //   fetch(`http://127.0.0.1:9091/api/v1/get_dcc_config`).then((resp) => {
+  //     return resp.json();
+  //   }).then((resp) => {
+  //     setDccConfig(resp.data);
+  //   });
+  // }, [])
 
   const handleDccClick = (e) => {
     setSelectedDcc(e.currentTarget.id);
@@ -72,8 +79,16 @@ function DccSelector(props) {
   const handleLaunchClick = (e) => {
     const dcc = getDcc();
     const dcc_name = getDccName(dcc.path.split("/").at(-1).split("\\").at(-1).split(".")[0]);
-    const env = envs[dcc_name];
-    window.electron.launcherAPI.launch(dcc.path, [selectedEntity.scene], env);
+    const env = {
+      ...generic_env,
+      ...dcc_envs[dcc_name],
+      PROJECT: selectedEntity.project,
+      PHASE: selectedEntity.phase,
+      CONTEXT: selectedEntity.context,
+      TASK: selectedEntity.task,
+      EXPORTS: selectedEntity.exports
+    }
+    window.api.launchDcc(dcc.path, [selectedEntity.scene], env);
   }
 
   return (

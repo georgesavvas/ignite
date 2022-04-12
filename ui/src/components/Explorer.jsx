@@ -47,7 +47,7 @@ function Explorer() {
     };
     setIsLoading(true);
     fetch(
-      `http://127.0.0.1:5000/api/v1/${methods[resultType]}`, {
+      `http://127.0.0.1:9090/api/v1/${methods[resultType]}`, {
         method: "POST",
         headers: {
           'Accept': 'application/json, text/plain, */*',
@@ -55,15 +55,13 @@ function Explorer() {
         },
         body: JSON.stringify(data)
       }
-    )
-      .then((resp) => {
-        return resp.json();
-      })
-      .then((resp) => {
-        setIsLoading(false);
-        setLoadedData(resp.data);
-        setPages((prevPages) => ({...prevPages, total: resp.pages.total}));
-      });
+    ).then((resp) => {
+      return resp.json();
+    }).then((resp) => {
+      setIsLoading(false);
+      setLoadedData(resp.data);
+      setPages((prevPages) => ({...prevPages, total: resp.pages.total}));
+    });
   }, [pages.current, resultType, refreshValue, currentContext, tilesPerPage, latest]);
 
   useEffect(() => {

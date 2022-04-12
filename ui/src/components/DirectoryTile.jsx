@@ -101,7 +101,7 @@ function DirectoryTileGrid(props) {
         <div className={styles.overlay}>
           <div className={styles.topGrad} />
           <div className={styles.bottomGrad} />
-          <Typography variant="context" style={{"position": "absolute", "top": "5px", "left": "10px"}}>{props.entity.context}</Typography>
+          <Typography variant="context" style={{"position": "absolute", "top": "5px", "left": "10px"}}>{props.entity.full_context}</Typography>
           <Typography style={{"position": "absolute", "bottom": "5px", "left": "10px"}}>{name}</Typography>
           <Typography style={{"position": "absolute", "bottom": "5px", "right": "10px"}}>{props.entity.version}</Typography>
         </div>
@@ -168,7 +168,7 @@ function DirectoryTileRow(props) {
       <div style={{"paddingLeft": "6px"}}>
         <Typography align="left">{props.entity.name}</Typography>
         <Typography align="left">{props.entity.version}</Typography>
-        <Typography align="left">{props.entity.context}</Typography>
+        <Typography align="left">{props.entity.full_context}</Typography>
       </div>
     </div>
   );

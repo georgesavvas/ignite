@@ -32,7 +32,7 @@ import CreateDirDialogue from "./../CreateDirDialogue";
 
 const projectIcon = () => {
   return (
-    <Typography variant="h6" style={{marginRight: "6px"}}>/</Typography>
+    <Typography variant="caption" style={{marginRight: "6px"}}>/</Typography>
   )
 }
 

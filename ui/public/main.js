@@ -1,6 +1,6 @@
 const { app, electron, BrowserWindow, protocol, ipcMain } = require('electron');
-// const os = window.require('os');
-// const fs = window.require('fs');
+const os = require('os');
+const fs = require('fs').promises;
 const path = require("path");
 
 function createWindow () {
@@ -21,33 +21,40 @@ function createWindow () {
   // Open the DevTools.
   win.webContents.openDevTools();
 
-  // ipcMain.on("store_data", (event, data, filename) => {
-  //   const filepath = path.join(os.homedir(), ".ignite", filename);
-  //   fs.writeFile(filepath, data, (err) => {
-  //     if (err) {
-  //       throw err;
-  //       return false;
-  //     }
-  //     else return true
-  //   });
-  // });
+  ipcMain.handle("store_data", async (event, filename, data) => {
+    const filepath = path.join(os.homedir(), ".ignite", filename);
+    fs.writeFile(filepath, data, (err) => {
+      if (err) {
+        throw err;
+        return false;
+      }
+      else return true
+    });
+  });
 
-  // ipcMain.on("load_data", (event, filename) => {
-  //   const filepath = path.join(os.homedir(), ".ignite", filename);
-  //   fs.readFile(filepath, (err, data) => {
-  //     if (err) throw err;
-  //     return JSON.parse(data);
-  //   });
-  // });
+  ipcMain.handle("load_data", async (event, filename) => {
+    const filepath = path.join(os.homedir(), ".ignite", filename);
+    fs.readFile(filepath, (err) => {
+      if (err) throw err;
+      return true;
+    });
+  });
+
+  ipcMain.handle("check_path", async (event, filepath) => {
+    let valid = true;
+    try {
+      await fs.access(filepath);
+    } catch (err) {
+      valid = false;
+    }
+    return valid;
+  });
 
   ipcMain.on("launch_dcc", (event, filepath, args=[], env={}) => {
     console.log("Launching DCC:");
     console.log(filepath, args, env);
-    var subpy = require('child_process').spawn(filepath, args, {env: {...process.env, ...env}, detached: true});
+    var proc = require('child_process').spawn(filepath, args, {env: {...process.env, ...env}, detached: true});
   });
-
-  
-
 }
 
 // This method will be called when Electron has finished
