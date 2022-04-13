@@ -2,6 +2,7 @@ import os
 from re import A
 import yaml
 import logging
+import shutil
 from pathlib import Path, PurePath
 from ignite import utils
 
@@ -13,6 +14,7 @@ ANCHORS = CONFIG["anchors"]
 KINDS = {v: k for k, v in ANCHORS.items()}
 if not Path(ROOT).is_dir():
     os.makedirs(ROOT)
+IGNITE_ROOT = Path(os.environ["IGNITE_ROOT"])
 
 
 def create_project(name: str):
@@ -334,3 +336,46 @@ def discover_scenes(path, dcc=[], latest=False, as_dict=False):
     if as_dict:
         scenes = [s.as_dict() for s in scenes]
     return scenes
+
+
+def copy_default_scene(task, dcc):
+    task = find(task)
+    if not task or not task.dir_kind == "task":
+        return
+    filepath = IGNITE_ROOT / "cg/default_scenes/default_scenes.yaml"
+    if not filepath.exists():
+        return
+    with open(filepath, "r") as f:
+        data = yaml.safe_load(f)
+    if dcc not in data.keys():
+        return
+    src = IGNITE_ROOT / "cg/default_scenes" / data[dcc]
+    dest = task.get_next_scene()
+    os.makedirs(dest)
+    shutil.copy2(src, dest)
+    utils.create_anchor(dest, "scene")
+    return dest / PurePath(src).name
+
+
+def register_directory(path, dir_kind):
+    utils.create_anchor(path, dir_kind)
+    return True
+
+
+def register_task(path, task_type):
+    utils.create_anchor(path, "task")
+    task = find(path)
+    if not task:
+        return
+    task.set_task_type(task_type)
+    return True
+
+
+def register_scene(path):
+    utils.create_anchor(path, "scene")
+    return True
+
+
+def register_assetversion(path):
+    utils.create_anchor(path, "assetversion")
+    return True

@@ -4,20 +4,21 @@ from posixpath import dirname
 import uvicorn
 import yaml
 from pprint import pprint
-from pathlib import Path
+from pathlib import PurePath
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from entities.task import Task
-
-from ignite.client import utils
-
 
 ENV = os.environ
+IGN_SERVER_HOST = "127.0.0.1"
+IGN_SERVER_PORT = "9090"
 IGNITE_ROOT = os.path.dirname(__file__)
 ENV["IGNITE_ROOT"] = IGNITE_ROOT
 s = os.path.join(IGNITE_ROOT, "cg", "houdini", "python")
 if not s in ENV["PYTHONPATH"]:
     ENV["PYTHONPATH"] += ";" + s
+ENV["OCIO"] = PurePath(IGNITE_ROOT / "cg/config/aces_1.2/config.ocio")
+
+from ignite.client import utils
 
 
 app = FastAPI()
@@ -45,9 +46,7 @@ async def set_dcc_config(request: Request):
     result = await request.json()
     config = result.get("config", [])
     utils.set_dcc_config(config)
-    return {
-        "ok": True
-    }
+    return {"ok": True}
 
 
 @app.post("/api/v1/launch_dcc")
@@ -59,13 +58,16 @@ async def launch_dcc(request: Request):
     dcc_name = result.get("dcc_name", "")
     new_scene = result.get("new_scene", False)
     if new_scene and task:
-        scene = utils.copy_default_scene(task, dcc)
+        data = {
+            "task": task,
+            "dcc": dcc
+        }
+        resp = utils.server_request("copy_default_scene", data)
+        scene = resp.get("scene", "")
     elif new_scene and not task:
         return {"ok": False}
     ok = utils.launch_dcc(dcc, dcc_name, scene)
-    return {
-        "ok": ok
-    }
+    return {"ok": ok}
 
 
 @app.post("/api/v1/get_env")

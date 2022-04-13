@@ -5,11 +5,14 @@ import uvicorn
 from pprint import pprint
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-
-from ignite import utils, api
-
+from ignite import utils
 
 CONFIG = utils.get_config()
+ENV = os.environ
+IGNITE_ROOT = os.path.dirname(__file__)
+ENV["IGNITE_ROOT"] = IGNITE_ROOT
+
+from ignite import api
 
 
 app = FastAPI()
@@ -197,6 +200,52 @@ async def get_scenes(request: Request):
         "result_amount": total,
         "data": to_return
     }
+
+
+@app.post("/api/v1/copy_default_scene")
+async def copy_default_scene(request: Request):
+    result = await request.json()
+    task = result.get("task", "")
+    dcc = result.get("dcc", "")
+    scene = api.copy_default_scene(task, dcc)
+    return {
+        "ok": scene != False,
+        "scene": scene
+    }
+
+
+@app.post("/api/v1/register_directory")
+async def register_directory(request: Request):
+    result = await request.json()
+    path = result.get("path", "")
+    dir_kind = result.get("dir_kind", "")
+    ok = api.register_directory(path, dir_kind)
+    return {"ok": ok}
+
+
+@app.post("/api/v1/register_task")
+async def register_task(request: Request):
+    result = await request.json()
+    path = result.get("path", "")
+    task_type = result.get("task_type", "")
+    ok = api.register_task(path, task_type)
+    return {"ok": ok}
+
+
+@app.post("/api/v1/register_scene")
+async def register_scene(request: Request):
+    result = await request.json()
+    path = result.get("path", "")
+    ok = api.register_scene(path)
+    return {"ok": ok}
+
+
+@app.post("/api/v1/register_assetversion")
+async def register_assetversion(request: Request):
+    result = await request.json()
+    path = result.get("path", "")
+    ok = api.register_assetversion(path)
+    return {"ok": ok}
 
 
 if __name__ == "__main__":
