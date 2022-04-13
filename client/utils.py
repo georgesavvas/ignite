@@ -2,7 +2,7 @@ import os
 import logging
 import yaml
 import subprocess
-import shutil
+import requests
 from pathlib import PurePath, Path
 from client_main import IGNITE_ROOT
 import ignite.api as ign
@@ -92,26 +92,6 @@ def set_dcc_config(config):
     return filepath
 
 
-def copy_default_scene(task, dcc):
-    task = ign.find(task)
-    if not task or not task.dir_kind == "task":
-        return
-    filepath = IGNITE_ROOT / "cg/default_scenes/default_scenes.yaml"
-    if not filepath.exists():
-        return
-    with open(filepath, "r") as f:
-        data = yaml.safe_load(f)
-    if dcc not in data.keys():
-        print(dcc, data)
-        return
-    src = IGNITE_ROOT / "cg/default_scenes" / data[dcc]
-    dest = task.get_next_scene()
-    os.makedirs(dest)
-    shutil.copy2(src, dest)
-    create_anchor(dest, "scene")
-    return dest / PurePath(src).name
-
-
 def discover_dcc():
     pass
 
@@ -133,3 +113,10 @@ def launch_dcc(dcc, dcc_name, scene):
     cmd.append(scene)
     subprocess.Popen(cmd, env=env)
     return True
+
+
+def server_request(method, data):
+    url = "http://{IGNITE_SERVER_HOST}:{IGNITE_SERVER_PORT}/api/v1/{method}"
+    headers = {"Content-type": "application/json"}
+    resp = requests.post(url, json=data, headers=headers).json()
+    return resp

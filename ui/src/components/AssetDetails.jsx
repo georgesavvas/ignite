@@ -1,6 +1,7 @@
-import React from "react";
+import React, {useState} from "react";
 import Typography from '@mui/material/Typography';
 import ImageViewer from "./ImageViewer";
+import ComponentViewer from "./ComponentViewer";
 import {
   ReflexContainer,
   ReflexSplitter,
@@ -18,21 +19,35 @@ const style = {
 }
 
 function AssetDetails(props) {
+  const [selectedCompName, setSelectedCompName] = useState("");
+
+  const getComp = compName => {
+    for(const comp of props.entity.components) {
+      if (comp.name === compName) return comp;
+    }
+    return {};
+  }
+
+  const selectedComp = getComp(selectedCompName);
+
   return (
     <div style={style}>
       <ReflexContainer orientation="horizontal">
           <ReflexElement flex={0.4}>
-            <ImageViewer entity={props.entity} />
+            <ImageViewer entity={selectedComp} />
           </ReflexElement>
           <ReflexSplitter style={splitterStyle} />
-          <ReflexElement flex={0.6}>
-          <div style={{margin: "10px", overflow: "hidden"}}>
-            <Typography variant="h5">Asset Details</Typography>
-            <Typography>{props.entity.dir_kind}</Typography>
-            <Typography>{props.entity.name}</Typography>
-            <Typography>{props.entity.path}</Typography>
-            <Typography>{props.entity.context}</Typography>
-          </div>
+          <ReflexElement flex={0.2}>
+            <div style={{margin: "10px", overflow: "hidden"}}>
+              <Typography variant="h5">Asset Details</Typography>
+              <Typography>Name: {props.entity.name}</Typography>
+              <Typography>Path: {props.entity.path}</Typography>
+              <Typography>Context: {props.entity.context}</Typography>
+            </div>
+          </ReflexElement>
+          <ReflexSplitter style={splitterStyle} />
+          <ReflexElement flex={0.4}>
+            <ComponentViewer components={props.entity.components} selectedComp={selectedComp} onSelect={setSelectedCompName} />
           </ReflexElement>
         </ReflexContainer>
     </div>

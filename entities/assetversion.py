@@ -36,18 +36,21 @@ class AssetVersion(Directory):
         path = Path(self.path)
         anchor = CONFIG["anchors"]["assetversion"]
         comps = []
-        collections, remainder = clique.assemble([str(path / d.name) for d in path.iterdir()])
+        collections, remainder = clique.assemble([str(d.name) for d in path.iterdir()])
         # comps += [c.format("{head}####{tail}") for c in collections]
         # comps += [r for r in remainder if not r == anchor]
         for c in collections:
+            filename = c.format("{head}####{tail}")
             comps.append({
-                "path": self.path / c.format("{head}####{tail}"),
+                "filename": filename,
+                "path": self.path / filename,
                 "name": c.head.rstrip("."),
                 "ext": c.tail.lstrip(".")
             })
         for r in remainder:
             r2 = PurePath(r)
             comps.append({
+                "filename": r2,
                 "path": self.path / r2.name,
                 "name": r2.stem,
                 "ext": r2.suffix

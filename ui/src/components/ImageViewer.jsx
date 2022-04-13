@@ -27,20 +27,20 @@ function Viewer(props) {
 }
 
 function ImageViewer(props) {
-  const path = `ign://${props.entity.thumbnail}`;
+  const path = `${props.entity.path || "C:\\Users\\George\\Desktop\\assetlib\\no_icon.png"}`;
 
   const thumbnailStyle = {
     display: "block",
     marginLeft: "auto",
     marginRight: "auto"
   };
-
+  console.log(props.entity);
   return (
     <div style={style}>
       {/* <img src={path} style={thumbnailStyle} /> */}
       <Canvas orthographic camera={{ zoom: 100, position: [0, 0, 1] }}>
         <Suspense fallback={null}>
-          <Viewer texture={props.entity.thumbnail} />
+          <Viewer texture={path} />
         </Suspense>
       </Canvas>
     </div>

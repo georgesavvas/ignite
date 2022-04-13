@@ -1,0 +1,38 @@
+.container {
+    /* height: 100%; */
+    margin: 10px;
+    box-sizing: border-box;
+}
+
+.compContainer {
+    width: 100%;
+    height: 50px;
+    border: solid 1px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    overflow: clip;
+}
+
+.compList {
+    box-sizing: border-box;
+}
+
+.compIcon {
+    aspect-ratio: 1;
+    width: 35px;
+    background-size: cover;
+    background-position: center;
+    background-image: url("ign://C:\\Users\\George\\Desktop\\assetlib\\roberto.png");
+    box-sizing: border-box;
+}
+
+.label {
+    padding-left: 15px;
+}
+
+.spacer {
+    flex-grow: 1;
+}
