@@ -16,7 +16,7 @@ ENV["IGNITE_ROOT"] = IGNITE_ROOT
 s = os.path.join(IGNITE_ROOT, "cg", "houdini", "python")
 if not s in ENV["PYTHONPATH"]:
     ENV["PYTHONPATH"] += ";" + s
-ENV["OCIO"] = PurePath(IGNITE_ROOT / "cg/config/aces_1.2/config.ocio")
+# ENV["OCIO"] = PurePath(IGNITE_ROOT / "cg/config/aces_1.2/config.ocio")
 
 from ignite.client import utils
 

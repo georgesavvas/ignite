@@ -1,4 +1,5 @@
-root: "D:/projects"
+# root: "D:/projects"
+root: "/Users/george/projects"
 
 anchors:
   project: ".ign_project.yaml"

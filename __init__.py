@@ -1,3 +1,8 @@
 import os
 
-os.environ["IGNITE_CONFIG_PATH"] = os.path.join(os.path.dirname(__file__), "config.yaml")
+
+DIR = os.path.dirname(__file__)
+ENV = os.environ
+
+ENV["IGNITE_CONFIG_PATH"] = os.path.join(DIR, "config.yaml")
+ENV["IGNITE_ROOT"] = DIR
