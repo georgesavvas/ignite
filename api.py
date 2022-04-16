@@ -172,13 +172,15 @@ def discover_tasks(path, task_types=[], as_dict=False):
             d["dir_kind"] = ""
             d["task_type"] = ""
             d["anchor"] = None
-            for x in path.iterdir():
+            for x in sorted(list(path.iterdir())):
                 name = x.name
                 if name in (".config", "common"):
                     continue
                 if name in KINDS:
                     d["dir_kind"] = KINDS[name]
                     d["anchor"] = x
+                    continue
+                if name.startswith("."):
                     continue
                 elif not d["dir_kind"]:
                     return []
@@ -211,13 +213,15 @@ def discover_assets(path, asset_kinds=[], as_dict=False):
             d["path"] = str(path)
             d["dir_kind"] = ""
             d["anchor"] = None
-            for x in path.iterdir():
+            for x in sorted(list(path.iterdir())):
                 name = x.name
                 if name in (".config", "common"):
                     continue
                 if name in KINDS:
                     d["dir_kind"] = KINDS[name]
                     d["anchor"] = x
+                    continue
+                if name.startswith("."):
                     continue
                 elif not d["dir_kind"] and d["name"] not in ("exports", "scenes"):
                     return []
@@ -236,44 +240,6 @@ def discover_assets(path, asset_kinds=[], as_dict=False):
     if as_dict:
         assets = [a.as_dict() for a in assets]
     return assets
-
-
-def _discover_assetversions(path, asset_kinds=[], as_dict=False):
-    from ignite.entities.assetversion import AssetVersion
-
-    def discover(path, l=[]):
-        name = path.name
-        if path.is_dir():
-            d = {}
-            d["name"] = name
-            d["path"] = str(path)
-            d["dir_kind"] = ""
-            d["anchor"] = None
-            for x in path.iterdir():
-                name = x.name
-                if name in (".config", "common"):
-                    continue
-                if name in KINDS:
-                    d["dir_kind"] = KINDS[name]
-                    d["anchor"] = x
-                    continue
-                elif not d["dir_kind"] and d["name"] != "exports":
-                    return []
-                if d["dir_kind"] == "assetversion" and d["anchor"]:
-                    with open(d["anchor"], "r") as f:
-                        config = yaml.safe_load(f)
-                        config = config or {}
-                discover(x, l)
-            if d["dir_kind"] == "assetversion":
-                if not asset_kinds or d["asset_kind"] in asset_kinds:
-                    l.append(d)
-        return l
-
-    data = discover(Path(path))
-    assetversions = [AssetVersion(path=av["path"]) for av in data]
-    if as_dict:
-        assetversions = [av.as_dict() for av in assetversions]
-    return assetversions
 
 
 def discover_assetversions(path, asset_kinds=[], latest=False, as_dict=False):
@@ -306,7 +272,7 @@ def discover_scenes(path, dcc=[], latest=False, as_dict=False):
             d["path"] = str(path)
             d["dir_kind"] = ""
             d["anchor"] = None
-            contents = list(path.iterdir())
+            contents = sorted(list(path.iterdir()))
             if contents and path.name == "scenes":
                 contents = sorted(contents, reverse=True)
                 if latest:
@@ -318,6 +284,8 @@ def discover_scenes(path, dcc=[], latest=False, as_dict=False):
                 if name in KINDS:
                     d["dir_kind"] = KINDS[name]
                     d["anchor"] = x
+                    continue
+                if name.startswith("."):
                     continue
                 elif not d["dir_kind"] and d["name"] != "scenes":
                     return []

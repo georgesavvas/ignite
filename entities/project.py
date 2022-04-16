@@ -92,14 +92,16 @@ class Project(Directory):
                 d["task_type"] = ""
                 d["children"] = []
                 d["anchor"] = None
-                for x in path.iterdir():
-                    _id[0] += 1
+                for x in sorted(list(path.iterdir())):
                     name = x.name
+                    _id[0] += 1
                     if name in (".config", "common"):
                         continue
                     if name in anchors:
                         d["dir_kind"] = kinds[name]
                         d["anchor"] = x
+                        continue
+                    if name.startswith("."):
                         continue
                     elif not d["dir_kind"]:
                         return
@@ -112,12 +114,13 @@ class Project(Directory):
                     d["children"].append(child_d)
                     walk_project(x, child_d, _id)
                 del d["anchor"]
-                d["children"] = [child for child in d["children"] if child["dir_kind"]]
+                d["children"] = [child for child in d["children"] if child and child["dir_kind"]]
                 d["icon"] = d["dir_kind"]
                 if d["task_type"]:
                     d["icon"] = d["icon"] + "_" + d["task_type"]
             return d
 
         path = Path(self.path)
+        print("-----", path)
         tree = walk_project(path)
         return tree
