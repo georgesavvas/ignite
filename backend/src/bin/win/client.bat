@@ -1,0 +1,1 @@
+python %0\..\..\..\src\python\client\main.py
