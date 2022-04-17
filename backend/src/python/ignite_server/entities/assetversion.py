@@ -1,16 +1,18 @@
 import os
+from ignite_server.constants import COMP_TYPES
 import clique
 from pathlib import Path, PurePath
 from ignite_server import utils
 from ignite_server.entities.directory import Directory
 from ignite_server.entities.asset import Asset
+from ignite_server.constants import ANCHORS
 
 CONFIG = utils.get_config()
-ROOT = PurePath(CONFIG["root"])
-COMP_TYPES = {}
-for name, exts in CONFIG["comp_types"].items():
+ROOT = PurePath(CONFIG["projects_root"])
+COMP_EXT_TYPES = {}
+for name, exts in COMP_TYPES.items():
     for ext in exts:
-        COMP_TYPES[ext] = name
+        COMP_EXT_TYPES[ext] = name
 
 
 class AssetVersion(Directory):
@@ -34,7 +36,7 @@ class AssetVersion(Directory):
 
     def _fetch_components(self):
         path = Path(self.path)
-        anchor = CONFIG["anchors"]["assetversion"]
+        anchor = ANCHORS["assetversion"]
         comps = []
         collections, remainder = clique.assemble([str(d.name) for d in path.iterdir()])
         # comps += [c.format("{head}####{tail}") for c in collections]
@@ -91,6 +93,6 @@ class AssetVersion(Directory):
             d["default_name"] = c["name"]
             ext = c["ext"]
             d["default_type"] = ""
-            if ext in COMP_TYPES.keys():
-                d["default_type"] = COMP_TYPES[ext]
+            if ext in COMP_EXT_TYPES.keys():
+                d["default_type"] = COMP_EXT_TYPES[ext]
         return d

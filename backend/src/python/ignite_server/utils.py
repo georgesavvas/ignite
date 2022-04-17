@@ -4,6 +4,7 @@ import yaml
 import logging
 import re
 from pathlib import Path, PurePath
+from ignite_server.constants import ANCHORS
 
 
 def get_config() -> dict:
@@ -13,15 +14,14 @@ def get_config() -> dict:
     logging.info(f"Reading config from {path}...")    
     with open(path, "r") as f:
         config = yaml.safe_load(f)
-    paths = ("root",)
+    paths = ("projects_root",)
     for p in paths:
         config[p] = os.path.abspath(config[p])
     return config
 
 
 CONFIG = get_config()
-ROOT = PurePath(CONFIG["root"])
-ANCHORS = CONFIG["anchors"]
+ROOT = PurePath(CONFIG["projects_root"])
 
 
 def ensure_directory(path: Path) -> int:

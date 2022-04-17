@@ -1,11 +1,12 @@
 import os
 from pathlib import Path, PurePath
+from ignite_server.constants import DCC_EXTENSIONS
 from ignite_server import utils
 from ignite_server.entities.directory import Directory
 from ignite_server.entities.task import Task
 
 CONFIG = utils.get_config()
-ROOT = PurePath(CONFIG["root"])
+ROOT = PurePath(CONFIG["projects_root"])
 
 
 class Scene(Directory):
@@ -53,7 +54,7 @@ class Scene(Directory):
 
         extensions = []
         ext_dcc = {}
-        for dcc, exts in CONFIG["dcc_extensions"].items():
+        for dcc, exts in DCC_EXTENSIONS.items():
             extensions += exts
             for ext in exts:
                 ext_dcc[ext] = dcc

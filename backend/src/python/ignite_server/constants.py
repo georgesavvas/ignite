@@ -13,7 +13,7 @@ TOOLS = {
 
 OS_NAMES = {
     "Windows": "win",
-    "Debian": "mac",
+    "Darwin": "mac",
     "Linux": "linux"
 }
 
@@ -29,29 +29,30 @@ MP4_CONFIG = (
         '-vendor ap10',
         '{output}',
     )
-# cmd = "ffmpeg " + " ".join(CONFIGS[output_format]).format(
-#         filepath=filepath,
-#         fps=env.get("FPS", 25),
-#         sframe=env.get("START_FRAME", 1001),
-#         output=output
-#     )
 
-# if "clique" in str(type(sequence)):
-#         seq_string = os.path.join(input_path, sequence.format("{head}{padding}{tail}"))
-#         cmd_frame = "-start_number {} ".format(sequence.indexes[0])
-#         cmd_fps = "-r 25 "
-#     else:
-#         seq_string = input_path
-#     cmd = "ffmpeg {}-i {} -c:v libx264 {}-vf scale=1280:-2 {}".format(
-#         cmd_frame,
-#         seq_string,
-#         cmd_fps,
-#         output_path
-#     )
-#     exit_code = -1
-#     try:
-#         exit_code = subprocess.check_call(
-#             cmd.split(),
-#             stdout=subprocess.PIPE,
-#             stderr=subprocess.STDOUT
-#         )
+ANCHORS = {
+    "project": ".ign_project.yaml",
+    "phase": ".ign_phase.yaml",
+    "directory": ".ign_dir.yaml",
+    "build": ".ign_build.yaml",
+    "sequence": ".ign_sequence.yaml",
+    "shot": ".ign_shot.yaml",
+    "task": ".ign_task.yaml",
+    "asset": ".ign_asset.yaml",
+    "scene": ".ign_scene.yaml",
+    "assetversion": ".ign_assetversion.yaml"
+}
+
+DCC_EXTENSIONS = {
+    "houdini": ["hip", "hipnc"],
+    "maya": ["ma"],
+    "nuke": ["nk"],
+    "natron": [],
+    "substance_designer": ["sbs"],
+    "substance_painter": [],
+    "blender": []
+}
+
+COMP_TYPES = {
+    "usd": ["usd", "usdz", "usdc", "usda"]
+}

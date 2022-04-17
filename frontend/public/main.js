@@ -4,11 +4,22 @@ const fs = require('fs').promises;
 const path = require("path");
 
 function createWindow () {
-  // Create the browser window.
+
+  let platformName = process.platform;
+  if (platformName === "win32") platformName = "win";
+  else if (platformName === "darwin") platformName = "mac";
+  else platformName = "linux";
+
+  const iconPaths = {
+    "win": "media/desktop_icon/win/ignite.ico",
+    "mac": "media/desktop_icon/mac/ignite.icns",
+    "linux": "media/desktop_icon/linux/ignite.png"
+  }
+
   const win = new BrowserWindow({
     width: 1280,
     height: 720,
-    icon: path.join(__dirname, "media/desktop_icon.ico"),
+    icon: path.join(__dirname, iconPaths[platformName]),
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: true,

@@ -1,13 +1,14 @@
 import os
 from pathlib import Path, PurePath
+from ignite_server.constants import ANCHORS
 from ignite_server import utils
 from ignite_server.entities.directory import Directory
 
 
 CONFIG = utils.get_config()
-ROOT = PurePath(CONFIG["root"])
+ROOT = PurePath(CONFIG["projects_root"])
 PHASES = ("global", "rnd", "build", "shots")
-ANCHOR = CONFIG["anchors"]["phase"]
+ANCHOR = ANCHORS["phase"]
 
 
 class Phase(Directory):

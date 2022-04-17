@@ -38,7 +38,6 @@ export const DccProvider = props => {
     fetch("http://127.0.0.1:9091/api/v1/get_dcc_config").then((resp) => {
       return resp.json();
     }).then((resp) => {
-      console.log(resp);
       noWrite.current = true;
       setDccConfig(resp.data);
     });

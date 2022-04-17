@@ -1,4 +1,5 @@
 GENERIC_ENV = {
+    "PROJECTS_ROOT": "{projects_root}",
     "OCIO": "{dcc}/ocio/aces_1.2/config.ocio"
 }
 
@@ -13,4 +14,10 @@ DCC_ENVS = {
 
 DCC_LOCATIONS = {
     "houdini": ""
+}
+
+OS_NAMES = {
+    "Windows": "win",
+    "Darwin": "mac",
+    "Linux": "linux"
 }

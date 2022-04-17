@@ -1,0 +1,82 @@
+import os
+import math
+from posixpath import dirname
+import uvicorn
+import yaml
+from pprint import pprint
+from pathlib import PurePath
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
+
+ENV = os.environ
+IGNITE_SERVER_HOST = "127.0.0.1"
+IGNITE_SERVER_PORT = "9090"
+ENV["IGNITE_SERVER_HOST"] = IGNITE_SERVER_HOST
+ENV["IGNITE_SERVER_PORT"] = IGNITE_SERVER_PORT
+
+from ignite_client import utils
+
+
+app = FastAPI()
+origins = ["*"]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+@app.get("/api/v1/get_dcc_config")
+async def get_dcc_config():
+    config = utils.get_dcc_config()
+    return {
+        "ok": True,
+        "data": config
+    }
+
+
+@app.post("/api/v1/set_dcc_config")
+async def set_dcc_config(request: Request):
+    result = await request.json()
+    config = result.get("config", [])
+    utils.set_dcc_config(config)
+    return {"ok": True}
+
+
+@app.post("/api/v1/launch_dcc")
+async def launch_dcc(request: Request):
+    result = await request.json()
+    task = result.get("task", "")
+    scene = result.get("scene", "")
+    dcc = result.get("dcc", "")
+    dcc_name = result.get("dcc_name", "")
+    new_scene = result.get("new_scene", False)
+    if new_scene and task:
+        data = {
+            "task": task,
+            "dcc": dcc
+        }
+        resp = utils.server_request("copy_default_scene", data)
+        scene = resp.get("scene", "")
+    elif new_scene and not task:
+        return {"ok": False}
+    ok = utils.launch_dcc(dcc, dcc_name, scene)
+    return {"ok": ok}
+
+
+@app.post("/api/v1/get_env")
+async def get_env(request: Request):
+    result = await request.json()
+    task = result.get("task", "")
+    dcc = result.get("dcc", "")
+    env = utils.get_env(task, dcc)
+    return {
+        "ok": True,
+        "data": env
+    }
+
+
+if __name__ == "__main__":
+    uvicorn.run("client_main:app", host="127.0.0.1", port=9091, log_level="info", reload=True)

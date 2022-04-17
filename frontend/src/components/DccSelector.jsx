@@ -12,7 +12,7 @@ const style = {
 }
 
 const dccNames = {
-  houdini: ["hmaster", "hescape", "houdini", "houdinicore", "houdinifx"],
+  houdini: ["hmaster", "hescape", "houdini"],
   maya: ["maya"],
   blender: ["blender"],
   nuke: ["nuke"]
@@ -46,7 +46,9 @@ function DccSelector(props) {
 
   const getDccName = (dcc) => {
     for(const _dcc of Object.keys(dccNames)) {
-      if (dccNames[_dcc].includes(dcc)) return _dcc;
+        for(const dcc_keyword of dccNames[_dcc]) {
+          if (dcc.toLowerCase().includes(dcc_keyword)) return _dcc;
+        }
     }
     return "unknown";
   }
