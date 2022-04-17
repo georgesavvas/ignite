@@ -1,10 +1,11 @@
 import os
 import logging
+import platform
 import yaml
 import subprocess
 import requests
 from pathlib import PurePath, Path
-from ignite_client.constants import GENERIC_ENV, DCC_ENVS
+from ignite_client.constants import GENERIC_ENV, DCC_ENVS, OS_NAMES
 
 
 ENV = os.environ
@@ -16,17 +17,23 @@ IGNITE_SERVER_HOST = ENV["IGNITE_SERVER_HOST"]
 IGNITE_SERVER_PORT = ENV["IGNITE_SERVER_PORT"]
 
 
-def replace_dcc(d):
+def replace_vars(d):
+    vars = {
+        "dcc": str(IGNITE_DCC),
+        "projects_root": server_request("get_projects_root").get("data", "")
+    }
     env = {}
     for k, v in d.items():
-        if "{dcc}" in v:
-            v = str(PurePath(v.format(dcc=IGNITE_DCC)))
+        for var_name, var_value in vars.items():
+            s = "{" + var_name + "}"
+            if s in v:
+                v = str(PurePath(v.replace(s, var_value)))
         env[k] = v
     return env
 
 
 def get_generic_env():
-    return replace_dcc(GENERIC_ENV)
+    return replace_vars(GENERIC_ENV)
 
 
 def get_task_env(path):
@@ -58,7 +65,7 @@ def get_scene_env(scene):
 def get_dcc_env(dcc):
     if not dcc in DCC_ENVS.keys():
         return {}
-    return replace_dcc(DCC_ENVS[dcc])
+    return replace_vars(DCC_ENVS[dcc])
 
 
 
@@ -108,14 +115,25 @@ def launch_dcc(dcc, dcc_name, scene):
             break
     else:
         return
-    cmd = [dcc_config["path"]]
+
+    os_name = OS_NAMES[platform.system()]
+    os_cmd = {
+        "win": [],
+        "mac": ["open", "-a"],
+        "linux": []
+    }
+    cmd = os_cmd[os_name]
+    cmd += [dcc_config["path"]]
     cmd.append(scene)
     subprocess.Popen(cmd, env=env)
     return True
 
 
-def server_request(method, data):
+def server_request(method, data=None):
     url = f"http://{IGNITE_SERVER_HOST}:{IGNITE_SERVER_PORT}/api/v1/{method}"
     headers = {"Content-type": "application/json"}
-    resp = requests.post(url, json=data, headers=headers).json()
+    if not data:
+        resp = requests.get(url, headers=headers).json()
+    else:
+        resp = requests.post(url, json=data, headers=headers).json()
     return resp

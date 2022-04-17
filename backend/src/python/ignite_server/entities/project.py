@@ -5,11 +5,12 @@ import time
 from pathlib import Path, PurePath
 from ignite_server import utils
 from ignite_server.entities.directory import Directory
+from ignite_server.constants import ANCHORS
 
 
 CONFIG = utils.get_config()
-ROOT = PurePath(CONFIG["root"])
-PHASE_ANCHOR = CONFIG["anchors"]["phase"]
+ROOT = PurePath(CONFIG["projects_root"])
+PHASE_ANCHOR = ANCHORS["phase"]
 PROJECT_CONFIG_FILE = "project.yaml"
 
 
@@ -42,7 +43,7 @@ class Project(Directory):
         split = path.split(root)
         if not path.startswith(root) or re.match("^[\/]+$", split[1]):
             raise Exception(f"Invalid project path: {path}")
-        self.name = split[1]
+        self.name = split[1].lstrip("/")
         dirs = ("config", "common", "global", "rnd", "assets", "shots")
         path = PurePath(path)
         for d in dirs:
@@ -79,7 +80,7 @@ class Project(Directory):
             yaml.safe_dump(new_config, f)
 
     def get_project_tree(self):
-        kinds = {v: k for k, v in CONFIG["anchors"].items()}
+        kinds = {v: k for k, v in ANCHORS.items()}
         anchors = kinds.keys()
 
         def walk_project(path, d={}, _id=[0]):

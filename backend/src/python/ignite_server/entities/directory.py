@@ -3,13 +3,12 @@ import yaml
 import logging
 from pathlib import Path, PurePath
 from ignite_server import utils
-
 from ignite_server import api
+from ignite_server.constants import ANCHORS
 
 
 CONFIG = utils.get_config()
-ROOT = PurePath(CONFIG["root"])
-ANCHORS = CONFIG["anchors"]
+ROOT = PurePath(CONFIG["projects_root"])
 
 
 class Directory():

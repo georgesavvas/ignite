@@ -16,17 +16,19 @@ import ThumbsUpDownIcon from '@mui/icons-material/ThumbsUpDown';
 import SettingsIcon from '@mui/icons-material/Settings';
 import SettingsDialog from "./SettingsDialog.jsx";
 import {ProjectContext} from "../contexts/ProjectContext";
+import ProjectBrowser from "../pages/ProjectBrowser";
 
 export default function TopBar() {
   const [isLoading, setIsLoading] = useState(true);
   const [projects, setProjects] = useState([]);
-  const [settingsOpen, setSettingsOpen] = React.useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [projectBrowserOpen, setProjectBrowserOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useContext(ProjectContext);
 
   useEffect(() => {
     setIsLoading(true);
     fetch(
-      "http://127.0.0.1:9090/api/v1/get_projects", {
+      "http://127.0.0.1:9090/api/v1/get_project_names", {
         method: "GET",
         headers: {
           'Accept': 'application/json, text/plain, */*',
@@ -50,6 +52,7 @@ export default function TopBar() {
 
   return (
     <div className={styles.container}>
+      <ProjectBrowser open={projectBrowserOpen} onClose={() => setProjectBrowserOpen(false)} />
       <SettingsDialog open={settingsOpen} onClose={() => setSettingsOpen(false)} />
       {/* <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
         <Select
@@ -65,8 +68,8 @@ export default function TopBar() {
         </Select>
       </FormControl> */}
       <div className={styles.buttonsRight}>
-        <Button variant="outlined">Project Browser</Button>
-        <Button variant="outlined">Vault</Button>
+        <Button variant="outlined" color="ignite" onClick={() => setProjectBrowserOpen(true)}>Project Browser</Button>
+        <Button variant="outlined" color="ignite">Vault</Button>
       </div>
       <div className={styles.logoContainer}>
         <img src="media/ignite_header.png" className={styles.logo} />

@@ -4,7 +4,7 @@ from ignite_server import utils
 from ignite_server.entities.directory import Directory
 
 CONFIG = utils.get_config()
-ROOT = PurePath(CONFIG["root"])
+ROOT = PurePath(CONFIG["projects_root"])
 
 
 class Sequence(Directory):

@@ -5,13 +5,13 @@ import logging
 import shutil
 from pathlib import Path, PurePath
 from ignite_server import utils
+from ignite_server.constants import ANCHORS
 
 
 ENV = os.environ
 CONFIG = utils.get_config()
-PROJECT_ANCHOR = CONFIG["anchors"]["project"]
-ROOT = PurePath(CONFIG["root"])
-ANCHORS = CONFIG["anchors"]
+PROJECT_ANCHOR = ANCHORS["project"]
+ROOT = PurePath(CONFIG["projects_root"])
 KINDS = {v: k for k, v in ANCHORS.items()}
 if not Path(ROOT).is_dir():
     os.makedirs(ROOT)
@@ -32,7 +32,15 @@ def create_project(name: str):
 
 
 def get_projects_root() -> str:
-    return ENV.get("IGNITE_PROJECTS_ROOT", "")
+    return str(ROOT)
+
+
+def get_projects() -> list:
+    from ignite_server.entities.project import Project
+    projects = Path(ROOT).iterdir()
+    projects = [p for p in projects if not p.name.startswith(".")]
+    projects = [Project(path=ROOT / p.name).as_dict() for p in projects if (Path(p) / PROJECT_ANCHOR).exists()]
+    return projects
 
 
 def get_project_names() -> list:
@@ -53,6 +61,8 @@ def get_project(name):
 
 
 def find(path):
+    if not path:
+        return
     from ignite_server.entities.project import Project
     from ignite_server.entities.directory import Directory
     from ignite_server.entities.phase import Phase
@@ -64,8 +74,7 @@ def find(path):
     from ignite_server.entities.assetversion import AssetVersion
     from ignite_server.entities.scene import Scene
 
-    config = utils.get_config()
-    kinds = {v: k for k, v in config["anchors"].items()}
+    kinds = {v: k for k, v in ANCHORS.items()}
     anchors = kinds.keys()
     entities = {
         "project": Project,
@@ -84,14 +93,14 @@ def find(path):
         path = path.parent
     if not path.is_dir():
         logging.error(f"Invalid path: {path}")
-        return None
+        return
     for d in path.iterdir():
         name = d.name
         if name in anchors:
             entity = entities[kinds[name]]
             break
     else:
-        return None
+        return
     return entity(path=path)
 
 
@@ -121,7 +130,7 @@ def get_contents(path, as_dict=False):
 
 def get_dir_type(path, dir_type):
     root = ROOT.as_posix()
-    anchor = CONFIG["anchors"][dir_type]
+    anchor = ANCHORS[dir_type]
     path = Path(path)
     parent = path
     iter = 1
@@ -315,14 +324,14 @@ def copy_default_scene(task, dcc):
     task = find(task)
     if not task or not task.dir_kind == "task":
         return
-    filepath = IGNITE_ROOT / "cg/default_scenes/default_scenes.yaml"
+    filepath = IGNITE_SERVER_ROOT / "cg/default_scenes/default_scenes.yaml"
     if not filepath.exists():
         return
     with open(filepath, "r") as f:
         data = yaml.safe_load(f)
     if dcc not in data.keys():
         return
-    src = IGNITE_ROOT / "cg/default_scenes" / data[dcc]
+    src = IGNITE_SERVER_ROOT / "cg/default_scenes" / data[dcc]
     dest = task.get_next_scene()
     os.makedirs(dest)
     shutil.copy2(src, dest)

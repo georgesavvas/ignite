@@ -116,14 +116,22 @@ function ExplorerBar(props) {
           onChange={handleLocationChange}
         />
         <Button
-          style={{width: "150px"}}
+          style={{minWidth: "120px"}}
           color="ignite"
           variant="outlined"
+          disabled={currentContext.kind !== "task"}
           onClick={() => setNewSceneOpen(true)}
         >
           New Scene
         </Button>
-        <Button style={{width: "150px"}} color="ignite" variant="outlined">New Asset</Button>
+        <Button
+          style={{minWidth: "120px"}}
+          color="ignite" 
+          variant="outlined"
+          disabled={currentContext.kind !== "task"}
+        >
+          New Asset
+        </Button>
       </div>
     </div>
   )
