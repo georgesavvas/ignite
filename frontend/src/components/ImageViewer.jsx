@@ -1,7 +1,9 @@
 import { grid } from "@mui/system";
 import React, { Suspense, useRef, useState } from "react";
-import { Canvas, useFrame, useLoader } from '@react-three/fiber'
-import { TextureLoader } from 'three/src/loaders/TextureLoader'
+import { Canvas, useFrame, useLoader } from '@react-three/fiber';
+import { OrbitControls   } from "@react-three/drei";
+import { TextureLoader } from 'three/src/loaders/TextureLoader';
+import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js';
 
 const style = {
   border: "solid red 1px",
@@ -14,7 +16,20 @@ const style = {
 }
 
 function Viewer(props) {
-  const colorMap = useLoader(TextureLoader, `ign://${props.texture}`)
+  const comp = props.comp;
+  let path = "media/no_icon.png";
+  if (comp.path) {
+    path = comp.path.replace("/Users/george/projects/", "");
+    path = `http://127.0.0.1:9091/files/${path}`;
+  }
+  if (!comp.static) {
+    let frame = comp.first + (comp.last - comp.first) * props.progress;
+    frame = Math.round(frame);
+    path = path.replace("####", frame);
+  }
+  const loader = comp.ext === ".exr" ? EXRLoader : TextureLoader;
+  console.log(path);
+  const colorMap = useLoader(loader, path)
   return (
     <>
       <ambientLight intensity={0.5} />
@@ -27,20 +42,21 @@ function Viewer(props) {
 }
 
 function ImageViewer(props) {
-  const path = `${props.entity.path || "C:\\Users\\George\\Desktop\\assetlib\\no_icon.png"}`;
+  const [progress, setProgress] = useState(0.5);
 
   const thumbnailStyle = {
     display: "block",
     marginLeft: "auto",
     marginRight: "auto"
   };
-  console.log(props.entity);
+  // console.log(props.entity);
   return (
     <div style={style}>
       {/* <img src={path} style={thumbnailStyle} /> */}
       <Canvas orthographic camera={{ zoom: 100, position: [0, 0, 1] }}>
+        <OrbitControls enableRotate={false} />
         <Suspense fallback={null}>
-          <Viewer texture={path} />
+          <Viewer comp={props.comp} progress={progress} />
         </Suspense>
       </Canvas>
     </div>

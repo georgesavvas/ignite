@@ -49,3 +49,15 @@ def create_anchor(path, name):
     if not full_path.exists():
         full_path.touch()
     return full_path
+
+
+def get_uri(path):
+    splt = PurePath(path).as_posix().split(ROOT.as_posix(), 1)[1].replace("/exports", "").split("/")[1:]
+    print(splt)
+    project = splt[0]
+    phase = splt[1]
+    context = "/".join(splt[2:-2])
+    task = splt[-2]
+    asset = splt[-1]
+    uri = f"ign:{project}:{phase}/{context}/{task}:{asset}"
+    return uri

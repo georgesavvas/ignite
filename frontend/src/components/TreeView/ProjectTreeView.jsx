@@ -184,10 +184,16 @@ function StyledTreeItem(props) {
                 props.dir_path,
                 contextOption
               ))}
+              style={{
+                paddingTop: "2px",
+                paddingBottom: "2px",
+                fontSize: "0.8rem"
+              }}
             >
               {contextOption.label}
             </MenuItem>
           ))}
+          <Divider />
       </Menu>
       <StyledTreeItemRoot
         label={

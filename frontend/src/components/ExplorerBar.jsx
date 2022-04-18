@@ -33,7 +33,8 @@ const dialogStyle = {
     "& .MuiPaper-root": {
       width: "100%",
       maxWidth: "30vw",
-      backgroundColor: "rgb(0,0,0)",
+      backgroundColor: "rgb(40,40,40)",
+      backgroundImage: "none"
     },
   },
 }
@@ -124,14 +125,14 @@ function ExplorerBar(props) {
         >
           New Scene
         </Button>
-        <Button
+        {/* <Button
           style={{minWidth: "120px"}}
           color="ignite" 
           variant="outlined"
           disabled={currentContext.kind !== "task"}
         >
           New Asset
-        </Button>
+        </Button> */}
       </div>
     </div>
   )

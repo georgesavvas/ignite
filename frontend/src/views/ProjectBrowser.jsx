@@ -112,7 +112,7 @@ const tileContainerStyle = {
   flexGrow: 1,
   display: "grid",
   overflowY: "auto",
-  gridTemplateColumns: `repeat(auto-fit, minmax(250px, 1fr))`,
+  gridTemplateColumns: `repeat(auto-fill, minmax(250px, 1fr))`,
   // gridGap: `${tileSize * 0.06}px`,
   // padding: `${tileSize * 0.06}px`
   gridGap: "10px",
@@ -131,6 +131,7 @@ const Browser = (props) => {
   }
 
   useEffect(() => {
+    if (!props.open) return;
     setIsLoading(true);
     fetch(
       "http://127.0.0.1:9090/api/v1/get_projects", {
@@ -148,7 +149,7 @@ const Browser = (props) => {
       setIsLoading(false);
       setLoadedData(resp.data);
     });
-  }, []);
+  }, [props.open]);
 
   useEffect(() => {
     const _tiles = loadedData.reduce(function(obj, project) {
@@ -179,7 +180,8 @@ const dialogStyle = {
     "& .MuiPaper-root": {
       width: "100%",
       maxWidth: "80vw",
-      backgroundColor: "rgb(0,0,0)",
+      backgroundColor: "rgb(40,40,40)",
+      backgroundImage: "none"
     },
   },
 }
