@@ -23,7 +23,7 @@ function AssetDetails(props) {
 
   const getComp = compName => {
     for(const comp of props.entity.components) {
-      if (comp.name === compName) return comp;
+      if (comp.filename === compName) return comp;
     }
     return {};
   }
@@ -34,7 +34,7 @@ function AssetDetails(props) {
     <div style={style}>
       <ReflexContainer orientation="horizontal">
           <ReflexElement flex={0.4}>
-            <ImageViewer entity={selectedComp} />
+            <ImageViewer comp={selectedComp} />
           </ReflexElement>
           <ReflexSplitter style={splitterStyle} />
           <ReflexElement flex={0.2}>
@@ -43,6 +43,7 @@ function AssetDetails(props) {
               <Typography>Name: {props.entity.name}</Typography>
               <Typography>Path: {props.entity.path}</Typography>
               <Typography>Context: {props.entity.context}</Typography>
+              <Typography color="rgb(252, 140, 3)">URI: {props.entity.uri}</Typography>
             </div>
           </ReflexElement>
           <ReflexSplitter style={splitterStyle} />

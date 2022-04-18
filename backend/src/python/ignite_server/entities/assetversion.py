@@ -21,15 +21,16 @@ class AssetVersion(Directory):
         self.version = self.name
         self.version_int = 0
         if self.version.startswith("v"):
-            int(self.version.lstrip("v"))
+            self.version_int = int(self.version.lstrip("v"))
         self.name = self.path.parent.name
         self.components = []
         self.asset = self.path.parent
+        self.uri = utils.get_uri(self.asset) + "@" + str(self.version_int)
         self.task = self.asset.parent.parent
         self.source = ""
-        self.thumbnail = PurePath()
         self.preview = PurePath()
         self._fetch_components()
+        self.thumbnail = self.get_thumbnail()
 
     def __lt__(self, other):
         return self.version_int < other.version_int
@@ -39,51 +40,39 @@ class AssetVersion(Directory):
         anchor = ANCHORS["assetversion"]
         comps = []
         collections, remainder = clique.assemble([str(d.name) for d in path.iterdir()])
-        # comps += [c.format("{head}####{tail}") for c in collections]
-        # comps += [r for r in remainder if not r == anchor]
         for c in collections:
             filename = c.format("{head}####{tail}")
+            indexes = list(c.indexes)
             comps.append({
                 "filename": filename,
                 "path": str(self.path / filename),
                 "name": c.head.rstrip("."),
-                "ext": c.tail
+                "ext": c.tail,
+                "first": indexes[0],
+                "last": indexes[-1],
+                "static": 0
             })
         for r in remainder:
             r2 = PurePath(r)
+            if r2.name.startswith("."):
+                continue
             comps.append({
                 "filename": str(r2),
                 "path": str(self.path / r2.name),
                 "name": r2.stem,
-                "ext": r2.suffix
+                "ext": r2.suffix,
+                "static": 1
             })
-        # for x in path.iterdir():
-        #     name = x.name
-        #     if name.startswith("."):
-        #         continue
-        #     if name == anchor:
-        #         continue
-        #     if x.stem == "source":
-        #         self.source = x
-        #         continue
-        #     if x.stem == "thumbnail":
-        #         self.thumbnail = x
-        #         continue
-        #     c = {}
-        #     c["name"] = name
-        #     c["path"] = x
-        #     c["ext"] = x.suffix
-        #     comps.append(c)
         self.components = comps
 
     def as_dict(self):
         d = {}
         for s in (
                 "path", "dir_kind", "anchor", "project", "name", "version",
-                "components", "asset", "source", "task"
+                "components", "asset", "source", "task", "uri"
             ):
             d[s] = getattr(self, s)
-        d["thumbnail"] = self.thumbnail.as_posix()
+        d["thumbnail"] = self.thumbnail
         project_path = ROOT / self.project
         # d["context"] = self.asset.as_posix().replace(project_path.as_posix() + "/", "")
         d["context"] = self.task.as_posix().replace(project_path.as_posix() + "/", "")
@@ -96,3 +85,26 @@ class AssetVersion(Directory):
             if ext in COMP_EXT_TYPES.keys():
                 d["default_type"] = COMP_EXT_TYPES[ext]
         return d
+
+    def get_thumbnail(self):
+        exts = (".jpg", ".jpeg", ".png", ".tif", ".tiff")
+        candidates = []
+        for comp in self.components:
+            # if comp["name"] == "thumbnail":
+            #     c = comp.copy()
+            #     c["static"] = 1
+            #     return c
+            ext = comp["ext"]
+            if ext not in exts:
+                continue
+            priority = 1
+            priority -= exts.index(ext) / len(exts) * 0.1
+            if comp["static"]:
+                priority -= 0.5
+            c = comp.copy()
+            c["priority"] = priority
+            candidates.append(c)
+        if not candidates:
+            return {}
+        return sorted(candidates, key=lambda c: c["priority"])[0]
+

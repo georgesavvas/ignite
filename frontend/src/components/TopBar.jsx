@@ -16,7 +16,7 @@ import ThumbsUpDownIcon from '@mui/icons-material/ThumbsUpDown';
 import SettingsIcon from '@mui/icons-material/Settings';
 import SettingsDialog from "./SettingsDialog.jsx";
 import {ProjectContext} from "../contexts/ProjectContext";
-import ProjectBrowser from "../pages/ProjectBrowser";
+import ProjectBrowser from "../views/ProjectBrowser";
 
 export default function TopBar() {
   const [isLoading, setIsLoading] = useState(true);
@@ -52,7 +52,10 @@ export default function TopBar() {
 
   return (
     <div className={styles.container}>
-      <ProjectBrowser open={projectBrowserOpen} onClose={() => setProjectBrowserOpen(false)} />
+      <ProjectBrowser
+        open={projectBrowserOpen}
+        onClose={() => setProjectBrowserOpen(false)}
+      />
       <SettingsDialog open={settingsOpen} onClose={() => setSettingsOpen(false)} />
       {/* <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
         <Select
@@ -68,7 +71,14 @@ export default function TopBar() {
         </Select>
       </FormControl> */}
       <div className={styles.buttonsRight}>
-        <Button variant="outlined" color="ignite" onClick={() => setProjectBrowserOpen(true)}>Project Browser</Button>
+        <Button
+          variant="outlined"
+          color="ignite"
+          style={{minWidth: "180px"}}
+          onClick={() => setProjectBrowserOpen(true)}
+        >
+          Project Browser
+        </Button>
         <Button variant="outlined" color="ignite">Vault</Button>
       </div>
       <div className={styles.logoContainer}>

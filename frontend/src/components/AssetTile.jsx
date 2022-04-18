@@ -32,9 +32,17 @@ function AssetTileGrid(props) {
     setProgress(clamp(width, 0, 1));
   }
 
+  const thumbnail = props.entity.thumbnail
+  let thumbnailPath = thumbnail.path || "media/no_icon.png"
+  if (!thumbnail.static) {
+    let frame = thumbnail.first + (thumbnail.last - thumbnail.first) * progress;
+    frame = Math.round(frame);
+    thumbnailPath = thumbnailPath.replace("####", frame);
+  }
+
   return (
     <div style={tileStyle} className={styles.tile} onClick={() => props.onSelected(props.entity)} >
-      <img src={`ign://${props.entity.thumbnail}`} style={thumbnailStyle} />
+      <img src={`ign://${thumbnailPath}`} style={thumbnailStyle} />
       <div className={styles.hoverArea} onMouseMove={handleMouseMove} ref={hoverArea}>
         <div className={styles.overlay}>
           <div className={styles.topGrad} />
@@ -66,14 +74,22 @@ function AssetTileRow(props) {
     overflow: "clip"
   };
 
+  const thumbnailContainer = {
+    minWidth: props.size,
+    height: props.size * 0.5625,
+    maxWidth: props.size,
+    position: "relative"
+  }
+
   const thumbnailStyle = {
-    // "borderRadius": "10px 0 0 10px",
-    "backgroundImage": "url(ign://" + props.entity.thumbnail + ")",
-    "backgroundSize": "cover",
-    "backgroundPosition": "center",
-    "width": "100%",
-    "height": props.size * 0.5625,
-    "maxWidth": props.size,
+    width: "100%",
+    height: "auto",
+    margin: "auto",
+    bottom: 0,
+    left: 0,
+    top: 0,
+    margin: "auto",
+    position: "absolute",
   };
 
   const barStyle = {
@@ -86,9 +102,19 @@ function AssetTileRow(props) {
     setProgress(clamp(width, 0, 1));
   }
 
+  const thumbnail = props.entity.thumbnail
+  let thumbnailPath = thumbnail.path || "media/no_icon.png"
+  if (!thumbnail.static) {
+    let frame = thumbnail.first + (thumbnail.last - thumbnail.first) * progress;
+    frame = Math.round(frame);
+    thumbnailPath = thumbnailPath.replace("####", frame);
+  }
+
   return (
     <div style={tileStyle} onClick={() => props.onSelected(props.entity)} >
-      <div style={thumbnailStyle} />
+      <div style={thumbnailContainer}>
+        <img src={`ign://${thumbnailPath}`} style={thumbnailStyle} />
+      </div>
       <div className={styles.hoverArea} onMouseMove={handleMouseMove} style={{"maxWidth": props.size}} ref={hoverArea}>
         <div className={styles.bar} style={barStyle} />
       </div>

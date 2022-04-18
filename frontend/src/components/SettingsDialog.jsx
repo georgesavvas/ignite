@@ -136,7 +136,8 @@ export default function SettingsDialog(props) {
       "& .MuiPaper-root": {
         width: "100%",
         maxWidth: "80vw",
-        backgroundColor: "rgb(0,0,0)",
+        backgroundColor: "rgb(40,40,40)",
+        backgroundImage: "none"
       },
     },
   }

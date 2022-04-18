@@ -16,21 +16,22 @@
     overflow: clip;
 }
 
+.textContainer {
+    padding-left: 5px;
+    overflow: clip;
+}
+
 .compList {
     box-sizing: border-box;
 }
 
 .compIcon {
     aspect-ratio: 1;
-    width: 35px;
+    min-width: 35px;
     background-size: cover;
     background-position: center;
-    background-image: url("ign://C:\\Users\\George\\Desktop\\assetlib\\roberto.png");
+    background-image: "media/folder_icon.png";
     box-sizing: border-box;
-}
-
-.label {
-    padding-left: 15px;
 }
 
 .spacer {

@@ -7,6 +7,7 @@ from pprint import pprint
 from pathlib import PurePath
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 ENV = os.environ
 IGNITE_SERVER_HOST = "127.0.0.1"
@@ -76,6 +77,11 @@ async def get_env(request: Request):
         "ok": True,
         "data": env
     }
+
+
+projects_root = PurePath(utils.server_request("get_projects_root").get("data"))
+print(projects_root)
+app.mount("/files", StaticFiles(directory=projects_root), name="projects_root")
 
 
 if __name__ == "__main__":

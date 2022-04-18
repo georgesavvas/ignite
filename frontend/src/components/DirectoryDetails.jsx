@@ -14,8 +14,9 @@ function DirectoryDetails(props) {
     <div style={style}>
       <div style={{margin: "10px", overflow: "hidden"}}>
         <Typography variant="h5">{dir_kind_formatted} Details</Typography>
-        <Typography>{props.entity.name}</Typography>
-        <Typography>{props.entity.path}</Typography>
+        <Typography>Name: {props.entity.name}</Typography>
+        <Typography>Path: {props.entity.path}</Typography>
+        <Typography>Repr Asset: {props.entity.repr_av}</Typography>
       </div>
     </div>
   )

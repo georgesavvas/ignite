@@ -35,6 +35,7 @@ function Explorer() {
   }
 
   const handleEntitySelection = (entity) => {
+    console.log(entity);
     setSelectedEntity(entity);
   }
 
@@ -102,7 +103,7 @@ function Explorer() {
     flexGrow: 1,
     display: "grid",
     overflowY: "auto",
-    gridTemplateColumns: `repeat(auto-fit, minmax(${tileSize}px, 1fr))`,
+    gridTemplateColumns: `repeat(auto-fill, minmax(${tileSize}px, 1fr))`,
     // gridGap: `${tileSize * 0.06}px`,
     // padding: `${tileSize * 0.06}px`
     gridGap: "10px",

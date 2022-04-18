@@ -33,9 +33,11 @@ function ComponentViewer(props) {
     }
 
     return (
-      <div className={styles.compContainer} id={comp.name} key={index} onClick={handleClick} style={containerStyle}>
+      <div className={styles.compContainer} id={comp.filename} key={index} onClick={handleClick} style={containerStyle}>
         <div className={styles.compIcon} />
-        <Typography variant="subtitle1" className={styles.label}>{comp.filename}</Typography>
+        <div className={styles.textContainer}>
+          <Typography variant="subtitle1" className={styles.label}>{comp.filename}</Typography>
+        </div>
         <div className={styles.spacer} />
         <IconButton>
           <CopyIcon />
