@@ -18,10 +18,7 @@ const style = {
 function Viewer(props) {
   const comp = props.comp;
   let path = "media/no_icon.png";
-  if (comp.path) {
-    path = comp.path.replace("/Users/george/projects/", "");
-    path = `http://127.0.0.1:9091/files/${path}`;
-  }
+  if (comp.path) path = `http://127.0.0.1:9091/files/${comp.api_path}`;
   if (!comp.static) {
     let frame = comp.first + (comp.last - comp.first) * props.progress;
     frame = Math.round(frame);
