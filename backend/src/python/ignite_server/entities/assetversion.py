@@ -43,9 +43,11 @@ class AssetVersion(Directory):
         for c in collections:
             filename = c.format("{head}####{tail}")
             indexes = list(c.indexes)
+            filepath = str(self.path / filename)
             comps.append({
                 "filename": filename,
-                "path": str(self.path / filename),
+                "path": filepath,
+                "api_path": utils.get_api_path(filepath),
                 "name": c.head.rstrip("."),
                 "ext": c.tail,
                 "first": indexes[0],
@@ -56,9 +58,11 @@ class AssetVersion(Directory):
             r2 = PurePath(r)
             if r2.name.startswith("."):
                 continue
+            filepath = str(self.path / r2.name)
             comps.append({
                 "filename": str(r2),
-                "path": str(self.path / r2.name),
+                "path": filepath,
+                "api_path": utils.get_api_path(filepath),
                 "name": r2.stem,
                 "ext": r2.suffix,
                 "static": 1
@@ -72,6 +76,7 @@ class AssetVersion(Directory):
                 "components", "asset", "source", "task", "uri"
             ):
             d[s] = getattr(self, s)
+        d["api_path"] = utils.get_api_path(d["path"]),
         d["thumbnail"] = self.thumbnail
         project_path = ROOT / self.project
         # d["context"] = self.asset.as_posix().replace(project_path.as_posix() + "/", "")
@@ -107,4 +112,3 @@ class AssetVersion(Directory):
         if not candidates:
             return {}
         return sorted(candidates, key=lambda c: c["priority"])[0]
-

@@ -61,3 +61,8 @@ def get_uri(path):
     asset = splt[-1]
     uri = f"ign:{project}:{phase}/{context}/{task}:{asset}"
     return uri
+
+
+def get_api_path(path):
+    path = str(path)
+    return path.replace(str(ROOT), "")
