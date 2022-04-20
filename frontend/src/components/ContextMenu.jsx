@@ -2,33 +2,39 @@ import React, {useState} from 'react';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 
-export function handleContextMenu(props) {
-  props.event.preventDefault();
+export function handleContextMenu(event, contextMenu, setContextMenu) {
+  event.preventDefault();
   setContextMenu(
-    props.contextMenu === null
+    contextMenu === null
       ? {
-          mouseX: props.event.clientX - 2,
-          mouseY: props.event.clientY - 4,
+          mouseX: event.clientX - 2,
+          mouseY: event.clientY - 4,
         }
       : null,
   );
 };
 
-function ContextMenu() {
-  const [contextMenu, setContextMenu] = useState(null);
+function ContextMenu(props) {
+  // const [contextMenu, setContextMenu] = useState(null);
 
   const handleClose = () => {
-    setContextMenu(null);
+    props.setContextMenu(null);
   };
 
   function formatItem(item, index) {
     // if (item.type === "divider") return <Divider />
+    if (!item.fn) item.fn = () => {};
+    if (!item.args) item.args = [];
     return(
       <MenuItem
         key={index}
-        data={item}
-        onClick={() => item.fn(...item.args)}
+        onClick={() => {item.fn(...item.args); handleClose();}}
         divider={item.divider || false}
+        style={{
+          paddingTop: "2px",
+          paddingBottom: "2px",
+          fontSize: "0.8rem"
+        }}
       >
         {item.label}
       </MenuItem>
@@ -37,12 +43,12 @@ function ContextMenu() {
 
   return (
     <Menu
-      open={contextMenu !== null}
+      open={props.contextMenu !== null}
       onClose={handleClose}
       anchorReference="anchorPosition"
       anchorPosition={
-        contextMenu !== null
-          ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
+        props.contextMenu !== null
+          ? { top: props.contextMenu.mouseY, left: props.contextMenu.mouseX }
           : undefined
       }
     >
