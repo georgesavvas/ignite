@@ -1,57 +1,105 @@
-import React, { useState, useEffect, useContext } from "react";
-import styles from "./ComponentViewer.module.css";
-import Typography from '@mui/material/Typography';
-import IconButton from '@mui/material/IconButton';
-import CopyIcon from "../icons/CopyIcon";
-import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
-import { Button } from "@mui/material";
-import {DccContext} from "../contexts/DccContext";
-import {ContextContext} from "../contexts/ContextContext";
+import { grid } from "@mui/system";
+import React, { Suspense, useRef, useState } from "react";
+import { Canvas, useFrame, useLoader } from '@react-three/fiber';
+import { OrbitControls   } from "@react-three/drei";
+import { TextureLoader } from 'three/src/loaders/TextureLoader';
+import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js';
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
-const dccNames = {
-  houdini: ["hmaster", "hescape", "houdini", "houdinicore", "houdinifx"],
-  maya: ["maya"],
-  blender: ["blender"],
-  nuke: ["nuke"]
+const style = {
+  // border: "solid red 1px",
+  // aspectRatio: 16 / 9,
+  position: "relative",
+  height: "100%",
+  width: "100%",
+  boxSizing: "border-box",
+  display: grid,
+}
+
+function ImgViewer(props) {
+  return (
+    <TransformWrapper limitToBounds={false}>
+      <TransformComponent>
+        <img src={props.path} />
+      </TransformComponent>
+    </TransformWrapper>
+  )
+}
+
+function EXRViewer(props) {
+  console.log(props.path);
+  const colorMap = useLoader(EXRLoader, props.path);
+  return (
+    <Canvas orthographic camera={{ zoom: 100, position: [0, 0, 1] }} colorManagement>
+      <OrbitControls enableRotate={false} />
+      <Suspense fallback={null}>
+        <ambientLight intensity={0.5} />
+        <mesh>
+          <planeGeometry attach="geometry" args={[1.77, 1]} />
+          <meshStandardMaterial map={colorMap} />
+        </mesh>
+      </Suspense>
+    </Canvas>
+  )
+}
+
+function VideoViewer(props) {
+  return (
+    // <TransformWrapper limitToBounds={false}>
+    //   <TransformComponent>
+        <video width="320" height="240" controls>
+          <source src={props.path} type="video/mp4" />
+        </video>
+    //   </TransformComponent>
+    // </TransformWrapper>
+  )
+}
+
+function GeoViewer(props) {
+  const loader = props.comp.ext === ".exr" ? EXRLoader : TextureLoader;
+  const colorMap = useLoader(loader, props.path)
+  return (
+    <Canvas orthographic camera={{ zoom: 100, position: [0, 0, 1] }}>
+      <OrbitControls enableRotate={false} />
+      <Suspense fallback={null}>
+        <ambientLight intensity={0.5} />
+        <mesh>
+          <planeGeometry />
+          <meshStandardMaterial map={colorMap} />
+        </mesh>
+      </Suspense>
+    </Canvas>
+  )
 }
 
 function ComponentViewer(props) {
-
-  const handleClick = (e) => {
-    props.onSelect(e.currentTarget.id);
+  const [progress, setProgress] = useState(0.5);
+  
+  const comp = props.comp;
+  let path = "media/no_icon.png";
+  if (comp.path) path = `http://127.0.0.1:9091/files/${comp.api_path}`;
+  if (!comp.static) {
+    let frame = comp.first + (comp.last - comp.first) * progress;
+    frame = Math.round(frame);
+    path = path.replace("####", frame);
   }
 
-  function formatComp(comp, index) {
-    // const dcc_name = getDccName(dcc.path.split("/").at(-1).split("\\").at(-1).split(".")[0]);
-    // const dccIcon = `url(media/dcc/${dcc_name}.png)`;
-    // const containerStyle = {
-    //   borderColor: dcc.name === selectedDcc ? "rgb(252, 140, 3)" : "rgb(70,70,70)"
-    // }
-
-    const containerStyle = {
-      borderColor: comp.name === props.selectedComp ? "rgb(252, 140, 3)" : "rgb(70,70,70)"
-    }
-
-    return (
-      <div className={styles.compContainer} id={comp.filename} key={index} onClick={handleClick} style={containerStyle}>
-        <div className={styles.compIcon} />
-        <div className={styles.textContainer}>
-          <Typography variant="subtitle1" className={styles.label}>{comp.filename}</Typography>
-        </div>
-        <div className={styles.spacer} />
-        <IconButton>
-          <CopyIcon />
-        </IconButton>
-      </div>
-    )
+  const getViewer = (comp, path) => {
+    const ext = comp.ext;
+    const img = [".jpg", ".jpeg", ".png", ".tif", ".tiff"];
+    const exr = [".exr"];
+    const vid = [".mp4", ".mov"];
+    const geo = [];
+    if (img.includes(ext)) return <ImgViewer comp={comp} path={path} />;
+    else if (exr.includes(ext)) return <EXRViewer comp={comp} path={path} />;
+    else if (vid.includes(ext)) return <VideoViewer comp={comp} path={path} />;
+    else if (geo.includes(ext)) return <GeoViewer comp={comp} path={path} />;
+    else return null;
   }
 
   return (
-    <div className={styles.container}>
-      <Typography variant="h5" style={{marginBottom: "10px"}}>Components</Typography>
-      <div className={styles.compList}>
-        {props.components.map((comp, index) => formatComp(comp, index))}
-      </div>
+    <div style={style}>
+      {getViewer(props.comp, path)}
     </div>
   )
 }

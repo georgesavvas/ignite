@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import Typography from '@mui/material/Typography';
-import ImageViewer from "./ImageViewer";
 import ComponentViewer from "./ComponentViewer";
+import ComponentList from "./ComponentList";
 import {
   ReflexContainer,
   ReflexSplitter,
@@ -34,7 +34,7 @@ function AssetDetails(props) {
     <div style={style}>
       <ReflexContainer orientation="horizontal">
           <ReflexElement flex={0.4}>
-            <ImageViewer comp={selectedComp} />
+            <ComponentViewer comp={selectedComp} />
           </ReflexElement>
           <ReflexSplitter style={splitterStyle} />
           <ReflexElement flex={0.2}>
@@ -48,7 +48,7 @@ function AssetDetails(props) {
           </ReflexElement>
           <ReflexSplitter style={splitterStyle} />
           <ReflexElement flex={0.4}>
-            <ComponentViewer components={props.entity.components} selectedComp={selectedComp} onSelect={setSelectedCompName} />
+            <ComponentList components={props.entity.components} selectedComp={selectedComp} onSelect={setSelectedCompName} />
           </ReflexElement>
         </ReflexContainer>
     </div>
