@@ -1,7 +1,8 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import Tile from "../../components/Tile";
 import Typography from '@mui/material/Typography';
 import {ContextContext} from "../../contexts/ContextContext";
+
 
 function DirectoryTile(props) {
   const [currentContext, setCurrentContext] = useContext(ContextContext);

@@ -1,10 +1,11 @@
 import React, { useState, createRef } from "react";
 import styles from "./Tile.module.css";
+import ContextMenu, { handleContextMenu } from "./ContextMenu";
 
 const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 
 function GridTile(props) {
-
+  const [contextMenu, setContextMenu] = useState(null);
   const [progress, setProgress] = useState(0);
   const hoverArea = createRef();
   const isStatic = props.thumbnail !== undefined;
@@ -44,17 +45,39 @@ function GridTile(props) {
     props.onSelected(props.entity);
   }
 
+  const contextItems = [
+    {
+      "label": "Copy URI",
+      "fn": () =>  navigator.clipboard.writeText(props.entity.uri)
+    },
+    {
+      "label": "Copy path",
+      "fn": () =>  navigator.clipboard.writeText(props.entity.path),
+      "divider": true
+    },
+    {
+      "label": "Open in file explorer"
+    },
+  ]
+
+  const _handleContextMenu = e => {
+    handleContextMenu(e, contextMenu, setContextMenu);
+  }
+
   return (
-    <div style={tileStyle} className={styles.tile} onClick={handleClick}>
-      <img src={thumbnailURL} className={styles.thumbnail} style={thumbnailStyle} />
-      <div className={styles.hoverArea} onMouseMove={isStatic ? null : handleMouseMove} ref={hoverArea}>
-        <div className={styles.overlay}>
-          <div className={styles.topGrad} />
-          {props.children}
+    <>
+    <ContextMenu items={contextItems} contextMenu={contextMenu} setContextMenu={setContextMenu} />
+      <div style={tileStyle} className={styles.tile} onClick={handleClick} onContextMenu={_handleContextMenu}>
+        <img src={thumbnailURL} className={styles.thumbnail} style={thumbnailStyle} />
+        <div className={styles.hoverArea} onMouseMove={isStatic ? null : handleMouseMove} ref={hoverArea}>
+          <div className={styles.overlay}>
+            <div className={styles.topGrad} />
+            {props.children}
+          </div>
+          {isStatic ? null : <div className={styles.bar} style={barStyle} />}
         </div>
-        {isStatic ? null : <div className={styles.bar} style={barStyle} />}
       </div>
-    </div>
+    </>
   );
 }
 
