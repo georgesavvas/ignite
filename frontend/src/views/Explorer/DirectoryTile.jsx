@@ -1,4 +1,4 @@
-import React, { useState, useContext, createRef} from "react";
+import React, { useContext } from "react";
 import Tile from "../../components/Tile";
 import Typography from '@mui/material/Typography';
 import {ContextContext} from "../../contexts/ContextContext";
@@ -6,7 +6,7 @@ import {ContextContext} from "../../contexts/ContextContext";
 function DirectoryTile(props) {
   const [currentContext, setCurrentContext] = useContext(ContextContext);
   const isScene = props.entity.dir_kind === "scene";
-  const thumbnailWidth = isScene ? "100%" : "50%";
+  const thumbnailWidth = isScene || props.entity.thumbnail ? "100%" : "50%";
 
   const handleClick = e => {
     if (e.detail === 2) {
@@ -55,7 +55,7 @@ function DirectoryTile(props) {
   return (
     <Tile
       {...props}
-      thumbnail={thumbnailPath()}
+      thumbnail={props.entity.thumbnail ? undefined : thumbnailPath()}
       thumbnailWidth={thumbnailWidth}
       onClick={handleClick}
     >

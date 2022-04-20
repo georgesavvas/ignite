@@ -5,7 +5,7 @@ from pathlib import Path, PurePath
 from ignite_server import utils
 from ignite_server.entities.directory import Directory
 from ignite_server.entities.asset import Asset
-from ignite_server.constants import ANCHORS
+from ignite_server.constants import ANCHORS, LABEL_WEIGHTS
 
 CONFIG = utils.get_config()
 ROOT = PurePath(CONFIG["projects_root"])
@@ -16,20 +16,25 @@ for name, exts in COMP_TYPES.items():
 
 
 class AssetVersion(Directory):
-    def __init__(self, path="") -> None:
+    def __init__(self, path) -> None:
+        self.score = 0
+        self.labels = set()
         super().__init__(path, dir_kind="assetversion")
         self.version = self.name
         self.version_int = 0
         if self.version.startswith("v"):
             self.version_int = int(self.version.lstrip("v"))
+        self.is_latest = self._is_latest()
         self.name = self.path.parent.name
         self.components = []
         self.asset = self.path.parent
-        self.uri = utils.get_uri(self.asset) + "@" + str(self.version_int)
+        self.uri = utils.get_uri(self.asset, self.version_int)
         self.task = self.asset.parent.parent
         self.source = ""
         self.preview = PurePath()
         self._fetch_components()
+        self._get_score()
+        
         self.thumbnail = self.get_thumbnail()
 
     def __lt__(self, other):
@@ -69,11 +74,25 @@ class AssetVersion(Directory):
             })
         self.components = comps
 
+    def _get_score(self):
+        score = 0
+        for label in self.labels:
+            if label not in LABEL_WEIGHTS:
+                continue
+            score += LABEL_WEIGHTS[label]
+        if self.is_latest:
+            score += 1
+        self.score = score
+
+    def _is_latest(self):
+        versions = sorted(list(self.path.iterdir()))
+        return self.version == versions[-1]
+
     def as_dict(self):
         d = {}
         for s in (
                 "path", "dir_kind", "anchor", "project", "name", "version",
-                "components", "asset", "source", "task", "uri"
+                "components", "asset", "source", "task", "uri", "labels"
             ):
             d[s] = getattr(self, s)
         d["api_path"] = utils.get_api_path(d["path"]),
@@ -112,3 +131,21 @@ class AssetVersion(Directory):
         if not candidates:
             return {}
         return sorted(candidates, key=lambda c: c["priority"])[0]
+
+    def set_labels(self, labels):
+        self.labels = set(labels)
+        self.update_config({"labels": labels})
+    
+    def add_labels(self, labels):
+        self.labels += labels
+        self.labels = set(self.labels)
+        self.update_config({"labels": self.labels})
+    
+    def remove_labels(self, labels=[], all=False):
+        if all:
+            self.labels = set()
+        for label in labels:
+            if label not in self.labels:
+                continue
+            self.labels.remove(label)
+        self.update_config({"labels": self.labels})

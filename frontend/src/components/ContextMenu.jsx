@@ -14,12 +14,26 @@ export function handleContextMenu(props) {
   );
 };
 
-export default function ContextMenu() {
+function ContextMenu() {
   const [contextMenu, setContextMenu] = useState(null);
 
   const handleClose = () => {
     setContextMenu(null);
   };
+
+  function formatItem(item, index) {
+    // if (item.type === "divider") return <Divider />
+    return(
+      <MenuItem
+        key={index}
+        data={item}
+        onClick={() => item.fn(...item.args)}
+        divider={item.divider || false}
+      >
+        {item.label}
+      </MenuItem>
+    )
+  }
 
   return (
     <Menu
@@ -32,25 +46,9 @@ export default function ContextMenu() {
           : undefined
       }
     >
-      {dirContextOptions[props.dir_kind].map(contextOption => (
-          <MenuItem
-            key={contextOption.name}
-            value={contextOption.name}
-            dir_path={props.dir_path}
-            onClick={(() => handleClick(
-              props.dir_path,
-              contextOption
-            ))}
-            style={{
-              paddingTop: "2px",
-              paddingBottom: "2px",
-              fontSize: "0.8rem"
-            }}
-          >
-            {contextOption.label}
-          </MenuItem>
-        ))}
-        <Divider />
+      {props.items.map((item, index) => formatItem(item, index))}
     </Menu>
   )
 }
+
+export default ContextMenu;

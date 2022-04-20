@@ -8,6 +8,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { TextField } from "@mui/material";
 import Modal from "../../components/Modal";
+import serverRequest from "../../services/serverRequest";
 
 const style = {
   width: "100%",
@@ -41,6 +42,11 @@ function DirectoryDetails(props) {
   const dir_kind_formatted = dir_kind.charAt(0).toUpperCase() + dir_kind.slice(1)
 
   const handleReptChange = uri => {
+    const data = {
+      target: props.entity.path,
+      repr: uri
+    }
+    serverRequest("set_repr_asset", data)
     setReptModalOpen(false);
   }
 
@@ -55,7 +61,7 @@ function DirectoryDetails(props) {
         <Typography variant="h5">{dir_kind_formatted} Details</Typography>
         <Typography>Name: {props.entity.name}</Typography>
         <Typography>Path: {props.entity.path}</Typography>
-        <Typography>Repr Asset: {props.entity.repr_av}</Typography>
+        <Typography>Repr Asset: {props.entity.repr}</Typography>
         <Button onClick={() => setReptModalOpen(true)}>Choose asset</Button>
       </div>
     </div>
