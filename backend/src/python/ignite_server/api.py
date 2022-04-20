@@ -366,3 +366,14 @@ def register_assetversion(path):
     comps = av.components
     print(comps)
     return True
+
+
+def set_repr_asset(target, repr):
+    target_entity = find(target)
+    repr_entity = find(repr)
+    if target_entity.dir_kind in ("directory", "scene"):
+        return
+    if repr_entity.dir_kind == "assetversion":
+        repr_entity = find(repr_entity.asset)
+    target_entity.set_repr(repr.path)
+    return True

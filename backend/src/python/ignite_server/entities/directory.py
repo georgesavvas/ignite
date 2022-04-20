@@ -18,8 +18,8 @@ class Directory():
         self.name = ""
         self.dir_kind = dir_kind
         self.context = ""
-        self.repr_asset = None
-        self.repr_av = None
+        self.repr = None
+        self.repr_comp = None
         if path:
             path = Path(path)
             self.path = path
@@ -72,7 +72,7 @@ class Directory():
     def as_dict(self):
         d = {}
         for s in ("path", "dir_kind", "anchor", "project", "name", "context",
-        "repr_asset", "repr_av"):
+        "repr", "repr_comp"):
             d[s] = getattr(self, s)
         # d["task"] = self.task.as_dict()
         return d
@@ -124,3 +124,9 @@ class Directory():
             config.update(data)
             yaml.safe_dump(config, f)
         return config
+
+    def set_repr(self, path):
+        self.repr = path
+
+    def get_repr_comp(self):
+        pass

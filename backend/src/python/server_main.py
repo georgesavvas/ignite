@@ -283,5 +283,14 @@ async def register_assetversion(request: Request):
     return {"ok": ok}
 
 
+@app.post("/api/v1/set_repr_asset")
+async def set_repr_asset(request: Request):
+    result = await request.json()
+    target = result.get("target", "")
+    repr = result.get("repr", "")
+    ok = api.set_repr_asset(target, repr)
+    return {"ok": ok}
+
+
 if __name__ == "__main__":
     uvicorn.run("server_main:app", host="127.0.0.1", port=9090, log_level="info", reload=True)
