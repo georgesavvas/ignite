@@ -19,7 +19,6 @@ class Directory():
         self.dir_kind = dir_kind
         self.context = ""
         self.repr = None
-        self.repr_comp = None
         if path:
             path = Path(path)
             self.path = path
@@ -72,7 +71,7 @@ class Directory():
     def as_dict(self):
         d = {}
         for s in ("path", "dir_kind", "anchor", "project", "name", "context",
-        "repr", "repr_comp"):
+        "repr"):
             d[s] = getattr(self, s)
         # d["task"] = self.task.as_dict()
         return d
@@ -127,6 +126,4 @@ class Directory():
 
     def set_repr(self, path):
         self.repr = path
-
-    def get_repr_comp(self):
-        pass
+        self.update_config({"repr": path.as_posix()})

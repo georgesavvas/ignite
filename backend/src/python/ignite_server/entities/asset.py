@@ -16,8 +16,9 @@ class Asset(Directory):
         self._assetversions = []
         self._latest_v = None
         self._latest_av = None
+        self._best_v = None
+        self._best_av = None
         self._avs_fetched = False
-        # self._fetch_versions()
 
     @property
     def versions(self):

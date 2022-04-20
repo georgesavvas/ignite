@@ -17,6 +17,11 @@ OS_NAMES = {
     "Linux": "linux"
 }
 
+LABEL_WEIGHTS = {
+    "approved": 1,
+    "deprecated": -100
+}
+
 MP4_CONFIG = (
         '-start_number {sframe}',
         '-r {fps}',

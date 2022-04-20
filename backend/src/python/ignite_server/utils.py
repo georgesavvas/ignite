@@ -3,8 +3,12 @@ import os
 import yaml
 import logging
 import re
+import parse
 from pathlib import Path, PurePath
 from ignite_server.constants import ANCHORS
+
+
+URI_TEMPLATE = parse.compile("ign:{project}:{phase}:{context}:{task}:{name}@{version}")
 
 
 def get_config() -> dict:
@@ -51,16 +55,35 @@ def create_anchor(path, name):
     return full_path
 
 
-def get_uri(path):
+def get_uri(path, version=None):
     splt = PurePath(path).as_posix().split(ROOT.as_posix(), 1)[1].replace("/exports", "").split("/")[1:]
     print(splt)
     project = splt[0]
     phase = splt[1]
     context = "/".join(splt[2:-2])
     task = splt[-2]
-    asset = splt[-1]
-    uri = f"ign:{project}:{phase}/{context}/{task}:{asset}"
+    name = splt[-1]
+    uri = f"ign:{project}:{phase}:{context}:{task}:{name}"
+    if version:
+        uri += "@" + str(version)
     return uri
+
+
+def format_int_version(s):
+    s = str(s)
+    return f"v{s.zfill(3)}"
+
+
+def uri_to_path(uri):
+    data = URI_TEMPLATE.parse(uri).named
+    if data.get("version"):
+        data["version"] = format_int_version(data["version"])
+    path = ROOT
+    for step in ("project", "phase", "context", "task", "exports", "name", "version"):
+        if not data.get(step):
+            return path
+        path = path / data[step]
+    return path
 
 
 def get_api_path(path):

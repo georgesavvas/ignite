@@ -63,6 +63,8 @@ def get_project(name):
 def find(path):
     if not path:
         return
+    if str(path).startswith("ign:"):
+        path = utils.uri_to_path(str(path))
     from ignite_server.entities.project import Project
     from ignite_server.entities.directory import Directory
     from ignite_server.entities.phase import Phase
@@ -125,6 +127,10 @@ def get_contents(path, as_dict=False):
         contents.append(entity)
     if as_dict:
         contents = [c.as_dict() for c in contents if hasattr(c, "as_dict")]
+    for d in contents:
+        if not d.get("repr"):
+            continue
+        d["thumbnail"] = get_repr_comp(d["path"])
     return contents
 
 
@@ -371,9 +377,34 @@ def register_assetversion(path):
 def set_repr_asset(target, repr):
     target_entity = find(target)
     repr_entity = find(repr)
-    if target_entity.dir_kind in ("directory", "scene"):
+    if not target_entity or target_entity.dir_kind in ("directory", "scene"):
+        return
+    if not repr_entity:
         return
     if repr_entity.dir_kind == "assetversion":
         repr_entity = find(repr_entity.asset)
-    target_entity.set_repr(repr.path)
+    target_entity.set_repr(repr_entity.path)
     return True
+
+
+def get_repr_comp(target):
+    print("\n\nGETTING REPR COMP FOR", target)
+    anchors = list(ANCHORS.keys())
+    asset_anchor = ANCHORS["asset"]
+    def search(path):
+        print("Searching in", path)
+        for x in path.iterdir():
+            if x.name == asset_anchor:
+                print("Found asset", x)
+                return x
+            if x.name not in anchors and x.name not in ("exports", "scenes"):
+                continue
+            return search(x)
+
+    target_entity = find(target)
+    path =  Path(target_entity.repr)
+    repr_asset = search(path)
+    if not repr_asset:
+        return {}
+    asset = find(repr_asset)
+    return asset.latest_av.get_thumbnail()

@@ -47,12 +47,12 @@ function GridTile(props) {
   return (
     <div style={tileStyle} className={styles.tile} onClick={handleClick}>
       <img src={thumbnailURL} className={styles.thumbnail} style={thumbnailStyle} />
-      <div className={styles.hoverArea} onMouseMove={handleMouseMove} ref={hoverArea}>
+      <div className={styles.hoverArea} onMouseMove={isStatic ? null : handleMouseMove} ref={hoverArea}>
         <div className={styles.overlay}>
           <div className={styles.topGrad} />
           {props.children}
         </div>
-        <div className={styles.bar} style={barStyle} />
+        {isStatic ? null : <div className={styles.bar} style={barStyle} />}
       </div>
     </div>
   );
@@ -113,8 +113,8 @@ function RowTile(props) {
       <div style={thumbnailContainer}>
         <img src={thumbnailURL} className={styles.thumbnail} style={thumbnailStyle} />
       </div>
-      <div className={styles.hoverArea} onMouseMove={handleMouseMove} style={{"maxWidth": props.size}} ref={hoverArea}>
-        <div className={styles.bar} style={barStyle} />
+      <div className={styles.hoverArea} onMouseMove={isStatic ? null : handleMouseMove} style={{"maxWidth": props.size}} ref={hoverArea}>
+        {isStatic ? null : <div className={styles.bar} style={barStyle} />}
       </div>
       <div style={{"paddingLeft": "6px"}}>
         {props.children}
