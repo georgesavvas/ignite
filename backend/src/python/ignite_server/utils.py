@@ -64,5 +64,5 @@ def get_uri(path):
 
 
 def get_api_path(path):
-    path = str(path)
-    return path.replace(str(ROOT), "")
+    path = PurePath(path).as_posix()
+    return path.replace(ROOT.as_posix(), "")
