@@ -16,7 +16,7 @@ import ThumbsUpDownIcon from '@mui/icons-material/ThumbsUpDown';
 import SettingsIcon from '@mui/icons-material/Settings';
 import SettingsDialog from "./SettingsDialog.jsx";
 import {ProjectContext} from "../contexts/ProjectContext";
-import ProjectBrowser from "../views/ProjectBrowser";
+import ProjectBrowser from "./ProjectBrowser";
 
 export default function TopBar() {
   const [isLoading, setIsLoading] = useState(true);

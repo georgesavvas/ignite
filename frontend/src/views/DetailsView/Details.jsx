@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from "react";
-import {EntityContext} from "../contexts/EntityContext";
+import {EntityContext} from "../../contexts/EntityContext";
 import DirectoryDetails from "./DirectoryDetails";
 import AssetDetails from "./AssetDetails";
 import SceneDetails from "./SceneDetails";

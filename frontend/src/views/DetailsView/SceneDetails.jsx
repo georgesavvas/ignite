@@ -1,6 +1,6 @@
 import React from "react";
 import Typography from '@mui/material/Typography';
-import DccSelector from "./DccSelector.jsx";
+import DccSelector from "../DccSelector.jsx";
 import { Divider } from "@mui/material";
 
 const style = {

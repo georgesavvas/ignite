@@ -1,6 +1,6 @@
 import { createRef, useState, useContext, useEffect } from "react";
 import styles from "./ProjectBrowser.module.css";
-import Explorer from "../components/Explorer";
+import Explorer from "./Explorer/Explorer";
 import Divider from '@mui/material/Divider';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';

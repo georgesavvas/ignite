@@ -28,7 +28,7 @@ import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturi
 import UnarchiveIcon from '@mui/icons-material/Unarchive';
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
 import {ContextContext} from "../../contexts/ContextContext";
-import CreateDirDialogue from "./../CreateDirDialogue";
+import CreateDirDialogue from "../../components/CreateDirDialogue";
 
 const projectIcon = () => {
   return (

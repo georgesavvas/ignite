@@ -6,17 +6,13 @@ import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import GridViewIcon from "../icons/GridViewIcon";
-import RowViewIcon from "../icons/RowViewIcon";
+import GridViewIcon from "../../icons/GridViewIcon";
+import RowViewIcon from "../../icons/RowViewIcon";
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
-import {ContextContext} from "../contexts/ContextContext";
-import DccSelector from "./DccSelector";
+import {ContextContext} from "../../contexts/ContextContext";
+import DccSelector from "../DccSelector";
 
 const style = {
   display: "flex",

@@ -7,21 +7,11 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { TextField } from "@mui/material";
+import Modal from "../../components/Modal";
 
 const style = {
   width: "100%",
   height: "100%"
-}
-
-const dialogStyle = {
-  "& .MuiDialog-container": {
-    "& .MuiPaper-root": {
-      width: "100%",
-      maxWidth: "80vw",
-      backgroundColor: "rgb(40,40,40)",
-      backgroundImage: "none"
-    },
-  },
 }
 
 function ReprAssetModal(props) {
@@ -32,14 +22,16 @@ function ReprAssetModal(props) {
     props.onSave(uri);
   }
   return(
-    <Dialog open={props.open} onClose={props.onClose} sx={dialogStyle}>
-      <DialogContent>
-        <TextField inputRef={uriField} />
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleSave}>Close</Button>
-      </DialogActions>
-    </Dialog>
+    <Modal
+      open={props.open}
+      onClose={props.onClose}
+      title="Set representative asset"
+      buttonLabel="OK"
+      onButtonClicked={handleSave}
+      maxWidth="sm"
+    >
+      <TextField inputRef={uriField} fullWidth color="ignite" size="small" label="Asset URI" />
+    </Modal>
   )
 }
 
@@ -49,7 +41,6 @@ function DirectoryDetails(props) {
   const dir_kind_formatted = dir_kind.charAt(0).toUpperCase() + dir_kind.slice(1)
 
   const handleReptChange = uri => {
-    console.log("URI received:", uri);
     setReptModalOpen(false);
   }
 
