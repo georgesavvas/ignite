@@ -2,11 +2,11 @@ import React, { useState, useEffect, useContext } from "react";
 import styles from "./ComponentList.module.css";
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
-import CopyIcon from "../icons/CopyIcon";
+import CopyIcon from "../../icons/CopyIcon";
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import { Button } from "@mui/material";
-import {DccContext} from "../contexts/DccContext";
-import {ContextContext} from "../contexts/ContextContext";
+import {DccContext} from "../../contexts/DccContext";
+import {ContextContext} from "../../contexts/ContextContext";
 
 const dccNames = {
   houdini: ["hmaster", "hescape", "houdini", "houdinicore", "houdinifx"],

@@ -1,9 +1,9 @@
-import ProjectTree from '../components/TreeView/ProjectTree';
-import TopBar from "../components/TopBar";
+import ProjectTree from '../views/TreeView/ProjectTree';
+import TopBar from "../views/TopBar";
 import styles from "./Home.module.css";
-import Explorer from "../components/Explorer";
+import Explorer from "../views/Explorer/Explorer";
 import Divider from '@mui/material/Divider';
-import Details from '../components/Details';
+import Details from '../views/DetailsView/Details';
 import {
   ReflexContainer,
   ReflexSplitter,

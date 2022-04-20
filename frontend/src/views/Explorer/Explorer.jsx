@@ -1,17 +1,13 @@
 import React, {useEffect, useState, useContext} from "react";
 import classes from "./Explorer.module.css";
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
-import Stack from '@mui/material/Stack';
 import AssetTile from "./AssetTile";
 import DirectoryTile from "./DirectoryTile";
-import Skeleton from '@mui/material/Skeleton';
 import Divider from '@mui/material/Divider';
-import Paper from '@mui/material/Paper';
 import ExplorerBar from "./ExplorerBar";
 import PageBar from "./PageBar";
-import {EntityContext} from "../contexts/EntityContext";
-import {ContextContext} from "../contexts/ContextContext";
+import {EntityContext} from "../../contexts/EntityContext";
+import {ContextContext} from "../../contexts/ContextContext";
+import serverRequest from "../../services/serverRequest";
 
 function Explorer() {
   const [refreshValue, setRefreshValue] = useState(0);
@@ -45,19 +41,9 @@ function Explorer() {
       path: currentContext.path,
       latest: latest
     };
+    const method = methods[resultType];
     setIsLoading(true);
-    fetch(
-      `http://127.0.0.1:9090/api/v1/${methods[resultType]}`, {
-        method: "POST",
-        headers: {
-          'Accept': 'application/json, text/plain, */*',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-      }
-    ).then((resp) => {
-      return resp.json();
-    }).then((resp) => {
+    serverRequest(method, data).then((resp) => {
       setIsLoading(false);
       setLoadedData(resp.data);
       setPages((prevPages) => ({...prevPages, total: resp.pages.total}));
@@ -103,8 +89,6 @@ function Explorer() {
     display: "grid",
     overflowY: "auto",
     gridTemplateColumns: `repeat(auto-fill, minmax(${tileSize}px, 1fr))`,
-    // gridGap: `${tileSize * 0.06}px`,
-    // padding: `${tileSize * 0.06}px`
     gridGap: "10px",
     padding: "10px"
   }

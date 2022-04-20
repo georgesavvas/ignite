@@ -1,5 +1,5 @@
 import React from "react";
-import Tile from "./Tile";
+import Tile from "../../components/Tile";
 import Typography from '@mui/material/Typography';
 
 function AssetTile(props) {
