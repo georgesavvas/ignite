@@ -1,5 +1,7 @@
 import { grid } from "@mui/system";
-import React, { Suspense, useRef, useState } from "react";
+import React, { Suspense, useEffect, useRef, useState } from "react";
+import Slider from '@mui/material/Slider';
+import * as THREE from "three";
 import { Canvas, useFrame, useLoader } from '@react-three/fiber';
 import { OrbitControls   } from "@react-three/drei";
 import { TextureLoader } from 'three/src/loaders/TextureLoader';
@@ -9,6 +11,7 @@ import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 const style = {
   // border: "solid red 1px",
   // aspectRatio: 16 / 9,
+  backgroundColor: "rgb(0,0,0)",
   position: "relative",
   height: "100%",
   width: "100%",
@@ -26,20 +29,73 @@ function ImgViewer(props) {
   )
 }
 
+const sliderContainerStyle = {
+  position: "absolute",
+  left: "30px",
+  right: "30px",
+  bottom: "30px",
+  zIndex: 1
+}
+
+function Scene({path}) {
+  path = path || "media/no_icon.png";
+  const loader = path.includes(".exr") ? EXRLoader : TextureLoader
+  const colorMap = useLoader(loader, path);
+  // console.log(colorMap);
+  return(
+    <mesh>
+      <planeGeometry attach="geometry" args={[1.77, 1]} />
+      <meshStandardMaterial map={colorMap} />
+    </mesh>
+  )
+}
+
 function EXRViewer(props) {
-  console.log(props.path);
-  const colorMap = useLoader(EXRLoader, props.path);
+  const [progress, setProgress] = useState(0.5);
+  const comp = props.comp;
+
+  const handleFrameChange = value => {
+    const new_progress = (value - comp.first) / (comp.last - comp.first);
+    setProgress(new_progress);
+  }
+
+  let path = "media/no_icon.png";
+  if (comp.path) path = `http://127.0.0.1:9091/files/${comp.api_path}`;
+  if (!comp.static) {
+    let frame = comp.first + (comp.last - comp.first) * progress;
+    frame = Math.round(frame);
+    path = path.replace("####", frame);
+  }
+  
+  const mouseButtons = {
+    LEFT: THREE.MOUSE.PAN,
+    MIDDLE: THREE.MOUSE.PAN,
+    RIGHT: THREE.MOUSE.PAN
+  }
+
   return (
-    <Canvas orthographic camera={{ zoom: 100, position: [0, 0, 1] }} colorManagement>
-      <OrbitControls enableRotate={false} />
-      <Suspense fallback={null}>
+    <div style={{position: "relative", height: "100%", width: "100%"}}>
+      <div style={sliderContainerStyle}>
+        <Slider
+          defaultValue={comp.first}
+          valueLabelDisplay="auto"
+          track={false}
+          step={1}
+          onChange={(e, value) => handleFrameChange(value)}
+          marks
+          min={comp.first}
+          max={comp.last}
+        />
+      </div>
+      <Canvas orthographic camera={{ zoom: 100, position: [0, 0, 1] }}>
+        <OrbitControls enableRotate={false} enableDamping={false} zoomSpeed={3} mouseButtons=
+        {mouseButtons} />
         <ambientLight intensity={0.5} />
-        <mesh>
-          <planeGeometry attach="geometry" args={[1.77, 1]} />
-          <meshStandardMaterial map={colorMap} />
-        </mesh>
-      </Suspense>
-    </Canvas>
+        <Suspense fallback={null}>
+          <Scene path={path} />
+        </Suspense>
+      </Canvas>
+    </div>
   )
 }
 
@@ -47,7 +103,7 @@ function VideoViewer(props) {
   return (
     // <TransformWrapper limitToBounds={false}>
     //   <TransformComponent>
-        <video width="320" height="240" controls>
+        <video width="100%" height="100%" controls>
           <source src={props.path} type="video/mp4" />
         </video>
     //   </TransformComponent>
@@ -84,13 +140,18 @@ function ComponentViewer(props) {
     path = path.replace("####", frame);
   }
 
+  const handleFrameChange = value => {
+    const new_progress = (value - comp.first) / (comp.last - comp.first);
+    setProgress(new_progress);
+  }
+
   const getViewer = (comp, path) => {
     const ext = comp.ext;
     const img = [".jpg", ".jpeg", ".png", ".tif", ".tiff"];
     const exr = [".exr"];
     const vid = [".mp4", ".mov"];
     const geo = [];
-    if (img.includes(ext)) return <ImgViewer comp={comp} path={path} />;
+    if (img.includes(ext)) return <EXRViewer comp={comp} path={path} />;
     else if (exr.includes(ext)) return <EXRViewer comp={comp} path={path} />;
     else if (vid.includes(ext)) return <VideoViewer comp={comp} path={path} />;
     else if (geo.includes(ext)) return <GeoViewer comp={comp} path={path} />;

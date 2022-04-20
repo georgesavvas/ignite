@@ -35,7 +35,6 @@ function Explorer() {
   }
 
   const handleEntitySelection = (entity) => {
-    console.log(entity);
     setSelectedEntity(entity);
   }
 

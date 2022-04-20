@@ -29,7 +29,7 @@ function ComponentList(props) {
     // }
 
     const containerStyle = {
-      borderColor: comp.name === props.selectedComp ? "rgb(252, 140, 3)" : "rgb(70,70,70)"
+      borderColor: comp.filename === props.selectedComp.filename ? "rgb(252, 140, 3)" : "rgb(70,70,70)"
     }
 
     return (
