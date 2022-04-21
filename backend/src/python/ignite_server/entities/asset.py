@@ -73,5 +73,5 @@ class Asset(Directory):
             d[s] = getattr(self, s)
         if self.latest_av:
             d["latest_av"] = self.latest_av.as_dict()
-            d["thumbnail"] = d["latest_av"]["thumbnail"].as_posix()
+            # d["thumbnail"] = d["latest_av"]["thumbnail"].as_posix()
         return d

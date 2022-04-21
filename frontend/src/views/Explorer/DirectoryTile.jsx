@@ -34,13 +34,13 @@ function DirectoryTile(props) {
   function details() {
     if (props.viewType === "grid") return(
       <>
-        <Typography variant="context" style={{"position": "absolute", "top": "5px", "left": "10px"}}>
+        <Typography variant="context" style={{position: "absolute", top: "5px", left: "10px"}}>
           {props.entity.full_context}
         </Typography>
-        <Typography style={{"position": "absolute", "bottom": "5px", "left": "10px"}}>
+        <Typography style={{position: "absolute", bottom: "5px", left: "10px"}}>
           {name}
         </Typography>
-        <Typography style={{"position": "absolute", "bottom": "5px", "right": "10px"}}>
+        <Typography style={{position: "absolute", bottom: "5px", right: "10px"}}>
           {props.entity.version}
         </Typography>
       </>
