@@ -82,6 +82,7 @@ function GridTile(props) {
 }
 
 function RowTile(props) {
+  const [contextMenu, setContextMenu] = useState(null);
   const [progress, setProgress] = useState(0.5);
   const hoverArea = createRef();
   const isStatic = props.thumbnail !== undefined;
@@ -131,18 +132,40 @@ function RowTile(props) {
     props.onSelected(props.entity);
   }
 
+  const contextItems = [
+    {
+      "label": "Copy URI",
+      "fn": () =>  navigator.clipboard.writeText(props.entity.uri)
+    },
+    {
+      "label": "Copy path",
+      "fn": () =>  navigator.clipboard.writeText(props.entity.path),
+      "divider": true
+    },
+    {
+      "label": "Open in file explorer"
+    },
+  ]
+
+  const _handleContextMenu = e => {
+    handleContextMenu(e, contextMenu, setContextMenu);
+  }
+
   return (
-    <div className={styles.tile} style={tileStyle} onClick={handleClick}>
-      <div style={thumbnailContainer}>
-        <img src={thumbnailURL} className={styles.thumbnail} style={thumbnailStyle} />
+    <>
+      <ContextMenu items={contextItems} contextMenu={contextMenu} setContextMenu={setContextMenu} />
+      <div className={styles.tile} style={tileStyle} onClick={handleClick} onContextMenu={_handleContextMenu}>
+        <div style={thumbnailContainer}>
+          <img src={thumbnailURL} className={styles.thumbnail} style={thumbnailStyle} />
+        </div>
+        <div className={styles.hoverArea} onMouseMove={isStatic ? null : handleMouseMove} style={{"maxWidth": props.size}} ref={hoverArea}>
+          {isStatic ? null : <div className={styles.bar} style={barStyle} />}
+        </div>
+        <div style={{"paddingLeft": "6px"}}>
+          {props.children}
+        </div>
       </div>
-      <div className={styles.hoverArea} onMouseMove={isStatic ? null : handleMouseMove} style={{"maxWidth": props.size}} ref={hoverArea}>
-        {isStatic ? null : <div className={styles.bar} style={barStyle} />}
-      </div>
-      <div style={{"paddingLeft": "6px"}}>
-        {props.children}
-      </div>
-    </div>
+    </>
   );
 }
 

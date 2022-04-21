@@ -72,7 +72,7 @@ const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
     },
     '&.Mui-focused, &.Mui-selected, &.Mui-selected.Mui-focused': {
       backgroundColor: `var(--tree-view-bg-color, ${theme.palette.action.selected})`,
-      color: 'var(--tree-view-color)',
+      color: 'var(--tree-view-color)'
     },
     [`& .${treeItemClasses.label}`]: {
       fontWeight: 'inherit',
@@ -225,7 +225,7 @@ StyledTreeItem.propTypes = {
   labelText: PropTypes.string.isRequired,
 };
 
-export default function ProjectTreeView(props) {
+function ProjectTreeView(props) {
   const [isLoading, setIsLoading] = useState(true);
   const [openDialogue, setOpenDialogue] = useState(false);
   const [expandedItems, setExpandedItems] = useState(["root"]);
@@ -279,6 +279,11 @@ export default function ProjectTreeView(props) {
           }
       }
     }
+
+    event.persist()
+    let iconClicked = event.target.closest(".MuiTreeItem-iconContainer")
+    if(iconClicked) return;
+
     var result = [];
     findNodeById(props.data, result, nodeId);
     result = result[0];
@@ -291,7 +296,11 @@ export default function ProjectTreeView(props) {
   };
 
   const handleNodeToggle = (event, nodeIds) => {
-    setExpandedItems(nodeIds);
+    event.persist()
+    let iconClicked = event.target.closest(".MuiTreeItem-iconContainer")
+    if(iconClicked) {
+      setExpandedItems(nodeIds);
+    }
   }
 
   const handleContextMenuSelection = (dir_path, contextOption) => {
@@ -355,3 +364,5 @@ export default function ProjectTreeView(props) {
     </div>
   );
 }
+
+export default ProjectTreeView;

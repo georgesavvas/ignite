@@ -8,11 +8,13 @@ import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import GridViewIcon from "../../icons/GridViewIcon";
 import RowViewIcon from "../../icons/RowViewIcon";
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import Dialog from '@mui/material/Dialog';
 import {ContextContext} from "../../contexts/ContextContext";
 import DccSelector from "../DccSelector";
+import { IconButton } from "@mui/material";
 
 const style = {
   display: "flex",
@@ -103,6 +105,13 @@ function ExplorerBar(props) {
         <Button variant="outlined" onClick={props.onRefresh}>Refresh</Button>
       </div>
       <div style={{...style, padding: "20px", paddingTop: 0, paddingBottom: 10}}>
+        <Button
+            style={{minHeight: "40px"}}
+            // color="ignite" 
+            variant="outlined"
+          >
+            <ArrowUpwardIcon />
+        </Button>
         <TextField
           id="outlined-basic"
           size="small"
@@ -113,7 +122,7 @@ function ExplorerBar(props) {
           onChange={handleLocationChange}
         />
         <Button
-          style={{minWidth: "120px"}}
+          style={{minWidth: "120px", minHeight: "40px"}}
           color="ignite"
           variant="outlined"
           disabled={currentContext.kind !== "task"}
@@ -122,7 +131,7 @@ function ExplorerBar(props) {
           New Scene
         </Button>
         {/* <Button
-          style={{minWidth: "120px"}}
+          style={{minWidth: "120px", minHeight: "40px"}}
           color="ignite" 
           variant="outlined"
           disabled={currentContext.kind !== "task"}

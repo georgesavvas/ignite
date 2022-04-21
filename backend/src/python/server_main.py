@@ -36,11 +36,22 @@ async def get_projects_root():
     }
 
 
+@app.post("/api/v1/get_context_info")
+async def get_context_info(request: Request):
+    result = await request.json()
+    path = result.get("path")
+    data = api.get_context_info(path)
+    return {
+        "ok": True,
+        "data": data
+    }
+
+
 @app.get("/api/v1/get_projects")
 async def get_projects():
     data = api.get_projects()
     for i, d in enumerate(data):
-        d["result_id"] = i 
+        d["result_id"] = i
     return {
         "ok": True,
         "data": data

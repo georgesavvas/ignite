@@ -60,6 +60,26 @@ def get_project(name):
     return Project(path=path)
 
 
+def get_context_info(path):
+    kinds = list(KINDS.keys())
+    path = Path(path)
+    if path.name in ("exports", "scenes"):
+        path = path.parent
+    for x in path.iterdir():
+        name = x.name
+        if name not in kinds:
+            continue
+        kind = KINDS[name]
+        data = {
+        "name": name,
+        "path": str(path),
+        "parent": str(path.parent),
+        "dir_kind": kind
+        }
+        return data
+    return {}
+
+
 def find(path):
     if not path:
         return
@@ -370,14 +390,14 @@ def register_assetversion(path):
     if not av.dir_kind == "assetversion":
         return
     comps = av.components
-    print(comps)
     return True
 
 
 def set_repr_asset(target, repr):
     target_entity = find(target)
     repr_entity = find(repr)
-    if not target_entity or target_entity.dir_kind in ("directory", "scene"):
+    print(target_entity)
+    if not target_entity:
         return
     if not repr_entity:
         return
@@ -389,7 +409,7 @@ def set_repr_asset(target, repr):
 
 def get_repr_comp(target):
     print("\n\nGETTING REPR COMP FOR", target)
-    anchors = list(ANCHORS.keys())
+    anchors = list(ANCHORS.values())
     asset_anchor = ANCHORS["asset"]
     def search(path):
         print("Searching in", path)
@@ -399,7 +419,13 @@ def get_repr_comp(target):
                 return x
             if x.name not in anchors and x.name not in ("exports", "scenes"):
                 continue
-            return search(x)
+            if x.name in anchors:
+                anchor = KINDS[x.name]
+                with open(x, "r") as f:
+                    config = yaml.safe_load(f)
+                their_repr = config.get("repr", "")
+                if their_repr:
+                    return search(Path(their_repr))
 
     target_entity = find(target)
     path =  Path(target_entity.repr)

@@ -28,7 +28,7 @@ class Task(Directory):
 
     def as_dict(self):
         d = {}
-        for s in ("path", "dir_kind", "anchor", "project", "name", "task_type"):
+        for s in ("path", "dir_kind", "anchor", "project", "name", "task_type", "repr"):
             d[s] = getattr(self, s)
         # d["task"] = self.task.as_dict()
         return d

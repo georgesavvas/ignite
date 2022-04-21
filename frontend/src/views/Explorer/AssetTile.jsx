@@ -7,13 +7,13 @@ function AssetTile(props) {
   function details() {
     if (props.viewType === "grid") return(
       <>
-        <Typography style={{"position": "absolute", "top": "5px", "left": "10px"}}>
+        <Typography style={{position: "absolute", top: "5px", left: "10px"}}>
           {props.entity.context}
         </Typography>
-        <Typography style={{"position": "absolute", "bottom": "5px", "left": "10px"}}>
+        <Typography style={{position: "absolute", bottom: "5px", left: "10px"}}>
           {props.entity.name}
         </Typography>
-        <Typography style={{"position": "absolute", "bottom": "5px", "right": "10px"}}>
+        <Typography style={{position: "absolute", bottom: "5px", right: "10px"}}>
           {props.entity.version}
         </Typography>
       </>

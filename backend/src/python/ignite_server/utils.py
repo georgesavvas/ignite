@@ -77,12 +77,17 @@ def format_int_version(s):
 def uri_to_path(uri):
     data = URI_TEMPLATE.parse(uri).named
     if data.get("version"):
+        data["task"] += "/exports"
         data["version"] = format_int_version(data["version"])
     path = ROOT
-    for step in ("project", "phase", "context", "task", "exports", "name", "version"):
+    for step in ("project", "phase", "context", "task", "name", "version"):
         if not data.get(step):
             return path
         path = path / data[step]
+    print("Converted URI to path:")
+    print(uri)
+    print(path)
+    print(data)
     return path
 
 

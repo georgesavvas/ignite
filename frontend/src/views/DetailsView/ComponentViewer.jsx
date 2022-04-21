@@ -6,7 +6,7 @@ import { Canvas, useFrame, useLoader } from '@react-three/fiber';
 import { OrbitControls   } from "@react-three/drei";
 import { TextureLoader } from 'three/src/loaders/TextureLoader';
 import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js';
-import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+// import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 const style = {
   // border: "solid red 1px",
@@ -19,15 +19,15 @@ const style = {
   display: grid,
 }
 
-function ImgViewer(props) {
-  return (
-    <TransformWrapper limitToBounds={false}>
-      <TransformComponent>
-        <img src={props.path} />
-      </TransformComponent>
-    </TransformWrapper>
-  )
-}
+// function ImgViewer(props) {
+//   return (
+//     <TransformWrapper limitToBounds={false}>
+//       <TransformComponent>
+//         <img src={props.path} />
+//       </TransformComponent>
+//     </TransformWrapper>
+//   )
+// }
 
 const sliderContainerStyle = {
   position: "absolute",
