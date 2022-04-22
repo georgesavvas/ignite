@@ -14,7 +14,7 @@ import Checkbox from '@mui/material/Checkbox';
 import Dialog from '@mui/material/Dialog';
 import {ContextContext} from "../../contexts/ContextContext";
 import DccSelector from "../DccSelector";
-import { IconButton } from "@mui/material";
+import { useSnackbar } from 'notistack';
 
 const style = {
   display: "flex",
@@ -38,14 +38,17 @@ const dialogStyle = {
 }
 
 function ExplorerBar(props) {
-  const [currentLocation, setCurrentLocation] = useState("");
   const [newSceneOpen, setNewSceneOpen] = useState(false);
   const [newAssetOpen, setNewAssetOpen] = useState(false);
+  const [contextPath, setContextPath] = useState("");
+  const [contextPathError, setContextPathError] = useState([false, ""]);
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const [currentContext, setCurrentContext] = useContext(ContextContext);
 
   useEffect(() => {
     if (currentContext.path !== undefined) {
-      setCurrentLocation(currentContext.path);
+      setContextPathError([false, ""]);
+      setContextPath(currentContext.path || "");
     }
   },[currentContext]);
 
@@ -57,8 +60,17 @@ function ExplorerBar(props) {
     if (value !== null) props.onViewTypeChange(value);
   };
   
-  const handleLocationChange = (event) => {
-    setCurrentLocation(event.target.value);
+  const handlePathChange = e => {
+    setCurrentContext(e.target.value).then((success => {
+      if (!success) {
+        setContextPathError([true, "Not found"]);
+        enqueueSnackbar("Path not found", {variant: "error"});
+      }
+    }))
+  }
+
+  const handleGoBack = e => {
+    setCurrentContext(currentContext.parent);
   }
 
   return (
@@ -107,8 +119,8 @@ function ExplorerBar(props) {
       <div style={{...style, padding: "20px", paddingTop: 0, paddingBottom: 10}}>
         <Button
             style={{minHeight: "40px"}}
-            // color="ignite" 
             variant="outlined"
+            onClick={handleGoBack}
           >
             <ArrowUpwardIcon />
         </Button>
@@ -118,14 +130,18 @@ function ExplorerBar(props) {
           fullWidth={true}
           placeholder="Location"
           variant="outlined"
-          value={currentLocation}
-          onChange={handleLocationChange}
+          error={contextPathError[0]}
+          // helperText={contextPathError[1]}
+          value={contextPath}
+          onChange={e => setContextPath(e.target.value)}
+          onKeyPress={e => e.key === "Enter" ? handlePathChange(e) : null}
+          onBlur={e => handlePathChange(e)}
         />
         <Button
           style={{minWidth: "120px", minHeight: "40px"}}
           color="ignite"
           variant="outlined"
-          disabled={currentContext.kind !== "task"}
+          disabled={currentContext.dir_kind !== "task"}
           onClick={() => setNewSceneOpen(true)}
         >
           New Scene
@@ -134,7 +150,7 @@ function ExplorerBar(props) {
           style={{minWidth: "120px", minHeight: "40px"}}
           color="ignite" 
           variant="outlined"
-          disabled={currentContext.kind !== "task"}
+          disabled={currentContext.dir_kind !== "task"}
         >
           New Asset
         </Button> */}

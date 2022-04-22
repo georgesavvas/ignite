@@ -61,9 +61,13 @@ def get_project(name):
 
 
 def get_context_info(path):
+    if not path:
+        return {}
     kinds = list(KINDS.keys())
     path = Path(path)
-    if path.name in ("exports", "scenes"):
+    if not path.exists():
+        return {}
+    if path.name in ("exports", "scenes") or path.is_file():
         path = path.parent
     for x in path.iterdir():
         name = x.name

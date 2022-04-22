@@ -94,3 +94,19 @@ def uri_to_path(uri):
 def get_api_path(path):
     path = PurePath(path).as_posix()
     return path.replace(ROOT.as_posix(), "")
+
+
+def query_filter(entities, query):
+    filtered = []
+
+    filter_string = query.get("filter_string")
+    if filter_string:
+        for entity in entities:
+            s = str(entity.get("path", ""))
+            if filter_string in s:
+                filtered.append(entity)
+
+    if not filter_string:
+        return entities
+
+    return filtered

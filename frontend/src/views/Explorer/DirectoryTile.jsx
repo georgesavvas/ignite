@@ -15,11 +15,7 @@ function DirectoryTile(props) {
       if (props.entity.hasOwnProperty("task")) {
         path = props.entity.task.path;
       }
-      setCurrentContext({
-        path: path,
-        name: props.entity.name,
-        kind: props.entity.dir_kind
-      });
+      setCurrentContext(path);
     };
   }
 

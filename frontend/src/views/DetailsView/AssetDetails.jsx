@@ -2,6 +2,7 @@ import React, {useState} from "react";
 import Typography from '@mui/material/Typography';
 import ComponentViewer from "./ComponentViewer";
 import ComponentList from "./ComponentList";
+import AssetLabel, { LabelContainer } from "./AssetLabel";
 import {
   ReflexContainer,
   ReflexSplitter,
@@ -45,6 +46,9 @@ function AssetDetails(props) {
               <Typography>Context: {props.entity.context}</Typography>
               <Typography color="rgb(252, 140, 3)">URI: {props.entity.uri}</Typography>
             </div>
+            <LabelContainer>
+              {props.entity.labels.map((label, index) => <AssetLabel name={label} key={index} />)}
+            </LabelContainer>
           </ReflexElement>
           <ReflexSplitter style={splitterStyle} />
           <ReflexElement flex={0.4}>

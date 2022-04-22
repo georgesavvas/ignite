@@ -233,14 +233,14 @@ function ProjectTreeView(props) {
   const [newDirData, setNewDirData] = useState({});
   const [currentContext, setCurrentContext] = useContext(ContextContext);
 
-  useEffect(() => {
-    if (!currentContext.path) {
-      handleNodeSelect(null, "root")
-    }
-  }, [])
+  // useEffect(() => {
+  //   if (!currentContext.path) {
+  //     handleNodeSelect(null, "root")
+  //   }
+  // }, [])
 
   useEffect(() => {
-    function findNodeByPath(object, result, value){
+    function findNodeByPath(object, result, value, parents){
       if(object.hasOwnProperty("path") && object.path === value) {
         result.push(object);
         return;
@@ -248,21 +248,24 @@ function ProjectTreeView(props) {
       for(var i=0; i<Object.keys(object).length; i++){
         const child = object[Object.keys(object)[i]]
           if(child !== null && typeof child === "object"){
-              findNodeByPath(object[Object.keys(object)[i]], result, value);
+              if (value.includes(child.path)) parents.push(child.id);
+              findNodeByPath(object[Object.keys(object)[i]], result, value, parents);
           }
       }
     }
 
     const newPath = currentContext.path;
-    var result = [];
-    findNodeByPath(props.data.children, result, newPath);
+    if (!newPath) return;
+    let result = [];
+    let parents = [];
+    findNodeByPath(props.data.children, result, newPath, parents);
     result = result[0];
     if (result) {
       const nodeId = result.id;
       setSelectedItems(nodeId);
-      // if (!expandedItems.includes(nodeId)) {
-      //   setExpandedItems(prevState => [...prevState, nodeId]);
-      // }
+      if (!expandedItems.includes(nodeId)) {
+        setExpandedItems(prevState => [...prevState, ...parents, nodeId]);
+      }
     }
   }, [currentContext])
 
@@ -280,23 +283,17 @@ function ProjectTreeView(props) {
       }
     }
 
-    event.persist()
     let iconClicked = event.target.closest(".MuiTreeItem-iconContainer")
     if(iconClicked) return;
 
     var result = [];
     findNodeById(props.data, result, nodeId);
     result = result[0];
-    setCurrentContext({
-      path: result.path,
-      name: result.name,
-      kind: result.dir_kind
-    });
+    setCurrentContext(result.path);
     setSelectedItems(nodeId);
   };
 
   const handleNodeToggle = (event, nodeIds) => {
-    event.persist()
     let iconClicked = event.target.closest(".MuiTreeItem-iconContainer")
     if(iconClicked) {
       setExpandedItems(nodeIds);
@@ -321,7 +318,9 @@ function ProjectTreeView(props) {
     }));
   }
 
-  const renderTree = (nodes) => (
+  const renderTree = (nodes) => {
+    const hide = props.filter === false || !nodes.path.includes(props.filter);
+    console.log(nodes.path, props.filter, hide);
     <StyledTreeItem
       key={nodes.id}
       nodeId={nodes.id}
@@ -331,12 +330,13 @@ function ProjectTreeView(props) {
       dir_kind={nodes.dir_kind}
       dir_path={nodes.path}
       onContextOpen={handleContextMenuSelection}
+      style={hide ? {display: "none"} : null}
     >
       {Array.isArray(nodes.children)
         ? nodes.children.map((node) => renderTree(node))
         : null}
     </StyledTreeItem>
-  );
+  };
 
   return (
     <div className={styles.container}>
