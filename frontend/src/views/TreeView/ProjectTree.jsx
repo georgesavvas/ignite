@@ -4,6 +4,7 @@ import Skeleton from '@mui/material/Skeleton';
 import FormControl from '@mui/material/FormControl';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import styles from "./ProjectTree.module.css";
+import serverRequest from "../../services/serverRequest";
 import {ProjectContext} from "../../contexts/ProjectContext";
 
 export default function ProjectTree() {
@@ -18,20 +19,7 @@ export default function ProjectTree() {
       project: selectedProject
     };
     setIsLoading(true);
-    fetch(
-      "http://127.0.0.1:9090/api/v1/get_project_tree", {
-        method: "POST",
-        headers: {
-          'Accept': 'application/json, text/plain, */*',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-      }
-    )
-    .then((resp) => {
-      return resp.json();
-    })
-    .then((resp) => {
+    serverRequest("get_project_tree", data).then((resp) => {
       setIsLoading(false);
       setLoadedData(resp.data);
     });
@@ -65,22 +53,22 @@ export default function ProjectTree() {
     // var filteredData = Object.assign({}, loadedData);;
     // var disabled = {};
     // filterData(filteredData, disabled);
-    content = <ProjectTreeView data={loadedData} shouldUpdate={setUpdateTreeView}/>;
+    content = <ProjectTreeView data={loadedData} shouldUpdate={setUpdateTreeView} filter={filterValue} />;
   }
 
   return (
     <div className={styles.container}>
-      {/* <div className={styles.filterBar}>
-          <FormControl>
-            <OutlinedInput
-              id="outlined-basic"
-              size="small"
-              placeholder="Filter"
-              value={filterValue}
-              onChange={e => setFilterValue(e.target.value)}
-            />
-          </FormControl>
-        </div> */}
+      <div className={styles.filterBar}>
+        <FormControl>
+          <OutlinedInput
+            id="outlined-basic"
+            size="small"
+            placeholder="Filter"
+            value={filterValue}
+            onChange={e => setFilterValue(e.target.value || "")}
+          />
+        </FormControl>
+      </div>
       {content}
     </div>
   );

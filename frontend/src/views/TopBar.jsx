@@ -17,6 +17,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import SettingsDialog from "./SettingsDialog.jsx";
 import {ProjectContext} from "../contexts/ProjectContext";
 import ProjectBrowser from "./ProjectBrowser";
+import serverRequest from "../services/serverRequest";
 
 export default function TopBar() {
   const [isLoading, setIsLoading] = useState(true);
@@ -27,28 +28,12 @@ export default function TopBar() {
 
   useEffect(() => {
     setIsLoading(true);
-    fetch(
-      "http://127.0.0.1:9090/api/v1/get_project_names", {
-        method: "GET",
-        headers: {
-          'Accept': 'application/json, text/plain, */*',
-          'Content-Type': 'application/json'
-        }
-      }
-    )
-    .then((resp) => {
-      return resp.json();
-    })
-    .then((resp) => {
+    serverRequest("get_project_names").then((resp) => {
       setIsLoading(false);
       setProjects(resp.data);
       if (selectedProject === "" && resp.data.length > 0) setSelectedProject(resp.data[0])
     });
   }, []);
-
-  const handleChange = (event) => {
-    setSelectedProject(event.target.value);
-  };
 
   return (
     <div className={styles.container}>

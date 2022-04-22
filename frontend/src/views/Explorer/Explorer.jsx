@@ -8,18 +8,18 @@ import PageBar from "./PageBar";
 import {EntityContext} from "../../contexts/EntityContext";
 import {ContextContext} from "../../contexts/ContextContext";
 import serverRequest from "../../services/serverRequest";
+import debounce from 'lodash.debounce';
 
 function Explorer() {
   const [refreshValue, setRefreshValue] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [loadedData, setLoadedData] = useState([]);
   const [pages, setPages] = useState({total: 1, current: 1});
-  const [query, setQuery] = useState({filter_string: ""});
+  const [query, setQuery] = useState({latest: 1});
   const [tileSize, setTileSize] = useState(200);
   const [tilesPerPage, setTilesPerPage] = useState(50);
   const [resultType, setResultType] = useState("dynamic");
   const [viewType, setViewType] = useState("grid");
-  const [latest, setLatest] = useState(1);
   const [tiles, setTiles] = useState([]);
   const [selectedEntity, setSelectedEntity] = useContext(EntityContext);
   const [currentContext, setCurrentContext] = useContext(ContextContext);
@@ -39,7 +39,7 @@ function Explorer() {
       page: pages.current,
       limit: tilesPerPage,
       path: currentContext.path,
-      latest: latest
+      query: query
     };
     const method = methods[resultType];
     setIsLoading(true);
@@ -48,7 +48,7 @@ function Explorer() {
       setLoadedData(resp.data);
       setPages((prevPages) => ({...prevPages, total: resp.pages.total}));
     });
-  }, [pages.current, resultType, refreshValue, currentContext, tilesPerPage, latest]);
+  }, [pages.current, resultType, refreshValue, currentContext, tilesPerPage, query]);
 
   useEffect(() => {
     const _tiles = loadedData.reduce(function(obj, entity) {
@@ -70,10 +70,12 @@ function Explorer() {
     setPages((prevPages) => ({...prevPages, current: value}));
   };
 
-  const handleFilterChange = (event) => {
-    const value = event.target.value;
-    const filter_string = value === undefined ? "" : value;
-    setQuery((prevQuery) => ({...prevQuery, filter_string: filter_string}));
+  const updateFilter = debounce(value => {
+    setQuery((prevState) => ({...prevState, filter_string: value}));
+  }, 250);
+
+  const handleFilterChange = e => {
+    updateFilter(e.target.value);
   }
 
   const handleTilesPerPageChange = (event) => {
@@ -82,6 +84,10 @@ function Explorer() {
 
   const handleTileSizeChange = (event) => {
     setTileSize(event.target.value * 40);
+  }
+
+  const handleLatestChange = e => {
+    setQuery(prevState => ({...prevState, latest: e.target.checked}))
   }
 
   const tileContainerStyle = {
@@ -105,7 +111,7 @@ function Explorer() {
         resultType={resultType}
         onResultTypeChange={setResultType}
         viewType={viewType}
-        onLatestChange={e => setLatest(e.target.checked)}
+        onLatestChange={handleLatestChange}
         onViewTypeChange={setViewType}
       />
       <Divider />

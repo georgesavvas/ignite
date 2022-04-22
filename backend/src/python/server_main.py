@@ -115,7 +115,9 @@ async def create_dir(request: Request):
 @app.post("/api/v1/get_contents")
 async def get_contents(request: Request):
     result = await request.json()
+    query = result.get("query", {})
     data = api.get_contents(result.get("path", ""), as_dict=True)
+    data = utils.query_filter(data, query)
     limit = result.get("limit", 20)
     total = len(data)
     pages = int(math.ceil(total/limit))
@@ -139,11 +141,13 @@ async def get_contents(request: Request):
 @app.post("/api/v1/get_tasks")
 async def get_tasks(request: Request):
     result = await request.json()
+    query = result.get("query", {})
     data = api.discover_tasks(
         result.get("path"),
-        latest=result.get("latest", 0),
+        latest=query.get("latest", 0),
         as_dict=True
     )
+    data = utils.query_filter(data, query)
     limit = result.get("limit", 20)
     total = len(data)
     pages = int(math.ceil(total/limit))
@@ -167,11 +171,13 @@ async def get_tasks(request: Request):
 @app.post("/api/v1/get_assets")
 async def get_assets(request: Request):
     result = await request.json()
+    query = result.get("query", {})
     data = api.discover_assets(
         result.get("path"),
-        latest=result.get("latest", 0),
+        latest=query.get("latest", 0),
         as_dict=True
     )
+    data = utils.query_filter(data, query)
     limit = result.get("limit", 20)
     total = len(data)
     pages = int(math.ceil(total/limit))
@@ -195,11 +201,13 @@ async def get_assets(request: Request):
 @app.post("/api/v1/get_assetversions")
 async def get_assetversions(request: Request):
     result = await request.json()
+    query = result.get("query", {})
     data = api.discover_assetversions(
         result.get("path"),
-        latest=result.get("latest", 0),
+        latest=query.get("latest", 0),
         as_dict=True
     )
+    data = utils.query_filter(data, query)
     limit = result.get("limit", 20)
     total = len(data)
     pages = int(math.ceil(total/limit))
@@ -223,11 +231,13 @@ async def get_assetversions(request: Request):
 @app.post("/api/v1/get_scenes")
 async def get_scenes(request: Request):
     result = await request.json()
+    query = result.get("query", {})
     data = api.discover_scenes(
         result.get("path"),
-        latest=result.get("latest", 0),
+        latest=query.get("latest", 0),
         as_dict=True
     )
+    data = utils.query_filter(data, query)
     limit = result.get("limit", 20)
     total = len(data)
     pages = int(math.ceil(total/limit))

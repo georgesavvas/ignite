@@ -121,6 +121,19 @@ class Project(Directory):
                     d["icon"] = d["icon"] + "_" + d["task_type"]
             return d
 
+        def get_filter_strings(node):
+            children = node.get("children")
+            if children:
+                for child in children:
+                    for child2 in child.get("children"):
+                        yield child["path"] + '/' + child2["path"]
+            else:
+                yield child["path"]
+
         path = Path(self.path)
         tree = walk_project(path)
+        for child in tree.get("children", []):
+            child["filter_string"] = list(get_filter_strings(tree))
+        from pprint import pprint
+        pprint(tree)
         return tree

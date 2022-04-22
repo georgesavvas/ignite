@@ -8,6 +8,7 @@ import {ProjectProvider} from "./contexts/ProjectContext";
 import {ContextProvider} from "./contexts/ContextContext";
 import {DccProvider} from "./contexts/DccContext";
 import {EntityProvider} from "./contexts/EntityContext";
+import { SnackbarProvider } from 'notistack';
 
 const darkTheme = createTheme({
   palette: {
@@ -28,15 +29,17 @@ function App() {
     <ThemeProvider theme={darkTheme}>
       <GlobalStyles styles={{ ...darkScrollbar() }} />
       <div className="App">
+      <ContextProvider>
         <ProjectProvider>
-          <ContextProvider>
             <DccProvider>
               <EntityProvider>
-                <Home />
+                <SnackbarProvider maxSnack={3} autoHideDuration={2500}>
+                  <Home />
+                </SnackbarProvider>
               </EntityProvider>
             </DccProvider>
-          </ContextProvider>
-        </ProjectProvider>
+          </ProjectProvider>
+        </ContextProvider>
       </div>
     </ThemeProvider>
   );
