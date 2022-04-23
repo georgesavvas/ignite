@@ -1,8 +1,34 @@
 import React from "react";
 import Tile from "../../components/Tile";
 import Typography from '@mui/material/Typography';
+import { useSnackbar } from 'notistack';
+import { CopyToClipboard } from "../../components/utils";
+import clientRequest from "../../services/clientRequest";
 
 function AssetTile(props) {
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+
+  const contextItems = [
+    {
+      "label": "Copy URI",
+      "fn": () =>  CopyToClipboard(props.entity.uri, enqueueSnackbar)
+    },
+    {
+      "label": "Copy path",
+      "fn": () =>  CopyToClipboard(props.entity.path, enqueueSnackbar),
+      "divider": true
+    },
+    {
+      "label": "Open in file explorer",
+      "fn": () => handleOpenExplorer(props.entity.path)
+    },
+  ]
+
+  const handleOpenExplorer = filepath => {
+    clientRequest("show_in_explorer", {"filepath": filepath}).then((resp) => {
+      if (!resp.ok) enqueueSnackbar("Failed launching scene.", {variant: "error"});
+    })
+  }
 
   function details() {
     if (props.viewType === "grid") return(
@@ -27,7 +53,7 @@ function AssetTile(props) {
   }
 
   return (
-    <Tile {...props}>
+    <Tile {...props} contextItems={contextItems}>
       {details()}
     </Tile>
   );

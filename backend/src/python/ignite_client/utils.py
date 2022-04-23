@@ -129,6 +129,24 @@ def launch_dcc(dcc, dcc_name, scene):
     return True
 
 
+def show_in_explorer(filepath):
+    filepath = Path(filepath)
+    if not filepath.is_dir():
+        if filepath.is_file() or filepath.parent.is_dir():
+            filepath = filepath.parent
+    if not filepath.is_dir():
+        return False
+
+    os_name = OS_NAMES[platform.system()]
+    if os_name == "win":
+        os.startfile(filepath)
+    elif os_name == "mac":
+        subprocess.Popen(["open", filepath])
+    else:
+        subprocess.Popen(["xdg-open", filepath])
+    return True
+
+
 def server_request(method, data=None):
     url = f"http://{IGNITE_SERVER_HOST}:{IGNITE_SERVER_PORT}/api/v1/{method}"
     headers = {"Content-type": "application/json"}

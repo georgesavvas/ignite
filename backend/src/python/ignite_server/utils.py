@@ -9,6 +9,7 @@ from ignite_server.constants import ANCHORS
 
 
 URI_TEMPLATE = parse.compile("ign:{project}:{phase}:{context}:{task}:{name}@{version}")
+URI_TEMPLATE_UNVERSIONED = parse.compile("ign:{project}:{phase}:{context}:{task}:{name}")
 
 
 def get_config() -> dict:
@@ -69,16 +70,35 @@ def get_uri(path, version=None):
     return uri
 
 
+def is_uri(s):
+    s = str(s)
+    if not s.startswith("ign:"):
+        return False
+    if not s.count(":") > 4:
+        return False
+    return True
+
+
 def format_int_version(s):
     s = str(s)
     return f"v{s.zfill(3)}"
 
 
 def uri_to_path(uri):
-    data = URI_TEMPLATE.parse(uri).named
+    uri = str(uri)
+    result = URI_TEMPLATE.parse(uri)
+    if not result:
+        result = URI_TEMPLATE_UNVERSIONED.parse(uri)
+    if not result:
+        logging.error(f"Failed to parse {uri}")
+    data = result.named
+    data["task"] += "/exports"
     if data.get("version"):
-        data["task"] += "/exports"
-        data["version"] = format_int_version(data["version"])
+        version = data.get("version")
+        if version.startswith("v"):
+            data["version"] = format_int_version(data["version"])
+        else:
+            del data["version"]
     path = ROOT
     for step in ("project", "phase", "context", "task", "name", "version"):
         if not data.get(step):

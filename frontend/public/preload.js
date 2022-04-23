@@ -1,9 +1,6 @@
 const { ipcRenderer, contextBridge } = require("electron");
 
 contextBridge.exposeInMainWorld("api", {
-  launchDcc: async (filepath, args, env) => {
-    ipcRenderer.send("launch_dcc", filepath, args, env);
-  },
   storeData: async (filename, data) => {
     return await ipcRenderer.invoke("store_data", filename, data);
   },
@@ -12,5 +9,8 @@ contextBridge.exposeInMainWorld("api", {
   },
   checkPath: (filepath) => {
     return ipcRenderer.invoke("check_path", filepath);
-  }
+  },
+  fileInput: async default_dir => {
+    return await ipcRenderer.invoke("fileInput", default_dir);
+  },
 })

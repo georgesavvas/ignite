@@ -43,6 +43,18 @@ class Asset(Directory):
         if not self._avs_fetched:
             self._fetch_versions()
         return self._latest_av
+    
+    @property
+    def best_v(self):
+        if not self._best_av:
+            self._get_best_version()
+        return self._best_av
+    
+    @property
+    def best_av(self):
+        if not self._best_av:
+            self._get_best_version()
+        return self._best_av
 
     def _fetch_versions(self):
         from ignite_server.entities.assetversion import AssetVersion
@@ -64,6 +76,19 @@ class Asset(Directory):
             self._latest_v = versions[0]
             self._latest_av = assetversions[0]
         self._avs_fetched = True
+
+    def _get_best_version(self):
+        assetversions = self.assetversions.reverse()
+        best_score = 0
+        best_av = None
+        for av in assetversions:
+            print(av)
+            score = av.score
+            if score > best_score:
+                best_score = score
+                best_av = av
+        self._best_v = best_av.version
+        self._best_av = best_av
 
     def as_dict(self):
         d = {}

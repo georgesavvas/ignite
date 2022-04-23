@@ -319,23 +319,25 @@ function ProjectTreeView(props) {
   }
 
   const renderTree = (nodes) => {
-    const hide = props.filter === false || !nodes.path.includes(props.filter);
-    console.log(nodes.path, props.filter, hide);
-    <StyledTreeItem
-      key={nodes.id}
-      nodeId={nodes.id}
-      labelText={nodes.name}
-      labelIcon={labelIcons[nodes.icon]}
-      labelInfo={nodes.dir_kind}
-      dir_kind={nodes.dir_kind}
-      dir_path={nodes.path}
-      onContextOpen={handleContextMenuSelection}
-      style={hide ? {display: "none"} : null}
-    >
-      {Array.isArray(nodes.children)
-        ? nodes.children.map((node) => renderTree(node))
-        : null}
-    </StyledTreeItem>
+    const filter_string = nodes.filter_strings.join(" ")
+    const hide = props.filter && !filter_string.includes(props.filter);
+    return (
+      <StyledTreeItem
+        key={nodes.id}
+        nodeId={nodes.id}
+        labelText={nodes.name}
+        labelIcon={labelIcons[nodes.icon]}
+        labelInfo={nodes.dir_kind}
+        dir_kind={nodes.dir_kind}
+        dir_path={nodes.path}
+        onContextOpen={handleContextMenuSelection}
+        style={hide ? {display: "none"} : null}
+      >
+        {Array.isArray(nodes.children)
+          ? nodes.children.map((node) => renderTree(node))
+          : null}
+      </StyledTreeItem>
+    )
   };
 
   return (

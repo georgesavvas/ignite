@@ -75,7 +75,6 @@ class Scene(Directory):
         for s in ("path", "project", "name", "phase" ,"dcc", "extension", "version",
                 "dir_kind", "scene", "context", "task", "version", "vsn"):
             d[s] = getattr(self, s)
-        d["thumbnail"] = self.dcc
         d["full_context"] = f"{self.phase}/{self.context}"
         d["exports"] = os.path.join(self.task, "exports")
         return d

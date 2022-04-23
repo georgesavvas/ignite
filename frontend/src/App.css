@@ -9,3 +9,11 @@
   padding: 0px;
   /* overflow-y: auto; */
 }
+
+.MuiButtonBase-root {
+  max-height: 35px;
+}
+
+.MuiInputBase-root {
+  max-height: 35px;
+}

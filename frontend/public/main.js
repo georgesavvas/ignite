@@ -1,4 +1,4 @@
-const { app, electron, BrowserWindow, protocol, ipcMain } = require('electron');
+const { app, electron, BrowserWindow, protocol, ipcMain, dialog } = require('electron');
 const os = require('os');
 const fs = require('fs').promises;
 const path = require("path");
@@ -61,11 +61,10 @@ function createWindow () {
     return valid;
   });
 
-  ipcMain.on("launch_dcc", (event, filepath, args=[], env={}) => {
-    console.log("Launching DCC:");
-    console.log(filepath, args, env);
-    var proc = require('child_process').spawn(filepath, args, {env: {...process.env, ...env}, detached: true});
+  ipcMain.handle("fileInput", async (default_dir="") => {
+    return dialog.showOpenDialog({properties: ['openFile'] });
   });
+
 }
 
 // This method will be called when Electron has finished

@@ -8,7 +8,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Typography from '@mui/material/Typography';
-import {ProjectContext} from "../contexts/ProjectContext";
+import {setProject, ContextContext} from "../contexts/ContextContext";
 import Button from '@mui/material/Button';
 import {
   ReflexContainer,
@@ -120,13 +120,13 @@ const tileContainerStyle = {
 }
 
 const Browser = (props) => {
+  const [currentContext, setCurrentContext] = useContext(ContextContext);
   const [isLoading, setIsLoading] = useState(false);
   const [loadedData, setLoadedData] = useState([]);
   const [tiles, setTiles] = useState([]);
-  const [selectedProject, setSelectedProject] = useContext(ProjectContext);
 
   const handleSelection = project => {
-    setSelectedProject(project.name);
+    setProject(project.name, setCurrentContext);
     props.onClose();
   }
 

@@ -5,20 +5,30 @@ import serverRequest from "../services/serverRequest";
 export const ProjectContext = createContext();
 
 export const ProjectProvider = props => {
-  const [selectedProject, setSelectedProject] = useState("test_project");
+  const [selectedProject, setSelectedProject] = useState("");
   const [currentContext, setCurrentContext] = useContext(ContextContext);
 
-  useEffect(() => {
-    if (selectedProject) {
-      serverRequest("get_projects_root").then(resp => {
-        const data = resp.data;
-        setCurrentContext(data + "/" + selectedProject);
-      })
-    }
-  }, [selectedProject])
+  // useEffect(() => {
+  //   if (selectedProject) {
+  //     serverRequest("get_projects_root").then(resp => {
+  //       const data = resp.data;
+  //       console.log("Setting context from project to", data)
+  //       setCurrentContext(data + "/" + selectedProject);
+  //     })
+  //   }
+  // }, [selectedProject])
+
+  const handleProjectChange = project => {
+    serverRequest("get_projects_root").then(resp => {
+      const data = resp.data;
+      console.log("Setting context from project to", data)
+      setSelectedProject(project);
+      setCurrentContext(data + "/" + project);
+    })
+  }
 
   return (
-    <ProjectContext.Provider value={[selectedProject, setSelectedProject]}>
+    <ProjectContext.Provider value={[selectedProject, handleProjectChange]}>
       {props.children}
     </ProjectContext.Provider>
   );

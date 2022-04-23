@@ -44,20 +44,25 @@ export default function SettingsDialog(props) {
     setDccConfig(data, "remove");
   }
 
-  const handleFileSelected = (e) => {
-    const value = e.target.files[0].path;
-    const s = e.currentTarget.id.split("-");
+  const handleFileInput = e => {
+    window.api.fileInput().then(resp => {
+      if (resp.cancelled) return;
+      onFileSelected(e, resp.filePaths[0]);
+    })
+  }
+
+  const onFileSelected = (e, filepath) => {
+    const s = e.target.id.split("-");
     const target_id = s[1];
     const data = {
       index: target_id,
       field: "path",
-      value: value
+      value: filepath
     }
     setDccConfig(data, "modify");
   }
 
   function renderDcc(dcc, index) {
-    // console.log(dcc);
     if (dcc.valid === undefined) dcc.valid = false;
     return (
       <ListItem key={index}>
@@ -86,10 +91,7 @@ export default function SettingsDialog(props) {
                 className: styles.input
               }}
             />
-            <label htmlFor={"file-" + index} className={styles.label}>
-              <Input onChange={handleFileSelected} id={"file-" + index} type="file" />
-              <Button variant="outlined" className={styles.browse} component="span">...</Button>
-            </label>
+            <Button id={"file-" + index} variant="outlined" className={styles.browse} onClick={handleFileInput}>...</Button>
           </div>
           <div className={styles.gridItemName}>
             <TextField
