@@ -45,28 +45,13 @@ function GridTile(props) {
     props.onSelected(props.entity);
   }
 
-  const contextItems = [
-    {
-      "label": "Copy URI",
-      "fn": () =>  navigator.clipboard.writeText(props.entity.uri)
-    },
-    {
-      "label": "Copy path",
-      "fn": () =>  navigator.clipboard.writeText(props.entity.path),
-      "divider": true
-    },
-    {
-      "label": "Open in file explorer"
-    },
-  ]
-
   const _handleContextMenu = e => {
     handleContextMenu(e, contextMenu, setContextMenu);
   }
 
   return (
     <>
-    <ContextMenu items={contextItems} contextMenu={contextMenu} setContextMenu={setContextMenu} />
+      <ContextMenu items={props.contextItems} contextMenu={contextMenu} setContextMenu={setContextMenu} />
       <div style={tileStyle} className={styles.tile} onClick={handleClick} onContextMenu={_handleContextMenu}>
         <img src={thumbnailURL} className={styles.thumbnail} style={thumbnailStyle} />
         <div className={styles.hoverArea} onMouseMove={isStatic ? null : handleMouseMove} ref={hoverArea}>
@@ -132,28 +117,13 @@ function RowTile(props) {
     props.onSelected(props.entity);
   }
 
-  const contextItems = [
-    {
-      "label": "Copy URI",
-      "fn": () =>  navigator.clipboard.writeText(props.entity.uri)
-    },
-    {
-      "label": "Copy path",
-      "fn": () =>  navigator.clipboard.writeText(props.entity.path),
-      "divider": true
-    },
-    {
-      "label": "Open in file explorer"
-    },
-  ]
-
   const _handleContextMenu = e => {
     handleContextMenu(e, contextMenu, setContextMenu);
   }
 
   return (
     <>
-      <ContextMenu items={contextItems} contextMenu={contextMenu} setContextMenu={setContextMenu} />
+      <ContextMenu items={props.contextItems} contextMenu={contextMenu} setContextMenu={setContextMenu} />
       <div className={styles.tile} style={tileStyle} onClick={handleClick} onContextMenu={_handleContextMenu}>
         <div style={thumbnailContainer}>
           <img src={thumbnailURL} className={styles.thumbnail} style={thumbnailStyle} />

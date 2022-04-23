@@ -74,10 +74,12 @@ def get_context_info(path):
         if name not in kinds:
             continue
         kind = KINDS[name]
+        project = path.as_posix().split(ROOT.as_posix(), 1)[1].lstrip("/").split("/")[0]
         data = {
         "name": name,
         "path": str(path),
         "parent": str(path.parent),
+        "project": project.strip(),
         "dir_kind": kind
         }
         return data
@@ -85,10 +87,38 @@ def get_context_info(path):
 
 
 def find(path):
+    from ignite_server.entities.asset import Asset
+
     if not path:
         return
-    if str(path).startswith("ign:"):
-        path = utils.uri_to_path(str(path))
+    path = str(path).strip()
+
+    if utils.is_uri(path):
+        if path.count("@") > 1:
+            logging.error(f"URI has more than 1 '@': {path}")
+            return None
+        asset_uri, version = path.split("@")
+        if version.isnumeric():
+            path = utils.uri_to_path(path)
+            return _find_from_path(path)
+        else:
+            if version not in ("best", "latest"):
+                logging.error(f"URI version '{version}' not recognised: {path}")
+                return None
+            asset_path = utils.uri_to_path(asset_uri)
+            asset = Asset(asset_path)
+            if not asset:
+                logging.error(f"Couldn't find path at {asset_path}")
+                return None
+            if version == "best":
+                return asset.best_av
+            elif version == "latest":
+                return asset.latest_av
+    else:
+        return _find_from_path(path)
+
+
+def _find_from_path(path):
     from ignite_server.entities.project import Project
     from ignite_server.entities.directory import Directory
     from ignite_server.entities.phase import Phase
@@ -400,14 +430,13 @@ def register_assetversion(path):
 def set_repr_asset(target, repr):
     target_entity = find(target)
     repr_entity = find(repr)
-    print(target_entity)
     if not target_entity:
         return
     if not repr_entity:
         return
     if repr_entity.dir_kind == "assetversion":
         repr_entity = find(repr_entity.asset)
-    target_entity.set_repr(repr_entity.path)
+    target_entity.set_repr(repr_entity.uri)
     return True
 
 
@@ -432,7 +461,10 @@ def get_repr_comp(target):
                     return search(Path(their_repr))
 
     target_entity = find(target)
-    path =  Path(target_entity.repr)
+    target_repr = target_entity.repr
+    if utils.is_uri(target_repr):
+        target_repr = utils.uri_to_path(target_repr)
+    path =  Path(target_repr)
     repr_asset = search(path)
     if not repr_asset:
         return {}

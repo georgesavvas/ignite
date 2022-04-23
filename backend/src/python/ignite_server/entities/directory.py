@@ -124,6 +124,8 @@ class Directory():
             yaml.safe_dump(config, f)
         return config
 
-    def set_repr(self, path):
-        self.repr = path
-        self.update_config({"repr": path.as_posix()})
+    def set_repr(self, uri):
+        if not utils.is_uri(uri):
+            uri = utils.get_uri(uri)
+        self.repr = uri
+        self.update_config({"repr": uri})

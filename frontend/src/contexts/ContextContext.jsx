@@ -1,4 +1,4 @@
-import { useState, createContext } from "react";
+import { useState, createContext, useEffect } from "react";
 import serverRequest from "../services/serverRequest";
 
 export const ContextContext = createContext();
@@ -6,12 +6,22 @@ export const ContextContext = createContext();
 export const ContextProvider = props => {
   const [currentContext, setCurrentContext] = useState({update: 0});
 
+  useEffect(() => {
+    const data = localStorage.getItem("context");
+    const context = JSON.parse(data);
+    console.log("loaded context", context);
+    if (!context || !context.path) return;
+    console.log("Setting context from context to", context)
+    setCurrentContext(context);
+  }, [])
+
   async function handleContextChange(path) {
     let success = false;
     const resp = await serverRequest("get_context_info", {path: path})
     const data = resp.data;
     if (!Object.keys(data).length) return false;
     setCurrentContext(data);
+    localStorage.setItem("context", JSON.stringify(data));
     success = true;
     return success;
   };
@@ -22,3 +32,11 @@ export const ContextProvider = props => {
     </ContextContext.Provider>
   )
 };
+
+export function setProject(project, setCurrentContext) {
+  serverRequest("get_projects_root").then(resp => {
+    const data = resp.data;
+    console.log("Setting context from setProject to", data)
+    setCurrentContext(data + "/" + project);
+  })
+}

@@ -1,5 +1,6 @@
 import os
 import re
+from xml.sax.handler import property_encoding
 import yaml
 import time
 from pathlib import Path, PurePath
@@ -121,19 +122,20 @@ class Project(Directory):
                     d["icon"] = d["icon"] + "_" + d["task_type"]
             return d
 
-        def get_filter_strings(node):
-            children = node.get("children")
-            if children:
-                for child in children:
-                    for child2 in child.get("children"):
-                        yield child["path"] + '/' + child2["path"]
-            else:
-                yield child["path"]
+        def get_filter_strings(node, prepend):
+            node["filter_strings"] = set(prepend)
+            node["filter_strings"].add(node["name"])
+            if not node.get("children"):
+                return {node["name"]}
+            child_strings = set()
+            for child in node["children"]:
+                child_strings.update(get_filter_strings(child, set(node["filter_strings"])))
+            node["filter_strings"].update(child_strings)
+            return set(node["filter_strings"])
 
         path = Path(self.path)
         tree = walk_project(path)
-        for child in tree.get("children", []):
-            child["filter_string"] = list(get_filter_strings(tree))
+        get_filter_strings(tree, set())
         from pprint import pprint
         pprint(tree)
         return tree

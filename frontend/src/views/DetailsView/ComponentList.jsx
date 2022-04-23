@@ -3,10 +3,8 @@ import styles from "./ComponentList.module.css";
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import CopyIcon from "../../icons/CopyIcon";
-import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
-import { Button } from "@mui/material";
-import {DccContext} from "../../contexts/DccContext";
-import {ContextContext} from "../../contexts/ContextContext";
+import { useSnackbar } from 'notistack';
+import { CopyToClipboard } from "../../components/utils";
 
 const dccNames = {
   houdini: ["hmaster", "hescape", "houdini", "houdinicore", "houdinifx"],
@@ -16,18 +14,13 @@ const dccNames = {
 }
 
 function ComponentList(props) {
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
   const handleClick = (e) => {
     props.onSelect(e.currentTarget.id);
   }
 
   function formatComp(comp, index) {
-    // const dcc_name = getDccName(dcc.path.split("/").at(-1).split("\\").at(-1).split(".")[0]);
-    // const dccIcon = `url(media/dcc/${dcc_name}.png)`;
-    // const containerStyle = {
-    //   borderColor: dcc.name === selectedDcc ? "rgb(252, 140, 3)" : "rgb(70,70,70)"
-    // }
-
     const containerStyle = {
       borderColor: comp.filename === props.selectedComp.filename ? "rgb(252, 140, 3)" : "rgb(70,70,70)"
     }
@@ -39,7 +32,7 @@ function ComponentList(props) {
           <Typography variant="subtitle1" className={styles.label}>{comp.filename}</Typography>
         </div>
         <div className={styles.spacer} />
-        <IconButton>
+        <IconButton onClick={() => CopyToClipboard(comp.filename, enqueueSnackbar)}>
           <CopyIcon />
         </IconButton>
       </div>

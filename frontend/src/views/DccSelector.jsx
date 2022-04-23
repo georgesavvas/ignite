@@ -5,6 +5,8 @@ import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import { Button } from "@mui/material";
 import {DccContext} from "../contexts/DccContext";
 import {ContextContext} from "../contexts/ContextContext";
+import { useSnackbar } from 'notistack';
+import clientRequest from "../services/clientRequest";
 
 const style = {
   width: "100%",
@@ -24,15 +26,7 @@ function DccSelector(props) {
   const [dccConfig, setDccConfig] = useContext(DccContext);
   const [selectedDcc, setSelectedDcc] = useState("");
   const [currentContext, setCurrentContext] = useContext(ContextContext);
-
-  // useEffect(() => {
-  //   // const data = localStorage.getItem("dcc_config");
-  //   fetch(`http://127.0.0.1:9091/api/v1/get_dcc_config`).then((resp) => {
-  //     return resp.json();
-  //   }).then((resp) => {
-  //     setDccConfig(resp.data);
-  //   });
-  // }, [])
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
   const handleDccClick = (e) => {
     setSelectedDcc(e.currentTarget.id);
@@ -78,36 +72,15 @@ function DccSelector(props) {
       scene: props.scene,
       new_scene: props.newScene
     };
-    fetch(
-      "http://127.0.0.1:9091/api/v1/launch_dcc", {
-        method: "POST",
-        headers: {
-          'Accept': 'application/json, text/plain, */*',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-      }
-    ).then((resp) => {
-      return resp.json();
-    }).then((resp) => {
-      if (resp.ok) console.log("Launched!")
-      else console.log("Failed launching...")
+    clientRequest("launch_dcc", data).then((resp) => {
+      if (resp.ok) enqueueSnackbar("Launched!", {variant: "success"});
+      else enqueueSnackbar("Failed launching scene.", {variant: "error"});
       setCurrentContext(prevState => {
         const cc = {...prevState};
         cc.update += 1;
         return cc
       });
     });
-    // const env = {
-    //   ...generic_env,
-    //   ...dcc_envs[dcc_name],
-    //   PROJECT: selectedEntity.project,
-    //   PHASE: selectedEntity.phase,
-    //   CONTEXT: selectedEntity.context,
-    //   TASK: selectedEntity.task,
-    //   EXPORTS: selectedEntity.exports
-    // }
-    // window.api.launchDcc(dcc.path, [selectedEntity.scene], env);
   }
 
   return (
@@ -122,6 +95,7 @@ function DccSelector(props) {
           startIcon={<RocketLaunchIcon />}
           style={{width: "100%", marginTop: "10px"}}
           onClick={handleLaunchClick}
+          disabled={!selectedDcc}
         >
           Launch
         </Button>

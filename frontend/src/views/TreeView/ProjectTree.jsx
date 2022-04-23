@@ -5,42 +5,25 @@ import FormControl from '@mui/material/FormControl';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import styles from "./ProjectTree.module.css";
 import serverRequest from "../../services/serverRequest";
-import {ProjectContext} from "../../contexts/ProjectContext";
+import {ContextContext} from "../../contexts/ContextContext";
 
 export default function ProjectTree() {
   const [isLoading, setIsLoading] = useState(true);
   const [loadedData, setLoadedData] = useState({});
   const [filterValue, setFilterValue] = useState("");
   const [updateTreeView, setUpdateTreeView] = useState(0);
-  const [selectedProject, setSelectedProject] = useContext(ProjectContext);
+  const [currentContext, setCurrentContext] = useContext(ContextContext);
 
   useEffect(() => {
     const data = {
-      project: selectedProject
+      project: currentContext.project
     };
     setIsLoading(true);
     serverRequest("get_project_tree", data).then((resp) => {
       setIsLoading(false);
       setLoadedData(resp.data);
     });
-  }, [selectedProject, updateTreeView]);
-
-  // function filterData(object, disabled){
-  //   var childValue = false;
-  //   if(object.hasOwnProperty('path') && object.path.includes(filterValue)) {
-  //     disabled[object.id] = false;
-  //   }
-  //   // if (object.hasOwnProperty("children") && object.children.length === 0) {
-  //   //   disabled[object.id] = true
-  //   // }
-  //   for(var i=0; i<Object.keys(object).length; i++){
-  //       if(typeof object[Object.keys(object)[i]] == "object"){
-  //         childValue = filterData(object[Object.keys(object)[i]], disabled);
-  //         if (childValue) disabled[object[Object.keys(object)[i]].id] = false;
-  //       }
-  //   }
-  //   if (!disabled.hasOwnProperty(object.id)) disabled[object.id] = true;
-  // }
+  }, [updateTreeView]);
 
   var content = [];
   if (loadedData.children === undefined) {
@@ -59,10 +42,11 @@ export default function ProjectTree() {
   return (
     <div className={styles.container}>
       <div className={styles.filterBar}>
-        <FormControl>
+        <FormControl fullWidth>
           <OutlinedInput
             id="outlined-basic"
             size="small"
+            fullWidth
             placeholder="Filter"
             value={filterValue}
             onChange={e => setFilterValue(e.target.value || "")}

@@ -20,8 +20,6 @@ const style = {
   display: "flex",
   justifyContent: "space-between",
   padding: "10px",
-  paddingLeft: "20px",
-  paddingRight: "20px",
   alignItems: "center",
   gap: "10px"
 }
@@ -76,9 +74,9 @@ function ExplorerBar(props) {
   return (
     <div>
       <div style={style}>
-      <Dialog open={newSceneOpen} onClose={() => setNewSceneOpen(false)} sx={dialogStyle}>
-        <DccSelector task={currentContext.path} newScene={true} />
-      </Dialog>
+        <Dialog open={newSceneOpen} onClose={() => setNewSceneOpen(false)} sx={dialogStyle}>
+          <DccSelector task={currentContext.path} newScene={true} />
+        </Dialog>
         <Stack direction="row" spacing={1} >
           <ToggleButtonGroup
             color="primary"
@@ -108,7 +106,7 @@ function ExplorerBar(props) {
         <TextField
           id="filterField"
           size="small"
-          label="Filter"
+          placeholder="Filter"
           variant="outlined"
           onChange={props.onFilterChange}
           style={{flexGrow: 1}}
@@ -116,11 +114,12 @@ function ExplorerBar(props) {
         <FormControlLabel control={<Checkbox defaultChecked onChange={props.onLatestChange} />} label="Latest" />
         <Button variant="outlined" onClick={props.onRefresh}>Refresh</Button>
       </div>
-      <div style={{...style, padding: "20px", paddingTop: 0, paddingBottom: 10}}>
+      <div style={{...style, padding: "0 10px 10px 10px"}}>
         <Button
-            style={{minHeight: "40px"}}
+            style={{maxWidth: "35px"}}
             variant="outlined"
             onClick={handleGoBack}
+            disabled={currentContext.dir_kind === "project"}
           >
             <ArrowUpwardIcon />
         </Button>
@@ -138,7 +137,14 @@ function ExplorerBar(props) {
           onBlur={e => handlePathChange(e)}
         />
         <Button
-          style={{minWidth: "120px", minHeight: "40px"}}
+          style={{minWidth: "120px"}}
+          color="ignite" 
+          variant="outlined"
+        >
+          Ingest
+        </Button>
+        <Button
+          style={{minWidth: "120px"}}
           color="ignite"
           variant="outlined"
           disabled={currentContext.dir_kind !== "task"}
@@ -146,14 +152,6 @@ function ExplorerBar(props) {
         >
           New Scene
         </Button>
-        {/* <Button
-          style={{minWidth: "120px", minHeight: "40px"}}
-          color="ignite" 
-          variant="outlined"
-          disabled={currentContext.dir_kind !== "task"}
-        >
-          New Asset
-        </Button> */}
       </div>
     </div>
   )

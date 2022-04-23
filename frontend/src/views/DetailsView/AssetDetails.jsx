@@ -2,12 +2,13 @@ import React, {useState} from "react";
 import Typography from '@mui/material/Typography';
 import ComponentViewer from "./ComponentViewer";
 import ComponentList from "./ComponentList";
-import AssetLabel, { LabelContainer } from "./AssetLabel";
+import Tag, { TagContainer } from "./Tag";
 import {
   ReflexContainer,
   ReflexSplitter,
   ReflexElement
 } from 'react-reflex'
+import URI from "../../components/URI";
 
 const splitterStyle = {
   borderColor: "rgb(80,80,80)",
@@ -44,11 +45,12 @@ function AssetDetails(props) {
               <Typography>Name: {props.entity.name}</Typography>
               <Typography>Path: {props.entity.path}</Typography>
               <Typography>Context: {props.entity.context}</Typography>
-              <Typography color="rgb(252, 140, 3)">URI: {props.entity.uri}</Typography>
+              <URI uri={props.entity.uri} />
+              {/* <Typography color="rgb(252, 140, 3)">URI: {props.entity.uri}</Typography> */}
             </div>
-            <LabelContainer>
-              {props.entity.labels.map((label, index) => <AssetLabel name={label} key={index} />)}
-            </LabelContainer>
+            <TagContainer>
+              {props.entity.labels.map((tag, index) => <Tag name={tag} key={index} />)}
+            </TagContainer>
           </ReflexElement>
           <ReflexSplitter style={splitterStyle} />
           <ReflexElement flex={0.4}>

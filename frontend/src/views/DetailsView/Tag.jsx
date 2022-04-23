@@ -1,5 +1,5 @@
 import React from 'react'
-import styles from "./AssetLabel.module.css";
+import styles from "./Tag.module.css";
 
 const namedStyles = {
   locked: {
@@ -13,7 +13,7 @@ const namedStyles = {
   }
 }
 
-export function LabelContainer(props) {
+export function TagContainer(props) {
   return (
     <div className={styles.container}>
       {props.children}
@@ -21,10 +21,10 @@ export function LabelContainer(props) {
   )
 }
 
-function AssetLabel(props) {
+function Tag(props) {
   return (
-    <div className={styles.label} style={namedStyles[props.name]}>{props.name}</div>
+    <div className={styles.tag} style={namedStyles[props.name]}>{props.name}</div>
   )
 }
 
-export default AssetLabel;
+export default Tag;

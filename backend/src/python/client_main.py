@@ -67,6 +67,16 @@ async def launch_dcc(request: Request):
     return {"ok": ok}
 
 
+@app.post("/api/v1/show_in_explorer")
+async def show_in_explorer(request: Request):
+    result = await request.json()
+    filepath = result.get("filepath")
+    if not filepath:
+        return {"ok": False}
+    ok = utils.show_in_explorer(filepath)
+    return {"ok": ok}
+
+
 @app.post("/api/v1/get_env")
 async def get_env(request: Request):
     result = await request.json()

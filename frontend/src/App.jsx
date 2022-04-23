@@ -4,7 +4,6 @@ import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
 import darkScrollbar from '@mui/material/darkScrollbar';
 import GlobalStyles from '@mui/material/GlobalStyles';
 import Home from './views/Home';
-import {ProjectProvider} from "./contexts/ProjectContext";
 import {ContextProvider} from "./contexts/ContextContext";
 import {DccProvider} from "./contexts/DccContext";
 import {EntityProvider} from "./contexts/EntityContext";
@@ -30,15 +29,13 @@ function App() {
       <GlobalStyles styles={{ ...darkScrollbar() }} />
       <div className="App">
       <ContextProvider>
-        <ProjectProvider>
-            <DccProvider>
-              <EntityProvider>
-                <SnackbarProvider maxSnack={3} autoHideDuration={2500}>
-                  <Home />
-                </SnackbarProvider>
-              </EntityProvider>
-            </DccProvider>
-          </ProjectProvider>
+          <DccProvider>
+            <EntityProvider>
+              <SnackbarProvider maxSnack={3} autoHideDuration={2500}>
+                <Home />
+              </SnackbarProvider>
+            </EntityProvider>
+          </DccProvider>
         </ContextProvider>
       </div>
     </ThemeProvider>

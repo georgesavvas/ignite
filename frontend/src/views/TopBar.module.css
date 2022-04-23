@@ -1,29 +1,39 @@
 .container {
-    /* border: solid whitesmoke; */
-    min-height: 70px;
+    /* min-height: 70px;
     max-height: 70px;
-    margin: 0px;
-    padding: 0px 25px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    margin: 0px; */
+    padding: 5px 10px;
+    display: grid;
+    /* grid-auto-flow: column; */
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    /* align-items: center;
+    justify-content: space-between; */
     box-sizing: border-box;
 }
 
 .logoContainer {
-    width: 50%;
+    grid-row: 1;
+    display: grid;
+    /* width: 50%; */
 }
 
 .logo {
     display: block;
-    margin-left: auto;
-    margin-right: auto;
-    height: 50px;
+    margin: auto;
+    height: 40px;
 }
 
-.buttonsRight {
+.leftSide {
+    grid-row: 1;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 10px;
+    gap: 5px;
+}
+
+.rightSide {
+    grid-row: 1;
+    display: flex;
+    /* align-items: center; */
+    justify-content: flex-end;
+    gap: 5px;
 }

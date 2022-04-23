@@ -19,70 +19,64 @@ import {ProjectContext} from "../contexts/ProjectContext";
 import ProjectBrowser from "./ProjectBrowser";
 import serverRequest from "../services/serverRequest";
 
+function FeedbackIcon() {
+  const style = {
+    height: "40px",
+    width: "40px",
+    margin: "auto",
+    objectFit: "contain"
+  }
+  return (
+    <img src="media/feedback.png" style={style} />
+  )
+}
+
 export default function TopBar() {
   const [isLoading, setIsLoading] = useState(true);
   const [projects, setProjects] = useState([]);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [projectBrowserOpen, setProjectBrowserOpen] = useState(false);
-  const [selectedProject, setSelectedProject] = useContext(ProjectContext);
-
-  useEffect(() => {
-    setIsLoading(true);
-    serverRequest("get_project_names").then((resp) => {
-      setIsLoading(false);
-      setProjects(resp.data);
-      if (selectedProject === "" && resp.data.length > 0) setSelectedProject(resp.data[0])
-    });
-  }, []);
 
   return (
-    <div className={styles.container}>
+    <>
       <ProjectBrowser
         open={projectBrowserOpen}
         onClose={() => setProjectBrowserOpen(false)}
       />
       <SettingsDialog open={settingsOpen} onClose={() => setSettingsOpen(false)} />
-      {/* <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
-        <Select
-          labelId="demo-simple-select-standard-label"
-          id="demo-simple-select-standard"
-          value={selectedProject}
-          onChange={handleChange}
-          label="Age"
-        >
-          {projects.map(project => (
-            <MenuItem key={project} value={project}>{project}</MenuItem>
-          ))}
-        </Select>
-      </FormControl> */}
-      <div className={styles.buttonsRight}>
-        <Button
-          variant="outlined"
-          color="ignite"
-          style={{minWidth: "180px"}}
-          onClick={() => setProjectBrowserOpen(true)}
-        >
-          Project Browser
-        </Button>
-        <Button variant="outlined" color="ignite">Vault</Button>
+      <div className={styles.container}>
+        <div className={styles.leftSide}>
+          <Button
+            variant="outlined"
+            color="ignite"
+            style={{minWidth: "180px"}}
+            onClick={() => setProjectBrowserOpen(true)}
+          >
+            Project Browser
+          </Button>
+          <Button variant="outlined" color="ignite">Vault</Button>
+        </div>
+        <div className={styles.logoContainer}>
+          <img src="media/ignite_logo.png" className={styles.logo} />
+        </div>
+        <div className={styles.rightSide}>
+          <ButtonGroup variant="text">
+            <IconButton>
+              <HelpIcon />
+            </IconButton>
+            <IconButton>
+              <BugReportIcon />
+            </IconButton>
+            <IconButton>
+              <ThumbsUpDownIcon />
+              {/* <FeedbackIcon /> */}
+            </IconButton>
+            <IconButton style={{marginLeft: "10px"}} onClick={() => setSettingsOpen(true)}>
+              <SettingsIcon />
+            </IconButton>
+          </ButtonGroup>
+        </div>
       </div>
-      <div className={styles.logoContainer}>
-        <img src="media/ignite_header.png" className={styles.logo} />
-      </div>
-      <ButtonGroup variant="text" style={{width: "300px", justifyContent: "flex-end"}}>
-        <IconButton aria-label="docs">
-          <HelpIcon />
-        </IconButton>
-        <IconButton aria-label="bug">
-          <BugReportIcon />
-        </IconButton>
-        <IconButton aria-label="feedback">
-          <ThumbsUpDownIcon />
-        </IconButton>
-        <IconButton aria-label="settings" onClick={() => setSettingsOpen(true)}>
-          <SettingsIcon fontSize="large"/>
-        </IconButton>
-      </ButtonGroup>
-    </div>
+    </>
   );
 }
