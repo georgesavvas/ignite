@@ -88,17 +88,19 @@ function DccSelector(props) {
       <div style={{margin: "10px", overflow: "hidden"}}>
         <Typography variant="h5" style={{marginBottom: "10px"}}>Scene Launcher</Typography>
         {dccConfig.map((dcc, index) => formatDcc(dcc, index))}
-        <Button
-          size="large"
-          variant="outlined"
-          color="ignite"
-          startIcon={<RocketLaunchIcon />}
-          style={{width: "100%", marginTop: "10px"}}
-          onClick={handleLaunchClick}
-          disabled={!selectedDcc}
-        >
-          Launch
-        </Button>
+        <div style={{width: "100%", display: "grid", justifyContent: "center", marginTop: "20px"}}>
+          <Button
+            size="large"
+            variant="outlined"
+            color="ignite"
+            startIcon={<RocketLaunchIcon />}
+            style={{width: "200px"}}
+            onClick={handleLaunchClick}
+            disabled={!selectedDcc}
+          >
+            Launch
+          </Button>
+        </div>
       </div>
     </div>
   )

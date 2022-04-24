@@ -50,7 +50,7 @@ function ExplorerBar(props) {
     }
   },[currentContext]);
 
-  const handleChange = (e, value) => {
+  const handleResultTypeChange = (e, value) => {
     if (value !== null) props.onResultTypeChange(value);
   };
 
@@ -83,7 +83,7 @@ function ExplorerBar(props) {
             value={props.resultType}
             exclusive
             size="small"
-            onChange={handleChange}
+            onChange={handleResultTypeChange}
           >
             <ToggleButton value="dynamic">Dynamic</ToggleButton>
             <ToggleButton value="assets">Assets</ToggleButton>

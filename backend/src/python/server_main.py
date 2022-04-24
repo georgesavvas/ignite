@@ -314,4 +314,4 @@ async def set_repr_asset(request: Request):
 
 
 if __name__ == "__main__":
-    uvicorn.run("server_main:app", host="127.0.0.1", port=9090, log_level="info", reload=True)
+    uvicorn.run("server_main:app", host="127.0.0.1", port=9090, log_level="info", reload=False)

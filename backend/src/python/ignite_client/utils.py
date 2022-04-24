@@ -46,6 +46,7 @@ def get_task_env(path):
         "CONTEXT": task.get("context", ""),
         "TASK": task.get("path", ""),
         "EXPORTS": task.get("exports", ""),
+        "CACHE": task.get("cache", ""),
         "SCENES": task.get("scenes", "")
     }
     return env

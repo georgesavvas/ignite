@@ -15,6 +15,7 @@ class Task(Directory):
         super().__init__(path, dir_kind="task")
         self.scenes = self.path / "scenes"
         self.exports = self.path / "exports"
+        self.cache = self.path / "cache"
         utils.ensure_directory(self.scenes)
         utils.ensure_directory(self.exports)
 
@@ -28,7 +29,8 @@ class Task(Directory):
 
     def as_dict(self):
         d = {}
-        for s in ("path", "dir_kind", "anchor", "project", "name", "task_type", "repr"):
+        for s in ("path", "dir_kind", "anchor", "project", "name", "task_type", "repr",
+        "exports", "scenes", "cache"):
             d[s] = getattr(self, s)
         # d["task"] = self.task.as_dict()
         return d
