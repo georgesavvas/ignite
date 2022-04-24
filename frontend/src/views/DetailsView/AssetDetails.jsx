@@ -1,8 +1,10 @@
-import React, {useState} from "react";
+import React, { useState, useEffect } from "react";
 import Typography from '@mui/material/Typography';
 import ComponentViewer from "./ComponentViewer";
 import ComponentList from "./ComponentList";
 import Tag, { TagContainer } from "./Tag";
+import saveReflexLayout from "../../utils/saveReflexLayout";
+import loadReflexLayout from "../../utils/loadReflexLayout";
 import {
   ReflexContainer,
   ReflexSplitter,
@@ -20,8 +22,41 @@ const style = {
   height: "100%"
 }
 
+const defaultFlexRations = {
+  "asset.viewer": 0.4,
+  "asset.details": 0.2,
+  "asset.comps": 0.4
+}
+
 function AssetDetails(props) {
+  const [flexRatios, setFlexRatios] = useState(defaultFlexRations);
   const [selectedCompName, setSelectedCompName] = useState("");
+
+  useEffect(() => {
+    const data = loadReflexLayout();
+    if (!data) {
+      setFlexRatios(defaultFlexRations);
+      return
+    }
+    const viewer = data["asset.viewer"];
+    const details = data["asset.details"];
+    const comps = data["asset.comps"];
+    if (!viewer || !details || !comps) {
+      setFlexRatios(defaultFlexRations);
+      return
+    }
+    const fullWidth = viewer[1] + details[1] + comps[1];
+    const ratios = {
+      "asset.viewer": viewer[1] / fullWidth,
+      "asset.details": details[1] / fullWidth,
+      "asset.comps": comps[1] / fullWidth
+    };
+    setFlexRatios(ratios);
+  }, [])
+
+  const handleResized = data => {
+    saveReflexLayout(data)
+  }
 
   const getComp = compName => {
     for(const comp of props.entity.components) {
@@ -35,11 +70,11 @@ function AssetDetails(props) {
   return (
     <div style={style}>
       <ReflexContainer orientation="horizontal">
-          <ReflexElement flex={0.4}>
+          <ReflexElement flex={flexRatios["asset.viewer"]} name={"asset.viewer"} onStopResize={handleResized}>
             <ComponentViewer comp={selectedComp} />
           </ReflexElement>
           <ReflexSplitter style={splitterStyle} />
-          <ReflexElement flex={0.2}>
+          <ReflexElement flex={flexRatios["asset.details"]} name={"asset.details"} onStopResize={handleResized}>
             <div style={{margin: "10px", overflow: "hidden"}}>
               <Typography variant="h5">Asset Details</Typography>
               <Typography>Name: {props.entity.name}</Typography>
@@ -53,7 +88,7 @@ function AssetDetails(props) {
             </TagContainer>
           </ReflexElement>
           <ReflexSplitter style={splitterStyle} />
-          <ReflexElement flex={0.4}>
+          <ReflexElement flex={flexRatios["asset.comps"]} name={"asset.comps"} onStopResize={handleResized}>
             <ComponentList components={props.entity.components} selectedComp={selectedComp} onSelect={setSelectedCompName} />
           </ReflexElement>
         </ReflexContainer>

@@ -6,8 +6,10 @@ GENERIC_ENV = {
 
 DCC_ENVS = {
     "houdini": {
-        "HOUDINI_MENU_PATH": "{dcc}/houdini;&;",
-        "HOUDINI_OTLSCAN_PATH": "&;{dcc}/houdini/otls;",
+        "IGNITE_DCC": "{dcc}/houdini",
+        "HOUDINI_PATH": "{dcc}/houdini;&",
+        "HOUDINI_MENU_PATH": "{dcc}/houdini;&",
+        "HOUDINI_OTLSCAN_PATH": "&;{dcc}/houdini/otls"
     }
 }
 

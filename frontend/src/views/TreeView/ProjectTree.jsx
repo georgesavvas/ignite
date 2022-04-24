@@ -23,7 +23,7 @@ export default function ProjectTree() {
       setIsLoading(false);
       setLoadedData(resp.data);
     });
-  }, [updateTreeView]);
+  }, [currentContext.project, updateTreeView]);
 
   var content = [];
   if (loadedData.children === undefined) {
