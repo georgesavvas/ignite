@@ -12,9 +12,12 @@ import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
 import {ContextContext} from "../../contexts/ContextContext";
 import DccSelector from "../DccSelector";
 import { useSnackbar } from 'notistack';
+import Ingest from "../Ingest/Ingest";
 
 const style = {
   display: "flex",
@@ -24,7 +27,7 @@ const style = {
   gap: "10px"
 }
 
-const dialogStyle = {
+const newSceneDialogStyle = {
   "& .MuiDialog-container": {
     "& .MuiPaper-root": {
       width: "100%",
@@ -35,9 +38,23 @@ const dialogStyle = {
   },
 }
 
+const ingestDialogStyle = {
+  "& .MuiDialog-container": {
+    "& .MuiPaper-root": {
+      width: "100%",
+      maxWidth: "95vw",
+      height: "100%",
+      maxHeight: "90vh",
+      backgroundColor: "rgb(40,40,40)",
+      backgroundImage: "none"
+    },
+  },
+}
+
 function ExplorerBar(props) {
   const [newSceneOpen, setNewSceneOpen] = useState(false);
   const [newAssetOpen, setNewAssetOpen] = useState(false);
+  const [ingestOpen, setIngestOpen] = useState(false);
   const [contextPath, setContextPath] = useState("");
   const [contextPathError, setContextPathError] = useState([false, ""]);
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
@@ -74,8 +91,17 @@ function ExplorerBar(props) {
   return (
     <div>
       <div style={style}>
-        <Dialog open={newSceneOpen} onClose={() => setNewSceneOpen(false)} sx={dialogStyle}>
+        <Dialog open={newSceneOpen} onClose={() => setNewSceneOpen(false)} sx={newSceneDialogStyle}>
           <DccSelector task={currentContext.path} newScene={true} />
+        </Dialog>
+        <Dialog open={ingestOpen} onClose={() => setIngestOpen(false)} sx={ingestDialogStyle}>
+          <DialogContent>
+            <Ingest />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setIngestOpen(false)}>Close</Button>
+            <Button onClick={() => setIngestOpen(false)} color="ignite" variant="outlined">Create</Button>
+          </DialogActions>
         </Dialog>
         <Stack direction="row" spacing={1} >
           <ToggleButtonGroup
@@ -140,6 +166,7 @@ function ExplorerBar(props) {
           style={{minWidth: "120px"}}
           color="ignite" 
           variant="outlined"
+          onClick={() => setIngestOpen(true)}
         >
           Ingest
         </Button>

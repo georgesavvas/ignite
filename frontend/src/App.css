@@ -17,3 +17,19 @@
 .MuiInputBase-root {
   max-height: 35px;
 }
+
+.MuiFormControl-root label {
+  top: -11px;
+}
+
+.MuiFormControl-root label[data-shrink='true'] {
+  top: 0;
+}
+
+.MuiTextField-root label {
+  top: -11px;
+}
+
+.MuiTextField-root label[data-shrink='true'] {
+  top: 0;
+}
