@@ -15,7 +15,7 @@ IGNITE_SERVER_PORT = "9090"
 ENV["IGNITE_SERVER_HOST"] = IGNITE_SERVER_HOST
 ENV["IGNITE_SERVER_PORT"] = IGNITE_SERVER_PORT
 
-from ignite_client import utils
+from ignite_client import utils, api
 
 
 app = FastAPI()
@@ -86,6 +86,17 @@ async def get_env(request: Request):
     return {
         "ok": True,
         "data": env
+    }
+
+
+@app.post("/api/v1/ingest")
+async def ingest(request: Request):
+    result = await request.json()
+    data = result.get("data", "")
+    resp = api.ingest(data)
+    return {
+        "ok": True,
+        "data": resp
     }
 
 
