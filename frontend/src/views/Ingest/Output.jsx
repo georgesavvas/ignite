@@ -4,6 +4,7 @@ import DynamicList from "../../components/DynamicList";
 import Typography from '@mui/material/Typography';
 
 function Asset(data) {
+  console.log(data);
   return (
     <div className={styles.assetContainer}>
       <Typography variant="body1">{data.name}</Typography>
@@ -11,14 +12,15 @@ function Asset(data) {
     </div>
   )
 }
+
 function Output(props) {
   return (
     <div className={styles.container}>
       <Typography variant="h6">Output Preview</Typography>
-      <DynamicList>
+      <DynamicList noButtons>
         {
-          props.data ?
-          props.data.map((child) => Asset(child)) :
+          props.assets ?
+          props.assets.map((child) => Asset(child)) :
           null
         }
       </DynamicList>

@@ -23,13 +23,19 @@ function createListItem(child, index, dense) {
   )
 }
 
+function buttons(props) {
+  return (
+    <div className={styles.buttonContainer}>
+      <AddIcon className={styles.button} onClick={props.onAdd || null}/>
+      <RemoveIcon className={styles.button} onClick={props.onRemove || null}/>
+    </div>
+  )
+}
+
 function DynamicList(props) {
   return (
     <>
-      <div className={styles.buttonContainer}>
-        <AddIcon className={styles.button} onClick={() => {}}/>
-        <RemoveIcon className={styles.button} onClick={() => {}}/>
-      </div>
+      {props.noButtons ? null : buttons(props)}
       <List sx={style}>
         {
           props.children ?
