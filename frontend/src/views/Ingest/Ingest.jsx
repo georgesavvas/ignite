@@ -16,7 +16,9 @@ const splitterStyle = {
   borderStyle: "solid",
   borderColor: "rgb(80,80,80)",
   backgroundColor: "rgb(80,80,80)",
-  boxSizing: "border-box"
+  boxSizing: "border-box",
+  marginLeft: "60px",
+  marginRight: "60px"
 }
 
 const defaultFlexRations = {

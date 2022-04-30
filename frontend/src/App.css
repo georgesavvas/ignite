@@ -14,7 +14,7 @@
   max-height: 35px;
 }
 
-.MuiInputBase-root {
+/* .MuiInputBase-root {
   max-height: 35px;
 }
 
@@ -32,4 +32,4 @@
 
 .MuiTextField-root label[data-shrink='true'] {
   top: 0;
-}
+} */
