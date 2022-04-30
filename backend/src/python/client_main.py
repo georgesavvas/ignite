@@ -89,6 +89,17 @@ async def get_env(request: Request):
     }
 
 
+@app.post("/api/v1/ingest_get_files")
+async def ingest_get_files(request: Request):
+    result = await request.json()
+    dirs = result.get("dirs", "")
+    resp = api.ingest_get_files(dirs)
+    return {
+        "ok": True,
+        "data": resp
+    }
+
+
 @app.post("/api/v1/ingest")
 async def ingest(request: Request):
     result = await request.json()
