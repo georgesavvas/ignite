@@ -11,14 +11,16 @@ import {
   ReflexElement
 } from 'react-reflex'
 import { useEffect, useState } from 'react';
+import debounce from 'lodash.debounce';
+import clientRequest from "../../services/clientRequest";
 
 const splitterStyle = {
   borderStyle: "solid",
   borderColor: "rgb(80,80,80)",
   backgroundColor: "rgb(80,80,80)",
   boxSizing: "border-box",
-  marginLeft: "60px",
-  marginRight: "60px"
+  marginLeft: "2.5%",
+  marginRight: "2.5%"
 }
 
 const defaultFlexRations = {
@@ -31,6 +33,10 @@ const duplicate = (x, n) => Array.from(new Array(n), () => x);
 
 function Ingest() {
   const [flexRatios, setFlexRatios] = useState(defaultFlexRations);
+  const [ingestDirs, setIngestDirs] = useState("");
+  const [ingestFiles, setIngestFiles] = useState([]);
+  const [ingestRules, setIngestRules] = useState([]);
+  const [ingestAssets, setIngestAssets] = useState([]);
 
   useEffect(() => {
     const data = loadReflexLayout();
@@ -54,38 +60,74 @@ function Ingest() {
     setFlexRatios(ratios);
   }, [])
 
-  const handleResized = data => {
+  useEffect(() => {
+    getFiles();
+    getOutput();
+  }, [ingestDirs])
+
+  const handleResize = data => {
     saveReflexLayout(data)
   }
 
-  const files = [
-    'textures/weathered_brown_planks_disp_2k.exr',
-    'textures/weathered_brown_planks_diff_2k.exr',
-    'textures/weathered_brown_planks_nor_gl_2k.exr',
-    'textures/weathered_brown_planks_rough_2k.exr',
-    'textures-2/coast_sand_01_nor_gl_2k.exr',
-    'textures-2/coast_sand_01_rough_2k.exr',
-    'textures-2/coast_sand_01_diff_2k.exr',
-    'textures-2/coast_sand_01_disp_2k.exr',
-    'textures-3/red_bricks_04_rough_2k.exr',
-    'textures-3/red_bricks_04_disp_2k.exr',
-    'textures-3/red_bricks_04_diff_2k.exr',
-    'textures-3/red_bricks_04_nor_gl_2k.exr',
-    'textures-4/forest_leaves_04_disp_2k.exr',
-    'textures-4/forest_leaves_04_diff_2k.exr',
-    'textures-4/forest_leaves_04_nor_gl_2k.exr',
-    'textures-4/forest_leaves_04_rough_2k.exr',
-    'textures-5/asphalt_02_nor_gl_2k.exr',
-    'textures-5/asphalt_02_rough_2k.exr',
-    'textures-5/asphalt_02_diff_2k.exr',
-    'textures-5/asphalt_02_disp_2k.exr',
-    'hdri/je_gray_park_2k.exr',
-    'hdri/moonless_golf_2k.exr',
-    'hdri/studio_small_09_2k.exr',
-    'hdri/cannon_2k.exr',
-    'hdri/reinforced_concrete_01_2k.hdr',
-    'hdri/abandoned_parking_2k.exr',
-    'hdri/quarry_04_2k.exr'
+  const ruleTemplate = {
+    "file_target": "*",
+    "file_target_type": "directory",
+    "rule_type": "extract_info",
+    "rule_target": "filename",
+    "rule_value": "{name.0}_{name.1}_{name.2}_{comp.0}_{}.{ext}"
+  }
+
+  const getFiles = debounce(() => {
+    clientRequest("ingest_get_files", {"dirs": ingestDirs}).then(resp => setIngestFiles(resp.data.trimmed));
+  }, 250)
+
+  const getOutput = debounce(() => {
+    const data = {
+      dirs: ingestDirs,
+      rules: ingestRules,
+      dry: true
+    }
+    clientRequest("ingest", {data: data}).then(resp => {
+      setIngestAssets(resp.data); 
+      console.log("data", resp.data);
+    });
+  }, 250)
+
+  const handleDirsChange = e => {
+    const dirs =e.target.value;
+    setIngestDirs(dirs);
+  }
+
+  const handleRulesChange = (e, action) => {
+    switch (action) {
+      case "add":
+        setIngestRules(prevState => [...prevState, ruleTemplate]);
+        break
+      case "remove":
+        setIngestRules(prevState => {
+          prevState.pop();
+          return [...prevState];
+        })
+        break
+      case "modify":
+        const [field, id] = e.target.name.split("-");
+        const value = e.target.value;
+        setIngestRules(prevState => {
+          prevState[id][field] = value;
+          return [...prevState];
+        })
+        break
+    }
+    getOutput();
+  }
+
+  const dirs = [
+    "/Users/george/Downloads/textures",
+    "/Users/george/Downloads/textures-2",
+    "/Users/george/Downloads/textures-3",
+    "/Users/george/Downloads/textures-4",
+    "/Users/george/Downloads/textures-5",
+    "/Users/george/Downloads/hdri"
   ]
 
   const rules = [
@@ -158,16 +200,16 @@ function Ingest() {
   return (
     <div className={styles.container}>
       <ReflexContainer orientation="vertical">
-        <ReflexElement flex={flexRatios["ingest.files"]} name="ingest.files" onStopResize={handleResized}>
-          <Files data={files} />
+        <ReflexElement flex={flexRatios["ingest.files"]} name="ingest.files" onStopResize={handleResize}>
+          <Files files={ingestFiles} onDirsChange={handleDirsChange} />
         </ReflexElement>
         <ReflexSplitter style={splitterStyle} />
-        <ReflexElement flex={flexRatios["ingest.rules"]} name="ingest.rules" onStopResize={handleResized}>
-          <Rules data={rules} />
+        <ReflexElement flex={flexRatios["ingest.rules"]} name="ingest.rules" onStopResize={handleResize}>
+          <Rules rules={ingestRules} onRulesChange={handleRulesChange} />
         </ReflexElement>
         <ReflexSplitter style={splitterStyle} />
-        <ReflexElement flex={flexRatios["ingest.output"]} name="ingest.output" onStopResize={handleResized}>
-          <Output data={output} />
+        <ReflexElement flex={flexRatios["ingest.output"]} name="ingest.output" onStopResize={handleResize}>
+          <Output assets={ingestAssets} />
         </ReflexElement>
       </ReflexContainer>
     </div>

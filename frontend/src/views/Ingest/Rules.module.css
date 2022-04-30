@@ -17,3 +17,7 @@
     flex-direction: column;
     padding: 10px
 }
+
+.ruleRow {
+    display: flex;
+}

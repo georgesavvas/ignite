@@ -103,7 +103,8 @@ async def ingest_get_files(request: Request):
 @app.post("/api/v1/ingest")
 async def ingest(request: Request):
     result = await request.json()
-    data = result.get("data", "")
+    data = result.get("data", {})
+    pprint(data)
     resp = api.ingest(data)
     return {
         "ok": True,
@@ -117,4 +118,4 @@ app.mount("/files", StaticFiles(directory=projects_root), name="projects_root")
 
 
 if __name__ == "__main__":
-    uvicorn.run("client_main:app", host="127.0.0.1", port=9091, log_level="info", reload=False)
+    uvicorn.run("client_main:app", host="127.0.0.1", port=9091, log_level="info", reload=True)
