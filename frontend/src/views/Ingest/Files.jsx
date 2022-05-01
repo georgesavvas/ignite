@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography';
 import { TextField } from '@mui/material';
 import Button from '@mui/material/Button';
 
-function File(filepath) {
+function File({filepath}) {
   return (
     <div className={styles.fileContainer}>
       <Typography variant="caption">{filepath}</Typography>
@@ -37,13 +37,13 @@ function Files(props) {
     <div className={styles.container}>
       <Typography variant="h6">Incoming files</Typography>
       {/* <div className={styles.inputBar}> */}
-      <TextField size="small" fullWidth multiline maxRows={5} placeholder="Paste directories..." onBlur={props.onDirsChange} />
+      <TextField size="small" fullWidth multiline maxRows={5} placeholder="Paste files or directories..." onBlur={props.onDirsChange} />
         {/* <Button id={"file-browser"} variant="outlined" className={styles.browse} onClick={handleFileInput}>...</Button>
       </div> */}
       <DynamicList dense noButtons>
         {
           props.files ?
-          props.files.map((child) => File(child)) :
+          props.files.map((child, index) => <File filepath={child} key={index} />) :
           null
         }
       </DynamicList>

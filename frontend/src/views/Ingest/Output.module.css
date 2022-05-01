@@ -16,3 +16,8 @@
     flex-direction: column;
     padding: 10px
 }
+
+.compContainer {
+    display: flex;
+    gap: 5px;
+}

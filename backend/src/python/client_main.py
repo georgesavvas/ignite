@@ -104,7 +104,6 @@ async def ingest_get_files(request: Request):
 async def ingest(request: Request):
     result = await request.json()
     data = result.get("data", {})
-    pprint(data)
     resp = api.ingest(data)
     return {
         "ok": True,

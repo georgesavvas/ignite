@@ -5,6 +5,7 @@ import yaml
 import subprocess
 import requests
 import parse
+import glob
 from fnmatch import fnmatch
 from pathlib import PurePath, Path
 from pprint import pprint
@@ -24,7 +25,6 @@ def ingest(data):
     dry = data.get("dry", True)
     dirs = data.get("dirs")
     if not dirs:
-        print("No dirs.")
         return []
     file_data = ingest_get_files(dirs)
     files = file_data["files"]
@@ -59,10 +59,10 @@ def ingest(data):
             rule_type = rule["rule_type"]
             if rule_type == "extract_info":
                 rule_value = rule["rule_value"]
-                rule_target = trimmed
-                if rule["rule_target"] == "directory":
+                expr_target = trimmed
+                if rule["extract_target"] == "directory":
                     expr_target = trimmed.rstrip(filename)
-                elif rule["rule_target"] == "filename":
+                elif rule["extract_target"] == "filename":
                     expr_target = filename
                 result["pattern"] = rule_value
                 parsed = parse.parse(rule_value, expr_target)
@@ -70,9 +70,9 @@ def ingest(data):
                     continue
                 result["extract_info"] = parsed.named
             elif rule_type == "replace_value":
-                result["replace_values"][rule["rule_target"]] = rule["rule_value"]
+                result["replace_values"][rule["replace_target"]] = rule["rule_value"]
             elif rule_type == "set_value":
-                result["set_value"][rule["rule_target"]] = rule["rule_value"]
+                result["set_values"][rule["set_target"]] = rule["rule_value"]
 
     fields = ("name", "comp")
     for result in results:
@@ -123,6 +123,8 @@ def ingest(data):
         if not assets.get(name):
             assets[name] = {"name": name, "comps": []}
         comp_name = extracted_fields.get("comp", "")
+        if _set_values.get("comp"):
+            comp_name = _set_values["comp"]
         comp_name = replace_values(comp_name, _replace_values)
         comp = {
             "name": comp_name,
@@ -137,12 +139,22 @@ def ingest(data):
 
 def ingest_get_files(dirs):
     def trim_filepaths(files):
+        file0 = files[0]
+        windows_path = 0
+        if not file0.startswith("/"):
+            windows_path = 1
         parts = files[0].lstrip("/").split("/")
         for i, part in enumerate(parts):
+            part += "/"
+            if not windows_path or i > 0:
+                part = "/" + part
             for file in files:
-                if f"/{part}/" not in file:
+                if part not in file:
                     break
-        common = "/" + "/".join(parts[:i - 1]) + "/"
+        common = ""
+        if not windows_path:
+            common = "/"
+        common += "/".join(parts[:i - 1]) + "/"
         return [f.replace(common, "") for f in files]
 
     files = []
@@ -151,13 +163,17 @@ def ingest_get_files(dirs):
             continue
         if len(dir) < 4:
             continue
-        path = Path(dir)
-        if path.is_dir():
-            files += list(path.glob("**/*"))
-        else:
-            files.append(path)
+        # path = Path(dir)
+        # if path.is_dir():
+        #     files += list(path.glob("**/*"))
+        # else:
+        #     files.append(path)
+        if not "*" in dir and not "?" in dir:
+            dir = str(PurePath(dir) / "*")
+        files += [Path(file) for file in glob.glob(dir)]
     if not files:
         return []
+    files = [file for file in files if file.is_file()]
     files_posix = [f.as_posix() for f in files]
     files_trimmed = trim_filepaths(files_posix)
     files_trimmed = list(set(files_trimmed))

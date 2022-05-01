@@ -70,11 +70,13 @@ function Ingest() {
   }
 
   const ruleTemplate = {
-    "file_target": "*",
-    "file_target_type": "directory",
-    "rule_type": "extract_info",
-    "rule_target": "filename",
-    "rule_value": "{name.0}_{name.1}_{name.2}_{comp.0}_{}.{ext}"
+    file_target: "*",
+    file_target_type: "filename",
+    rule_type: "extract_info",
+    extract_target: "filename",
+    set_target: "name",
+    replace_target: "",
+    rule_value: "{name}_{comp}_{}.{ext}"
   }
 
   const getFiles = debounce(() => {
@@ -88,8 +90,7 @@ function Ingest() {
       dry: true
     }
     clientRequest("ingest", {data: data}).then(resp => {
-      setIngestAssets(resp.data); 
-      console.log("data", resp.data);
+      setIngestAssets(resp.data);
     });
   }, 250)
 
@@ -121,82 +122,6 @@ function Ingest() {
     getOutput();
   }
 
-  const dirs = [
-    "/Users/george/Downloads/textures",
-    "/Users/george/Downloads/textures-2",
-    "/Users/george/Downloads/textures-3",
-    "/Users/george/Downloads/textures-4",
-    "/Users/george/Downloads/textures-5",
-    "/Users/george/Downloads/hdri"
-  ]
-
-  const rules = [
-    {
-      "file_target": "*",
-      "file_target_type": "directory",
-      "rule_type": "extract_info",
-      "rule_target": "filename",
-      "rule_value": "{name.0}_{name.1}_{name.2}_{comp.0}_{}.{ext}"
-    },
-    {
-      "file_target": "asphalt",
-      "file_target_type": "filename",
-      "rule_type": "extract_info",
-      "rule_target": "filename",
-      "rule_value": "{name.0}_{name.1}_{comp}_{}.{ext}"
-    },
-    {
-      "file_target": "hdri",
-      "file_target_type": "filepath",
-      "rule_type": "extract_info",
-      "rule_target": "filename",
-      "rule_value": "{name.0}_{name.1}_{}.{ext}"
-    },
-    {
-      "file_target": "*",
-      "file_target_type": "filename",
-      "rule_type": "replace_value",
-      "rule_target": "nor",
-      "rule_value": "norm"
-    }
-  ]
-
-  const output = [{'comps': [{'file': 'weathered_brown_planks_disp_2k.exr', 'name': 'disp'},
-  {'file': 'weathered_brown_planks_diff_2k.exr', 'name': 'diff'},
-  {'file': 'weathered_brown_planks_nor_gl_2k.exr', 'name': 'norm'},
-  {'file': 'weathered_brown_planks_rough_2k.exr', 'name': 'rough'}],
-'name': 'weathered_brown_planks'},
-{'comps': [{'file': 'coast_sand_01_nor_gl_2k.exr', 'name': 'norm'},
-  {'file': 'coast_sand_01_rough_2k.exr', 'name': 'rough'},
-  {'file': 'coast_sand_01_diff_2k.exr', 'name': 'diff'},
-  {'file': 'coast_sand_01_disp_2k.exr', 'name': 'disp'}],
-'name': 'coast_sand_01'},
-{'comps': [{'file': 'red_bricks_04_rough_2k.exr', 'name': 'rough'},
-  {'file': 'red_bricks_04_disp_2k.exr', 'name': 'disp'},
-  {'file': 'red_bricks_04_diff_2k.exr', 'name': 'diff'},
-  {'file': 'red_bricks_04_nor_gl_2k.exr', 'name': 'norm'}],
-'name': 'red_bricks_04'},
-{'comps': [{'file': 'forest_leaves_04_disp_2k.exr', 'name': 'disp'},
-  {'file': 'forest_leaves_04_diff_2k.exr', 'name': 'diff'},
-  {'file': 'forest_leaves_04_nor_gl_2k.exr', 'name': 'norm'},
-  {'file': 'forest_leaves_04_rough_2k.exr', 'name': 'rough'}],
-'name': 'forest_leaves_04'},
-{'comps': [{'file': 'asphalt_02_nor_gl_2k.exr', 'name': 'norm'},
-  {'file': 'asphalt_02_rough_2k.exr', 'name': 'rough'},
-  {'file': 'asphalt_02_diff_2k.exr', 'name': 'diff'},
-  {'file': 'asphalt_02_disp_2k.exr', 'name': 'disp'}],
-'name': 'asphalt_02'},
-{'comps': [{'file': 'je_gray_park_2k.exr', 'name': ''}], 'name': 'je_gray'},
-{'comps': [{'file': 'moonless_golf_2k.exr', 'name': ''}],
-'name': 'moonless_golf'},
-{'comps': [{'file': 'studio_small_09_2k.exr', 'name': ''}],
-'name': 'studio_small'},
-{'comps': [{'file': 'reinforced_concrete_01_2k.hdr', 'name': ''}],
-'name': 'reinforced_concrete'},
-{'comps': [{'file': 'abandoned_parking_2k.exr', 'name': ''}],
-'name': 'abandoned_parking'},
-{'comps': [{'file': 'quarry_04_2k.exr', 'name': ''}], 'name': 'quarry_04'}]
-
   return (
     <div className={styles.container}>
       <ReflexContainer orientation="vertical">
@@ -205,7 +130,7 @@ function Ingest() {
         </ReflexElement>
         <ReflexSplitter style={splitterStyle} />
         <ReflexElement flex={flexRatios["ingest.rules"]} name="ingest.rules" onStopResize={handleResize}>
-          <Rules rules={ingestRules} onRulesChange={handleRulesChange} />
+          <Rules rules={ingestRules} onRulesChange={handleRulesChange} template={ruleTemplate} />
         </ReflexElement>
         <ReflexSplitter style={splitterStyle} />
         <ReflexElement flex={flexRatios["ingest.output"]} name="ingest.output" onStopResize={handleResize}>
