@@ -3,12 +3,16 @@ import styles from "./Output.module.css";
 import DynamicList from "../../components/DynamicList";
 import Typography from '@mui/material/Typography';
 
-function Asset(data) {
-  console.log(data);
+function Asset({data}) {
   return (
     <div className={styles.assetContainer}>
       <Typography variant="body1">{data.name}</Typography>
-      {data.comps.map((comp) => <Typography variant="caption">{comp.file}</Typography>)}
+      {data.comps.map((comp) => 
+        <div className={styles.compContainer}>
+          <Typography variant="caption">{comp.name}</Typography>
+          <Typography variant="caption">{comp.file}</Typography>
+        </div>
+      )}
     </div>
   )
 }
@@ -20,7 +24,7 @@ function Output(props) {
       <DynamicList noButtons>
         {
           props.assets ?
-          props.assets.map((child) => Asset(child)) :
+          props.assets.map((child, index) => <Asset data={child} key={index} />) :
           null
         }
       </DynamicList>
