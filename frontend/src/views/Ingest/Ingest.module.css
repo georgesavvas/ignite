@@ -4,6 +4,30 @@
     height: 100%;
     box-sizing: border-box;
     display: flex;
+    flex-direction: column;
     /* padding: 10px; */
     flex-grow: 0.5;
+    position: relative;
+}
+
+.connectionContainer {
+    height: 100%;
+    min-width: 50px;
+    width: 25%;
+    box-sizing: border-box;
+    position: relative;
+    flex-grow: 1;
+}
+
+.fade {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(0deg, rgba(40,40,40,1), rgba(0,0,0,0) 15% 75%, rgba(40,40,40,1) 90%);
+}
+
+.row {
+    display: flex;
+    height: 100%;
+    overflow: hidden;
 }

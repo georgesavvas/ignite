@@ -15,7 +15,18 @@
     display: flex;
     gap: 5px;
     flex-direction: column;
-    padding: 10px
+    padding: 10px;
+    position: relative;
+}
+
+.connector {
+    /* border: solid; */
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    z-index: -1;
 }
 
 .ruleRow {

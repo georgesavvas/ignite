@@ -3,6 +3,8 @@ import Files from "./Files";
 import Rules from "./Rules";
 import Output from "./Output";
 import Divider from '@mui/material/Divider';
+import LinearProgress from '@mui/material/LinearProgress';
+import Xarrow, { Xwrapper, useXarrow } from 'react-xarrows';
 import saveReflexLayout from "../../utils/saveReflexLayout";
 import loadReflexLayout from "../../utils/loadReflexLayout";
 import {
@@ -19,17 +21,28 @@ const splitterStyle = {
   borderColor: "rgb(80,80,80)",
   backgroundColor: "rgb(80,80,80)",
   boxSizing: "border-box",
-  marginLeft: "2.5%",
-  marginRight: "2.5%"
+  // marginLeft: "5%"
 }
 
 const defaultFlexRations = {
-  "ingest.files": 0.3,
-  "ingest.rules": 0.4,
-  "ingest.output": 0.3
+  "ingest.files": 0.35,
+  "ingest.rules": 0.3,
+  "ingest.output": 0.35
 }
 
 const duplicate = (x, n) => Array.from(new Array(n), () => x);
+
+const getFilesDebounced = debounce((data, callback) => {
+  clientRequest("ingest_get_files", data).then(resp => {
+    callback(resp);
+  });
+}, 250)
+
+const getOutputDebounced = debounce((data, callback) => {
+  clientRequest("ingest", data).then(resp => {
+    callback(resp);
+  });
+}, 500)
 
 function Ingest() {
   const [flexRatios, setFlexRatios] = useState(defaultFlexRations);
@@ -37,6 +50,9 @@ function Ingest() {
   const [ingestFiles, setIngestFiles] = useState([]);
   const [ingestRules, setIngestRules] = useState([]);
   const [ingestAssets, setIngestAssets] = useState([]);
+  const [connections, setConnections] = useState({});
+  const [loading, setLoading] = useState(false);
+  const updateXarrow = useXarrow();
 
   useEffect(() => {
     const data = loadReflexLayout();
@@ -61,9 +77,14 @@ function Ingest() {
   }, [])
 
   useEffect(() => {
+    setLoading(true);
     getFiles();
     getOutput();
   }, [ingestDirs])
+
+  useEffect(() => {
+    getOutput();
+  }, [ingestRules])
 
   const handleResize = data => {
     saveReflexLayout(data)
@@ -72,42 +93,53 @@ function Ingest() {
   const ruleTemplate = {
     file_target: "*",
     file_target_type: "filename",
-    rule_type: "extract_info",
-    extract_target: "filename",
-    set_target: "name",
+    task: "",
+    name: "",
+    comp: "",
+    rule: "",
     replace_target: "",
-    rule_value: "{name}_{comp}_{}.{ext}"
+    replace_value: ""
   }
 
-  const getFiles = debounce(() => {
-    clientRequest("ingest_get_files", {"dirs": ingestDirs}).then(resp => setIngestFiles(resp.data.trimmed));
-  }, 250)
+  const getFiles = () => getFilesDebounced(
+      {"dirs": ingestDirs},
+      resp => {
+        setIngestFiles(resp.data.trimmed);
+      }
+  )
 
-  const getOutput = debounce(() => {
+  const getOutput = () => {
     const data = {
       dirs: ingestDirs,
       rules: ingestRules,
       dry: true
     }
-    clientRequest("ingest", {data: data}).then(resp => {
-      setIngestAssets(resp.data);
-    });
-  }, 250)
+    getOutputDebounced(
+    {data: data},
+    resp => {
+      setIngestAssets(resp.data.assets);
+      setConnections(resp.data.connections);
+      setLoading(false);
+    }
+  )}
 
   const handleDirsChange = e => {
     const dirs =e.target.value;
     setIngestDirs(dirs);
   }
 
-  const handleRulesChange = (e, action) => {
+  const handleRulesChange = (e, action, index=-1) => {
+    setLoading(true);
     switch (action) {
       case "add":
         setIngestRules(prevState => [...prevState, ruleTemplate]);
         break
       case "remove":
         setIngestRules(prevState => {
-          prevState.pop();
-          return [...prevState];
+          const rules = [...prevState];
+          if (index < 0) rules.pop();
+          else rules.splice(index, 1);
+          return rules;
         })
         break
       case "modify":
@@ -119,24 +151,62 @@ function Ingest() {
         })
         break
     }
-    getOutput();
   }
 
   return (
     <div className={styles.container}>
-      <ReflexContainer orientation="vertical">
-        <ReflexElement flex={flexRatios["ingest.files"]} name="ingest.files" onStopResize={handleResize}>
-          <Files files={ingestFiles} onDirsChange={handleDirsChange} />
-        </ReflexElement>
-        <ReflexSplitter style={splitterStyle} />
-        <ReflexElement flex={flexRatios["ingest.rules"]} name="ingest.rules" onStopResize={handleResize}>
-          <Rules rules={ingestRules} onRulesChange={handleRulesChange} template={ruleTemplate} />
-        </ReflexElement>
-        <ReflexSplitter style={splitterStyle} />
-        <ReflexElement flex={flexRatios["ingest.output"]} name="ingest.output" onStopResize={handleResize}>
-          <Output assets={ingestAssets} />
-        </ReflexElement>
-      </ReflexContainer>
+      <Xwrapper>
+        <ReflexContainer orientation="vertical">
+          <ReflexElement flex={flexRatios["ingest.files"]} name="ingest.files" onStopResize={handleResize}>
+            <div className={styles.row}>
+              <Files files={ingestFiles} onDirsChange={handleDirsChange} />
+              <div className={styles.connectionContainer}>
+                {
+                  !loading && connections && connections.rules_files ?
+                  connections.rules_files.map(
+                    (rule, index) => <Xarrow end={"file-" + rule[1]} start={"rule-" + rule[0]}
+                      key={index} strokeWidth={2} curveness={0.5} color="rgb(100,100,100)"
+                      showHead={true} animateDrawing={0.25} headShape="circle" headSize={3}
+                      endAnchor={{position: "right", offset: {x: 40}}}
+                      startAnchor={{position: "left", offset: {x: -25}}}
+                    />
+                  )
+                  : null
+                }
+                <div className={styles.fade} />
+              </div>
+            </div>
+          </ReflexElement>
+          <ReflexSplitter style={splitterStyle} onResize={updateXarrow} />
+          <ReflexElement flex={flexRatios["ingest.rules"]} name="ingest.rules" onStopResize={handleResize}>
+            <Rules rules={ingestRules} onRulesChange={handleRulesChange} template={ruleTemplate} />
+          </ReflexElement>
+          <ReflexSplitter style={splitterStyle} onResize={updateXarrow} />
+          <ReflexElement flex={flexRatios["ingest.output"]} name="ingest.output" onStopResize={handleResize}>
+            <div className={styles.row}>
+              <div className={styles.connectionContainer}>
+                {
+                  !loading && connections && connections.rules_assets ?
+                  connections.rules_assets.map(
+                    (rule, index) => <Xarrow start={"rule-" + rule[0]} end={"asset-" + rule[1]}
+                      key={index} strokeWidth={2} curveness={0.5} color="rgb(100,100,100)"
+                      showHead={true} animateDrawing={0.25} headShape="circle" headSize={3}
+                      startAnchor={{position: "right", offset: {x: 40}}}
+                      endAnchor={{position: "left", offset: {x: -25}}}
+                    />
+                  )
+                  : null
+                }
+                <div className={styles.fade} />
+              </div>
+              <Output assets={ingestAssets} />
+            </div>
+          </ReflexElement>
+        </ReflexContainer>
+      </Xwrapper>
+      <div style={{width: "100%", marginTop: "10px", display: loading ? "inline" : "none"}}>
+        <LinearProgress color="ignite" />
+      </div>
     </div>
   );
 }

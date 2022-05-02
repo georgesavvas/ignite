@@ -25,29 +25,37 @@ def ingest(data):
     dry = data.get("dry", True)
     dirs = data.get("dirs")
     if not dirs:
-        return []
+        return {}
     file_data = ingest_get_files(dirs)
+    if not file_data:
+        return {}
     files = file_data["files"]
     files_posix = file_data["posix"]
     files_trimmed = file_data["trimmed"]
     rules = data.get("rules", [])
     results = [
         {
-            "trimmed": files_trimmed[i],
+            "trimmed": f,
             "file": files[i],
             "extract_info": {},
             "replace_values": {},
-            "set_values": {}
+            "set_values": {},
+            "index": i,
+            "rules": []
         }
         for i, f in enumerate(files_trimmed)
     ]
+    connections = {
+        "rules_files": [],
+        "rules_assets": []
+    }
     for result in results:
         file = result["file"]
         trimmed = result["trimmed"]
         filepath = str(file)
         directory = str(file.parent)
         filename = file.name
-        for rule in rules:
+        for i, rule in enumerate(rules):
             file_target = filepath
             if rule["file_target_type"] == "directory":
                 file_target = directory
@@ -56,25 +64,33 @@ def ingest(data):
             pattern = f"*{rule['file_target']}*"
             if not fnmatch(file_target, pattern):
                 continue
-            rule_type = rule["rule_type"]
-            if rule_type == "extract_info":
-                rule_value = rule["rule_value"]
-                expr_target = trimmed
-                if rule["extract_target"] == "directory":
-                    expr_target = trimmed.rstrip(filename)
-                elif rule["extract_target"] == "filename":
-                    expr_target = filename
-                result["pattern"] = rule_value
-                parsed = parse.parse(rule_value, expr_target)
-                if not parsed:
-                    continue
-                result["extract_info"] = parsed.named
-            elif rule_type == "replace_value":
-                result["replace_values"][rule["replace_target"]] = rule["rule_value"]
-            elif rule_type == "set_value":
-                result["set_values"][rule["set_target"]] = rule["rule_value"]
 
-    fields = ("name", "comp")
+            # Extract info
+            rule_value = rule["rule"]
+            expr_target = trimmed
+            if "/" not in rule_value:
+                expr_target = filename
+            result["pattern"] = rule_value
+            parsed = parse.parse(rule_value, expr_target)
+            if parsed:
+                result["extract_info"] = parsed.named
+                result["rules"].append(i)
+
+            # Replace values
+            if rule["replace_target"]:
+                result["replace_values"][rule["replace_target"]] = rule["replace_value"]
+                result["rules"].append(i)
+            
+            # Set values
+            for field in ("task", "name", "comp"):
+                if not rule[field]:
+                    continue
+                result["set_values"][field] = rule[field]
+                result["rules"].append(i)
+
+            connections["rules_files"].append([i, result["index"]])
+
+    fields = ("task", "name", "comp")
     for result in results:
         extracted_fields = result["extract_info"]
         if not extracted_fields:
@@ -121,7 +137,9 @@ def ingest(data):
         if _set_values.get("name"):
             name = _set_values["name"]
         if not assets.get(name):
-            assets[name] = {"name": name, "comps": []}
+            assets[name] = {"task": "", "name": name, "comps": [], "rules": result["rules"]}
+        if _set_values.get("task"):
+            assets[name]["task"] = _set_values["task"]
         comp_name = extracted_fields.get("comp", "")
         if _set_values.get("comp"):
             comp_name = _set_values["comp"]
@@ -131,10 +149,20 @@ def ingest(data):
             "file": result["file"].as_posix().split("/")[-1]
         }
         assets[name]["comps"].append(comp)
+        assets[name]["rules"] += result["rules"]
 
-    assets = [assets[k] for k in list(assets.keys())]
+    assets = list(assets.values())
+    for i, asset in enumerate(assets):
+        rules = set(asset["rules"])
+        connections["rules_assets"] += [[rule, i] for rule in rules]
+        del asset["rules"]
+
     if dry:
-        return assets
+        data = {
+            "assets": assets,
+            "connections": connections
+        }
+        return data
 
 
 def ingest_get_files(dirs):
@@ -171,12 +199,12 @@ def ingest_get_files(dirs):
         if not "*" in dir and not "?" in dir:
             dir = str(PurePath(dir) / "*")
         files += [Path(file) for file in glob.glob(dir)]
+    files = [file for file in files if file.is_file()]
     if not files:
         return []
-    files = [file for file in files if file.is_file()]
+    files = sorted(list(set(files)))
     files_posix = [f.as_posix() for f in files]
     files_trimmed = trim_filepaths(files_posix)
-    files_trimmed = list(set(files_trimmed))
     data = {
         "files": files,
         "posix": files_posix,

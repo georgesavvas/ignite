@@ -36,7 +36,7 @@ function DynamicList(props) {
   return (
     <>
       {props.noButtons ? null : buttons(props)}
-      <List sx={style}>
+      <List sx={style} onScroll={props.onScroll}>
         {
           props.children ?
           props.children.map((child, index) => createListItem(child, index, props.dense)) :
