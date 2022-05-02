@@ -1,7 +1,7 @@
 .App {
   /* text-align: center; */
   background-color: rgb(20, 20, 20);
-  color: rgb(200, 200, 200);
+  color: lightgrey;
   height: 100vh;
   width: 100vw;
   box-sizing: border-box;

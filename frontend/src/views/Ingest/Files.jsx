@@ -3,12 +3,14 @@ import styles from "./Files.module.css";
 import DynamicList from "../../components/DynamicList";
 import Typography from '@mui/material/Typography';
 import { TextField } from '@mui/material';
+import {useXarrow} from "react-xarrows";
 import Button from '@mui/material/Button';
 
-function File({filepath}) {
+function File({filepath, id}) {
   return (
     <div className={styles.fileContainer}>
       <Typography variant="caption">{filepath}</Typography>
+      <div className={styles.connector} id={id} />
     </div>
   )
 }
@@ -32,6 +34,7 @@ const onFileSelected = (e, filepath) => {
 }
 
 function Files(props) {
+  const updateXarrow = useXarrow();
 
   return (
     <div className={styles.container}>
@@ -40,12 +43,12 @@ function Files(props) {
       <TextField size="small" fullWidth multiline maxRows={5} placeholder="Paste files or directories..." onBlur={props.onDirsChange} />
         {/* <Button id={"file-browser"} variant="outlined" className={styles.browse} onClick={handleFileInput}>...</Button>
       </div> */}
-      <DynamicList dense noButtons>
-        {
-          props.files ?
-          props.files.map((child, index) => <File filepath={child} key={index} />) :
-          null
-        }
+      <DynamicList dense noButtons onScroll={updateXarrow}>
+      {
+        props.files ?
+        props.files.map((child, index) => <File filepath={child} key={index} id={"file-" + index} />) :
+        null
+      }
       </DynamicList>
     </div>
   )

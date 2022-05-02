@@ -7,6 +7,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
+import {useXarrow} from "react-xarrows";
 import { Divider } from '@mui/material';
 
 function getRuleTypeField(ruleType, index, onModify, template) {
@@ -53,9 +54,9 @@ function getRuleTypeField(ruleType, index, onModify, template) {
   }
 }
 
-function Rule({index, template, onModify}) {
+function Rule({index, template, onModify, id}) {
   const [ruleType, setRuleType] = useState(template.rule_type);
-
+  
   return (
     <div className={styles.ruleContainer} key={index}>
       <div className={styles.ruleRow}>
@@ -74,47 +75,59 @@ function Rule({index, template, onModify}) {
           <MenuItem value="filename">Filename</MenuItem>
         </Select>
       </FormControl>
-      <TextField sx={{ m: "5px", minWidth: 120 }} label="Target" defaultValue={template.file_target} size="small" style={{flexGrow: 1}} name={"file_target-" + index} onChange={onModify} />
+      <TextField sx={{ m: "5px", minWidth: 120 }} label="Target"
+        defaultValue={template.file_target} size="small" style={{flexGrow: 1}}
+        name={"file_target-" + index} onChange={onModify}
+      />
       </div>
       <Divider />
+      <TextField sx={{ m: "5px", minWidth: 120 }} label="Task"
+        defaultValue={template.task} size="small" style={{flexGrow: 1}}
+        name={"task-" + index} onChange={onModify}
+      />
       <div className={styles.ruleRow}>
-        <FormControl sx={{ m: "5px" }} size="small" style={{flexGrow: 1}}>
-          <InputLabel id="label-rule_type">Rule type</InputLabel>
-          <Select
-            labelId="label-rule_type"
-            id="select-rule_type"
-            label="Rule type"
-            defaultValue={template.rule_type}
-            name={"rule_type-" + index}
-            onChange={e => {
-              setRuleType(e.target.value);
-              onModify(e);
-            }}
-          >
-            <MenuItem value="extract_info">Extract info</MenuItem>
-            <MenuItem value="set_value">Set value</MenuItem>
-            <MenuItem value="replace_value">Replace value</MenuItem>
-          </Select>
-        </FormControl>
-        {getRuleTypeField(ruleType, index, onModify, template)}  
+        <TextField sx={{ m: "5px", minWidth: 120 }} label="Asset name"
+          defaultValue={template.name} size="small" style={{flexGrow: 1}}
+          name={"name-" + index} onChange={onModify}
+        />
+        <TextField sx={{ m: "5px", minWidth: 120 }} label="Component name"
+          defaultValue={template.comp} size="small" style={{flexGrow: 1}}
+          name={"comp-" + index} onChange={onModify}
+        />
       </div>
       <div className={styles.ruleRow}>
-        <TextField sx={{ m: "5px", minWidth: 120 }} label="Rule value" style={{flexGrow: 1}} size="small" defaultValue={template.rule_value} name={"rule_value-" + index} onChange={onModify} />
+        <TextField sx={{ m: "5px", minWidth: 120 }} label="Rule"
+          style={{flexGrow: 1}} size="small" defaultValue={template.rule}
+          name={"rule-" + index} onChange={onModify}
+        />
       </div>
+      <div className={styles.ruleRow}>
+        <TextField sx={{ m: "5px", minWidth: 120 }} label="Replace text"
+          defaultValue={template.replace_target} size="small" style={{flexGrow: 1}}
+          name={"replace_target-" + index} onChange={onModify}
+        />
+        <TextField sx={{ m: "5px", minWidth: 120 }} label="With"
+          defaultValue={template.replace_value} size="small" style={{flexGrow: 1}}
+          name={"replace_value-" + index} onChange={onModify}
+        />
+      </div>
+      <div className={styles.connector} id={id} />
     </div>
   )
 }
 
 function Rules(props) {
+  const updateXarrow = useXarrow();
+
   return (
     <div className={styles.container}>
       <Typography variant="h6">Ingest Rules</Typography>
-      <DynamicList onAdd={() => props.onRulesChange(null, "add")} onRemove={() => props.onRulesChange(null, "remove")}>
-        {
-          props.rules ? props.rules.map((child, index) => <Rule
-            key={index} index={index} template={props.template} onModify={e => props.onRulesChange(e, "modify")}
-          />) : null
-        }
+      <DynamicList onAdd={() => props.onRulesChange(null, "add")} onScroll={updateXarrow} onRemove={() => props.onRulesChange(null, "remove", -1)}>
+      {
+        props.rules ? props.rules.map((child, index) => <Rule
+          key={index} index={index} template={props.template} onModify={e => props.onRulesChange(e, "modify")} id={"rule-" + index}
+        />) : null
+      }
       </DynamicList>
     </div>
   )
