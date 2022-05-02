@@ -30,7 +30,16 @@ const defaultFlexRations = {
   "ingest.output": 0.35
 }
 
-const duplicate = (x, n) => Array.from(new Array(n), () => x);
+function rand(min, max) {
+  return min + Math.random() * (max - min);
+}
+
+function getRandomColour() {
+  var h = rand(1, 360);
+  var s = rand(10, 20);
+  var l = rand(0, 20);
+  return `hsl(${h},${s}%,${l}%)`;
+}
 
 const getFilesDebounced = debounce((data, callback) => {
   clientRequest("ingest_get_files", data).then(resp => {
@@ -128,11 +137,12 @@ function Ingest() {
     setIngestDirs(dirs);
   }
 
-  const handleRulesChange = (e, action, index=-1) => {
+  const handleRulesChange = (e, action, index=-1, index2=-1) => {
     setLoading(true);
     switch (action) {
       case "add":
-        setIngestRules(prevState => [...prevState, ruleTemplate]);
+        const rule = {...ruleTemplate, colour: getRandomColour()}
+        setIngestRules(prevState => [...prevState, rule]);
         break
       case "remove":
         setIngestRules(prevState => {
@@ -150,13 +160,20 @@ function Ingest() {
           return [...prevState];
         })
         break
+      case "swap":
+        setIngestRules(prevState => {
+          const rules = [...prevState];
+          [rules[index], rules[index2]] = [rules[index2], rules[index]]
+          return rules;
+        })
+        break
     }
   }
 
   return (
     <div className={styles.container}>
-      <Xwrapper>
-        <ReflexContainer orientation="vertical">
+      <ReflexContainer orientation="vertical" style={{border: "solid", boxSizing: "border-box"}}>
+        <Xwrapper>
           <ReflexElement flex={flexRatios["ingest.files"]} name="ingest.files" onStopResize={handleResize}>
             <div className={styles.row}>
               <Files files={ingestFiles} onDirsChange={handleDirsChange} />
@@ -179,7 +196,7 @@ function Ingest() {
           </ReflexElement>
           <ReflexSplitter style={splitterStyle} onResize={updateXarrow} />
           <ReflexElement flex={flexRatios["ingest.rules"]} name="ingest.rules" onStopResize={handleResize}>
-            <Rules rules={ingestRules} onRulesChange={handleRulesChange} template={ruleTemplate} />
+            <Rules rules={ingestRules} onRulesChange={handleRulesChange} setLoading={setLoading} />
           </ReflexElement>
           <ReflexSplitter style={splitterStyle} onResize={updateXarrow} />
           <ReflexElement flex={flexRatios["ingest.output"]} name="ingest.output" onStopResize={handleResize}>
@@ -202,9 +219,9 @@ function Ingest() {
               <Output assets={ingestAssets} />
             </div>
           </ReflexElement>
-        </ReflexContainer>
-      </Xwrapper>
-      <div style={{width: "100%", marginTop: "10px", display: loading ? "inline" : "none"}}>
+        </Xwrapper>
+      </ReflexContainer>
+      <div style={{width: "100%", visibility: loading ? "visible" : "hidden"}}>
         <LinearProgress color="ignite" />
       </div>
     </div>

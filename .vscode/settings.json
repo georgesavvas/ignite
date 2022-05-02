@@ -6,6 +6,8 @@
         "bottomness",
         "Popen",
         "repr",
-        "valtio"
+        "valtio",
+        "Xarrow",
+        "Xwrapper"
     ]
 }

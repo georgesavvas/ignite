@@ -6,7 +6,6 @@ import {useXarrow} from "react-xarrows";
 import { Divider } from '@mui/material';
 
 function Asset({data, id}) {
-  console.log(data);
   return (
     <div className={styles.assetContainer}>
       <Typography variant="h6">{data.name}</Typography>
@@ -29,7 +28,7 @@ function Output(props) {
   return (
     <div className={styles.container}>
       <Typography variant="h6">Output Preview</Typography>
-      <DynamicList noButtons onScroll={updateXarrow}>
+      <DynamicList noButtons onScroll={updateXarrow} style={{marginTop: "34px"}}>
         {
           props.assets ?
           props.assets.map((child, index) => <Asset data={child} key={index} id={"asset-" + index} />) :

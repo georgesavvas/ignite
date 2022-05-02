@@ -9,7 +9,8 @@ import Add from '@mui/icons-material/Add';
 
 const style = {
   width: "100%",
-  // height: "100%",
+  height: "100%",
+  boxSizing: "border-box",
   backgroundColor: "rgb(30,30,30)",
   overflowY: "scroll",
   flexGrow: 1
@@ -36,7 +37,7 @@ function DynamicList(props) {
   return (
     <>
       {props.noButtons ? null : buttons(props)}
-      <List sx={style} onScroll={props.onScroll}>
+      <List sx={style} onScroll={props.onScroll} style={props.style} ref={props.innerRef}>
         {
           props.children ?
           props.children.map((child, index) => createListItem(child, index, props.dense)) :

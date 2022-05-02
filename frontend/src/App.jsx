@@ -15,6 +15,9 @@ const darkTheme = createTheme({
     ignite: {
       main: "rgb(252, 140, 3)",
     },
+    lightgrey: {
+      main: "rgb(211,211,211)",
+    },
   },
   typography: {
     allVariants: {
