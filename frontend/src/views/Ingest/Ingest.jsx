@@ -35,9 +35,9 @@ function rand(min, max) {
 }
 
 function getRandomColour() {
-  var h = rand(1, 360);
-  var s = rand(10, 20);
-  var l = rand(0, 20);
+  var h = rand(1, 36) * 10;
+  var s = rand(30, 30);
+  var l = rand(10, 10);
   return `hsl(${h},${s}%,${l}%)`;
 }
 
@@ -53,11 +53,22 @@ const getOutputDebounced = debounce((data, callback) => {
   });
 }, 500)
 
-function Ingest() {
+function Ingest(props) {
+  const ruleTemplate = {
+    file_target: "*",
+    file_target_type: "filename",
+    task: props.task,
+    name: "",
+    comp: "",
+    rule: "",
+    replace_target: "",
+    replace_value: ""
+  }
+
   const [flexRatios, setFlexRatios] = useState(defaultFlexRations);
   const [ingestDirs, setIngestDirs] = useState("");
   const [ingestFiles, setIngestFiles] = useState([]);
-  const [ingestRules, setIngestRules] = useState([]);
+  const [ingestRules, setIngestRules] = useState([{...ruleTemplate, colour: getRandomColour()}]);
   const [ingestAssets, setIngestAssets] = useState([]);
   const [connections, setConnections] = useState({});
   const [loading, setLoading] = useState(false);
@@ -97,17 +108,6 @@ function Ingest() {
 
   const handleResize = data => {
     saveReflexLayout(data)
-  }
-
-  const ruleTemplate = {
-    file_target: "*",
-    file_target_type: "filename",
-    task: "",
-    name: "",
-    comp: "",
-    rule: "",
-    replace_target: "",
-    replace_value: ""
   }
 
   const getFiles = () => getFilesDebounced(
@@ -171,60 +171,60 @@ function Ingest() {
   }
 
   return (
-    <div className={styles.container}>
-      <ReflexContainer orientation="vertical" style={{border: "solid", boxSizing: "border-box"}}>
+    <>
+      <div className={styles.container}>
         <Xwrapper>
-          <ReflexElement flex={flexRatios["ingest.files"]} name="ingest.files" onStopResize={handleResize}>
-            <div className={styles.row}>
-              <Files files={ingestFiles} onDirsChange={handleDirsChange} />
-              <div className={styles.connectionContainer}>
-                {
-                  !loading && connections && connections.rules_files ?
-                  connections.rules_files.map(
-                    (rule, index) => <Xarrow end={"file-" + rule[1]} start={"rule-" + rule[0]}
-                      key={index} strokeWidth={2} curveness={0.5} color="rgb(100,100,100)"
-                      showHead={true} animateDrawing={0.25} headShape="circle" headSize={3}
-                      endAnchor={{position: "right", offset: {x: 40}}}
-                      startAnchor={{position: "left", offset: {x: -25}}}
-                    />
-                  )
-                  : null
-                }
-                <div className={styles.fade} />
+          <ReflexContainer orientation="vertical">
+            <ReflexElement flex={flexRatios["ingest.files"]} name="ingest.files" onStopResize={handleResize}>
+              <div className={styles.row}>
+                <Files files={ingestFiles} onDirsChange={handleDirsChange} />
+                <div className={styles.connectionContainer}>
+                  {
+                    !loading && ingestRules && connections && connections.rules_files ?
+                    connections.rules_files.map(
+                      (rule, index) => <Xarrow end={"file-" + rule[1]} start={"rule-" + rule[0]}
+                        key={index} strokeWidth={2} curveness={0.5} color={ingestRules[rule[0]].colour}
+                        showHead={true} animateDrawing={0.25} headShape="circle" headSize={3}
+                        endAnchor={{position: "right", offset: {x: 40}}}
+                        startAnchor={{position: "left", offset: {x: 0}}}
+                      />
+                    )
+                    : null
+                  }
+                  <div className={styles.fade} />
+                </div>
               </div>
-            </div>
-          </ReflexElement>
-          <ReflexSplitter style={splitterStyle} onResize={updateXarrow} />
-          <ReflexElement flex={flexRatios["ingest.rules"]} name="ingest.rules" onStopResize={handleResize}>
-            <Rules rules={ingestRules} onRulesChange={handleRulesChange} setLoading={setLoading} />
-          </ReflexElement>
-          <ReflexSplitter style={splitterStyle} onResize={updateXarrow} />
-          <ReflexElement flex={flexRatios["ingest.output"]} name="ingest.output" onStopResize={handleResize}>
-            <div className={styles.row}>
-              <div className={styles.connectionContainer}>
-                {
-                  !loading && connections && connections.rules_assets ?
-                  connections.rules_assets.map(
-                    (rule, index) => <Xarrow start={"rule-" + rule[0]} end={"asset-" + rule[1]}
-                      key={index} strokeWidth={2} curveness={0.5} color="rgb(100,100,100)"
-                      showHead={true} animateDrawing={0.25} headShape="circle" headSize={3}
-                      startAnchor={{position: "right", offset: {x: 40}}}
-                      endAnchor={{position: "left", offset: {x: -25}}}
-                    />
-                  )
-                  : null
-                }
-                <div className={styles.fade} />
+            </ReflexElement>
+            <ReflexSplitter style={splitterStyle} onResize={updateXarrow} />
+            <ReflexElement flex={flexRatios["ingest.rules"]} name="ingest.rules" onStopResize={handleResize}>
+              <Rules rules={ingestRules} onRulesChange={handleRulesChange} setLoading={setLoading} />
+            </ReflexElement>
+            <ReflexSplitter style={splitterStyle} onResize={updateXarrow} />
+            <ReflexElement flex={flexRatios["ingest.output"]} name="ingest.output" onStopResize={handleResize}>
+              <div className={styles.row}>
+                <div className={styles.connectionContainer}>
+                  {
+                    !loading && connections && connections.rules_assets ?
+                    connections.rules_assets.map(
+                      (rule, index) => <Xarrow start={"rule-" + rule[0]} end={"asset-" + rule[1]}
+                        key={index} strokeWidth={2} curveness={0.5} color={ingestRules[rule[0]].colour}
+                        showHead={true} animateDrawing={0.25} headShape="circle" headSize={3}
+                        startAnchor={{position: "right", offset: {x: 15}}}
+                        endAnchor={{position: "left", offset: {x: -25}}}
+                      />
+                    )
+                    : null
+                  }
+                  <div className={styles.fade} />
+                </div>
+                <Output assets={ingestAssets} />
               </div>
-              <Output assets={ingestAssets} />
-            </div>
-          </ReflexElement>
+            </ReflexElement>
+          </ReflexContainer>
         </Xwrapper>
-      </ReflexContainer>
-      <div style={{width: "100%", visibility: loading ? "visible" : "hidden"}}>
-        <LinearProgress color="ignite" />
       </div>
-    </div>
+      <LinearProgress color="ignite" style={{width: "100%", marginTop: "10px", visibility: loading ? "visible" : "hidden"}} />
+    </>
   );
 }
 

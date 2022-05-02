@@ -95,8 +95,8 @@ function ExplorerBar(props) {
           <DccSelector task={currentContext.path} newScene={true} />
         </Dialog>
         <Dialog open={ingestOpen} onClose={() => setIngestOpen(false)} sx={ingestDialogStyle}>
-          <DialogContent>
-            <Ingest />
+          <DialogContent style={{overflow: "hidden"}}>
+            <Ingest task={currentContext.path} />
           </DialogContent>
           <DialogActions>
             <Button onClick={() => setIngestOpen(false)}>Close</Button>
