@@ -164,7 +164,7 @@ function Rules(props) {
   return (
     <div className={styles.container}>
       <Typography variant="h6">Ingest Rules</Typography>
-      <DragDropContext onDragStart={() => props.setLoading(true)} onDragEnd={onDragEnd}>
+      <DragDropContext onBeforeCapture={() => props.setLoading(true)} onDragEnd={onDragEnd}>
         <Droppable droppableId={"rules-" + props.rules.length}>
           {provided => (
             <RuleList {...props} innerRef={provided.innerRef} {...provided.droppableProps}>

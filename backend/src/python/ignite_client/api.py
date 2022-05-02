@@ -6,6 +6,7 @@ import subprocess
 import requests
 import parse
 import glob
+from string import Formatter
 from fnmatch import fnmatch
 from pathlib import PurePath, Path
 from pprint import pprint
@@ -90,12 +91,15 @@ def ingest(data):
 
             connections["rules_files"].append([i, result["index"]])
 
-    fields = ("task", "name", "comp")
+    # fields = ("task", "name", "comp")
     for result in results:
         extracted_fields = result["extract_info"]
         if not extracted_fields:
             continue
         pattern = result["pattern"]
+        fields = [f[1] for f in Formatter().parse(pattern) if f[1]]
+        fields = [field.split(".")[0] for field in fields]
+        fields = set(fields)
         processed = {}
         for field in fields:
             if field in list(extracted_fields.keys()):
@@ -116,6 +120,14 @@ def ingest(data):
             value += data_filtered[ordered[-1]]
             processed[field] = value
         result["extract_info"] = processed
+        pprint(result)
+
+    def format_values(s, d):
+        for k, v in d.items():
+            if k not in s:
+                continue
+            s = s.replace("{" + k + "}", v)
+        return s
 
     def replace_values(value, replace_data):
         for k, v in replace_data.items():
@@ -130,19 +142,23 @@ def ingest(data):
         extracted_fields = result["extract_info"]
         _set_values = result["set_values"]
         _replace_values = result["replace_values"]
-        if not extracted_fields and not _set_values.get("name"):
+        if not extracted_fields and not _set_values:
             unmatched.append(str(result["file"]))
             continue
-        name = replace_values(extracted_fields.get("name", ""), result["replace_values"])
-        if _set_values.get("name"):
-            name = _set_values["name"]
+
+        name = _set_values.get("name", "{name}")
+        name = format_values(name, extracted_fields)
+        name = replace_values(name, _replace_values)
         if not assets.get(name):
             assets[name] = {"task": "", "name": name, "comps": [], "rules": result["rules"]}
-        if _set_values.get("task"):
-            assets[name]["task"] = _set_values["task"]
-        comp_name = extracted_fields.get("comp", "")
-        if _set_values.get("comp"):
-            comp_name = _set_values["comp"]
+
+        task = _set_values.get("task", "")
+        task = format_values(task, extracted_fields)
+        task = replace_values(task, _replace_values)
+        assets[name]["task"] = task
+
+        comp_name = _set_values.get("comp", "")
+        comp_name = format_values(comp_name, extracted_fields)
         comp_name = replace_values(comp_name, _replace_values)
         comp = {
             "name": comp_name,
