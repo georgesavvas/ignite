@@ -9,9 +9,7 @@ export const ContextProvider = props => {
   useEffect(() => {
     const data = localStorage.getItem("context");
     const context = JSON.parse(data);
-    console.log("loaded context", context);
     if (!context || !context.path) return;
-    console.log("Setting context from context to", context)
     setCurrentContext(context);
   }, [])
 
@@ -36,7 +34,6 @@ export const ContextProvider = props => {
 export function setProject(project, setCurrentContext) {
   serverRequest("get_projects_root").then(resp => {
     const data = resp.data;
-    console.log("Setting context from setProject to", data)
     setCurrentContext(data + "/" + project);
   })
 }

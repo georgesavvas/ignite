@@ -3,4 +3,4 @@ function loadReflexLayout() {
   return JSON.parse(data)
 }
 
-export default loadReflexLayout
+export default loadReflexLayout;

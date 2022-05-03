@@ -13,11 +13,15 @@ import IconButton from '@mui/material/IconButton';
 import HelpIcon from '@mui/icons-material/Help';
 import BugReportIcon from '@mui/icons-material/BugReport';
 import ThumbsUpDownIcon from '@mui/icons-material/ThumbsUpDown';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
 import SettingsIcon from '@mui/icons-material/Settings';
 import SettingsDialog from "./SettingsDialog.jsx";
 import {ProjectContext} from "../contexts/ProjectContext";
 import ProjectBrowser from "./ProjectBrowser";
 import serverRequest from "../services/serverRequest";
+import Vault from "./Vault/Vault";
 
 function FeedbackIcon() {
   const style = {
@@ -31,14 +35,36 @@ function FeedbackIcon() {
   )
 }
 
+const vaultDialogStyle = {
+  "& .MuiDialog-container": {
+    "& .MuiPaper-root": {
+      width: "100%",
+      maxWidth: "95vw",
+      height: "100%",
+      maxHeight: "90vh",
+      backgroundColor: "rgb(40,40,40)",
+      backgroundImage: "none"
+    },
+  },
+}
+
 export default function TopBar() {
   const [isLoading, setIsLoading] = useState(true);
   const [projects, setProjects] = useState([]);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [projectBrowserOpen, setProjectBrowserOpen] = useState(false);
+  const [vaultOpen, setVaultOpen] = useState(false);
 
   return (
     <>
+      <Dialog open={vaultOpen} onClose={() => setVaultOpen(false)} sx={vaultDialogStyle}>
+        <DialogContent style={{overflow: "hidden"}}>
+          <Vault />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setVaultOpen(false)}>Close</Button>
+        </DialogActions>
+      </Dialog>
       <ProjectBrowser
         open={projectBrowserOpen}
         onClose={() => setProjectBrowserOpen(false)}
@@ -54,7 +80,7 @@ export default function TopBar() {
           >
             Project Browser
           </Button>
-          <Button variant="outlined" color="ignite">Vault</Button>
+          <Button variant="outlined" color="ignite" onClick={() => setVaultOpen(true)}>Vault</Button>
         </div>
         <div className={styles.logoContainer}>
           <img src="media/ignite_logo.png" className={styles.logo} />

@@ -13,47 +13,9 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import Divider from '@mui/material/Divider';
 import Box from '@mui/material/Box';
-import AssignmentIcon from '@mui/icons-material/Assignment';
-import ScienceIcon from '@mui/icons-material/Science';
-import CameraIcon from '@mui/icons-material/Camera';
-import LocalMoviesIcon from '@mui/icons-material/LocalMovies';
-import MovieIcon from '@mui/icons-material/Movie';
-import ConstructionIcon from '@mui/icons-material/Construction';
-import FolderIcon from '@mui/icons-material/Folder';
-import FortIcon from '@mui/icons-material/Fort';
-import FormatPaintIcon from '@mui/icons-material/FormatPaint';
-import LightbulbIcon from '@mui/icons-material/Lightbulb';
-import DirectionsRunIcon from '@mui/icons-material/DirectionsRun';
-import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturing';
-import UnarchiveIcon from '@mui/icons-material/Unarchive';
-import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
 import {ContextContext} from "../../contexts/ContextContext";
 import CreateDirDialogue from "../../components/CreateDirDialogue";
-
-const projectIcon = () => {
-  return (
-    <Typography variant="caption" style={{marginRight: "6px"}}>/</Typography>
-  )
-}
-
-const labelIcons = {
-  directory: FolderIcon,
-  project: projectIcon,
-  phase: MovieIcon,
-  build: ConstructionIcon,
-  sequence: LocalMoviesIcon,
-  shot: CameraIcon,
-  task: AssignmentIcon,
-  task_generic: AssignmentIcon,
-  task_model: FortIcon,
-  task_look: FormatPaintIcon,
-  task_light: LightbulbIcon,
-  task_anim: DirectionsRunIcon,
-  task_rig: PrecisionManufacturingIcon,
-  task_asset: UnarchiveIcon,
-  task_fx: LocalFireDepartmentIcon,
-  rnd: ScienceIcon,
-}
+import { DIRECTORYICONS } from "../../constants";
 
 const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
   color: theme.palette.text.secondary,
@@ -326,7 +288,7 @@ function ProjectTreeView(props) {
         key={nodes.id}
         nodeId={nodes.id}
         labelText={nodes.name}
-        labelIcon={labelIcons[nodes.icon]}
+        labelIcon={DIRECTORYICONS[nodes.icon]}
         labelInfo={nodes.dir_kind}
         dir_kind={nodes.dir_kind}
         dir_path={nodes.path}

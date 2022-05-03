@@ -69,18 +69,31 @@ def get_context_info(path):
         return {}
     if path.name in ("exports", "scenes") or path.is_file():
         path = path.parent
+    parts = path.parts
+    ancestor_kinds = {}
+    ignore = len(ROOT.parts)
+    for i in range(len(parts)):
+        if i <= ignore:
+            continue
+        part_path = ROOT / PurePath(*parts[:i])
+        kind = get_dir_kind(part_path, append_task=True)
+        ancestor_kinds[part_path.as_posix()] = kind
     for x in path.iterdir():
         name = x.name
         if name not in kinds:
             continue
         kind = KINDS[name]
+        ancestor_kinds[path.as_posix()] = kind
         project = path.as_posix().split(ROOT.as_posix(), 1)[1].lstrip("/").split("/")[0]
         data = {
-        "name": name,
-        "path": str(path),
-        "parent": str(path.parent),
-        "project": project.strip(),
-        "dir_kind": kind
+            "root": ROOT.as_posix(),
+            "name": name,
+            "path": str(path),
+            "posix": path.as_posix(),
+            "parent": str(path.parent),
+            "project": project.strip(),
+            "dir_kind": kind,
+            "ancestor_kinds": ancestor_kinds
         }
         return data
     return {}
@@ -158,6 +171,23 @@ def _find_from_path(path):
     else:
         return
     return entity(path=path)
+
+
+def get_dir_kind(path, append_task=False):
+    anchors = KINDS.keys()
+    for x in Path(path).iterdir():
+        name = x.name
+        if name not in anchors:
+            continue
+        kind = KINDS[name]
+        if kind != "task":
+            return kind
+        with open(x, "r") as f:
+            config = yaml.safe_load(f)
+        if not config:
+            return "task_generic"
+        kind = "task_" + config.get("task_type", "generic")
+        return kind
 
 
 def get_contents(path, as_dict=False):
