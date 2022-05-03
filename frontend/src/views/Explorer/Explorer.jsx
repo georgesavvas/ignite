@@ -15,17 +15,8 @@ import { LinearProgress } from "@mui/material";
 
 const debounced = debounce(fn => fn(), 500);
 
-const defaultViewType = {
-  dynamic: "grid",
-  assets: "grid",
-  scenes: "grid"
-}
-
-const defaultTileSize = {
-  dynamic: {grid: 5, row: 5},
-  assets: {grid: 5, row: 5},
-  scenes: {grid: 5, row: 5}
-}
+const defaultViewType = "grid";
+const defaultTileSize = 5;
 
 function Explorer() {
   const [refreshValue, setRefreshValue] = useState(0);
@@ -33,6 +24,7 @@ function Explorer() {
   const [loadedData, setLoadedData] = useState([]);
   const [pages, setPages] = useState({total: 1, current: 1});
   const [query, setQuery] = useState({latest: 1});
+  const [explorerSettings, setExplorerSettings] = useState("dynamic");
   const [tileSize, setTileSize] = useState(defaultTileSize);
   const [tilesPerPage, setTilesPerPage] = useState(50);
   const [resultType, setResultType] = useState("dynamic");
@@ -55,18 +47,20 @@ function Explorer() {
     const data = loadExplorerSettings();
     if (!data) return;
     setTilesPerPage(data.tilesPerPage || 50);
-    setViewType(data.viewType || defaultViewType);
-    setTileSize(data.tileSize || defaultTileSize);
+    setViewType(data.viewType[resultType] || defaultViewType);
+    setTileSize(data.tileSize[resultType][viewType[resultType]] || defaultTileSize);
   }, []);
 
   useEffect(() => {
+    console.log("Firing...");
     const data = {
-      tilesPerPage: tilesPerPage,
+      resultType: resultType,
       viewType: viewType,
       tileSize: tileSize
     }
-    saveExplorerSettings(data);
-  }, [tilesPerPage, viewType, tileSize])
+    const settings = saveExplorerSettings(data);
+    setExplorerSettings(settings);
+  }, [resultType, viewType, tileSize])
 
   useEffect(() => {
     const data = {
@@ -87,9 +81,9 @@ function Explorer() {
   useEffect(() => {
     const _tiles = loadedData.reduce(function(obj, entity) {
       if (entity.dir_kind === "assetversion") {
-        obj[entity.result_id] = <AssetTile key={entity.result_id} entity={entity} onSelected={handleEntitySelection} selected={selectedEntity.path === entity.path} size={tileSize[resultType][viewType[resultType]] * 40} viewType={viewType[resultType]} />;
+        obj[entity.result_id] = <AssetTile key={entity.result_id} entity={entity} onSelected={handleEntitySelection} selected={selectedEntity.path === entity.path} size={tileSize * 40} viewType={viewType} />;
       } else {
-        obj[entity.result_id] = <DirectoryTile key={entity.result_id} entity={entity} onSelected={handleEntitySelection} selected={selectedEntity.path === entity.path} size={tileSize[resultType][viewType[resultType]] * 40} viewType={viewType[resultType]} />;
+        obj[entity.result_id] = <DirectoryTile key={entity.result_id} entity={entity} onSelected={handleEntitySelection} selected={selectedEntity.path === entity.path} size={tileSize * 40} viewType={viewType} />;
       }
       return obj;
     }, {});
@@ -114,22 +108,16 @@ function Explorer() {
     setTilesPerPage(parseInt(e.target.value));
   }
 
-  const getNewTileSize = (existing, newValue) => {
-    let size = {};
-    const existing_type = existing[resultType];
-    size[resultType] = {...existing_type};
-    size[resultType][viewType[resultType]] = newValue;
-    return size;
-  }
-
-  const handleTileSizeChange = e => {
-    setTileSize(prevState => getNewTileSize(prevState, e.target.value));
+  const handleResultTypeChange = value => {
+    setResultType(value);
+    const view = explorerSettings.viewType[value];
+    setViewType(view || defaultViewType);
+    setTileSize(explorerSettings.tileSize[value][view] || defaultTileSize);
   }
 
   const handleViewTypeChange = value => {
-    const newView = {};
-    newView[resultType] = value;
-    setViewType(prevState => ({...prevState, ...newView}));
+    setViewType(value || defaultViewType);
+    setTileSize(explorerSettings.tileSize[resultType][value] || defaultTileSize);
   }
 
   const handleLatestChange = e => {
@@ -140,12 +128,12 @@ function Explorer() {
     flexGrow: 1,
     display: "grid",
     overflowY: "auto",
-    gridTemplateColumns: `repeat(auto-fill, minmax(${tileSize[resultType][viewType[resultType]] * 40}px, 1fr))`,
+    gridTemplateColumns: `repeat(auto-fill, minmax(${tileSize * 40}px, 1fr))`,
     gridGap: "10px",
     padding: "10px"
   }
 
-  if (viewType[resultType] === "row") {
+  if (viewType === "row") {
     tileContainerStyle.gridTemplateColumns = `repeat(1, 1fr)`;
   }
 
@@ -155,8 +143,8 @@ function Explorer() {
         onRefresh={forceUpdate}
         onFilterChange={handleFilterChange}
         resultType={resultType}
-        onResultTypeChange={setResultType}
-        viewType={viewType[resultType]}
+        onResultTypeChange={handleResultTypeChange}
+        viewType={viewType}
         onLatestChange={handleLatestChange}
         onViewTypeChange={handleViewTypeChange}
       />
@@ -167,7 +155,7 @@ function Explorer() {
       </div>
       <div className={classes.layoutHelper} />
       <Divider />
-      <PageBar pages={pages.total} onChange={handlePageChange} tileSize={tileSize[resultType][viewType[resultType]]} onTilesPerPageChange={handleTilesPerPageChange} onTileSizeChange={handleTileSizeChange}/>
+      <PageBar pages={pages.total} onChange={handlePageChange} tileSize={tileSize} onTilesPerPageChange={handleTilesPerPageChange} onTileSizeChange={e => setTileSize(e.target.value)}/>
     </div>
   )
 }
