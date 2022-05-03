@@ -28,7 +28,11 @@ function ContextMenu(props) {
     return(
       <MenuItem
         key={index}
-        onClick={() => {item.fn(...item.args); handleClose();}}
+        onClick={e => {
+          e.stopPropagation();
+          item.fn(...item.args);
+          handleClose();
+        }}
         divider={item.divider || false}
         style={{
           paddingTop: "2px",

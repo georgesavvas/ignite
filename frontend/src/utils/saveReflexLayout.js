@@ -7,4 +7,4 @@ function saveReflexLayout({domElement, component}) {
   localStorage.setItem("reflex_layout", JSON.stringify({...existing, ...data}));
 }
 
-export default saveReflexLayout
+export default saveReflexLayout;

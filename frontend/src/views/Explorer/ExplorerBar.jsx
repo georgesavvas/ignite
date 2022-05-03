@@ -16,8 +16,8 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import {ContextContext} from "../../contexts/ContextContext";
 import DccSelector from "../DccSelector";
-import { useSnackbar } from 'notistack';
 import Ingest from "../Ingest/Ingest";
+import ContextBar from "./ContextBar";
 
 const style = {
   display: "flex",
@@ -53,19 +53,8 @@ const ingestDialogStyle = {
 
 function ExplorerBar(props) {
   const [newSceneOpen, setNewSceneOpen] = useState(false);
-  const [newAssetOpen, setNewAssetOpen] = useState(false);
   const [ingestOpen, setIngestOpen] = useState(false);
-  const [contextPath, setContextPath] = useState("");
-  const [contextPathError, setContextPathError] = useState([false, ""]);
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const [currentContext, setCurrentContext] = useContext(ContextContext);
-
-  useEffect(() => {
-    if (currentContext.path !== undefined) {
-      setContextPathError([false, ""]);
-      setContextPath(currentContext.path || "");
-    }
-  },[currentContext]);
 
   const handleResultTypeChange = (e, value) => {
     if (value !== null) props.onResultTypeChange(value);
@@ -74,15 +63,6 @@ function ExplorerBar(props) {
   const handleViewTypeChange = (e, value) => {
     if (value !== null) props.onViewTypeChange(value);
   };
-  
-  const handlePathChange = e => {
-    setCurrentContext(e.target.value).then((success => {
-      if (!success) {
-        setContextPathError([true, "Not found"]);
-        enqueueSnackbar("Path not found", {variant: "error"});
-      }
-    }))
-  }
 
   const handleGoBack = e => {
     setCurrentContext(currentContext.parent);
@@ -149,19 +129,7 @@ function ExplorerBar(props) {
           >
             <ArrowUpwardIcon />
         </Button>
-        <TextField
-          id="outlined-basic"
-          size="small"
-          fullWidth={true}
-          placeholder="Location"
-          variant="outlined"
-          error={contextPathError[0]}
-          // helperText={contextPathError[1]}
-          value={contextPath}
-          onChange={e => setContextPath(e.target.value)}
-          onKeyPress={e => e.key === "Enter" ? handlePathChange(e) : null}
-          onBlur={e => handlePathChange(e)}
-        />
+        <ContextBar />
         <Button
           style={{minWidth: "120px"}}
           color="ignite" 

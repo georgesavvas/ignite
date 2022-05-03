@@ -26,7 +26,7 @@ function PageBar(props) {
       </div>
       <Pagination onChange={props.onChange} count={props.pages} variant="outlined" shape="rounded" />
       <div style={{width: "200px", height: "30px"}}>
-        <Slider size="small" defaultValue={5} step={1} marks min={3} max={10} onChange={props.onTileSizeChange} />
+        <Slider size="small" value={props.tileSize} step={1} marks min={3} max={10} onChange={props.onTileSizeChange} />
       </div>
     </Container>
   )

@@ -4,6 +4,7 @@ import Typography from '@mui/material/Typography';
 import { useSnackbar } from 'notistack';
 import { CopyToClipboard } from "../../components/utils";
 import clientRequest from "../../services/clientRequest";
+import openExplorer from "../../utils/openExplorer";
 
 function AssetTile(props) {
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
@@ -20,15 +21,9 @@ function AssetTile(props) {
     },
     {
       "label": "Open in file explorer",
-      "fn": () => handleOpenExplorer(props.entity.path)
+      "fn": () => openExplorer(props.entity.path, enqueueSnackbar)
     },
   ]
-
-  const handleOpenExplorer = filepath => {
-    clientRequest("show_in_explorer", {"filepath": filepath}).then((resp) => {
-      if (!resp.ok) enqueueSnackbar("Failed launching scene.", {variant: "error"});
-    })
-  }
 
   function details() {
     if (props.viewType === "grid") return(

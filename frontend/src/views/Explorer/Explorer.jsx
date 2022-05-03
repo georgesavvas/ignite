@@ -9,6 +9,23 @@ import {EntityContext} from "../../contexts/EntityContext";
 import {ContextContext} from "../../contexts/ContextContext";
 import serverRequest from "../../services/serverRequest";
 import debounce from 'lodash.debounce';
+import loadExplorerSettings from "../../utils/loadExplorerSettings";
+import saveExplorerSettings from "../../utils/saveExplorerSettings";
+import { LinearProgress } from "@mui/material";
+
+const debounced = debounce(fn => fn(), 500);
+
+const defaultViewType = {
+  dynamic: "grid",
+  assets: "grid",
+  scenes: "grid"
+}
+
+const defaultTileSize = {
+  dynamic: {grid: 5, row: 5},
+  assets: {grid: 5, row: 5},
+  scenes: {grid: 5, row: 5}
+}
 
 function Explorer() {
   const [refreshValue, setRefreshValue] = useState(0);
@@ -16,10 +33,10 @@ function Explorer() {
   const [loadedData, setLoadedData] = useState([]);
   const [pages, setPages] = useState({total: 1, current: 1});
   const [query, setQuery] = useState({latest: 1});
-  const [tileSize, setTileSize] = useState(200);
+  const [tileSize, setTileSize] = useState(defaultTileSize);
   const [tilesPerPage, setTilesPerPage] = useState(50);
   const [resultType, setResultType] = useState("dynamic");
-  const [viewType, setViewType] = useState("grid");
+  const [viewType, setViewType] = useState(defaultViewType);
   const [tiles, setTiles] = useState([]);
   const [selectedEntity, setSelectedEntity] = useContext(EntityContext);
   const [currentContext, setCurrentContext] = useContext(ContextContext);
@@ -33,6 +50,23 @@ function Explorer() {
   const handleEntitySelection = (entity) => {
     setSelectedEntity(entity);
   }
+
+  useEffect(() => {
+    const data = loadExplorerSettings();
+    if (!data) return;
+    setTilesPerPage(data.tilesPerPage || 50);
+    setViewType(data.viewType || defaultViewType);
+    setTileSize(data.tileSize || defaultTileSize);
+  }, []);
+
+  useEffect(() => {
+    const data = {
+      tilesPerPage: tilesPerPage,
+      viewType: viewType,
+      tileSize: tileSize
+    }
+    saveExplorerSettings(data);
+  }, [tilesPerPage, viewType, tileSize])
 
   useEffect(() => {
     const data = {
@@ -53,37 +87,49 @@ function Explorer() {
   useEffect(() => {
     const _tiles = loadedData.reduce(function(obj, entity) {
       if (entity.dir_kind === "assetversion") {
-        obj[entity.result_id] = <AssetTile key={entity.result_id} entity={entity} onSelected={handleEntitySelection} selected={selectedEntity.path === entity.path} size={tileSize} viewType={viewType} />;
+        obj[entity.result_id] = <AssetTile key={entity.result_id} entity={entity} onSelected={handleEntitySelection} selected={selectedEntity.path === entity.path} size={tileSize[resultType][viewType[resultType]] * 40} viewType={viewType[resultType]} />;
       } else {
-        obj[entity.result_id] = <DirectoryTile key={entity.result_id} entity={entity} onSelected={handleEntitySelection} selected={selectedEntity.path === entity.path} size={tileSize} viewType={viewType} />;
+        obj[entity.result_id] = <DirectoryTile key={entity.result_id} entity={entity} onSelected={handleEntitySelection} selected={selectedEntity.path === entity.path} size={tileSize[resultType][viewType[resultType]] * 40} viewType={viewType[resultType]} />;
       }
       return obj;
     }, {});
     setTiles(_tiles);
   }, [loadedData, selectedEntity, viewType, tileSize])
 
-  const forceUpdate = (event, value) => {
+  const forceUpdate = () => {
     setRefreshValue((prevRefresh) => (prevRefresh + 1))
   }
 
-  const handlePageChange = (event, value) => {
+  const handlePageChange = (e, value) => {
     setPages((prevPages) => ({...prevPages, current: value}));
   };
 
-  const updateFilter = debounce(value => {
-    setQuery((prevState) => ({...prevState, filter_string: value}));
-  }, 250);
-
   const handleFilterChange = e => {
-    updateFilter(e.target.value);
+    setIsLoading(true);
+    const value = e.target.value;
+    debounced(() => setQuery((prevState) => ({...prevState, filter_string: value})));
   }
 
-  const handleTilesPerPageChange = (event) => {
-    setTilesPerPage(parseInt(event.target.value));
+  const handleTilesPerPageChange = e => {
+    setTilesPerPage(parseInt(e.target.value));
   }
 
-  const handleTileSizeChange = (event) => {
-    setTileSize(event.target.value * 40);
+  const getNewTileSize = (existing, newValue) => {
+    let size = {};
+    const existing_type = existing[resultType];
+    size[resultType] = {...existing_type};
+    size[resultType][viewType[resultType]] = newValue;
+    return size;
+  }
+
+  const handleTileSizeChange = e => {
+    setTileSize(prevState => getNewTileSize(prevState, e.target.value));
+  }
+
+  const handleViewTypeChange = value => {
+    const newView = {};
+    newView[resultType] = value;
+    setViewType(prevState => ({...prevState, ...newView}));
   }
 
   const handleLatestChange = e => {
@@ -94,12 +140,12 @@ function Explorer() {
     flexGrow: 1,
     display: "grid",
     overflowY: "auto",
-    gridTemplateColumns: `repeat(auto-fill, minmax(${tileSize}px, 1fr))`,
+    gridTemplateColumns: `repeat(auto-fill, minmax(${tileSize[resultType][viewType[resultType]] * 40}px, 1fr))`,
     gridGap: "10px",
     padding: "10px"
   }
 
-  if (viewType === "row") {
+  if (viewType[resultType] === "row") {
     tileContainerStyle.gridTemplateColumns = `repeat(1, 1fr)`;
   }
 
@@ -110,17 +156,18 @@ function Explorer() {
         onFilterChange={handleFilterChange}
         resultType={resultType}
         onResultTypeChange={setResultType}
-        viewType={viewType}
+        viewType={viewType[resultType]}
         onLatestChange={handleLatestChange}
-        onViewTypeChange={setViewType}
+        onViewTypeChange={handleViewTypeChange}
       />
       <Divider />
+      <LinearProgress color="ignite" style={{width: "100%", minHeight: "2px", visibility: isLoading ? "visible" : "hidden"}} />
       <div style={tileContainerStyle}>
         {Object.keys(tiles).map((k) => tiles[k])}
       </div>
       <div className={classes.layoutHelper} />
       <Divider />
-      <PageBar pages={pages.total} onChange={handlePageChange} onTilesPerPageChange={handleTilesPerPageChange} onTileSizeChange={handleTileSizeChange}/>
+      <PageBar pages={pages.total} onChange={handlePageChange} tileSize={tileSize[resultType][viewType[resultType]]} onTilesPerPageChange={handleTilesPerPageChange} onTileSizeChange={handleTileSizeChange}/>
     </div>
   )
 }
