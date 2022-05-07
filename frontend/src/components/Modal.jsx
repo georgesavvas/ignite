@@ -19,16 +19,19 @@ const dialogStyle = {
 
 function Modal(props) {
   return (
-    <Dialog open={props.open} onClose={props.onClose} fullWidth maxWidth={props.maxWidth || "sx"} sx={dialogStyle}>
+    <Dialog open={props.open} onClose={props.onClose} fullWidth={props.fullWidth !== undefined ? props.fullWidth : true} maxWidth={props.maxWidth || "sx"} sx={dialogStyle}>
       {props.title ? <DialogTitle>{props.title}</DialogTitle> : null}
       <DialogContent>
         {props.text ? <DialogContentText>{props.text}</DialogContentText> : null}
         {props.children}
       </DialogContent>
       <DialogActions>
-        <Button onClick={props.onButtonClicked || props.onClose}>
-          {props.buttonLabel || "Close"}
-        </Button>
+        {
+          props.buttonLabel ?
+          <Button onClick={props.onButtonClicked}>{props.buttonLabel}</Button> :
+          null
+        }
+        {props.closeButton ? <Button onClick={props.onClose}>Close</Button> : null}
       </DialogActions>
     </Dialog>
   );

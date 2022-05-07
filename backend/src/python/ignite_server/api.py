@@ -500,3 +500,17 @@ def get_repr_comp(target):
         return {}
     asset = find(repr_asset)
     return asset.latest_av.get_thumbnail()
+
+
+def delete_entity(path, entity_type):
+    entity = find(path)
+    if entity.dir_kind != entity_type:
+        print(
+            "Attempted to delete", entity.dir_kind,
+            "but the entity was supposed to be", entity_type
+        )
+        return False
+    if not hasattr(entity, "delete"):
+        return False
+    ok = entity.delete()
+    return ok

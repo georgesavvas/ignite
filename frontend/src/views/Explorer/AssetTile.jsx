@@ -1,13 +1,29 @@
-import React from "react";
+import React, { useState } from "react";
 import Tile from "../../components/Tile";
 import Typography from '@mui/material/Typography';
 import { useSnackbar } from 'notistack';
 import { CopyToClipboard } from "../../components/utils";
-import clientRequest from "../../services/clientRequest";
 import openExplorer from "../../utils/openExplorer";
+import Modal from "../../components/Modal";
+import serverRequest from "../../services/serverRequest";
 
 function AssetTile(props) {
+  const [ modalOpen, setModalOpen ] = useState(false);
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+
+  const handleDeleteEntity = () => {
+    const data = {
+      path: props.entity.path,
+      entity: "assetversion"
+    }
+    serverRequest("delete_entity", data).then(resp => {
+      if (resp.ok) enqueueSnackbar("Successfully deleted!", {variant: "success"});
+      else enqueueSnackbar(
+        "There was an issue with deleting this.", {variant: "error"}
+      );
+    });
+    setModalOpen(false);
+  }
 
   const contextItems = [
     {
@@ -21,8 +37,13 @@ function AssetTile(props) {
     },
     {
       "label": "Open in file explorer",
-      "fn": () => openExplorer(props.entity.path, enqueueSnackbar)
+      "fn": () => openExplorer(props.entity.path, enqueueSnackbar),
+      "divider": true
     },
+    {
+      "label": "Delete asset version",
+      "fn": () => setModalOpen(true)
+    }
   ]
 
   function details() {
@@ -48,9 +69,15 @@ function AssetTile(props) {
   }
 
   return (
-    <Tile {...props} contextItems={contextItems}>
-      {details()}
-    </Tile>
+    <>
+      <Modal open={modalOpen} buttonLabel="Confirm" onButtonClicked={handleDeleteEntity}
+        maxWidth="sm" closeButton text="This will permanently delete this version!"
+        onClose={() => setModalOpen(false)} title="Are you sure?"
+      />
+      <Tile {...props} contextItems={contextItems}>
+        {details()}
+      </Tile>
+    </>
   );
 }
 

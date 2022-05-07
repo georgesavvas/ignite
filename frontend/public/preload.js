@@ -13,4 +13,7 @@ contextBridge.exposeInMainWorld("api", {
   fileInput: async default_dir => {
     return await ipcRenderer.invoke("fileInput", default_dir);
   },
+  launch_dcc: async (cmd, args, env) => {
+    return await ipcRenderer.invoke("launch_dcc", cmd, args, env);
+  },
 })

@@ -1,6 +1,7 @@
 import os
 import yaml
 import logging
+import shutil
 from pathlib import Path, PurePath
 from ignite_server import utils
 from ignite_server import api
@@ -129,3 +130,14 @@ class Directory():
             uri = utils.get_uri(uri)
         self.repr = uri
         self.update_config({"repr": uri})
+    
+    def delete(self):
+        print("About to delete", self.path)
+        try:
+            shutil.rmtree(self.path)
+        except Exception as e:
+            print("Failed.")
+            print(e)
+            return False
+        print("Success.")
+        return True

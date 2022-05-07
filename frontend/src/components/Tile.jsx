@@ -21,7 +21,7 @@ function GridTile(props) {
   const barStyle = {
     "left": `${progress * 100}%`
   }
-  
+
   const handleMouseMove = (e) => {
     const rect = hoverArea.current.getBoundingClientRect();
     const width = (e.clientX - rect.left) / rect.width;
@@ -51,8 +51,12 @@ function GridTile(props) {
 
   return (
     <>
-      <ContextMenu items={props.contextItems} contextMenu={contextMenu} setContextMenu={setContextMenu} />
-      <div style={tileStyle} className={styles.tile} onClick={handleClick} onContextMenu={_handleContextMenu}>
+      <ContextMenu items={props.contextItems} contextMenu={contextMenu}
+        setContextMenu={setContextMenu}
+      />
+      <div style={tileStyle} className={styles.tile} onClick={handleClick}
+        onContextMenu={_handleContextMenu}
+      >
         <img src={thumbnailURL} className={styles.thumbnail} style={thumbnailStyle} />
         <div className={styles.hoverArea} onMouseMove={isStatic ? null : handleMouseMove} ref={hoverArea}>
           <div className={styles.overlay}>

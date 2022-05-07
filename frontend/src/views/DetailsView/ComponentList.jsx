@@ -16,8 +16,13 @@ const dccNames = {
 function ComponentList(props) {
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
-  const handleClick = (e) => {
+  const handleClick = e => {
     props.onSelect(e.currentTarget.id);
+  }
+
+  const handleCopy = (e, comp) => {
+    e.stopPropagation();
+    CopyToClipboard(comp.filename, enqueueSnackbar);
   }
 
   function formatComp(comp, index) {
@@ -32,7 +37,7 @@ function ComponentList(props) {
           <Typography variant="subtitle1" className={styles.label}>{comp.filename}</Typography>
         </div>
         <div className={styles.spacer} />
-        <IconButton onClick={() => CopyToClipboard(comp.filename, enqueueSnackbar)}>
+        <IconButton onClick={e => handleCopy(e, comp)}>
           <CopyIcon />
         </IconButton>
       </div>

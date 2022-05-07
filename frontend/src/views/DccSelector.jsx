@@ -62,7 +62,7 @@ function DccSelector(props) {
     )
   }
 
-  const handleLaunchClick = (e) => {
+  async function handleLaunchClick(e) {
     const dcc = getDcc();
     const dcc_name = getDccName(dcc.path.split("/").at(-1).split("\\").at(-1).split(".")[0]);
     const data = {
@@ -72,14 +72,18 @@ function DccSelector(props) {
       scene: props.scene,
       new_scene: props.newScene
     };
-    clientRequest("launch_dcc", data).then((resp) => {
-      if (resp.ok) enqueueSnackbar("Launched!", {variant: "success"});
-      else enqueueSnackbar("Failed launching scene.", {variant: "error"});
-      setCurrentContext(prevState => {
-        const cc = {...prevState};
-        cc.update += 1;
-        return cc
-      });
+
+    const ok = await clientRequest("get_launch_cmd", data).then(resp => {
+      const data = resp.data;
+      return window.api.launch_dcc(data.cmd, data.args, data.env);
+    });
+
+    if (ok) enqueueSnackbar(`${dcc.name} launched!`, {variant: "success"});
+    else enqueueSnackbar("Failed launching scene.", {variant: "error"});
+    setCurrentContext(prevState => {
+      const cc = {...prevState};
+      cc.update += 1;
+      return cc
     });
   }
 
