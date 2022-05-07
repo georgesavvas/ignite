@@ -49,6 +49,7 @@ function ContextMenu(props) {
     <Menu
       open={props.contextMenu !== null}
       onClose={handleClose}
+      MenuListProps={{style: {padding: "4px 0"}}}
       anchorReference="anchorPosition"
       anchorPosition={
         props.contextMenu !== null

@@ -130,6 +130,37 @@ def launch_dcc(dcc, dcc_name, scene):
     return True
 
 
+def get_launch_cmd(dcc, dcc_name, scene):
+    scene = server_request("find", {"query": scene}).get("data", {})
+    if not scene:
+        return
+    task = scene.get("task", "")
+    env = get_env(task, dcc, scene)
+    scene = scene.get("scene")
+    for config in get_dcc_config():
+        if config["name"] == dcc_name:
+            dcc_config = config
+            break
+    else:
+        return
+
+    os_name = OS_NAMES[platform.system()]
+    os_cmd = {
+        "win": [],
+        "mac": ["open", "-a"],
+        "linux": []
+    }
+    cmd = os_cmd[os_name]
+    cmd += [dcc_config["path"]]
+    cmd.append(scene)
+    data = {
+        "cmd": cmd[0],
+        "args": cmd[1:],
+        "env": env
+    }
+    return data
+
+
 def show_in_explorer(filepath):
     filepath = Path(filepath)
     if not filepath.is_dir():
@@ -146,6 +177,29 @@ def show_in_explorer(filepath):
     else:
         subprocess.Popen(["xdg-open", filepath])
     return True
+
+
+def get_explorer_cmd(filepath):
+    filepath = Path(filepath)
+    if not filepath.is_dir():
+        if filepath.is_file() or filepath.parent.is_dir():
+            filepath = filepath.parent
+    if not filepath.is_dir():
+        return False
+
+    os_name = OS_NAMES[platform.system()]
+    cmds = {
+        "win": ["explorer.exe", filepath],
+        "mac": ["open", filepath],
+        "linux": ["xdg-open", filepath]
+    }
+    cmd = cmds[os_name]
+    data = {
+        "cmd": cmd[0],
+        "args": cmd[1:],
+        "env": {}
+    }
+    return data
 
 
 def server_request(method, data=None):

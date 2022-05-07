@@ -3,7 +3,7 @@ import { useSnackbar } from 'notistack';
 import React, {useEffect, useState, useContext, useRef} from "react";
 import TextField from '@mui/material/TextField';
 import styles from "./ContextBar.module.css";
-import {ContextContext} from "../../contexts/ContextContext";
+import { ContextContext } from "../../contexts/ContextContext";
 import { CopyToClipboard } from "../../components/utils";
 import { DIRECTORYICONS } from "../../constants";
 import ContextBarLink from './ContextBarLink';

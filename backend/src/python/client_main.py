@@ -67,6 +67,30 @@ async def launch_dcc(request: Request):
     return {"ok": ok}
 
 
+@app.post("/api/v1/get_launch_cmd")
+async def get_launch_cmd(request: Request):
+    result = await request.json()
+    task = result.get("task", "")
+    scene = result.get("scene", "")
+    dcc = result.get("dcc", "")
+    dcc_name = result.get("dcc_name", "")
+    new_scene = result.get("new_scene", False)
+    if new_scene and task:
+        data = {
+            "task": task,
+            "dcc": dcc
+        }
+        resp = utils.server_request("copy_default_scene", data)
+        scene = resp.get("scene", "")
+    elif new_scene and not task:
+        return {"ok": False}
+    data = utils.get_launch_cmd(dcc, dcc_name, scene)
+    return {
+        "ok": True,
+        "data": data
+    }
+
+
 @app.post("/api/v1/show_in_explorer")
 async def show_in_explorer(request: Request):
     result = await request.json()
@@ -75,6 +99,19 @@ async def show_in_explorer(request: Request):
         return {"ok": False}
     ok = utils.show_in_explorer(filepath)
     return {"ok": ok}
+
+
+@app.post("/api/v1/get_explorer_cmd")
+async def get_explorer_cmd(request: Request):
+    result = await request.json()
+    filepath = result.get("filepath")
+    if not filepath:
+        return {"ok": False}
+    data = utils.get_explorer_cmd(filepath)
+    return {
+        "ok": True,
+        "data": data
+    }
 
 
 @app.post("/api/v1/get_env")

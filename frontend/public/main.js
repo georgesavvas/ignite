@@ -2,6 +2,7 @@ const { app, electron, BrowserWindow, protocol, ipcMain, dialog } = require('ele
 const os = require('os');
 const fs = require('fs').promises;
 const path = require("path");
+const child_process = require("child_process");
 
 function createWindow () {
 
@@ -59,6 +60,11 @@ function createWindow () {
       valid = false;
     }
     return valid;
+  });
+
+  ipcMain.handle("launch_dcc", async (event, cmd, args, env) => {
+    const proc = child_process.spawn(cmd, args, {env: env, detached: true});
+    if (proc) return true;
   });
 
   ipcMain.handle("fileInput", async (default_dir="") => {

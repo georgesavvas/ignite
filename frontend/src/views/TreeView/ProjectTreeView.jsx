@@ -155,7 +155,6 @@ function StyledTreeItem(props) {
               {contextOption.label}
             </MenuItem>
           ))}
-          <Divider />
       </Menu>
       <StyledTreeItemRoot
         label={
