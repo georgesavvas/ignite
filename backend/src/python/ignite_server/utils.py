@@ -58,7 +58,6 @@ def create_anchor(path, name):
 
 def get_uri(path, version=None):
     splt = PurePath(path).as_posix().split(ROOT.as_posix(), 1)[1].replace("/exports", "").split("/")[1:]
-    print(splt)
     project = splt[0]
     phase = splt[1]
     context = "/".join(splt[2:-2])
@@ -104,10 +103,6 @@ def uri_to_path(uri):
         if not data.get(step):
             return path
         path = path / data[step]
-    print("Converted URI to path:")
-    print(uri)
-    print(path)
-    print(data)
     return path
 
 

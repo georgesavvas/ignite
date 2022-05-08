@@ -15,7 +15,7 @@ const dccNames = {
   nuke: ["nuke"]
 }
 
-function Component({comp, index, onSelect, selectedComp}) {
+function Component({comp, onSelect, selectedComp}) {
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const [contextMenu, setContextMenu] = useState(null);
 
@@ -45,7 +45,7 @@ function Component({comp, index, onSelect, selectedComp}) {
   ]
 
   return (
-    <div key={index} onContextMenu={e => handleContextMenu(e, contextMenu, setContextMenu)}>
+    <div onContextMenu={e => handleContextMenu(e, contextMenu, setContextMenu)}>
       <ContextMenu items={contextItems} contextMenu={contextMenu} setContextMenu={setContextMenu} />
       <div className={styles.compContainer} id={comp.filename} onClick={handleClick} style={containerStyle}>
         <div className={styles.compIcon} />
@@ -66,8 +66,7 @@ function ComponentList(props) {
     <div className={styles.container}>
       <Typography variant="h5" style={{marginBottom: "10px"}}>Components</Typography>
       <div className={styles.compList}>
-        {props.components.map((comp, index) => <Component
-            comp={comp} index={index}
+        {props.components.map((comp, index) => <Component key={index} comp={comp}
             onSelect={props.onSelect} selectedComp={props.selectedComp}
           />
         )}
