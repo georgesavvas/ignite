@@ -45,17 +45,13 @@ function GridTile(props) {
     props.onSelected(props.entity);
   }
 
-  const _handleContextMenu = e => {
-    handleContextMenu(e, contextMenu, setContextMenu);
-  }
-
   return (
     <>
       <ContextMenu items={props.contextItems} contextMenu={contextMenu}
         setContextMenu={setContextMenu}
       />
       <div style={tileStyle} className={styles.tile} onClick={handleClick}
-        onContextMenu={_handleContextMenu}
+        onContextMenu={e => handleContextMenu(e, contextMenu, setContextMenu)}
       >
         <img src={thumbnailURL} className={styles.thumbnail} style={thumbnailStyle} />
         <div className={styles.hoverArea} onMouseMove={isStatic ? null : handleMouseMove} ref={hoverArea}>
@@ -121,18 +117,20 @@ function RowTile(props) {
     props.onSelected(props.entity);
   }
 
-  const _handleContextMenu = e => {
-    handleContextMenu(e, contextMenu, setContextMenu);
-  }
-
   return (
     <>
-      <ContextMenu items={props.contextItems} contextMenu={contextMenu} setContextMenu={setContextMenu} />
-      <div className={styles.tile} style={tileStyle} onClick={handleClick} onContextMenu={_handleContextMenu}>
+      <ContextMenu items={props.contextItems} contextMenu={contextMenu}
+        setContextMenu={setContextMenu}
+      />
+      <div className={styles.tile} style={tileStyle} onClick={handleClick}
+        onContextMenu={e => handleContextMenu(e, contextMenu, setContextMenu)}
+      >
         <div style={thumbnailContainer}>
           <img src={thumbnailURL} className={styles.thumbnail} style={thumbnailStyle} />
         </div>
-        <div className={styles.hoverArea} onMouseMove={isStatic ? null : handleMouseMove} style={{"maxWidth": props.size}} ref={hoverArea}>
+        <div className={styles.hoverArea} style={{"maxWidth": props.size}}
+          onMouseMove={isStatic ? null : handleMouseMove} ref={hoverArea}
+        >
           {isStatic ? null : <div className={styles.bar} style={barStyle} />}
         </div>
         <div style={{"paddingLeft": "6px"}}>

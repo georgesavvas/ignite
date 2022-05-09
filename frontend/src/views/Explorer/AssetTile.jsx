@@ -27,22 +27,22 @@ function AssetTile(props) {
 
   const contextItems = [
     {
-      "label": "Copy URI",
-      "fn": () =>  CopyToClipboard(props.entity.uri, enqueueSnackbar)
+      label: "Copy URI",
+      fn: () =>  CopyToClipboard(props.entity.uri, enqueueSnackbar)
     },
     {
-      "label": "Copy path",
-      "fn": () =>  CopyToClipboard(props.entity.path, enqueueSnackbar),
-      "divider": true
+      label: "Copy path",
+      fn: () =>  CopyToClipboard(props.entity.path, enqueueSnackbar),
+      divider: true
     },
     {
-      "label": "Open in file explorer",
-      "fn": () => openExplorer(props.entity.path, enqueueSnackbar),
-      "divider": true
+      label: "Open in file explorer",
+      fn: () => openExplorer(props.entity.path, enqueueSnackbar),
+      divider: true
     },
     {
-      "label": "Delete asset version",
-      "fn": () => setModalOpen(true)
+      label: "Delete asset version",
+      fn: () => setModalOpen(true)
     }
   ]
 
