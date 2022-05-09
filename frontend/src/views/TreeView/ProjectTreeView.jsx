@@ -11,18 +11,17 @@ import TreeView from '@mui/lab/TreeView';
 import TreeItem, {treeItemClasses} from '@mui/lab/TreeItem';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import Divider from '@mui/material/Divider';
 import Box from '@mui/material/Box';
 import {ContextContext} from "../../contexts/ContextContext";
 import CreateDirDialogue from "../../components/CreateDirDialogue";
 import { DIRECTORYICONS } from "../../constants";
+import serverRequest from "../../services/serverRequest";
+import ContextMenu, { handleContextMenu } from "./ContextMenu";
 
 const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
   color: theme.palette.text.secondary,
   [`& .${treeItemClasses.content}`]: {
     color: theme.palette.text.secondary,
-    // borderTopRightRadius: theme.spacing(2),
-    // borderBottomRightRadius: theme.spacing(2),
     paddingRight: theme.spacing(0),
     paddingLeft: theme.spacing(0),
     fontWeight: theme.typography.fontWeightMedium,
@@ -40,14 +39,7 @@ const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
       fontWeight: 'inherit',
       color: 'inherit',
     },
-  },
-  // [`& .${treeItemClasses.group}`]: {
-  //   marginLeft: 0,
-  //   [`& .${treeItemClasses.content}`]: {
-  //     // paddingLeft: theme.spacing(4)
-  //     paddingLeft: `calc(var(--node-depth) * ${theme.spacing(2)}px)`
-  //   },
-  // },
+  }
 }));
 
 const cOpts = {
@@ -56,7 +48,7 @@ const cOpts = {
   create_sequence: {name: "create_sequence", label: "Create sequence", dir_kind: "sequence"},
   create_shot: {name: "create_shot", label: "Create shot", dir_kind: "shot"},
   create_task: {name: "create_task", label: "Create task", dir_kind: "task"}
-};
+}
 
 const dirContextOptions = {
   "project": [],
@@ -68,22 +60,41 @@ const dirContextOptions = {
   "shot": [cOpts.create_directory, cOpts.create_task]
 }
 
-function requestCreateDir(data) {
-  const promise = fetch(
-    "http://127.0.0.1:9090/api/v1/create_dir", {
-      method: "POST",
-      headers: {
-        'Accept': 'application/json, text/plain, */*',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
+function getGenericContextItems(data) {
+  return [
+    {
+      label: "Copy path",
+      fn: () =>  CopyToClipboard(data.path, enqueueSnackbar),
+      divider: true
+    },
+    {
+      label: "Open in file explorer",
+      fn: () => openExplorer(data.path, enqueueSnackbar),
+      divider: true
+    },
+    {
+      label: "Rename",
+      fn: () => handleRenameDir(data)
+    },
+    {
+      label: "Delete",
+      fn: () => handleDeleteDir(data),
+      divider: true
     }
-  )
-  .then((resp) => {
-    return resp.json();
-  });
-  return promise;
-};
+  ]
+}
+
+function handleRenameDir(data) {
+  return serverRequest("rename_dir", data);
+}
+
+function handleDeleteDir(data) {
+  return serverRequest("delete_dir", data);
+}
+
+function handleCreateDir(data) {
+  return serverRequest("create_dir", data);
+}
 
 function StyledTreeItem(props) {
   const [contextMenu, setContextMenu] = useState(null);
@@ -101,21 +112,6 @@ function StyledTreeItem(props) {
     ...other
   } = props;
 
-  const handleContextMenu = (event) => {
-    event.preventDefault();
-    setContextMenu(
-      contextMenu === null
-        ? {
-            mouseX: event.clientX - 2,
-            mouseY: event.clientY - 4,
-          }
-          : // repeated contextmenu when it is already open closes it with Chrome 84 on Ubuntu
-          // Other native context menus might behave different.
-          // With this behavior we prevent contextmenu from the backdrop to re-locale existing context menus.
-          null,
-    );
-  };
-
   const handleClick = (dir_path, contextOption) => {
     props.onContextOpen(dir_path, contextOption);
     handleClose();
@@ -127,6 +123,9 @@ function StyledTreeItem(props) {
 
   return (
     <div>
+      <ContextMenu items={props.contextItems} contextMenu={contextMenu}
+        setContextMenu={setContextMenu}
+      />
       <Menu
         open={contextMenu !== null}
         onClose={handleClose}
@@ -158,7 +157,9 @@ function StyledTreeItem(props) {
       </Menu>
       <StyledTreeItemRoot
         label={
-          <Box onContextMenu={handleContextMenu} sx={{ display: 'flex', alignItems: 'center', p: 0.1, pr: 0.8 }}>
+          <Box onContextMenu={e => handleContextMenu(e, contextMenu, setContextMenu)}
+            sx={{ display: 'flex', alignItems: 'center', p: 0.1, pr: 0.8 }}
+          >
             <Box component={LabelIcon} color="inherit" sx={{ height: "20px", width: "20px", mr: 1 }} />
             <Typography variant="body2" sx={{ textAlign: 'left', fontWeight: 'inherit', flexGrow: 1 }}>
               {labelText}
@@ -274,7 +275,7 @@ function ProjectTreeView(props) {
 
   const handleOnCreate = (dialogueData, meta) => {
     const data = {...meta, ...dialogueData};
-    requestCreateDir(data).then((resp => {
+    handleCreateDir(data).then((resp => {
       props.shouldUpdate(prevState => prevState + 1);
     }));
   }
