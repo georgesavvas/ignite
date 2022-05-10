@@ -16,7 +16,10 @@ import {ContextContext} from "../../contexts/ContextContext";
 import CreateDirDialogue from "../../components/CreateDirDialogue";
 import { DIRECTORYICONS } from "../../constants";
 import serverRequest from "../../services/serverRequest";
-import ContextMenu, { handleContextMenu } from "./ContextMenu";
+import ContextMenu, { handleContextMenu } from "../../components/ContextMenu";
+import { CopyToClipboard } from "../../components/utils";
+import openExplorer from "../../utils/openExplorer";
+import { useSnackbar } from 'notistack';
 
 const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
   color: theme.palette.text.secondary,
@@ -60,7 +63,7 @@ const dirContextOptions = {
   "shot": [cOpts.create_directory, cOpts.create_task]
 }
 
-function getGenericContextItems(data) {
+function getGenericContextItems(data, enqueueSnackbar) {
   return [
     {
       label: "Copy path",
@@ -84,6 +87,27 @@ function getGenericContextItems(data) {
   ]
 }
 
+function getSpecificContextItems(data) {
+  return dirContextOptions[data.kind].map(contextOption => (
+    <MenuItem
+      key={contextOption.name}
+      value={contextOption.name}
+      dir_path={data.path}
+      onClick={(() => data.handleClick(
+        data.path,
+        contextOption
+      ))}
+      style={{
+        paddingTop: "2px",
+        paddingBottom: "2px",
+        fontSize: "0.8rem"
+      }}
+    >
+      {contextOption.label}
+    </MenuItem>
+  ))
+}
+
 function handleRenameDir(data) {
   return serverRequest("rename_dir", data);
 }
@@ -98,6 +122,7 @@ function handleCreateDir(data) {
 
 function StyledTreeItem(props) {
   const [contextMenu, setContextMenu] = useState(null);
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
   const {
     bgColor,
@@ -121,40 +146,20 @@ function StyledTreeItem(props) {
     setContextMenu(null);
   };
 
+  const itemData = {
+    path: props.path,
+    kind: props.dir_kind,
+    handleClick: handleClick
+  }
+
+  let contextItems = getGenericContextItems(itemData, enqueueSnackbar);
+  // contextItems = contextItems.concat(getSpecificContextItems(itemData))
+
   return (
     <div>
-      <ContextMenu items={props.contextItems} contextMenu={contextMenu}
+      <ContextMenu items={contextItems} contextMenu={contextMenu}
         setContextMenu={setContextMenu}
       />
-      <Menu
-        open={contextMenu !== null}
-        onClose={handleClose}
-        anchorReference="anchorPosition"
-        anchorPosition={
-          contextMenu !== null
-            ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
-            : undefined
-        }
-      >
-        {dirContextOptions[props.dir_kind].map(contextOption => (
-            <MenuItem
-              key={contextOption.name}
-              value={contextOption.name}
-              dir_path={props.dir_path}
-              onClick={(() => handleClick(
-                props.dir_path,
-                contextOption
-              ))}
-              style={{
-                paddingTop: "2px",
-                paddingBottom: "2px",
-                fontSize: "0.8rem"
-              }}
-            >
-              {contextOption.label}
-            </MenuItem>
-          ))}
-      </Menu>
       <StyledTreeItemRoot
         label={
           <Box onContextMenu={e => handleContextMenu(e, contextMenu, setContextMenu)}
