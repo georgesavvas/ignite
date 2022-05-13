@@ -67,8 +67,7 @@ function getGenericContextItems(data, enqueueSnackbar) {
   return [
     {
       label: "Copy path",
-      fn: () =>  CopyToClipboard(data.path, enqueueSnackbar),
-      divider: true
+      fn: () =>  CopyToClipboard(data.path, enqueueSnackbar)
     },
     {
       label: "Open in file explorer",
@@ -89,22 +88,28 @@ function getGenericContextItems(data, enqueueSnackbar) {
 
 function getSpecificContextItems(data) {
   return dirContextOptions[data.kind].map(contextOption => (
-    <MenuItem
-      key={contextOption.name}
-      value={contextOption.name}
-      dir_path={data.path}
-      onClick={(() => data.handleClick(
-        data.path,
-        contextOption
-      ))}
-      style={{
-        paddingTop: "2px",
-        paddingBottom: "2px",
-        fontSize: "0.8rem"
-      }}
-    >
-      {contextOption.label}
-    </MenuItem>
+    {
+      label: contextOption.label,
+      value: contextOption.name,
+      dir_path: data.path,
+      fn: () => data.handleClick(data.path, contextOption)
+    }
+    // <MenuItem
+    //   key={contextOption.name}
+    //   value={contextOption.name}
+    //   dir_path={data.path}
+    //   onClick={(() => data.handleClick(
+    //     data.path,
+    //     contextOption
+    //   ))}
+    //   style={{
+    //     paddingTop: "2px",
+    //     paddingBottom: "2px",
+    //     fontSize: "0.8rem"
+    //   }}
+    // >
+    //   {contextOption.label}
+    // </MenuItem>
   ))
 }
 
@@ -153,7 +158,7 @@ function StyledTreeItem(props) {
   }
 
   let contextItems = getGenericContextItems(itemData, enqueueSnackbar);
-  // contextItems = contextItems.concat(getSpecificContextItems(itemData))
+  contextItems = contextItems.concat(getSpecificContextItems(itemData))
 
   return (
     <div>
