@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import Link from '@mui/material/Link';
 import { useSnackbar } from 'notistack';
-import { CopyToClipboard } from "../../components/utils";
+import { CopyToClipboard } from "../ContextActions";
 import ContextMenu, { handleContextMenu } from "../../components/ContextMenu";
 import openExplorer from "../../utils/openExplorer";
 

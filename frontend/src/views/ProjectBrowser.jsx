@@ -120,7 +120,7 @@ const tileContainerStyle = {
 }
 
 const Browser = (props) => {
-  const [currentContext, setCurrentContext] = useContext(ContextContext);
+  const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
   const [isLoading, setIsLoading] = useState(false);
   const [loadedData, setLoadedData] = useState([]);
   const [tiles, setTiles] = useState([]);

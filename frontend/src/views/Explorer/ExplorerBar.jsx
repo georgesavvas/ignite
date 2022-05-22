@@ -54,7 +54,7 @@ const ingestDialogStyle = {
 function ExplorerBar(props) {
   const [newSceneOpen, setNewSceneOpen] = useState(false);
   const [ingestOpen, setIngestOpen] = useState(false);
-  const [currentContext, setCurrentContext] = useContext(ContextContext);
+  const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
 
   const handleResultTypeChange = (e, value) => {
     if (value !== null) props.onResultTypeChange(value);

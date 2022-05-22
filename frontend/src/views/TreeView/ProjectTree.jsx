@@ -12,7 +12,7 @@ export default function ProjectTree() {
   const [loadedData, setLoadedData] = useState({});
   const [filterValue, setFilterValue] = useState("");
   const [updateTreeView, setUpdateTreeView] = useState(0);
-  const [currentContext, setCurrentContext] = useContext(ContextContext);
+  const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
 
   useEffect(() => {
     const data = {
@@ -23,7 +23,7 @@ export default function ProjectTree() {
       setIsLoading(false);
       setLoadedData(resp.data);
     });
-  }, [currentContext.project, updateTreeView]);
+  }, [currentContext, updateTreeView]);
 
   var content = [];
   if (loadedData.children === undefined) {

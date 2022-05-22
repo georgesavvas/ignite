@@ -92,24 +92,27 @@ async def find(request: Request):
     }
 
 
-@app.post("/api/v1/create_dir")
-async def create_dir(request: Request):
+@app.post("/api/v1/create_dirs")
+async def create_dirs(request: Request):
     result = await request.json()
+    pprint(result)
     path = result.get("path")
     method = result.get("method")
-    dir_name = result.get("dir_name")
-    if not path or not method or not dir_name:
-        print("something missing")
-        return {"success": False}
-    entity = api.find(path)
-    if method == "create_task":
-        entity.create_task(dir_name, task_type=result["task_type"])
-        return {"success": True}
-    if not hasattr(entity, method):
-        print(entity, "has no method", method)
-        return {"success": False}
-    getattr(entity, method)(dir_name)
-    return {"ok": True}
+    dir_kind = result.get("kind")
+    dirs = result.get("dirs")
+    created_amount = api.create_dirs(path, method, dirs)
+    if created_amount:
+        s = "s" if created_amount > 1 else ""
+        if dir_kind == "directory" and created_amount > 1:
+            s = ""
+            dir_kind = "directories"
+        text = f"Created {created_amount} {dir_kind}{s}"
+    else:
+        text = f"No {dir_kind}s created."
+    return {
+        "ok": created_amount > 0,
+        "text": text
+    }
 
 
 @app.post("/api/v1/get_contents")
@@ -317,9 +320,27 @@ async def set_repr_asset(request: Request):
 async def delete_entity(request: Request):
     result = await request.json()
     path = result.get("path", "")
-    entity = result.get("entity", "")
+    entity = result.get("kind", "")
     ok = api.delete_entity(path, entity)
     return {"ok": ok}
+
+
+@app.post("/api/v1/rename_entity")
+async def rename_entity(request: Request):
+    result = await request.json()
+    path = result.get("path", "")
+    entity = result.get("kind", "")
+    new_name = result.get("name")
+    if not new_name:
+        return {"ok": False}
+    ok = api.rename_entity(path, entity, new_name)
+    reasons = {
+        -1: "directory not empty"
+    }
+    return {
+        "ok": ok > 0,
+        "text": reasons.get(ok, "")
+    }
 
 
 if __name__ == "__main__":

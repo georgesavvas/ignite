@@ -57,6 +57,7 @@ function GridTile(props) {
         <div className={styles.hoverArea} onMouseMove={isStatic ? null : handleMouseMove} ref={hoverArea}>
           <div className={styles.overlay}>
             <div className={styles.topGrad} />
+            <div className={styles.bottomGrad} />
             {props.children}
           </div>
           {isStatic ? null : <div className={styles.bar} style={barStyle} />}

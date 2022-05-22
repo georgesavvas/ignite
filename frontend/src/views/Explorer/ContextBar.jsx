@@ -4,12 +4,12 @@ import React, {useEffect, useState, useContext, useRef} from "react";
 import TextField from '@mui/material/TextField';
 import styles from "./ContextBar.module.css";
 import { ContextContext } from "../../contexts/ContextContext";
-import { CopyToClipboard } from "../../components/utils";
+import { CopyToClipboard } from "../ContextActions";
 import { DIRECTORYICONS } from "../../constants";
 import ContextBarLink from './ContextBarLink';
 
 export default function ContextBar() {
-  const [currentContext, setCurrentContext] = useContext(ContextContext);
+  const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
   const [contextPath, setContextPath] = useState("");
   const [contextPathError, setContextPathError] = useState([false, ""]);
   const [isTextField, setIsTextField] = useState(false);
