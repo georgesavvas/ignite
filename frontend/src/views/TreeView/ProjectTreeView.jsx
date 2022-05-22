@@ -13,12 +13,10 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import Box from '@mui/material/Box';
 import {ContextContext} from "../../contexts/ContextContext";
-import CreateDirDialogue from "../../components/CreateDirDialogue";
 import { DIRECTORYICONS } from "../../constants";
-import serverRequest from "../../services/serverRequest";
 import ContextMenu, { handleContextMenu } from "../../components/ContextMenu";
-import { CopyToClipboard } from "../../components/utils";
-import openExplorer from "../../utils/openExplorer";
+import { CopyToClipboard, ShowInExplorer } from "../ContextActions";
+import { DeleteDir, RenameDir, CreateDir } from "../ContextActions";
 import { useSnackbar } from 'notistack';
 
 const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
@@ -71,16 +69,16 @@ function getGenericContextItems(data, enqueueSnackbar) {
     },
     {
       label: "Open in file explorer",
-      fn: () => openExplorer(data.path, enqueueSnackbar),
+      fn: () => ShowInExplorer(data.path, enqueueSnackbar),
       divider: true
     },
     {
       label: "Rename",
-      fn: () => handleRenameDir(data)
+      fn: () => data.handleClick("rename", data)
     },
     {
       label: "Delete",
-      fn: () => handleDeleteDir(data),
+      fn: () => data.handleClick("delete", data),
       divider: true
     }
   ]
@@ -92,37 +90,11 @@ function getSpecificContextItems(data) {
       label: contextOption.label,
       value: contextOption.name,
       dir_path: data.path,
-      fn: () => data.handleClick(data.path, contextOption)
+      fn: () => data.handleClick(
+        "create", {...data, method: contextOption.name, kind: contextOption.dir_kind}
+      )
     }
-    // <MenuItem
-    //   key={contextOption.name}
-    //   value={contextOption.name}
-    //   dir_path={data.path}
-    //   onClick={(() => data.handleClick(
-    //     data.path,
-    //     contextOption
-    //   ))}
-    //   style={{
-    //     paddingTop: "2px",
-    //     paddingBottom: "2px",
-    //     fontSize: "0.8rem"
-    //   }}
-    // >
-    //   {contextOption.label}
-    // </MenuItem>
   ))
-}
-
-function handleRenameDir(data) {
-  return serverRequest("rename_dir", data);
-}
-
-function handleDeleteDir(data) {
-  return serverRequest("delete_dir", data);
-}
-
-function handleCreateDir(data) {
-  return serverRequest("create_dir", data);
 }
 
 function StyledTreeItem(props) {
@@ -142,8 +114,8 @@ function StyledTreeItem(props) {
     ...other
   } = props;
 
-  const handleClick = (dir_path, contextOption) => {
-    props.onContextOpen(dir_path, contextOption);
+  const handleClick = (action, data) => {
+    props.onContextOpen(action, data);
     handleClose();
   }
 
@@ -152,8 +124,9 @@ function StyledTreeItem(props) {
   };
 
   const itemData = {
-    path: props.path,
+    path: props.dir_path,
     kind: props.dir_kind,
+    name: labelText,
     handleClick: handleClick
   }
 
@@ -199,17 +172,28 @@ StyledTreeItem.propTypes = {
 
 function ProjectTreeView(props) {
   const [isLoading, setIsLoading] = useState(true);
-  const [openDialogue, setOpenDialogue] = useState(false);
+  const [renameModalOpen, setRenameModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [createModalOpen, setCreateModalOpen] = useState(false);
   const [expandedItems, setExpandedItems] = useState(["root"]);
+  const [modalData, setModalData] = useState({});
   const [selectedItems, setSelectedItems] = useState("root");
-  const [newDirData, setNewDirData] = useState({});
-  const [currentContext, setCurrentContext] = useContext(ContextContext);
+  const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
-  // useEffect(() => {
-  //   if (!currentContext.path) {
-  //     handleNodeSelect(null, "root")
-  //   }
-  // }, [])
+  useEffect(() => {
+    switch (modalData.action) {
+      case "create":
+        setCreateModalOpen(true);
+        break
+      case "rename":
+        setRenameModalOpen(true);
+        break
+      case "delete":
+        setDeleteModalOpen(true);
+        break
+    }
+  }, [modalData])
 
   useEffect(() => {
     function findNodeByPath(object, result, value, parents){
@@ -272,23 +256,9 @@ function ProjectTreeView(props) {
     }
   }
 
-  const handleContextMenuSelection = (dir_path, contextOption) => {
-    const data = {
-      path: dir_path,
-      dir_kind: contextOption.dir_kind,
-      method: contextOption.name,
-      modal_title: contextOption.label
-    };
-    setNewDirData(data);
-    setOpenDialogue(true);
+  const handleContextMenuSelection = (action, data) => {
+    setModalData({...data, action: action});
   };
-
-  const handleOnCreate = (dialogueData, meta) => {
-    const data = {...meta, ...dialogueData};
-    handleCreateDir(data).then((resp => {
-      props.shouldUpdate(prevState => prevState + 1);
-    }));
-  }
 
   const renderTree = (nodes) => {
     const filter_string = nodes.filter_strings.join(" ")
@@ -312,13 +282,24 @@ function ProjectTreeView(props) {
     )
   };
 
+  const handleCloseModal = setModalOpen => {
+    setModalOpen(false);
+    setModalData({});
+  }
+
   return (
     <div className={styles.container}>
-      <CreateDirDialogue
-        open={openDialogue}
-        meta={newDirData}
-        onCreate={(v, data) => handleOnCreate(v, data)}
-        onClose={() => setOpenDialogue(false)}
+      <CreateDir open={createModalOpen} enqueueSnackbar={enqueueSnackbar}
+        onClose={() => handleCloseModal(setCreateModalOpen)} data={modalData}
+        fn={refreshContext}
+      />
+      <DeleteDir open={deleteModalOpen} enqueueSnackbar={enqueueSnackbar}
+        onClose={() => handleCloseModal(setDeleteModalOpen)} data={modalData}
+        fn={refreshContext}
+      />
+      <RenameDir open={renameModalOpen} enqueueSnackbar={enqueueSnackbar}
+        onClose={() =>handleCloseModal(setRenameModalOpen)} data={modalData}
+        fn={refreshContext}
       />
       <div className={styles.treeContainer}>
         <TreeView
@@ -331,7 +312,6 @@ function ProjectTreeView(props) {
           selected={selectedItems}
           sx={{ flexGrow: 1, maxWidth: 800, overflowX: "hidden", overflowY: 'auto' }}
         >
-          {/* {props.data.children.map((node) => renderTree(node))} */}
           {renderTree(props.data)}
         </TreeView>
       </div>

@@ -3,53 +3,39 @@ import Tile from "../../components/Tile";
 import Typography from '@mui/material/Typography';
 import { ContextContext } from "../../contexts/ContextContext";
 import { useSnackbar } from 'notistack';
-import { CopyToClipboard } from "../../components/utils";
+import { CopyToClipboard, ShowInExplorer } from "../ContextActions";
+import { DeleteDir, RenameDir, CreateDir } from "../ContextActions";
 import clientRequest from "../../services/clientRequest";
 import Modal from "../../components/Modal";
 import serverRequest from "../../services/serverRequest";
 
 function DirectoryTile(props) {
-  const [ modalOpen, setModalOpen ] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [renameModalOpen, setRenameModalOpen] = useState(false);
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
-  const [currentContext, setCurrentContext] = useContext(ContextContext);
+  const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
   const isScene = props.entity.dir_kind === "scene";
   const thumbnailWidth = isScene || props.entity.thumbnail ? "100%" : "50%";
 
-  const entityType = isScene ? "scene" : "directory";
-
-  const handleDeleteEntity = () => {
-    const data = {
-      path: props.entity.path,
-      entity: entityType
-    }
-    serverRequest("delete_entity", data).then(resp => {
-      if (resp.ok) enqueueSnackbar("Successfully deleted!", {variant: "success"});
-      else enqueueSnackbar("There was an issue with deleting this.", {variant: "error"}
-      );
-    });
-    setModalOpen(false);
-  }
-
   const contextItems = [
-{
+    {
       "label": "Copy path",
       "fn": () =>  CopyToClipboard(props.entity.path, enqueueSnackbar)
     },
     {
       "label": "Open in file explorer",
-      "fn": () => handleOpenExplorer(props.entity.path)
+      "fn": () => ShowInExplorer(props.entity.path, enqueueSnackbar)
     },
     {
-      "label": `Delete ${entityType}`,
-      "fn": () => setModalOpen(true)
+      "label": `Rename ${props.entity.dir_kind}`,
+      "fn": () => setRenameModalOpen(true)
+    },
+    {
+      "label": `Delete ${props.entity.dir_kind}`,
+      "fn": () => setDeleteModalOpen(true)
     }
   ]
-
-  const handleOpenExplorer = filepath => {
-    clientRequest("show_in_explorer", {"filepath": filepath}).then((resp) => {
-      if (!resp.ok) enqueueSnackbar("Failed launching scene.", {variant: "error"});
-    })
-  }
 
   const handleClick = e => {
     if (e.detail === 2) {
@@ -91,13 +77,26 @@ function DirectoryTile(props) {
     )
   }
 
+  const dirData = {
+    path: props.entity.path,
+    kind: props.entity.dir_kind,
+    name: props.entity.name
+  }
+
   return (
     <>
-      <Modal open={modalOpen} buttonLabel="Confirm" onButtonClicked={handleDeleteEntity}
-          maxWidth="sm" closeButton onClose={() => setModalOpen(false)}
-          text={`This will permanently delete this ${entityType}!`}
-          title="Are you sure?"
-        />
+      <CreateDir open={createModalOpen} enqueueSnackbar={enqueueSnackbar}
+        onClose={() => setCreateModalOpen(false)} data={dirData}
+        fn={props.refreshContext}
+      />
+      <DeleteDir open={deleteModalOpen} enqueueSnackbar={enqueueSnackbar}
+        onClose={() => setDeleteModalOpen(false)} data={dirData}
+        fn={props.refreshContext}
+      />
+      <RenameDir open={renameModalOpen} enqueueSnackbar={enqueueSnackbar}
+        onClose={() => setRenameModalOpen(false)} data={dirData}
+        fn={props.refreshContext}
+      />
       <Tile
         {...props}
         thumbnail={props.entity.thumbnail ? undefined : thumbnailPath()}

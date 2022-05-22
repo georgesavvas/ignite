@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import CopyIcon from "../../icons/CopyIcon";
 import { useSnackbar } from 'notistack';
-import { CopyToClipboard } from "../../components/utils";
+import { CopyToClipboard } from "../ContextActions";
 import ContextMenu, { handleContextMenu } from "../../components/ContextMenu";
 import openExplorer from "../../utils/openExplorer";
 

@@ -136,6 +136,4 @@ class Project(Directory):
         path = Path(self.path)
         tree = walk_project(path)
         get_filter_strings(tree, set())
-        from pprint import pprint
-        pprint(tree)
         return tree

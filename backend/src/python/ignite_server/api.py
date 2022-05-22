@@ -190,6 +190,28 @@ def get_dir_kind(path, append_task=False):
         return kind
 
 
+def create_dirs(path, method, dirs):
+    created = 0
+    entity = find(path)
+    if not entity:
+        print(f"Couldn't find entity at {path}")
+        return created
+    for d in dirs:
+        dir_name = d.get("dir_name")
+        if not dir_name:
+            continue
+        if method == "create_task":
+            entity.create_task(dir_name, task_type=d["dir_type"])
+            created += 1
+            continue
+        if not hasattr(entity, method):
+            print(entity, "has no method", method)
+            continue
+        getattr(entity, method)(dir_name)
+        created += 1
+    return created
+
+
 def get_contents(path, as_dict=False):
     path = Path(path)
     exp = path / "exports"
@@ -471,14 +493,11 @@ def set_repr_asset(target, repr):
 
 
 def get_repr_comp(target):
-    print("\n\nGETTING REPR COMP FOR", target)
     anchors = list(ANCHORS.values())
     asset_anchor = ANCHORS["asset"]
     def search(path):
-        print("Searching in", path)
         for x in path.iterdir():
             if x.name == asset_anchor:
-                print("Found asset", x)
                 return x
             if x.name not in anchors and x.name not in ("exports", "scenes"):
                 continue
@@ -514,3 +533,19 @@ def delete_entity(path, entity_type):
         return False
     ok = entity.delete()
     return ok
+
+
+def rename_entity(path, entity_type, new_name):
+    entity = find(path)
+    if entity.dir_kind != entity_type:
+        print(
+            "Attempted to rename", entity.dir_kind,
+            "but the entity was supposed to be", entity_type
+        )
+        return False
+    contents = get_contents(path)
+    if contents:
+        return -1
+    path = Path(path)
+    path.rename(path.parent / new_name)
+    return 1

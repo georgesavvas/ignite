@@ -2,28 +2,14 @@ import React, { useState } from "react";
 import Tile from "../../components/Tile";
 import Typography from '@mui/material/Typography';
 import { useSnackbar } from 'notistack';
-import { CopyToClipboard } from "../../components/utils";
-import openExplorer from "../../utils/openExplorer";
+import { CopyToClipboard, ShowInExplorer } from "../ContextActions";
+import { DeleteDir, RenameDir, CreateDir } from "../ContextActions";
 import Modal from "../../components/Modal";
 import serverRequest from "../../services/serverRequest";
 
 function AssetTile(props) {
-  const [ modalOpen, setModalOpen ] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
-
-  const handleDeleteEntity = () => {
-    const data = {
-      path: props.entity.path,
-      entity: "assetversion"
-    }
-    serverRequest("delete_entity", data).then(resp => {
-      if (resp.ok) enqueueSnackbar("Successfully deleted!", {variant: "success"});
-      else enqueueSnackbar(
-        "There was an issue with deleting this.", {variant: "error"}
-      );
-    });
-    setModalOpen(false);
-  }
 
   const contextItems = [
     {
@@ -37,12 +23,12 @@ function AssetTile(props) {
     },
     {
       label: "Open in file explorer",
-      fn: () => openExplorer(props.entity.path, enqueueSnackbar),
+      fn: () => ShowInExplorer(props.entity.path, enqueueSnackbar),
       divider: true
     },
     {
       label: "Delete asset version",
-      fn: () => setModalOpen(true)
+      fn: () => setDeleteModalOpen(true)
     }
   ]
 
@@ -68,11 +54,16 @@ function AssetTile(props) {
     )
   }
 
+  const dirData = {
+    kind: props.entity.dir_kind,
+    path: props.entity.path
+  }
+
   return (
     <>
-      <Modal open={modalOpen} buttonLabel="Confirm" onButtonClicked={handleDeleteEntity}
-        maxWidth="sm" closeButton text="This will permanently delete this version!"
-        onClose={() => setModalOpen(false)} title="Are you sure?"
+      <DeleteDir open={deleteModalOpen} enqueueSnackbar={enqueueSnackbar}
+        onClose={() => setDeleteModalOpen(false)} data={dirData}
+        fn={props.refreshContext}
       />
       <Tile {...props} contextItems={contextItems}>
         {details()}

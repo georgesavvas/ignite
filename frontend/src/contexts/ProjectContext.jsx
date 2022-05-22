@@ -6,7 +6,7 @@ export const ProjectContext = createContext();
 
 export const ProjectProvider = props => {
   const [selectedProject, setSelectedProject] = useState("");
-  const [currentContext, setCurrentContext] = useContext(ContextContext);
+  const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
 
   // useEffect(() => {
   //   if (selectedProject) {

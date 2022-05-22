@@ -25,7 +25,7 @@ function DccSelector(props) {
   // const dir_kind_formatted = dir_kind.charAt(0).toUpperCase() + dir_kind.slice(1)
   const [dccConfig, setDccConfig] = useContext(DccContext);
   const [selectedDcc, setSelectedDcc] = useState("");
-  const [currentContext, setCurrentContext] = useContext(ContextContext);
+  const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
   const handleDccClick = (e) => {

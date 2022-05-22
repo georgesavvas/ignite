@@ -31,7 +31,7 @@ function Explorer() {
   const [viewType, setViewType] = useState(defaultViewType);
   const [tiles, setTiles] = useState([]);
   const [selectedEntity, setSelectedEntity] = useContext(EntityContext);
-  const [currentContext, setCurrentContext] = useContext(ContextContext);
+  const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
 
   const methods = {
     dynamic: "get_contents",
@@ -52,7 +52,6 @@ function Explorer() {
   }, []);
 
   useEffect(() => {
-    console.log("Firing...");
     const data = {
       resultType: resultType,
       viewType: viewType,
@@ -81,9 +80,15 @@ function Explorer() {
   useEffect(() => {
     const _tiles = loadedData.reduce(function(obj, entity) {
       if (entity.dir_kind === "assetversion") {
-        obj[entity.result_id] = <AssetTile key={entity.result_id} entity={entity} onSelected={handleEntitySelection} selected={selectedEntity.path === entity.path} size={tileSize * 40} viewType={viewType} />;
+        obj[entity.result_id] = <AssetTile key={entity.result_id} entity={entity}
+          onSelected={handleEntitySelection} size={tileSize * 40} viewType={viewType}
+          selected={selectedEntity.path === entity.path} refreshContext={refreshContext}
+        />;
       } else {
-        obj[entity.result_id] = <DirectoryTile key={entity.result_id} entity={entity} onSelected={handleEntitySelection} selected={selectedEntity.path === entity.path} size={tileSize * 40} viewType={viewType} />;
+        obj[entity.result_id] = <DirectoryTile key={entity.result_id} entity={entity}
+          onSelected={handleEntitySelection} size={tileSize * 40} viewType={viewType}
+          selected={selectedEntity.path === entity.path} refreshContext={refreshContext}
+        />;
       }
       return obj;
     }, {});

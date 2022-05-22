@@ -4,7 +4,7 @@ import serverRequest from "../services/serverRequest";
 export const ContextContext = createContext();
 
 export const ContextProvider = props => {
-  const [currentContext, setCurrentContext] = useState({update: 0});
+  const [currentContext, setCurrentContext, refreshContext] = useState({update: 0});
 
   useEffect(() => {
     const data = localStorage.getItem("context");
@@ -18,14 +18,19 @@ export const ContextProvider = props => {
     const resp = await serverRequest("get_context_info", {path: path})
     const data = resp.data;
     if (!Object.keys(data).length) return false;
+    data.update = 0;
     setCurrentContext(data);
     localStorage.setItem("context", JSON.stringify(data));
     success = true;
     return success;
   };
 
+  function refresh() {
+    setCurrentContext(prevState => ({...prevState, update: prevState.update + 1}));
+  }
+
   return (
-    <ContextContext.Provider value={[currentContext, handleContextChange]}>
+    <ContextContext.Provider value={[currentContext, handleContextChange, refresh]}>
       {props.children}
     </ContextContext.Provider>
   )
