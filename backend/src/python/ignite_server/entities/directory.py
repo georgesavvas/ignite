@@ -57,7 +57,7 @@ class Directory():
         if hasattr(self, "task"):
             context = self.task.as_posix()
         else:
-            context = self.path.as_posix()
+            context = self.path.parent.as_posix()
         values = context.replace(project_path.as_posix() + "/", "").split("/", 1)
         if not values or len(values) < 2:
             values = ["", ""]
@@ -71,9 +71,9 @@ class Directory():
 
     def as_dict(self):
         d = {}
-        for s in ("path", "dir_kind", "anchor", "project", "name", "context",
-        "repr"):
+        for s in ("path", "dir_kind", "anchor", "project", "name", "context", "repr"):
             d[s] = getattr(self, s)
+        d["full_context"] = f"{self.phase}/{self.context}"
         # d["task"] = self.task.as_dict()
         return d
 

@@ -18,6 +18,7 @@ import {ContextContext} from "../../contexts/ContextContext";
 import DccSelector from "../DccSelector";
 import Ingest from "../Ingest/Ingest";
 import ContextBar from "./ContextBar";
+import Modal from "../../components/Modal";
 
 const style = {
   display: "flex",
@@ -27,17 +28,6 @@ const style = {
   gap: "10px"
 }
 
-const newSceneDialogStyle = {
-  "& .MuiDialog-container": {
-    "& .MuiPaper-root": {
-      width: "100%",
-      maxWidth: "30vw",
-      backgroundColor: "rgb(40,40,40)",
-      backgroundImage: "none"
-    },
-  },
-}
-
 const ingestDialogStyle = {
   "& .MuiDialog-container": {
     "& .MuiPaper-root": {
@@ -45,7 +35,7 @@ const ingestDialogStyle = {
       maxWidth: "95vw",
       height: "100%",
       maxHeight: "90vh",
-      backgroundColor: "rgb(40,40,40)",
+      backgroundColor: "rgb(20,20,20)",
       backgroundImage: "none"
     },
   },
@@ -71,9 +61,9 @@ function ExplorerBar(props) {
   return (
     <div>
       <div style={style}>
-        <Dialog open={newSceneOpen} onClose={() => setNewSceneOpen(false)} sx={newSceneDialogStyle}>
+        <Modal open={newSceneOpen} onClose={() => setNewSceneOpen(false)} maxWidth="xs">
           <DccSelector task={currentContext.path} newScene={true} />
-        </Dialog>
+        </Modal>
         <Dialog open={ingestOpen} onClose={() => setIngestOpen(false)} sx={ingestDialogStyle}>
           <DialogContent style={{overflow: "hidden"}}>
             <Ingest task={currentContext.path} />

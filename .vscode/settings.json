@@ -4,6 +4,7 @@
     "python.linting.enabled": true,
     "cSpell.words": [
         "bottomness",
+        "DIRCONTEXTOPTIONS",
         "DIRECTORYICONS",
         "KINDTYPES",
         "Popen",

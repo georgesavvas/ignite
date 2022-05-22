@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Modal from "../components/Modal";
 import CreateDirModal from "./CreateDirModal";
 import serverRequest from "../services/serverRequest";
@@ -16,7 +16,7 @@ export function ShowInExplorer(filepath, enqueueSnackbar) {
   })
 }
 
-export function DeleteDir({data, open, onClose, enqueueSnackbar, fn}) {
+export function DeleteDir({data, open=false, onClose, enqueueSnackbar, fn}) {
   const handleDeleteEntity = () => {
     serverRequest("delete_entity", data).then(resp => {
       if (resp.ok) enqueueSnackbar("Successfully deleted!", {variant: "success"});
@@ -36,11 +36,21 @@ export function DeleteDir({data, open, onClose, enqueueSnackbar, fn}) {
   )
 }
 
-export function RenameDir({data, open, onClose, enqueueSnackbar, fn}) {
+export function RenameDir({data, open=false, onClose, enqueueSnackbar, fn}) {
+  const [nameValue, setNameValue] = useState("");
+
+  useEffect(() => {
+    setNameValue(data.name);
+  }, [data.name])
+
   function handleRenameDir() {
-    serverRequest("rename_entity", data).then(resp => {
-      if (resp.ok) enqueueSnackbar("Successfully deleted!", {variant: "success"});
-      else enqueueSnackbar(`Couldn't rename ${data.kind}.`, {variant: "error"});
+    serverRequest("rename_entity", {...data, name: nameValue}).then(resp => {
+      if (resp.ok) enqueueSnackbar("Renamed!", {variant: "success"});
+      else {
+        let reason = "";
+        if (resp.text) reason = ` - ${resp.text}`;
+        enqueueSnackbar(`Couldn't rename ${data.kind}${reason}.`, {variant: "error"});
+      }
     });
     if (fn) fn();
     onClose();
@@ -54,7 +64,8 @@ export function RenameDir({data, open, onClose, enqueueSnackbar, fn}) {
         id="name"
         label="Name"
         variant="outlined"
-        defaultValue={data.name}
+        value={nameValue}
+        onChange={e => setNameValue(e.target.value)}
         size="small"
         fullWidth
         autoFocus
@@ -64,8 +75,8 @@ export function RenameDir({data, open, onClose, enqueueSnackbar, fn}) {
   )
 }
 
-export function CreateDir({data, open, onClose, enqueueSnackbar, fn}) {
-  const handleOnCreate = () => {
+export function CreateDir({data, open=false, onClose, enqueueSnackbar, fn}) {
+  const handleOnCreate = data => {
     serverRequest("create_dirs", data).then((resp => {
       enqueueSnackbar(resp.text, {variant: resp.ok ? "success" : "error"});
       if (fn) fn();
@@ -76,7 +87,7 @@ export function CreateDir({data, open, onClose, enqueueSnackbar, fn}) {
     <CreateDirModal
       open={open}
       data={data}
-      onCreate={(v, data) => handleOnCreate(v, data)}
+      onCreate={data => handleOnCreate(data)}
       onClose={onClose}
     />
   )

@@ -1,15 +1,23 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import Tile from "../../components/Tile";
 import Typography from '@mui/material/Typography';
+import { ContextContext } from "../../contexts/ContextContext";
 import { useSnackbar } from 'notistack';
 import { CopyToClipboard, ShowInExplorer } from "../ContextActions";
-import { DeleteDir, RenameDir, CreateDir } from "../ContextActions";
-import Modal from "../../components/Modal";
-import serverRequest from "../../services/serverRequest";
 
 function AssetTile(props) {
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
+
+  const hasThumbnail = props.entity.thumbnail.filename !== undefined;
+  const thumbnailWidth = hasThumbnail ? "100%" : "50%";
+  const currentPath = currentContext.posix.replace(currentContext.project_path + "/", "");
+  const contextPath = props.entity.full_context.replace(currentPath + "/", "");
+
+  const dirData = {
+    kind: props.entity.dir_kind,
+    path: props.entity.path
+  }
 
   const contextItems = [
     {
@@ -28,7 +36,7 @@ function AssetTile(props) {
     },
     {
       label: "Delete asset version",
-      fn: () => setDeleteModalOpen(true)
+      fn: () => props.onContextMenu("delete", dirData)
     }
   ]
 
@@ -36,7 +44,7 @@ function AssetTile(props) {
     if (props.viewType === "grid") return(
       <>
         <Typography style={{position: "absolute", top: "5px", left: "10px"}}>
-          {props.entity.context}
+          {contextPath}
         </Typography>
         <Typography style={{position: "absolute", bottom: "5px", left: "10px"}}>
           {props.entity.name}
@@ -54,18 +62,11 @@ function AssetTile(props) {
     )
   }
 
-  const dirData = {
-    kind: props.entity.dir_kind,
-    path: props.entity.path
-  }
-
   return (
     <>
-      <DeleteDir open={deleteModalOpen} enqueueSnackbar={enqueueSnackbar}
-        onClose={() => setDeleteModalOpen(false)} data={dirData}
-        fn={props.refreshContext}
-      />
-      <Tile {...props} contextItems={contextItems}>
+      <Tile {...props} contextItems={contextItems} thumbnailWidth={thumbnailWidth}
+        thumbnail={hasThumbnail ? undefined : "media/no_icon.png"}
+      >
         {details()}
       </Tile>
     </>

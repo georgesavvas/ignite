@@ -115,6 +115,7 @@ function CreateDirModal(props) {
 
   const handleCreate = () => {
     const data = {...props.data};
+    delete data.handleClick;
     data.dirs = dirList.map(dir => ({
       dir_type: dir.type,
       dir_name: dir.name

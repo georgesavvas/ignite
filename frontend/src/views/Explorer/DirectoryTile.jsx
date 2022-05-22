@@ -4,10 +4,7 @@ import Typography from '@mui/material/Typography';
 import { ContextContext } from "../../contexts/ContextContext";
 import { useSnackbar } from 'notistack';
 import { CopyToClipboard, ShowInExplorer } from "../ContextActions";
-import { DeleteDir, RenameDir, CreateDir } from "../ContextActions";
-import clientRequest from "../../services/clientRequest";
-import Modal from "../../components/Modal";
-import serverRequest from "../../services/serverRequest";
+import { DIRCONTEXTOPTIONS } from "../../constants";
 
 function DirectoryTile(props) {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -15,27 +12,54 @@ function DirectoryTile(props) {
   const [renameModalOpen, setRenameModalOpen] = useState(false);
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
+
   const isScene = props.entity.dir_kind === "scene";
   const thumbnailWidth = isScene || props.entity.thumbnail ? "100%" : "50%";
+  const currentPath = currentContext.posix.replace(currentContext.project_path + "/", "");
+  const contextPath = props.entity.full_context.replace(currentPath, "");
 
-  const contextItems = [
-    {
-      "label": "Copy path",
-      "fn": () =>  CopyToClipboard(props.entity.path, enqueueSnackbar)
-    },
-    {
-      "label": "Open in file explorer",
-      "fn": () => ShowInExplorer(props.entity.path, enqueueSnackbar)
-    },
-    {
-      "label": `Rename ${props.entity.dir_kind}`,
-      "fn": () => setRenameModalOpen(true)
-    },
-    {
-      "label": `Delete ${props.entity.dir_kind}`,
-      "fn": () => setDeleteModalOpen(true)
-    }
-  ]
+  const dirData = {
+    path: props.entity.path,
+    kind: props.entity.dir_kind,
+    name: props.entity.name
+  }
+
+  function getGenericContextItems(entity) {
+    return [
+      {
+        label: "Copy path",
+        fn: () =>  CopyToClipboard(entity.path, enqueueSnackbar)
+      },
+      {
+        label: "Open in file explorer",
+        fn: () => ShowInExplorer(entity.path, enqueueSnackbar),
+        divider: true
+      },
+      {
+        label: `Rename ${entity.dir_kind}`,
+        fn: () => props.onContextMenu("rename", dirData)
+      },
+      {
+        label: `Delete ${entity.dir_kind}`,
+        fn: () => props.onContextMenu("delete", dirData),
+        divider: true
+      }
+    ]
+  }
+
+  function getSpecificContextItems(entity) {
+    if (!DIRCONTEXTOPTIONS.hasOwnProperty(entity.dir_kind)) return [];
+    return DIRCONTEXTOPTIONS[entity.dir_kind].map(contextOption => (
+      {
+        label: contextOption.label,
+        value: contextOption.name,
+        dir_path: entity.path,
+        fn: () => props.onContextMenu(
+          "create", {...entity, method: contextOption.name, kind: contextOption.dir_kind}
+        )
+      }
+    ))
+  }
 
   const handleClick = e => {
     if (e.detail === 2) {
@@ -59,7 +83,7 @@ function DirectoryTile(props) {
     if (props.viewType === "grid") return(
       <>
         <Typography variant="context" style={{position: "absolute", top: "5px", left: "10px"}}>
-          {props.entity.full_context}
+          {contextPath}
         </Typography>
         <Typography style={{position: "absolute", bottom: "5px", left: "10px"}}>
           {name}
@@ -77,26 +101,11 @@ function DirectoryTile(props) {
     )
   }
 
-  const dirData = {
-    path: props.entity.path,
-    kind: props.entity.dir_kind,
-    name: props.entity.name
-  }
+  let contextItems = getGenericContextItems(props.entity);
+  contextItems = contextItems.concat(getSpecificContextItems(props.entity));
 
   return (
     <>
-      <CreateDir open={createModalOpen} enqueueSnackbar={enqueueSnackbar}
-        onClose={() => setCreateModalOpen(false)} data={dirData}
-        fn={props.refreshContext}
-      />
-      <DeleteDir open={deleteModalOpen} enqueueSnackbar={enqueueSnackbar}
-        onClose={() => setDeleteModalOpen(false)} data={dirData}
-        fn={props.refreshContext}
-      />
-      <RenameDir open={renameModalOpen} enqueueSnackbar={enqueueSnackbar}
-        onClose={() => setRenameModalOpen(false)} data={dirData}
-        fn={props.refreshContext}
-      />
       <Tile
         {...props}
         thumbnail={props.entity.thumbnail ? undefined : thumbnailPath()}
