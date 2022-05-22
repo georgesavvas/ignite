@@ -13,7 +13,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import Box from '@mui/material/Box';
 import {ContextContext} from "../../contexts/ContextContext";
-import { DIRECTORYICONS } from "../../constants";
+import { DIRECTORYICONS, DIRCONTEXTOPTIONS } from "../../constants";
 import ContextMenu, { handleContextMenu } from "../../components/ContextMenu";
 import { CopyToClipboard, ShowInExplorer } from "../ContextActions";
 import { DeleteDir, RenameDir, CreateDir } from "../ContextActions";
@@ -43,24 +43,6 @@ const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
   }
 }));
 
-const cOpts = {
-  create_directory: {name: "create_dir", label: "Create directory", dir_kind: "directory"},
-  create_build: {name: "create_build", label: "Create build", dir_kind: "build"},
-  create_sequence: {name: "create_sequence", label: "Create sequence", dir_kind: "sequence"},
-  create_shot: {name: "create_shot", label: "Create shot", dir_kind: "shot"},
-  create_task: {name: "create_task", label: "Create task", dir_kind: "task"}
-}
-
-const dirContextOptions = {
-  "project": [],
-  "task": [cOpts.create_task],
-  "directory": [cOpts.create_directory, cOpts.create_sequence, cOpts.create_shot, cOpts.create_build, cOpts.create_task],
-  "phase": [cOpts.create_directory, cOpts.create_sequence, cOpts.create_shot, cOpts.create_build],
-  "build": [cOpts.create_directory, cOpts.create_task],
-  "sequence": [cOpts.create_directory, cOpts.create_shot],
-  "shot": [cOpts.create_directory, cOpts.create_task]
-}
-
 function getGenericContextItems(data, enqueueSnackbar) {
   return [
     {
@@ -85,7 +67,7 @@ function getGenericContextItems(data, enqueueSnackbar) {
 }
 
 function getSpecificContextItems(data) {
-  return dirContextOptions[data.kind].map(contextOption => (
+  return DIRCONTEXTOPTIONS[data.kind].map(contextOption => (
     {
       label: contextOption.label,
       value: contextOption.name,
@@ -131,7 +113,7 @@ function StyledTreeItem(props) {
   }
 
   let contextItems = getGenericContextItems(itemData, enqueueSnackbar);
-  contextItems = contextItems.concat(getSpecificContextItems(itemData))
+  contextItems = contextItems.concat(getSpecificContextItems(itemData));
 
   return (
     <div>
@@ -172,28 +154,11 @@ StyledTreeItem.propTypes = {
 
 function ProjectTreeView(props) {
   const [isLoading, setIsLoading] = useState(true);
-  const [renameModalOpen, setRenameModalOpen] = useState(false);
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [createModalOpen, setCreateModalOpen] = useState(false);
   const [expandedItems, setExpandedItems] = useState(["root"]);
   const [modalData, setModalData] = useState({});
   const [selectedItems, setSelectedItems] = useState("root");
   const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
-
-  useEffect(() => {
-    switch (modalData.action) {
-      case "create":
-        setCreateModalOpen(true);
-        break
-      case "rename":
-        setRenameModalOpen(true);
-        break
-      case "delete":
-        setDeleteModalOpen(true);
-        break
-    }
-  }, [modalData])
 
   useEffect(() => {
     function findNodeByPath(object, result, value, parents){
@@ -257,7 +222,8 @@ function ProjectTreeView(props) {
   }
 
   const handleContextMenuSelection = (action, data) => {
-    setModalData({...data, action: action});
+    data[`${action}Open`] = true;
+    setModalData(data);
   };
 
   const renderTree = (nodes) => {
@@ -282,24 +248,19 @@ function ProjectTreeView(props) {
     )
   };
 
-  const handleCloseModal = setModalOpen => {
-    setModalOpen(false);
-    setModalData({});
-  }
-
   return (
     <div className={styles.container}>
-      <CreateDir open={createModalOpen} enqueueSnackbar={enqueueSnackbar}
-        onClose={() => handleCloseModal(setCreateModalOpen)} data={modalData}
-        fn={refreshContext}
+      <CreateDir open={modalData.createOpen} enqueueSnackbar={enqueueSnackbar}
+        onClose={() => setModalData(prevState => ({...prevState, createOpen: false}))}
+        data={modalData} fn={refreshContext}
       />
-      <DeleteDir open={deleteModalOpen} enqueueSnackbar={enqueueSnackbar}
-        onClose={() => handleCloseModal(setDeleteModalOpen)} data={modalData}
-        fn={refreshContext}
+      <DeleteDir open={modalData.deleteOpen} enqueueSnackbar={enqueueSnackbar}
+        onClose={() => setModalData(prevState => ({...prevState, deleteOpen: false}))}
+        data={modalData} fn={refreshContext}
       />
-      <RenameDir open={renameModalOpen} enqueueSnackbar={enqueueSnackbar}
-        onClose={() =>handleCloseModal(setRenameModalOpen)} data={modalData}
-        fn={refreshContext}
+      <RenameDir open={modalData.renameOpen} enqueueSnackbar={enqueueSnackbar}
+        onClose={() => setModalData(prevState => ({...prevState, renameOpen: false}))}
+        data={modalData} fn={refreshContext}
       />
       <div className={styles.treeContainer}>
         <TreeView

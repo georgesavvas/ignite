@@ -73,7 +73,8 @@ class Scene(Directory):
     def as_dict(self):
         d = {}
         for s in ("path", "project", "name", "phase" ,"dcc", "extension", "version",
-                "dir_kind", "scene", "context", "task", "version", "vsn"):
+                "dir_kind", "scene", "context", "task", "version",
+                "vsn"):
             d[s] = getattr(self, s)
         d["full_context"] = f"{self.phase}/{self.context}"
         d["exports"] = os.path.join(self.task, "exports")

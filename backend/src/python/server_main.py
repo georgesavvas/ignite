@@ -95,11 +95,10 @@ async def find(request: Request):
 @app.post("/api/v1/create_dirs")
 async def create_dirs(request: Request):
     result = await request.json()
-    pprint(result)
     path = result.get("path")
     method = result.get("method")
     dir_kind = result.get("kind")
-    dirs = result.get("dirs")
+    dirs = result.get("dirs", [])
     created_amount = api.create_dirs(path, method, dirs)
     if created_amount:
         s = "s" if created_amount > 1 else ""
@@ -119,7 +118,11 @@ async def create_dirs(request: Request):
 async def get_contents(request: Request):
     result = await request.json()
     query = result.get("query", {})
-    data = api.get_contents(result.get("path", ""), as_dict=True)
+    data = api.get_contents(
+        result.get("path", ""),
+        latest=query.get("latest", 0),
+        as_dict=True
+    )
     data = utils.query_filter(data, query)
     limit = result.get("limit", 20)
     total = len(data)

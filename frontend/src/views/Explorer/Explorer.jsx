@@ -7,11 +7,13 @@ import ExplorerBar from "./ExplorerBar";
 import PageBar from "./PageBar";
 import {EntityContext} from "../../contexts/EntityContext";
 import {ContextContext} from "../../contexts/ContextContext";
+import { DeleteDir, RenameDir, CreateDir } from "../ContextActions";
 import serverRequest from "../../services/serverRequest";
 import debounce from 'lodash.debounce';
 import loadExplorerSettings from "../../utils/loadExplorerSettings";
 import saveExplorerSettings from "../../utils/saveExplorerSettings";
 import { LinearProgress } from "@mui/material";
+import { useSnackbar } from 'notistack';
 
 const debounced = debounce(fn => fn(), 500);
 
@@ -30,8 +32,10 @@ function Explorer() {
   const [resultType, setResultType] = useState("dynamic");
   const [viewType, setViewType] = useState(defaultViewType);
   const [tiles, setTiles] = useState([]);
+  const [modalData, setModalData] = useState({});
   const [selectedEntity, setSelectedEntity] = useContext(EntityContext);
   const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
   const methods = {
     dynamic: "get_contents",
@@ -42,6 +46,11 @@ function Explorer() {
   const handleEntitySelection = (entity) => {
     setSelectedEntity(entity);
   }
+
+  const handleContextMenuSelection = (action, data) => {
+    data[`${action}Open`] = true;
+    setModalData(data);
+  };
 
   useEffect(() => {
     const data = loadExplorerSettings();
@@ -83,11 +92,13 @@ function Explorer() {
         obj[entity.result_id] = <AssetTile key={entity.result_id} entity={entity}
           onSelected={handleEntitySelection} size={tileSize * 40} viewType={viewType}
           selected={selectedEntity.path === entity.path} refreshContext={refreshContext}
+          onContextMenu={handleContextMenuSelection}
         />;
       } else {
         obj[entity.result_id] = <DirectoryTile key={entity.result_id} entity={entity}
           onSelected={handleEntitySelection} size={tileSize * 40} viewType={viewType}
           selected={selectedEntity.path === entity.path} refreshContext={refreshContext}
+          onContextMenu={handleContextMenuSelection}
         />;
       }
       return obj;
@@ -144,6 +155,18 @@ function Explorer() {
 
   return (
     <div className={classes.container}>
+      <CreateDir open={modalData.createOpen} enqueueSnackbar={enqueueSnackbar}
+        onClose={() => setModalData(prevState => ({...prevState, createOpen: false}))}
+        data={modalData} fn={refreshContext}
+      />
+      <DeleteDir open={modalData.deleteOpen} enqueueSnackbar={enqueueSnackbar}
+        onClose={() => setModalData(prevState => ({...prevState, deleteOpen: false}))}
+        data={modalData} fn={refreshContext}
+      />
+      <RenameDir open={modalData.renameOpen} enqueueSnackbar={enqueueSnackbar}
+        onClose={() => setModalData(prevState => ({...prevState, renameOpen: false}))}
+        data={modalData} fn={refreshContext}
+      />
       <ExplorerBar
         onRefresh={forceUpdate}
         onFilterChange={handleFilterChange}

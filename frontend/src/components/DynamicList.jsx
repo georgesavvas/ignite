@@ -11,7 +11,7 @@ const style = {
   width: "100%",
   height: "100%",
   boxSizing: "border-box",
-  backgroundColor: "rgb(30,30,30)",
+  backgroundColor: "rgb(20,20,20)",
   overflowY: "scroll",
   flexGrow: 1
 }

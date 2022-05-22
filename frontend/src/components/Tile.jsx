@@ -8,7 +8,8 @@ function GridTile(props) {
   const [contextMenu, setContextMenu] = useState(null);
   const [progress, setProgress] = useState(0);
   const hoverArea = createRef();
-  const isStatic = props.thumbnail !== undefined;
+  let isStatic = props.thumbnail !== undefined
+  if (!isStatic && !props.entity.thumbnail.path.includes("####")) isStatic = true;
 
   const tileStyle = {
     "borderColor": props.selected ? "rgb(252, 140, 3)" : "rgb(50, 50, 50)",
@@ -38,7 +39,7 @@ function GridTile(props) {
     }
     return thumbnailPath;
   }
-  const thumbnailURL = isStatic ? props.thumbnail : `ign://${getSeqThumbnail()}`;
+  const thumbnailURL = props.thumbnail || `ign://${getSeqThumbnail()}`;
 
   const handleClick = e => {
     if (props.onClick) props.onClick(e);

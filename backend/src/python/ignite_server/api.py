@@ -92,6 +92,7 @@ def get_context_info(path):
             "posix": path.as_posix(),
             "parent": str(path.parent),
             "project": project.strip(),
+            "project_path": (ROOT / project).as_posix(),
             "dir_kind": kind,
             "ancestor_kinds": ancestor_kinds
         }
@@ -212,31 +213,28 @@ def create_dirs(path, method, dirs):
     return created
 
 
-def get_contents(path, as_dict=False):
+def get_contents(path, latest=False, as_dict=False):
     path = Path(path)
-    exp = path / "exports"
-    if exp.is_dir():
-        path = exp
     contents = []
     for x in path.iterdir():
         if not x.is_dir():
             continue
-        entity = find(x)
-        if not entity and x.name in ("exports", "scenes"):
+        if x.name in ("exports", "scenes"):
             if x.name == "scenes":
-                scenes = discover_scenes(x)
-                contents.append(scenes)
+                scenes = discover_scenes(x, latest=latest)
+                contents += scenes
             elif x.name == "exports":
-                avs = discover_assetversions(x)
-                contents.append(avs)
+                avs = discover_assetversions(x, latest=latest)
+                contents += avs
             continue
+        entity = find(x)
         contents.append(entity)
     if as_dict:
         contents = [c.as_dict() for c in contents if hasattr(c, "as_dict")]
-    for d in contents:
-        if not d.get("repr"):
-            continue
-        d["thumbnail"] = get_repr_comp(d["path"])
+        for d in contents:
+            if not d.get("repr"):
+                continue
+            d["thumbnail"] = get_repr_comp(d["path"])
     return contents
 
 
