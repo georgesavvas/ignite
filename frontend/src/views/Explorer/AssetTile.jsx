@@ -11,9 +11,10 @@ function AssetTile(props) {
 
   const hasThumbnail = props.entity.thumbnail.filename !== undefined;
   const thumbnailWidth = hasThumbnail ? "100%" : "50%";
-  const currentPath = currentContext.posix.replace(currentContext.project_path + "/", "");
-  const contextPath = props.entity.full_context.replace(currentPath + "/", "");
-
+  let currentPath = currentContext.posix.replace(currentContext.project_path, "");
+  if (currentPath.startsWith("/")) currentPath = currentPath.slice(1);
+  let contextPath = props.entity.full_context.replace(currentPath, "");
+  if (contextPath.startsWith("/")) contextPath = contextPath.slice(1);
   const dirData = {
     kind: props.entity.dir_kind,
     path: props.entity.path
@@ -44,7 +45,7 @@ function AssetTile(props) {
     if (props.viewType === "grid") return(
       <>
         <Typography style={{position: "absolute", top: "5px", left: "10px"}}>
-          {contextPath}
+          {contextPath || "asset"}
         </Typography>
         <Typography style={{position: "absolute", bottom: "5px", left: "10px"}}>
           {props.entity.name}
@@ -65,7 +66,7 @@ function AssetTile(props) {
   return (
     <>
       <Tile {...props} contextItems={contextItems} thumbnailWidth={thumbnailWidth}
-        thumbnail={hasThumbnail ? undefined : "media/no_icon.png"}
+        thumbnail={hasThumbnail ? undefined : "media/no_icon_grey.png"}
       >
         {details()}
       </Tile>

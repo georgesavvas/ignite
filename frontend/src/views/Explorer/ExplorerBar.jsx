@@ -62,7 +62,7 @@ function ExplorerBar(props) {
     <div>
       <div style={style}>
         <Modal open={newSceneOpen} onClose={() => setNewSceneOpen(false)} maxWidth="xs">
-          <DccSelector task={currentContext.path} newScene={true} />
+          <DccSelector task={currentContext.path} newScene={true} onClose={() => setNewSceneOpen(false)} />
         </Modal>
         <Dialog open={ingestOpen} onClose={() => setIngestOpen(false)} sx={ingestDialogStyle}>
           <DialogContent style={{overflow: "hidden"}}>

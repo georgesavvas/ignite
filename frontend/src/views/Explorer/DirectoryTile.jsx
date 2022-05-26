@@ -83,7 +83,7 @@ function DirectoryTile(props) {
     if (props.viewType === "grid") return(
       <>
         <Typography variant="context" style={{position: "absolute", top: "5px", left: "10px"}}>
-          {contextPath}
+          {contextPath || props.entity.dir_kind}
         </Typography>
         <Typography style={{position: "absolute", bottom: "5px", left: "10px"}}>
           {name}

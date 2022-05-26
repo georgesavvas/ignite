@@ -73,7 +73,7 @@ class Directory():
         d = {}
         for s in ("path", "dir_kind", "anchor", "project", "name", "context", "repr"):
             d[s] = getattr(self, s)
-        d["full_context"] = f"{self.phase}/{self.context}"
+        d["full_context"] = f"{self.phase}/{self.context}" if self.phase else ""
         # d["task"] = self.task.as_dict()
         return d
 
