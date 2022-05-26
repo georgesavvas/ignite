@@ -132,8 +132,8 @@ def launch_dcc(dcc, dcc_name, scene):
 
 def get_launch_cmd(dcc, dcc_name, scene):
     scene = server_request("find", {"query": scene}).get("data", {})
-    if not scene:
-        return
+    # if not scene:
+    #     return
     task = scene.get("task", "")
     env = get_env(task, dcc, scene)
     scene = scene.get("scene")
@@ -152,7 +152,8 @@ def get_launch_cmd(dcc, dcc_name, scene):
     }
     cmd = os_cmd[os_name]
     cmd += [dcc_config["path"]]
-    cmd.append(scene)
+    if scene:
+        cmd.append(scene)
     data = {
         "cmd": cmd[0],
         "args": cmd[1:],

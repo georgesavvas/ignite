@@ -17,7 +17,8 @@ const dccNames = {
   houdini: ["hmaster", "hescape", "houdini"],
   maya: ["maya"],
   blender: ["blender"],
-  nuke: ["nuke"]
+  nuke: ["nuke"],
+  unreal: ["unreal"]
 }
 
 function DccSelector(props) {
@@ -75,6 +76,7 @@ function DccSelector(props) {
 
     const ok = await clientRequest("get_launch_cmd", data).then(resp => {
       const data = resp.data;
+      console.log(data);
       return window.api.launch_dcc(data.cmd, data.args, data.env);
     });
 
@@ -85,6 +87,7 @@ function DccSelector(props) {
       cc.update += 1;
       return cc
     });
+    props.onClose();
   }
 
   return (
