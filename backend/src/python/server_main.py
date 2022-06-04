@@ -10,8 +10,6 @@ from ignite_server import utils
 
 CONFIG = utils.get_config()
 ENV = os.environ
-IGNITE_SERVER_ROOT = os.path.dirname(__file__)
-ENV["IGNITE_SERVER_ROOT"] = IGNITE_SERVER_ROOT
 
 from ignite_server import api
 
@@ -88,6 +86,17 @@ async def find(request: Request):
         data = entity.as_dict()
     return {
         "ok": data != {},
+        "data": data
+    }
+
+
+@app.post("/api/v1/resolve")
+async def resolve(request: Request):
+    result = await request.json()
+    uri = result.get("uri")
+    data = api.resolve(uri)
+    return {
+        "ok": True,
         "data": data
     }
 

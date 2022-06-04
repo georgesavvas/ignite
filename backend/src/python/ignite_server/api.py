@@ -16,6 +16,7 @@ KINDS = {v: k for k, v in ANCHORS.items()}
 if not Path(ROOT).is_dir():
     os.makedirs(ROOT)
 IGNITE_SERVER_ROOT = Path(ENV["IGNITE_SERVER_ROOT"])
+IGNITE_DCC = Path(ENV["IGNITE_DCC"])
 
 
 def create_project(name: str):
@@ -130,6 +131,11 @@ def find(path):
                 return asset.latest_av
     else:
         return _find_from_path(path)
+
+
+def resolve(uri):
+    entity = find(uri)
+    return None if not entity else entity.path
 
 
 def _find_from_path(path):
@@ -433,17 +439,21 @@ def discover_scenes(path, dcc=[], latest=False, as_dict=False):
 def copy_default_scene(task, dcc):
     task = find(task)
     if not task or not task.dir_kind == "task":
+        logging.error(f"Invalid task {task}")
         return
-    filepath = IGNITE_SERVER_ROOT / "cg/default_scenes/default_scenes.yaml"
+    filepath = IGNITE_DCC / "default_scenes/default_scenes.yaml"
     if not filepath.exists():
+        logging.error(f"Default scenes config {filepath} does not exist.")
         return
     with open(filepath, "r") as f:
         data = yaml.safe_load(f)
     if dcc not in data.keys():
+        logging.error(f"Default scenes config is empty {filepath}")
         return
-    src = IGNITE_SERVER_ROOT / "cg/default_scenes" / data[dcc]
+    src = IGNITE_DCC / "default_scenes" / data[dcc]
     dest = task.get_next_scene()
     os.makedirs(dest)
+    logging.info(f"Copying default scene {src} to {dest}")
     shutil.copy2(src, dest)
     utils.create_anchor(dest, "scene")
     return dest / PurePath(src).name
