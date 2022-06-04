@@ -87,7 +87,7 @@ function DccSelector(props) {
       cc.update += 1;
       return cc
     });
-    props.onClose();
+    if (props.onClose) props.onClose();
   }
 
   return (

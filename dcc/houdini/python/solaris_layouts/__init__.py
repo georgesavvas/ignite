@@ -16,21 +16,21 @@ def setup(kwargs, context):
         kwargs["context"] = "lops"
         kwargs["layout_fn"] = create_lops_layout
         kwargs["loader"] = loptoolutils.genericTool(
-            kwargs, kwargs["hda_name"], "VoltStageLoader"
+            kwargs, kwargs["hda_name"], "StageLoader"
         )
     elif context == "sops":
         kwargs["context"] = "sops"
         kwargs["layout_fn"] = create_sops_layout
         kwargs["loader"] = soptoolutils.genericTool(
-            kwargs, kwargs["hda_name"], "VoltStageLoader"
+            kwargs, kwargs["hda_name"], "StageLoader"
         )
     elif context == "obj":
         kwargs["context"] = "obj"
         kwargs["layout_fn"] = create_lops_layout
         lopnet = objecttoolutils.genericTool(kwargs, "lopnet", "lopnet")
-        kwargs["loader"] = lopnet.createNode(kwargs["hda_name"], "VoltStageLoader")
+        kwargs["loader"] = lopnet.createNode(kwargs["hda_name"], "StageLoader")
 
-    if ENV.get("ASSET"):
+    if ENV.get("PHASE", "") == "build":
         create_asset_layout(kwargs)
     elif ENV.get("SHOT") == "0000":
         create_sequence_layout(kwargs)
@@ -222,7 +222,7 @@ def create_shot_layout(kwargs):
     loader, stage_export, nodes = fn(kwargs)
     loader.setName("load_shot_stage", True)
 
-    seq_loader = loader.createInputNode(0, "VoltStageLoader", "load_sequence_stage")
+    seq_loader = loader.createInputNode(0, "StageLoader", "load_sequence_stage")
     seq_loader.setPosition(loader.position())
     seq_loader.move((0, 1))
     seq_loader.parm("type").set("sequence")

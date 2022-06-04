@@ -1,8 +1,10 @@
 import os
 import platform
 import yaml
+import logging
 from pathlib import Path
 
+logging.basicConfig(level=logging.DEBUG)
 
 DIR = os.path.dirname(__file__)
 ENV = os.environ
@@ -24,13 +26,17 @@ else:
         }
         with open(CONFIG_PATH, "w") as file:
             yaml.safe_dump(config, file)
+logging.info(f"Setting IGNITE_CONFIG_PATH to {CONFIG_PATH}")
+logging.info(f"Setting IGNITE_SERVER_ROOT to {DIR}")
 ENV["IGNITE_CONFIG_PATH"] = str(CONFIG_PATH)
 ENV["IGNITE_SERVER_ROOT"] = DIR
 
 dcc = Path(DIR).parent.parent.parent.parent / "dcc"
+logging.info(f"Setting IGNITE_DCC to {dcc}")
 ENV["IGNITE_DCC"] = str(dcc)
 
 ocio = dcc / "ocio/aces_1.2/config.ocio"
+logging.info(f"Setting OCIO to {ocio}")
 ENV["OCIO"] = str(ocio)
 
 os_name = platform.system()
