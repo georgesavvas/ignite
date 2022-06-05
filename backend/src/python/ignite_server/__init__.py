@@ -12,6 +12,7 @@ ENV = os.environ
 CONFIG_PATH = Path.home() / ".ignite/server_config.yaml"
 default_projects_root = str(Path.home() / "projects")
 if not CONFIG_PATH.is_file():
+    CONFIG_PATH.parent.mkdir(parents=True, exist_ok=True)
     config = {
         "projects_root": default_projects_root
     }
