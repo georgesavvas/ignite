@@ -14,5 +14,5 @@ ocio = dcc / "ocio/aces_1.2/config.ocio"
 ENV["OCIO"] = str(ocio)
 
 houdini_modules = str(dcc / "houdini/python")
-if not houdini_modules in ENV["PYTHONPATH"]:
-    ENV["PYTHONPATH"] = houdini_modules + ";" + ENV["PYTHONPATH"]
+if houdini_modules not in ENV.get("PYTHONPATH", ""):
+    ENV["PYTHONPATH"] = houdini_modules + ";" + ENV.get("PYTHONPATH", "")
