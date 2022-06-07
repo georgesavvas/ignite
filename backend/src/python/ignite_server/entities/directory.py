@@ -20,6 +20,7 @@ class Directory():
         self.dir_kind = dir_kind
         self.context = ""
         self.repr = None
+        self.path = ""
         if path:
             path = Path(path)
             self.path = path

@@ -121,6 +121,8 @@ def find(path):
                 logging.error(f"URI version '{version}' not recognised: {path}")
                 return None
             asset_path = utils.uri_to_path(asset_uri)
+            if not asset_path or not asset_path.exists():
+                return None
             asset = Asset(asset_path)
             if not asset:
                 logging.error(f"Couldn't find path at {asset_path}")
@@ -135,6 +137,15 @@ def find(path):
 
 def resolve(uri):
     entity = find(uri)
+    if not entity:
+        return None
+    if entity.dir_kind == "asset":
+        entity = entity.latest_av
+    if entity.dir_kind == "assetversion":
+        for comp in entity.components:
+            if comp["ext"] in (".usd", ".usdc", ".usda", ".usdz"):
+                path = PurePath(comp["path"])
+                return path.as_posix()
     return None if not entity else entity.path
 
 
@@ -244,49 +255,33 @@ def get_contents(path, latest=False, as_dict=False):
     return contents
 
 
-def get_dir_type(path, dir_type):
-    root = ROOT.as_posix()
-    anchor = ANCHORS[dir_type]
-    path = Path(path)
-    parent = path
-    iter = 1
-    while root in parent.as_posix():
-        contents = [c.name for c in parent.iterdir()]
-        if anchor in contents:
-            return find(parent)
-        iter +=1
-        if iter > 20:
-            raise Exception(f"Reached iteration limit when walking directory: {path}")
-    return None
-
-
 def get_phase(path):
-    phase = get_dir_type(path, "phase")
+    phase = find(utils.get_dir_type(path, "phase"))
     return phase
 
 
 def get_sequence(path):
-    sequence = get_dir_type(path, "sequence")
+    sequence = find(utils.get_dir_type(path, "sequence"))
     return sequence
 
 
 def get_shot(path):
-    shot = get_dir_type(path, "shot")
+    shot = find(utils.get_dir_type(path, "shot"))
     return shot
 
 
 def get_build(path):
-    build = get_dir_type(path, "build")
+    build = find(utils.get_dir_type(path, "build"))
     return build
 
 
 def _get_project(path):
-    project = get_dir_type(path, "project")
+    project = find(utils.get_dir_type(path, "project"))
     return project
 
 
 def get_task(path):
-    task = get_dir_type(path, "task")
+    task = find(utils.get_dir_type(path, "task"))
     return task
 
 

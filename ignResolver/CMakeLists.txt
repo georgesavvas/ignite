@@ -1,16 +1,55 @@
-cmake_minimum_required( VERSION 3.6 )
+cmake_minimum_required(VERSION "3.7.1")
 
-project( IgniteResolver )
+project(ignResolver)
 
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+add_library(ignResolver SHARED
+    source/ignResolver.h
+    source/ignResolver.cpp
+)
 
-list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_SOURCE_DIR}/cmake")
-set(CMAKE_INSTALL_PREFIX "./install" CACHE PATH "..." FORCE)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_GENERATOR_PLATFORM x64)
+set(CMAKE_BUILD_TYPE Release)
 
-list ( APPEND CMAKE_PREFIX_PATH "C:/Program Files/Side Effects Software/Houdini 19.0.587/toolkit/cmake" )
-find_package( Houdini REQUIRED )
+add_definitions(-DCURL_STATICLIB)
 
-find_package(USD REQUIRED)
+target_compile_options(ignResolver PUBLIC -Zc:inline-)
 
-add_subdirectory(source)
+if( MSVC )
+    set_target_properties(ignResolver PROPERTIES LINK_FLAGS "/NODEFAULTLIB:hboost_python37-vc141-mt-x64.lib" )
+endif()
+
+target_include_directories(ignResolver PRIVATE .)
+include_directories(
+    source/windows/include
+    $ENV{USD_ROOT}/include
+    $ENV{USD_ROOT}/include/boost
+    $ENV{PYTHON_ROOT}/include
+)
+
+target_link_directories(ignResolver PUBLIC
+    source/windows/lib
+    $ENV{PYTHON_ROOT}/lib
+    $ENV{USD_ROOT}/lib
+    $ENV{USD_ROOT}/bin
+    $ENV{HOUDINI_ROOT}/custom/houdini/dsolib
+    )
+target_link_libraries(ignResolver
+    $ENV{PYTHON_ROOT}/libs/python37.lib
+    hboost_python37-mt-x64.lib
+    libpxr_ar.lib
+    libpxr_arch.lib
+    libpxr_pxOsd.lib
+    libpxr_sdf.lib
+    libpxr_usd.lib
+    libpxr_vt.lib
+    libpxr_tf.lib
+    libpxr_hd.lib
+    libpxr_hdx.lib
+    libcurl.lib
+)
+
+install(TARGETS ignResolver DESTINATION dso)
+# install(FILES IgniteResolver.h DESTINATION include)
+install(FILES plugInfo.json DESTINATION resources)

@@ -1,10 +1,12 @@
 import os
 import math
+import json
 from posixpath import dirname
 import uvicorn
 from pprint import pprint
 from pathlib import PurePath
 from fastapi import FastAPI, Request
+from fastapi.responses import PlainTextResponse
 from fastapi.middleware.cors import CORSMiddleware
 from ignite_server import utils
 
@@ -90,11 +92,16 @@ async def find(request: Request):
     }
 
 
-@app.post("/api/v1/resolve")
+@app.post("/api/v1/resolve", response_class=PlainTextResponse)
 async def resolve(request: Request):
+    print("-", await request.body())
     result = await request.json()
+    pprint(result)
     uri = result.get("uri")
+    print("Received", uri)
     data = api.resolve(uri)
+    print("Sending", data)
+    return data
     return {
         "ok": True,
         "data": data
