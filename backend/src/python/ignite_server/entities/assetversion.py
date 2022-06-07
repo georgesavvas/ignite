@@ -95,6 +95,7 @@ class AssetVersion(Directory):
                 "path", "dir_kind", "anchor", "project", "name", "version",
                 "components", "asset", "source", "task", "uri", "labels", "context"):
             d[s] = getattr(self, s)
+        d["build"] = self.asset
         d["full_context"] = f"{self.phase}/{self.context}"
         d["api_path"] = utils.get_api_path(d["path"]),
         d["thumbnail"] = self.thumbnail

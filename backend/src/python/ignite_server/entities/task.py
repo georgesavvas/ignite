@@ -16,6 +16,12 @@ class Task(Directory):
         self.scenes = self.path / "scenes"
         self.exports = self.path / "exports"
         self.cache = self.path / "cache"
+        self.build = PurePath(utils.get_dir_type(self.path, "build")).name
+        self.sequence = ""
+        self.shot = ""
+        if not self.build:
+            self.sequence = PurePath(utils.get_dir_type(self.path, "sequence")).name
+            self.shot = PurePath(utils.get_dir_type(self.path, "shot")).name
         utils.ensure_directory(self.scenes)
         utils.ensure_directory(self.exports)
 
@@ -30,7 +36,7 @@ class Task(Directory):
     def as_dict(self):
         d = {}
         for s in ("path", "dir_kind", "anchor", "project", "name", "task_type", "repr",
-        "exports", "scenes", "cache", "phase"):
+        "exports", "scenes", "cache", "phase", "build", "sequence", "shot"):
             d[s] = getattr(self, s)
         d["full_context"] = f"{self.phase}/{self.context}"
         # d["task"] = self.task.as_dict()

@@ -8,7 +8,7 @@
                       }
               }
           },
-          "LibraryPath": "../ignResolver.dll", 
+          "LibraryPath": "../IgniteResolver.dll", 
           "Name": "IgniteResolver",
           "Type": "library"
       }

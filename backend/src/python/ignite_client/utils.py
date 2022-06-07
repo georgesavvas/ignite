@@ -27,13 +27,19 @@ def replace_vars(d):
         for var_name, var_value in vars.items():
             s = "{" + var_name + "}"
             if s in v:
-                v = str(PurePath(v.replace(s, var_value)))
+                v_path = PurePath(v.replace(s, var_value))
+                v = str(v_path)
         env[k] = v
     return env
 
 
 def get_generic_env():
-    return replace_vars(GENERIC_ENV)
+    env = {
+        "IGNITE_SERVER_HOST": IGNITE_SERVER_HOST,
+        "IGNITE_SERVER_PORT": IGNITE_SERVER_PORT
+    }
+    env.update(replace_vars(GENERIC_ENV))
+    return env
 
 
 def get_task_env(path):
@@ -44,7 +50,10 @@ def get_task_env(path):
         "PROJECT": task.get("project", ""),
         "PHASE": task.get("phase", ""),
         "CONTEXT": task.get("context", ""),
-        "TASK": task.get("path", ""),
+        "BUILD": task.get("build", ""),
+        "SEQUENCE": task.get("sequence", ""),
+        "SHOT": task.get("shot", ""),
+        "TASK": task.get("name", ""),
         "EXPORTS": task.get("exports", ""),
         "CACHE": task.get("cache", ""),
         "SCENES": task.get("scenes", "")
@@ -71,7 +80,8 @@ def get_dcc_env(dcc):
 
 
 def get_env(task="", dcc="", scene={}):
-    env = os.environ.copy()
+    # env = os.environ.copy()
+    env = {}
     env.update(get_generic_env())
     if task:
         env.update(get_task_env(task))

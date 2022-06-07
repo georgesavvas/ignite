@@ -73,14 +73,31 @@ def is_uri(s):
     s = str(s)
     if not s.startswith("ign:"):
         return False
-    if not s.count(":") > 4:
-        return False
+    # if not s.count(":") > 4:
+    #     return False
     return True
 
 
 def format_int_version(s):
     s = str(s)
     return f"v{s.zfill(3)}"
+
+
+def get_dir_type(path, dir_type):
+    root = ROOT.as_posix()
+    anchor = ANCHORS[dir_type]
+    path = Path(path)
+    parent = path
+    iter = 1
+    while root in parent.as_posix():
+        contents = [c.name for c in parent.iterdir()]
+        if anchor in contents:
+            return parent
+        parent = parent.parent
+        iter +=1
+        if iter > 20:
+            raise Exception(f"Reached iteration limit when walking directory: {path}")
+    return ""
 
 
 def uri_to_path(uri):
@@ -90,6 +107,7 @@ def uri_to_path(uri):
         result = URI_TEMPLATE_UNVERSIONED.parse(uri)
     if not result:
         logging.error(f"Failed to parse {uri}")
+        return ""
     data = result.named
     data["task"] += "/exports"
     if data.get("version"):
