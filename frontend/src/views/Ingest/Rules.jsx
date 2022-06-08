@@ -23,7 +23,7 @@ function getRuleTypeField(ruleType, index, onModify, template) {
             labelId="label-extract_target"
             id="select-extract_target"
             label="Extract from"
-            defaultValue={template.extract_target}
+            defaultValue={template.extract_target || ""}
             name={"extract_target-" + index}
             onChange={onModify}
           >
@@ -45,7 +45,7 @@ function getRuleTypeField(ruleType, index, onModify, template) {
             labelId="label-set_target"
             id="select-set_target"
             label="Field to set"
-            defaultValue={template.set_target}
+            defaultValue={template.set_target || ""}
             name={"set_target-" + index}
             onChange={onModify}
           >
@@ -82,7 +82,7 @@ function Rule({index, rule, onRulesChange, id}) {
                 labelId="label-file_target_type"
                 id="select-file_target_type"
                 label="Target type"
-                value={rule.file_target_type}
+                value={rule.file_target_type || "filename"}
                 name={"file_target_type-" + index}
                 onChange={handleChanged}
               >
@@ -92,36 +92,36 @@ function Rule({index, rule, onRulesChange, id}) {
               </Select>
             </FormControl>
             <TextField sx={{ m: "5px", minWidth: 120 }} label="Target"
-              value={rule.file_target} size="small" style={{flexGrow: 1}}
+              value={rule.file_target || ""} size="small" style={{flexGrow: 1}}
               name={"file_target-" + index} onChange={handleChanged}
             />
             </div>
             <Divider />
             <TextField sx={{ m: "5px", minWidth: 120 }} label="Filepath structure"
-              style={{flexGrow: 1}} size="small" value={rule.rule}
+              style={{flexGrow: 1}} size="small" value={rule.rule || ""}
               name={"rule-" + index} onChange={handleChanged}
             />
             <TextField sx={{ m: "5px", minWidth: 120 }} label="Task"
-              value={rule.task} size="small" style={{flexGrow: 1}}
+              value={rule.task || ""} size="small" style={{flexGrow: 1}}
               name={"task-" + index} onChange={handleChanged}
             />
             <div className={styles.ruleRow}>
               <TextField sx={{ m: "5px", minWidth: 120 }} label="Asset name"
-                value={rule.name} size="small" style={{flexGrow: 1}}
+                value={rule.name || ""} size="small" style={{flexGrow: 1}}
                 name={"name-" + index} onChange={handleChanged}
               />
               <TextField sx={{ m: "5px", minWidth: 120 }} label="Component name"
-                value={rule.comp} size="small" style={{flexGrow: 1}}
+                value={rule.comp || ""} size="small" style={{flexGrow: 1}}
                 name={"comp-" + index} onChange={handleChanged}
               />
             </div>
             <div className={styles.ruleRow}>
               <TextField sx={{ m: "5px", minWidth: 120 }} label="Replace text"
-                value={rule.replace_target} size="small" style={{flexGrow: 1}}
+                value={rule.replace_target || ""} size="small" style={{flexGrow: 1}}
                 name={"replace_target-" + index} onChange={handleChanged}
               />
               <TextField sx={{ m: "5px", minWidth: 120 }} label="With"
-                value={rule.replace_value} size="small" style={{flexGrow: 1}}
+                value={rule.replace_value || ""} size="small" style={{flexGrow: 1}}
                 name={"replace_value-" + index} onChange={handleChanged}
               />
             </div>

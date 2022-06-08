@@ -37,7 +37,7 @@ class Asset(Directory):
         if not self._avs_fetched:
             self._fetch_versions()
         return self._latest_v
-    
+
     @property
     def latest_av(self):
         if not self._avs_fetched:
@@ -65,7 +65,6 @@ class Asset(Directory):
             name = x.name
             if not name.startswith("v"):
                 continue
-            v = AssetVersion(x)
             versions.append(name)
         versions = sorted(versions, reverse=True)
         assetversions = [AssetVersion(path / v) for v in versions]
@@ -89,6 +88,18 @@ class Asset(Directory):
                 best_av = av
         self._best_v = best_av.version
         self._best_av = best_av
+
+    def next_version(self):
+        if self.version:
+            version = int(self.version.lstrip("v"))
+            version += 1
+            return str(version).zfill(3)
+        else:
+            return "v001"
+    
+    def next_path(self):
+        next_v = self.next_version()
+        return self.path / "exports" / next_v
 
     def as_dict(self):
         d = {}

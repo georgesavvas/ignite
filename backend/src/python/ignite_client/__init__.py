@@ -1,5 +1,9 @@
 import os
+import logging
 from pathlib import Path
+
+
+logging.basicConfig(level=logging.DEBUG)
 
 
 DIR = os.path.dirname(__file__)

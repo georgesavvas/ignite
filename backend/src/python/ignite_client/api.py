@@ -1,16 +1,16 @@
 import os
-import logging
-import platform
-import yaml
-import subprocess
-import requests
 import parse
 import glob
+import shutil
+import logging
 from string import Formatter
 from fnmatch import fnmatch
 from pathlib import PurePath, Path
 from pprint import pprint
-from ignite_client.constants import GENERIC_ENV, DCC_ENVS, OS_NAMES
+from ignite_client import utils
+
+
+logging.basicConfig(level=logging.DEBUG)
 
 
 ENV = os.environ
@@ -84,7 +84,7 @@ def ingest(data):
             
             # Set values
             for field in ("task", "name", "comp"):
-                if not rule[field]:
+                if not rule.get(field):
                     continue
                 result["set_values"][field] = rule[field]
                 result["rules"].append(i)
@@ -162,7 +162,8 @@ def ingest(data):
         comp_name = replace_values(comp_name, _replace_values)
         comp = {
             "name": comp_name,
-            "file": result["file"].as_posix().split("/")[-1]
+            "file": result["file"].as_posix().split("/")[-1],
+            "source": result["file"].as_posix()
         }
         assets[name]["comps"].append(comp)
         assets[name]["rules"] += result["rules"]
@@ -179,6 +180,10 @@ def ingest(data):
             "connections": connections
         }
         return data
+    
+    for asset in assets:
+        print("Ingesting ", asset)
+        ingest_asset(asset)
 
 
 def ingest_get_files(dirs):
@@ -227,3 +232,48 @@ def ingest_get_files(dirs):
         "trimmed": files_trimmed
     }
     return data
+
+
+def ingest_asset(data):
+    name = data.get("name")
+    if not name or not data.get("task"):
+        print("Missing comp name or task")
+        return
+    comps = data.get("comps")
+    if not comps or not len(comps):
+        print("Missing comps")
+        return
+    task = Path(data["task"])
+    asset = task / "exports" / name
+    asset_entity = None
+    if asset.exists():
+        asset_entity = utils.server_request(
+            "find", {"query": asset.as_posix()}
+        ).get("data")
+        if not asset_entity:
+            logging.error(f"Tried to create an asset at {asset} but couldn't, possibly directory exists already.")
+            return
+    if asset_entity:
+        print("Ingesting on top of existing asset.")
+        new_version_path = asset_entity.next_path()
+    else:
+        asset.mkdir()
+        asset_path = asset.as_posix()
+        resp = utils.server_request("register_asset", {"path": asset_path})
+        if not resp.get("ok"):
+            print("Failed.")
+            return
+        new_version_path = asset / "v001"
+    new_version_path.mkdir()
+    for comp in comps:
+        comp_path = Path(comp.get("source"))
+        comp_name = comp.get("name") or comp_path.stem
+        dest = new_version_path / (comp_name + comp_path.suffix)
+        print(f"Copying {comp_path} to {dest}")
+        shutil.copyfile(comp_path, dest)
+    resp = utils.server_request(
+        "register_assetversion", {"path": new_version_path.as_posix()}
+    )
+    if not resp.get("ok"):
+        print("Failed.")
+        return

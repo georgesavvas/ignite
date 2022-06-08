@@ -50,7 +50,7 @@ def create_anchor(path, name):
     anchor = ANCHORS.get(name)
     if not anchor:
         raise Exception(f"Invalid anchor name: {name}")
-    full_path = Path(path / anchor)
+    full_path = Path(path) / anchor
     if not full_path.exists():
         full_path.touch()
     return full_path

@@ -149,7 +149,6 @@ async def ingest(request: Request):
 
 
 projects_root = PurePath(utils.server_request("get_projects_root").get("data"))
-print(projects_root)
 app.mount("/files", StaticFiles(directory=projects_root), name="projects_root")
 
 

@@ -175,6 +175,7 @@ function Explorer() {
         viewType={viewType}
         onLatestChange={handleLatestChange}
         onViewTypeChange={handleViewTypeChange}
+        enqueueSnackbar={enqueueSnackbar}
       />
       <Divider />
       <LinearProgress color="ignite" style={{width: "100%", minHeight: "2px", visibility: isLoading ? "visible" : "hidden"}} />
