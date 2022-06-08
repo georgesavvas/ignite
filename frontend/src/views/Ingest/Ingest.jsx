@@ -2,7 +2,10 @@ import styles from "./Ingest.module.css";
 import Files from "./Files";
 import Rules from "./Rules";
 import Output from "./Output";
-import Divider from '@mui/material/Divider';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import Button from '@mui/material/Button';
 import LinearProgress from '@mui/material/LinearProgress';
 import Xarrow, { Xwrapper, useXarrow } from 'react-xarrows';
 import saveReflexLayout from "../../utils/saveReflexLayout";
@@ -53,17 +56,21 @@ const getOutputDebounced = debounce((data, callback) => {
   });
 }, 500)
 
+const ingestDialogStyle = {
+  "& .MuiDialog-container": {
+    "& .MuiPaper-root": {
+      width: "100%",
+      maxWidth: "95vw",
+      height: "100%",
+      maxHeight: "90vh",
+      backgroundColor: "rgb(20,20,20)",
+      backgroundImage: "none"
+    },
+  },
+}
+
 function Ingest(props) {
-  const ruleTemplate = {
-    file_target: "*",
-    file_target_type: "filename",
-    task: props.task,
-    name: "",
-    comp: "",
-    rule: "",
-    replace_target: "",
-    replace_value: ""
-  }
+  let ruleTemplate = {};
 
   const [flexRatios, setFlexRatios] = useState(defaultFlexRations);
   const [ingestDirs, setIngestDirs] = useState("");
@@ -73,6 +80,23 @@ function Ingest(props) {
   const [connections, setConnections] = useState({});
   const [loading, setLoading] = useState(false);
   const updateXarrow = useXarrow();
+
+  useEffect(() => {
+    if (!props.open) return;
+    ruleTemplate = {
+      file_target: "*",
+      file_target_type: "filename",
+      task: props.task,
+      name: "",
+      comp: "",
+      rule: "",
+      replace_target: "",
+      replace_value: ""
+    }
+    setIngestDirs("");
+    setIngestRules([{...ruleTemplate, colour: getRandomColour()}]);
+    setIngestAssets([]);
+  }, [])
 
   useEffect(() => {
     const data = loadReflexLayout();
@@ -170,61 +194,84 @@ function Ingest(props) {
     }
   }
 
+  function handleCreate() {
+    const data = {
+      dirs: ingestDirs,
+      rules: ingestRules,
+      dry: false
+    }
+    clientRequest("ingest", {data: data}).then(resp => {
+      if (resp.ok) {
+        props.enqueueSnackbar("Ingested!", {variant: "success"});
+      } else {
+        props.enqueueSnackbar("Ingest failed.", {variant: "error"});
+      }
+      props.refresh();
+      // props.onClose();
+    });
+  }
+
   return (
-    <>
-      <div className={styles.container}>
-        <Xwrapper>
-          <ReflexContainer orientation="vertical">
-            <ReflexElement flex={flexRatios["ingest.files"]} name="ingest.files" onStopResize={handleResize}>
-              <div className={styles.row}>
-                <Files files={ingestFiles} onDirsChange={handleDirsChange} />
-                <div className={styles.connectionContainer}>
-                  {
-                    !loading && ingestRules && connections && connections.rules_files ?
-                    connections.rules_files.map(
-                      (rule, index) => <Xarrow end={"file-" + rule[1]} start={"rule-" + rule[0]}
-                        key={index} strokeWidth={2} curveness={0.5} color={ingestRules[rule[0]].colour}
-                        showHead={true} animateDrawing={0.25} headShape="circle" headSize={3}
-                        endAnchor={{position: "right", offset: {x: 40}}}
-                        startAnchor={{position: "left", offset: {x: 0}}}
-                      />
-                    )
-                    : null
-                  }
-                  <div className={styles.fade} />
+    <Dialog open={props.open} onClose={props.onClose} sx={ingestDialogStyle}>
+      <DialogContent style={{overflow: "hidden"}}>
+        <div className={styles.container}>
+          <Xwrapper>
+            <ReflexContainer orientation="vertical">
+              <ReflexElement flex={flexRatios["ingest.files"]} name="ingest.files" onStopResize={handleResize}>
+                <div className={styles.row}>
+                  <Files files={ingestFiles} onDirsChange={handleDirsChange} />
+                  <div className={styles.connectionContainer}>
+                    {
+                      !loading && ingestRules && connections && connections.rules_files ?
+                      connections.rules_files.map(
+                        (rule, index) => <Xarrow end={"file-" + rule[1]} start={"rule-" + rule[0]}
+                          key={index} strokeWidth={2} curveness={0.5} color={ingestRules[rule[0]].colour}
+                          showHead={true} animateDrawing={0.25} headShape="circle" headSize={3}
+                          endAnchor={{position: "right", offset: {x: 40}}}
+                          startAnchor={{position: "left", offset: {x: 0}}}
+                        />
+                      )
+                      : null
+                    }
+                    <div className={styles.fade} />
+                  </div>
                 </div>
-              </div>
-            </ReflexElement>
-            <ReflexSplitter style={splitterStyle} onResize={updateXarrow} />
-            <ReflexElement flex={flexRatios["ingest.rules"]} name="ingest.rules" onStopResize={handleResize}>
-              <Rules rules={ingestRules} onRulesChange={handleRulesChange} setLoading={setLoading} />
-            </ReflexElement>
-            <ReflexSplitter style={splitterStyle} onResize={updateXarrow} />
-            <ReflexElement flex={flexRatios["ingest.output"]} name="ingest.output" onStopResize={handleResize}>
-              <div className={styles.row}>
-                <div className={styles.connectionContainer}>
-                  {
-                    !loading && connections && connections.rules_assets ?
-                    connections.rules_assets.map(
-                      (rule, index) => <Xarrow start={"rule-" + rule[0]} end={"asset-" + rule[1]}
-                        key={index} strokeWidth={2} curveness={0.5} color={ingestRules[rule[0]].colour}
-                        showHead={true} animateDrawing={0.25} headShape="circle" headSize={3}
-                        startAnchor={{position: "right", offset: {x: 15}}}
-                        endAnchor={{position: "left", offset: {x: -25}}}
-                      />
-                    )
-                    : null
-                  }
-                  <div className={styles.fade} />
+              </ReflexElement>
+              <ReflexSplitter style={splitterStyle} onResize={updateXarrow} />
+              <ReflexElement flex={flexRatios["ingest.rules"]} name="ingest.rules" onStopResize={handleResize}>
+                <Rules rules={ingestRules} onRulesChange={handleRulesChange} setLoading={setLoading} />
+              </ReflexElement>
+              <ReflexSplitter style={splitterStyle} onResize={updateXarrow} />
+              <ReflexElement flex={flexRatios["ingest.output"]} name="ingest.output" onStopResize={handleResize}>
+                <div className={styles.row}>
+                  <div className={styles.connectionContainer}>
+                    {
+                      !loading && connections && connections.rules_assets ?
+                      connections.rules_assets.map(
+                        (rule, index) => <Xarrow start={"rule-" + rule[0]} end={"asset-" + rule[1]}
+                          key={index} strokeWidth={2} curveness={0.5} color={ingestRules[rule[0]].colour}
+                          showHead={true} animateDrawing={0.25} headShape="circle" headSize={3}
+                          startAnchor={{position: "right", offset: {x: 15}}}
+                          endAnchor={{position: "left", offset: {x: -25}}}
+                        />
+                      )
+                      : null
+                    }
+                    <div className={styles.fade} />
+                  </div>
+                  <Output assets={ingestAssets} />
                 </div>
-                <Output assets={ingestAssets} />
-              </div>
-            </ReflexElement>
-          </ReflexContainer>
-        </Xwrapper>
-      </div>
-      <LinearProgress color="ignite" style={{width: "100%", marginTop: "10px", visibility: loading ? "visible" : "hidden"}} />
-    </>
+              </ReflexElement>
+            </ReflexContainer>
+          </Xwrapper>
+        </div>
+        <LinearProgress color="ignite" style={{width: "100%", marginTop: "10px", visibility: loading ? "visible" : "hidden"}} />
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={props.onClose}>Close</Button>
+        <Button onClick={handleCreate} color="ignite" variant="outlined">Create</Button>
+      </DialogActions>
+    </Dialog>
   );
 }
 

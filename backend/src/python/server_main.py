@@ -318,11 +318,11 @@ async def register_scene(request: Request):
     return {"ok": ok}
 
 
-@app.post("/api/v1/register_assetversion")
-async def register_assetversion(request: Request):
+@app.post("/api/v1/register_asset")
+async def register_asset(request: Request):
     result = await request.json()
     path = result.get("path", "")
-    ok = api.register_assetversion(path)
+    ok = api.register_asset(path)
     return {"ok": ok}
 
 
@@ -332,6 +332,14 @@ async def set_repr_asset(request: Request):
     target = result.get("target", "")
     repr = result.get("repr", "")
     ok = api.set_repr_asset(target, repr)
+    return {"ok": ok}
+
+
+@app.post("/api/v1/register_assetversion")
+async def register_assetversion(request: Request):
+    result = await request.json()
+    path = result.get("path", "")
+    ok = api.register_assetversion(path)
     return {"ok": ok}
 
 

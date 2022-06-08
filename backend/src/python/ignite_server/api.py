@@ -473,12 +473,19 @@ def register_scene(path):
     return True
 
 
+def register_asset(path):
+    utils.create_anchor(path, "asset")
+    av = find(path)
+    if not av.dir_kind == "asset":
+        return
+    return True
+
+
 def register_assetversion(path):
     utils.create_anchor(path, "assetversion")
     av = find(path)
     if not av.dir_kind == "assetversion":
         return
-    comps = av.components
     return True
 
 

@@ -6,6 +6,7 @@ import { Canvas, useFrame, useLoader } from '@react-three/fiber';
 import { OrbitControls   } from "@react-three/drei";
 import { TextureLoader } from 'three/src/loaders/TextureLoader';
 import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js';
+import { Typography } from "@mui/material";
 // import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 const style = {
@@ -155,7 +156,7 @@ function ComponentViewer(props) {
     else if (exr.includes(ext)) return <EXRViewer comp={comp} path={path} />;
     else if (vid.includes(ext)) return <VideoViewer comp={comp} path={path} />;
     else if (geo.includes(ext)) return <GeoViewer comp={comp} path={path} />;
-    else return null;
+    else return <Typography>No file preview for {comp.filename}</Typography>;
   }
 
   return (

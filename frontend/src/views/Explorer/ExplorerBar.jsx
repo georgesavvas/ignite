@@ -11,9 +11,6 @@ import RowViewIcon from "../../icons/RowViewIcon";
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
-import Dialog from '@mui/material/Dialog';
-import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
 import {ContextContext} from "../../contexts/ContextContext";
 import DccSelector from "../DccSelector";
 import Ingest from "../Ingest/Ingest";
@@ -26,19 +23,6 @@ const style = {
   padding: "10px",
   alignItems: "center",
   gap: "10px"
-}
-
-const ingestDialogStyle = {
-  "& .MuiDialog-container": {
-    "& .MuiPaper-root": {
-      width: "100%",
-      maxWidth: "95vw",
-      height: "100%",
-      maxHeight: "90vh",
-      backgroundColor: "rgb(20,20,20)",
-      backgroundImage: "none"
-    },
-  },
 }
 
 function ExplorerBar(props) {
@@ -64,15 +48,10 @@ function ExplorerBar(props) {
         <Modal open={newSceneOpen} onClose={() => setNewSceneOpen(false)} maxWidth="xs">
           <DccSelector task={currentContext.path} newScene={true} onClose={() => setNewSceneOpen(false)} />
         </Modal>
-        <Dialog open={ingestOpen} onClose={() => setIngestOpen(false)} sx={ingestDialogStyle}>
-          <DialogContent style={{overflow: "hidden"}}>
-            <Ingest task={currentContext.path} />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setIngestOpen(false)}>Close</Button>
-            <Button onClick={() => setIngestOpen(false)} color="ignite" variant="outlined">Create</Button>
-          </DialogActions>
-        </Dialog>
+        <Ingest open={ingestOpen} onClose={() => setIngestOpen(false)}
+          refresh={props.onRefresh} task={currentContext.path}
+          enqueueSnackbar={props.enqueueSnackbar}
+        />
         <Stack direction="row" spacing={1} >
           <ToggleButtonGroup
             color="primary"
