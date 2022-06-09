@@ -9,7 +9,12 @@ logging.basicConfig(level=logging.DEBUG)
 DIR = os.path.dirname(__file__)
 ENV = os.environ
 
-CONFIG_PATH = Path.home() / ".ignite/server_config.yaml"
+ignite_root = Path(DIR).parent.parent.parent.parent
+
+logging.info(f"Setting IGNITE_ROOT to {ignite_root}")
+ENV["IGNITE_ROOT"] = str(ignite_root)
+
+CONFIG_PATH = ignite_root / "common/server_config.yaml"
 default_projects_root = str(Path.home() / "projects")
 if not CONFIG_PATH.is_file():
     CONFIG_PATH.parent.mkdir(parents=True, exist_ok=True)

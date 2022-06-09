@@ -30,7 +30,7 @@ class AssetVersion(Directory):
         self.asset = self.path.parent
         self.uri = utils.get_uri(self.asset, self.version_int)
         self.task = self.asset.parent.parent
-        self.phase, self.context = self._get_context()
+        self.group, self.context = self._get_context()
         self.source = ""
         self.preview = PurePath()
         self._fetch_components()
@@ -96,7 +96,7 @@ class AssetVersion(Directory):
                 "components", "asset", "source", "task", "uri", "labels", "context"):
             d[s] = getattr(self, s)
         d["build"] = self.asset
-        d["full_context"] = f"{self.phase}/{self.context}"
+        d["full_context"] = f"{self.group}/{self.context}"
         d["api_path"] = utils.get_api_path(d["path"]),
         d["thumbnail"] = self.thumbnail
         project_path = ROOT / self.project

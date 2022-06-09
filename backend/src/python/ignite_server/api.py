@@ -152,7 +152,7 @@ def resolve(uri):
 def _find_from_path(path):
     from ignite_server.entities.project import Project
     from ignite_server.entities.directory import Directory
-    from ignite_server.entities.phase import Phase
+    from ignite_server.entities.group import Group
     from ignite_server.entities.build import Build
     from ignite_server.entities.sequence import Sequence
     from ignite_server.entities.shot import Shot
@@ -165,7 +165,7 @@ def _find_from_path(path):
     anchors = kinds.keys()
     entities = {
         "project": Project,
-        "phase": Phase,
+        "group": Group,
         "directory": Directory,
         "build": Build,
         "sequence": Sequence,
@@ -255,9 +255,9 @@ def get_contents(path, latest=False, as_dict=False):
     return contents
 
 
-def get_phase(path):
-    phase = find(utils.get_dir_type(path, "phase"))
-    return phase
+def get_group(path):
+    group = find(utils.get_dir_type(path, "group"))
+    return group
 
 
 def get_sequence(path):

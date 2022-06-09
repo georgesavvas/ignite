@@ -48,7 +48,7 @@ def get_task_env(path):
         return {}
     env = {
         "PROJECT": task.get("project", ""),
-        "PHASE": task.get("phase", ""),
+        "GROUP": task.get("group", ""),
         "CONTEXT": task.get("context", ""),
         "BUILD": task.get("build", ""),
         "SEQUENCE": task.get("sequence", ""),

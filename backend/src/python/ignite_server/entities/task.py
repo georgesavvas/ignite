@@ -36,9 +36,9 @@ class Task(Directory):
     def as_dict(self):
         d = {}
         for s in ("path", "dir_kind", "anchor", "project", "name", "task_type", "repr",
-        "exports", "scenes", "cache", "phase", "build", "sequence", "shot"):
+        "exports", "scenes", "cache", "group", "build", "sequence", "shot"):
             d[s] = getattr(self, s)
-        d["full_context"] = f"{self.phase}/{self.context}"
+        d["full_context"] = f"{self.group}/{self.context}"
         # d["task"] = self.task.as_dict()
         return d
 
