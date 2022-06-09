@@ -11,7 +11,7 @@ from ignite_server.constants import ANCHORS
 
 CONFIG = utils.get_config()
 ROOT = PurePath(CONFIG["projects_root"])
-PHASE_ANCHOR = ANCHORS["phase"]
+GROUP_ANCHOR = ANCHORS["group"]
 PROJECT_CONFIG_FILE = "project.yaml"
 
 
@@ -28,7 +28,7 @@ class Project(Directory):
             path = self.path / d
             utils.ensure_directory(path)
             if d in ("global", "rnd", "assets", "shots"):
-                utils.create_anchor(path, PHASE_ANCHOR)
+                utils.create_anchor(path, GROUP_ANCHOR)
         config = {
             "status": "open",
             "short_name": "",

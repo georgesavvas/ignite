@@ -15,7 +15,7 @@ ROOT = PurePath(CONFIG["projects_root"])
 class Directory():
     def __init__(self, path="", dir_kind="directory") -> None:
         self.project = ""
-        self.phase = ""
+        self.group = ""
         self.name = ""
         self.dir_kind = dir_kind
         self.context = ""
@@ -50,7 +50,7 @@ class Directory():
         project = split2[0]
         self.project = project
         self.name = split2[-1]
-        self.phase, self.context = self._get_context()
+        self.group, self.context = self._get_context()
         self.load_from_config()
 
     def _get_context(self):
@@ -74,7 +74,7 @@ class Directory():
         d = {}
         for s in ("path", "dir_kind", "anchor", "project", "name", "context", "repr"):
             d[s] = getattr(self, s)
-        d["full_context"] = f"{self.phase}/{self.context}" if self.phase else ""
+        d["full_context"] = f"{self.group}/{self.context}" if self.group else ""
         # d["task"] = self.task.as_dict()
         return d
 

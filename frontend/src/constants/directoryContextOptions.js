@@ -10,7 +10,7 @@ export const DIRCONTEXTOPTIONS = {
   "project": [],
   "task": [cOpts.create_task],
   "directory": [cOpts.create_directory, cOpts.create_sequence, cOpts.create_shot, cOpts.create_build, cOpts.create_task],
-  "phase": [cOpts.create_directory, cOpts.create_sequence, cOpts.create_shot, cOpts.create_build],
+  "group": [cOpts.create_directory, cOpts.create_sequence, cOpts.create_shot, cOpts.create_build],
   "build": [cOpts.create_directory, cOpts.create_task],
   "sequence": [cOpts.create_directory, cOpts.create_shot],
   "shot": [cOpts.create_directory, cOpts.create_task]

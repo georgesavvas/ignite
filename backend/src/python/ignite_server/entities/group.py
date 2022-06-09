@@ -7,10 +7,10 @@ from ignite_server.entities.directory import Directory
 
 CONFIG = utils.get_config()
 ROOT = PurePath(CONFIG["projects_root"])
-PHASES = ("global", "rnd", "build", "shots")
-ANCHOR = ANCHORS["phase"]
+GROUPS = ("global", "rnd", "build", "shots")
+ANCHOR = ANCHORS["group"]
 
 
-class Phase(Directory):
+class Group(Directory):
     def __init__(self, path="") -> None:
-        super().__init__(path, dir_kind = "phase")
+        super().__init__(path, dir_kind = "group")

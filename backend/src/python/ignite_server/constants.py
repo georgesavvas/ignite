@@ -37,7 +37,7 @@ MP4_CONFIG = (
 
 ANCHORS = {
     "project": ".ign_project.yaml",
-    "phase": ".ign_phase.yaml",
+    "group": ".ign_group.yaml",
     "directory": ".ign_dir.yaml",
     "build": ".ign_build.yaml",
     "sequence": ".ign_sequence.yaml",

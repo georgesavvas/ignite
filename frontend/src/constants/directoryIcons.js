@@ -17,7 +17,7 @@ import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
 export const DIRECTORYICONS = {
   directory: FolderIcon,
   project: HomeIcon,
-  phase: MovieIcon,
+  group: MovieIcon,
   build: ConstructionIcon,
   sequence: LocalMoviesIcon,
   shot: CameraIcon,
