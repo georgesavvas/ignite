@@ -4,17 +4,26 @@ import platform
 import yaml
 import subprocess
 import requests
+import importlib
 from pathlib import PurePath, Path
+from huey import SqliteHuey
 from ignite_client.constants import GENERIC_ENV, DCC_ENVS, OS_NAMES
 
 
 ENV = os.environ
+IGNITE_ROOT = Path(ENV["IGNITE_ROOT"])
 IGNITE_DCC = Path(os.environ["IGNITE_DCC"])
 CONFIG_PATH = Path(Path.home(), ".ignite")
 if not CONFIG_PATH.exists():
     CONFIG_PATH.mkdir()
 IGNITE_SERVER_HOST = ENV["IGNITE_SERVER_HOST"]
 IGNITE_SERVER_PORT = ENV["IGNITE_SERVER_PORT"]
+
+HUEY = SqliteHuey(filename=IGNITE_ROOT / "common/ignite.db")
+
+
+def get_huey():
+    return HUEY
 
 
 def replace_vars(d):
@@ -222,3 +231,28 @@ def server_request(method, data=None):
     else:
         resp = requests.post(url, json=data, headers=headers).json()
     return resp
+
+
+def discover_actions():
+    path = IGNITE_ROOT / "common/actions"
+    actions = {}
+    for entity in ("scenes", "assets", "assetversions", "components"):
+        entity_path = path / entity
+        if not entity_path.exists():
+            continue
+        actions[entity] = []
+        files = entity_path.glob("*.py")
+        for file in files:
+            if file.name == "__init__.py":
+                continue
+            module = importlib.machinery.SourceFileLoader(
+                file.name, str(file)
+            ).load_module()
+            entity_action = {
+                "label": module.LABEL,
+                "source": file,
+                "exts": module.EXTENSIONS,
+                "fn": HUEY.task()(module.main)
+            }
+            actions[entity].append(entity_action)
+    return actions

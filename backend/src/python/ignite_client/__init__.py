@@ -11,7 +11,10 @@ ENV = os.environ
 
 ENV["IGNITE_CONFIG_PATH"] = str(Path.home() / ".ignite/server_config.yaml")
 
-dcc = Path(DIR).parent.parent.parent.parent / "dcc"
+ignite_root = Path(DIR).parent.parent.parent.parent
+ENV["IGNITE_ROOT"] = str(ignite_root)
+
+dcc = ignite_root / "dcc"
 ENV["IGNITE_DCC"] = str(dcc)
 
 ocio = dcc / "ocio/aces_1.2/config.ocio"

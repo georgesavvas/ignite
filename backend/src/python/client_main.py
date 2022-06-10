@@ -148,6 +148,26 @@ async def ingest(request: Request):
     }
 
 
+@app.get("/api/v1/get_actions")
+async def get_actions():
+    data = api.get_actions()
+    return {
+        "ok": True,
+        "data": data
+    }
+
+
+@app.post("/api/v1/run_action")
+async def run_action(request: Request):
+    result = await request.json()
+    entity = result.get("entity")
+    action = result.get("action")
+    if not entity or not action:
+        return {"ok": False}
+    ok = api.run_action(entity, action)
+    return {"ok": ok}
+
+
 projects_root = PurePath(utils.server_request("get_projects_root").get("data"))
 app.mount("/files", StaticFiles(directory=projects_root), name="projects_root")
 
