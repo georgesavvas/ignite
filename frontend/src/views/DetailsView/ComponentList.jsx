@@ -7,6 +7,7 @@ import { useSnackbar } from 'notistack';
 import { CopyToClipboard } from "../ContextActions";
 import ContextMenu, { handleContextMenu } from "../../components/ContextMenu";
 import openExplorer from "../../utils/openExplorer";
+import clientRequest from "../../services/clientRequest";
 
 const dccNames = {
   houdini: ["hmaster", "hescape", "houdini", "houdinicore", "houdinifx"],
@@ -15,7 +16,7 @@ const dccNames = {
   nuke: ["nuke"]
 }
 
-function Component({comp, onSelect, selectedComp}) {
+function Component({comp, onSelect, selectedComp, actions}) {
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const [contextMenu, setContextMenu] = useState(null);
 
@@ -32,17 +33,25 @@ function Component({comp, onSelect, selectedComp}) {
     CopyToClipboard(path, enqueueSnackbar);
   }
 
-  const contextItems = [
+  let contextItems = [
     {
-      "label": "Copy path",
-      "fn": () => handleCopy(undefined, comp.path),
-      "divider": true
+      label: "Copy path",
+      fn: () => handleCopy(undefined, comp.path),
+      divider: true
     },
     {
-      "label": "Open in file explorer",
-      "fn": () => openExplorer(comp.path, enqueueSnackbar)
+      label: "Open in file explorer",
+      fn: () => openExplorer(comp.path, enqueueSnackbar),
+      divider: true
     },
   ]
+
+  contextItems = contextItems.concat(actions.map(action => (
+    {
+      label: action.label,
+      fn: () => clientRequest("run_action", {entity: "components", action: action.label})
+    }
+  )));
 
   return (
     <div onContextMenu={e => handleContextMenu(e, contextMenu, setContextMenu)}>
@@ -62,12 +71,22 @@ function Component({comp, onSelect, selectedComp}) {
 }
 
 function ComponentList(props) {
+  const [actions, setActions] = useState([]);
+
+  useEffect(() => {
+    clientRequest("get_actions").then(resp => {
+      setActions(resp.data.components);
+    })
+  }, [])
+
+  console.log(actions);
+
   return (
     <div className={styles.container}>
       <Typography variant="h5" style={{marginBottom: "10px"}}>Components</Typography>
       <div className={styles.compList}>
         {props.components.map((comp, index) => <Component key={index} comp={comp}
-            onSelect={props.onSelect} selectedComp={props.selectedComp}
+            onSelect={props.onSelect} selectedComp={props.selectedComp} actions={actions}
           />
         )}
       </div>

@@ -5,11 +5,22 @@ import logging
 import re
 import parse
 from pathlib import Path, PurePath
+from huey import SqliteHuey
 from ignite_server.constants import ANCHORS
 
 
+ENV = os.environ
+IGNITE_ROOT = Path(ENV["IGNITE_ROOT"])
+
 URI_TEMPLATE = parse.compile("ign:{project}:{group}:{context}:{task}:{name}@{version}")
 URI_TEMPLATE_UNVERSIONED = parse.compile("ign:{project}:{group}:{context}:{task}:{name}")
+
+
+HUEY = SqliteHuey(filename=IGNITE_ROOT / "common/ignite.db")
+
+
+def get_huey():
+    return HUEY
 
 
 def get_config() -> dict:
@@ -143,3 +154,4 @@ def query_filter(entities, query):
         return entities
 
     return filtered
+

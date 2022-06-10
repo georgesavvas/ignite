@@ -21,6 +21,8 @@ if not CONFIG_PATH.exists():
 IGNITE_SERVER_HOST = ENV["IGNITE_SERVER_HOST"]
 IGNITE_SERVER_PORT = ENV["IGNITE_SERVER_PORT"]
 
+HUEY = utils.get_huey()
+
 
 def ingest(data):
     dry = data.get("dry", True)
@@ -277,3 +279,23 @@ def ingest_asset(data):
     if not resp.get("ok"):
         print("Failed.")
         return
+
+
+def get_actions():
+    actions = utils.discover_actions()
+    for entity in actions.keys():
+        for action in actions[entity]:
+            del action["fn"]
+    return actions
+
+
+def run_action(entity, action):
+    actions = utils.discover_actions().get(entity)
+    if not actions:
+        logging.error(f"Couldn't find action {entity} {action}")
+        return
+    for _action in actions:
+        if _action["label"] != action:
+            continue
+        _action["fn"]("", "", "")
+        break
