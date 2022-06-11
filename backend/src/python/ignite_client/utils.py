@@ -233,15 +233,21 @@ def server_request(method, data=None):
     return resp
 
 
-def discover_actions():
+def get_action_files():
     path = IGNITE_ROOT / "common/actions"
-    actions = {}
+    files = {}
     for entity in ("scenes", "assets", "assetversions", "components"):
         entity_path = path / entity
         if not entity_path.exists():
             continue
+        files[entity] = entity_path.glob("*.py")
+    return files
+
+
+def discover_actions():
+    actions = {}
+    for entity, files in get_action_files().items():
         actions[entity] = []
-        files = entity_path.glob("*.py")
         for file in files:
             if file.name == "__init__.py":
                 continue
@@ -252,7 +258,7 @@ def discover_actions():
                 "label": module.LABEL,
                 "source": file,
                 "exts": module.EXTENSIONS,
-                "fn": HUEY.task()(module.main)
+                "fn": module.main #HUEY.task()(module.main)
             }
             actions[entity].append(entity_action)
     return actions
