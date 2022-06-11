@@ -1,0 +1,16 @@
+{
+    "Plugins": [
+        {
+            "Info": {
+                "Types": {
+                    "IgniteResolver": {
+                        "bases": [ "ArResolver" ]
+                        }
+                }
+            },
+            "LibraryPath": "../ignResolver.dll", 
+            "Name": "IgniteResolver",
+            "Type": "library"
+        }
+    ]
+}
