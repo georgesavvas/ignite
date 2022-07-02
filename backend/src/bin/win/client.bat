@@ -1,1 +1,2 @@
-python %0\..\..\..\src\python\client\main.py
+.\env\Scripts\activate && python %0\..\..\..\python\client_main.py
+PAUSE
