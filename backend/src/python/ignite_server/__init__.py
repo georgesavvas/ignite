@@ -50,6 +50,8 @@ if os_name == "Windows":
     os_name = "win"
 elif os_name == "Darwin":
     os_name = "mac"
+else:
+    os_name = "linux"
 tools = Path(DIR).parent.parent.parent / "tools"
 path = tools / os_name
 if path.is_dir():

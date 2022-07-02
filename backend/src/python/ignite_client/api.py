@@ -289,6 +289,7 @@ def get_actions():
     return actions
 
 
+@HUEY.task()
 def run_action(entity, action):
     actions = utils.discover_actions().get(entity)
     if not actions:

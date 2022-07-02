@@ -1,5 +1,8 @@
 *.DS_Store
 
+common/server_config.yaml
+common/ignite.db*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
