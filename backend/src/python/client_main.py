@@ -164,8 +164,8 @@ async def run_action(request: Request):
     action = result.get("action")
     if not entity or not action:
         return {"ok": False}
-    ok = api.run_action(entity, action)
-    return {"ok": ok}
+    api.run_action(entity, action)
+    return {"ok": True}
 
 
 projects_root = PurePath(utils.server_request("get_projects_root").get("data"))
