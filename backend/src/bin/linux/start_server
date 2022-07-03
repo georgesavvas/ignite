@@ -1,5 +1,5 @@
 #!/bin/bash
 
-git pull;
+git pull --ff-only;
 source env/bin/activate;
 python src/python/server_main.py;
