@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 ENV = os.environ
-IGNITE_SERVER_HOST = "127.0.0.1"
+IGNITE_SERVER_HOST = "10.101.120.31" # "127.0.0.1"
 IGNITE_SERVER_PORT = "9090"
 ENV["IGNITE_SERVER_HOST"] = IGNITE_SERVER_HOST
 ENV["IGNITE_SERVER_PORT"] = IGNITE_SERVER_PORT
