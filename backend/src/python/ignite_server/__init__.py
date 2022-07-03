@@ -32,9 +32,9 @@ else:
         }
         with open(CONFIG_PATH, "w") as file:
             yaml.safe_dump(config, file)
-logging.info(f"Setting IGNITE_CONFIG_PATH to {CONFIG_PATH}")
+logging.info(f"Setting IGNITE_SERVER_CONFIG_PATH to {CONFIG_PATH}")
 logging.info(f"Setting IGNITE_SERVER_ROOT to {DIR}")
-ENV["IGNITE_CONFIG_PATH"] = str(CONFIG_PATH)
+ENV["IGNITE_SERVER_CONFIG_PATH"] = str(CONFIG_PATH)
 ENV["IGNITE_SERVER_ROOT"] = DIR
 
 dcc = Path(DIR).parent.parent.parent.parent / "dcc"

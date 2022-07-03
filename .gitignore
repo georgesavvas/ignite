@@ -1,6 +1,7 @@
 *.DS_Store
 
 common/server_config.yaml
+common/client_config.yaml
 common/ignite.db*
 
 # Byte-compiled / optimized / DLL files

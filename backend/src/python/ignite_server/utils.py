@@ -24,7 +24,7 @@ def get_huey():
 
 
 def get_config() -> dict:
-    path = os.environ["IGNITE_CONFIG_PATH"]
+    path = os.environ["IGNITE_SERVER_CONFIG_PATH"]
     if not os.path.isfile(path):
         raise Exception(f"Config file not found: {path}")
     logging.info(f"Reading config from {path}...")    

@@ -3,6 +3,7 @@ import math
 from posixpath import dirname
 import uvicorn
 import yaml
+import logging
 from pprint import pprint
 from pathlib import PurePath
 from fastapi import FastAPI, Request
@@ -17,6 +18,8 @@ ENV["IGNITE_SERVER_PORT"] = IGNITE_SERVER_PORT
 
 from ignite_client import utils, api
 
+
+CONFIG = utils.get_config()
 
 app = FastAPI()
 origins = ["*"]
@@ -168,7 +171,8 @@ async def run_action(request: Request):
     return {"ok": True}
 
 
-projects_root = PurePath(utils.server_request("get_projects_root").get("data"))
+projects_root = CONFIG["projects_root"]
+logging.debug(f"Attempting to mount {projects_root}")
 app.mount("/files", StaticFiles(directory=projects_root), name="projects_root")
 
 
