@@ -22,6 +22,23 @@ IGNITE_SERVER_PORT = ENV["IGNITE_SERVER_PORT"]
 HUEY = SqliteHuey(filename=IGNITE_ROOT / "common/ignite.db")
 
 
+def get_config() -> dict:
+    path = os.environ["IGNITE_CLIENT_CONFIG_PATH"]
+    if not os.path.isfile(path):
+        raise Exception(f"Config file not found: {path}")
+    logging.info(f"Reading config from {path}...")    
+    with open(path, "r") as f:
+        config = yaml.safe_load(f)
+    paths = ("projects_root",)
+    for p in paths:
+        config[p] = os.path.abspath(config[p])
+    return config
+
+
+CONFIG = get_config()
+ROOT = PurePath(CONFIG["projects_root"])
+
+
 def get_huey():
     return HUEY
 
