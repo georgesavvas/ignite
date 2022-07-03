@@ -15,6 +15,7 @@ import {
   ReflexSplitter,
   ReflexElement
 } from 'react-reflex'
+import serverRequest from "../services/serverRequest";
 
 const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 
@@ -133,19 +134,7 @@ const Browser = (props) => {
   useEffect(() => {
     if (!props.open) return;
     setIsLoading(true);
-    fetch(
-      "http://127.0.0.1:9090/api/v1/get_projects", {
-        method: "GET",
-        headers: {
-          'Accept': 'application/json, text/plain, */*',
-          'Content-Type': 'application/json'
-        }
-      }
-    )
-    .then((resp) => {
-      return resp.json();
-    })
-    .then((resp) => {
+    serverRequest("get_projects").then((resp) => {
       setIsLoading(false);
       setLoadedData(resp.data);
     });

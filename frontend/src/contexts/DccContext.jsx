@@ -1,4 +1,5 @@
 import { useState, createContext, useEffect, useRef } from "react";
+import clientRequest from "../services/clientRequest";
 
 export const DccContext = createContext();
 
@@ -35,9 +36,7 @@ export const DccProvider = props => {
   const noWrite = useRef(true);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:9091/api/v1/get_dcc_config").then((resp) => {
-      return resp.json();
-    }).then((resp) => {
+    clientRequest("get_dcc_config").then((resp) => {
       noWrite.current = true;
       setDccConfig(resp.data);
     });
@@ -52,16 +51,7 @@ export const DccProvider = props => {
     const data = {
       config: dccConfig
     };
-    fetch(
-      "http://127.0.0.1:9091/api/v1/set_dcc_config", {
-        method: "POST",
-        headers: {
-          'Accept': 'application/json, text/plain, */*',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-      }
-    )
+    clientRequest("set_dcc_config", data)
   }, [writeIncr])
   
   const addToConfig = prevState => {
