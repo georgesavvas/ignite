@@ -133,6 +133,7 @@ async def create_dirs(request: Request):
 @app.post("/api/v1/get_contents")
 async def get_contents(request: Request):
     result = await request.json()
+    pprint(result)
     query = result.get("query", {})
     data = api.get_contents(
         result.get("path", ""),

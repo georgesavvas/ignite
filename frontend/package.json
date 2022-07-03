@@ -33,7 +33,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "electron-dev": "electron ."
+    "sanitize": "lsof -i TCP:3000 | grep LISTEN | awk '{print $2}' | xargs kill -9",
+    "electron-dev": "export BROWSER=NONE && concurrently \"npm run sanitize\" \"npm start\" \"wait-on http://localhost:3000 && electron .\""
   },
   "eslintConfig": {
     "extends": [
@@ -52,5 +53,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "concurrently": "^7.2.2"
   }
 }

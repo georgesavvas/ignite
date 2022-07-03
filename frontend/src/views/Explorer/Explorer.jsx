@@ -77,6 +77,7 @@ function Explorer() {
       path: currentContext.path,
       query: query
     };
+    console.log(data);
     const method = methods[resultType];
     setIsLoading(true);
     serverRequest(method, data).then((resp) => {

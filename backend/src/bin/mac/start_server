@@ -1,7 +1,6 @@
 #!/bin/bash
 
 git pull --ff-only;
-echo "Killing processes listening on 9090...";
-fuser -k -n tcp 9090;
+lsof -P | grep ':9090' | awk '{print $2}' | xargs kill -9
 source env/bin/activate;
 python src/python/server_main.py;
