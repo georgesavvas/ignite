@@ -5,9 +5,10 @@ import darkScrollbar from '@mui/material/darkScrollbar';
 import GlobalStyles from '@mui/material/GlobalStyles';
 import Home from './views/Home';
 import {ContextProvider} from "./contexts/ContextContext";
-import {DccProvider} from "./contexts/DccContext";
+import {ConfigProvider} from "./contexts/ConfigContext";
 import {EntityProvider} from "./contexts/EntityContext";
 import { SnackbarProvider } from 'notistack';
+import BuildFileURL from './services/BuildFileURL';
 
 const darkTheme = createTheme({
   palette: {
@@ -26,20 +27,22 @@ const darkTheme = createTheme({
   },
 });
 
+BuildFileURL("");
+
 function App() {
   return (
     <ThemeProvider theme={darkTheme}>
       <GlobalStyles styles={{ ...darkScrollbar() }} />
       <div className="App">
-      <ContextProvider>
-          <DccProvider>
+        <ConfigProvider>
+          <ContextProvider>
             <EntityProvider>
               <SnackbarProvider maxSnack={3} autoHideDuration={2500}>
                 <Home />
               </SnackbarProvider>
             </EntityProvider>
-          </DccProvider>
-        </ContextProvider>
+          </ContextProvider>
+        </ConfigProvider>
       </div>
     </ThemeProvider>
   );

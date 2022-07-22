@@ -9,19 +9,23 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import IconButton from '@mui/material/IconButton';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
-import { Stack } from '@mui/material';
-import {DccContext} from "../contexts/DccContext";
+import { Stack, Divider } from '@mui/material';
+import Modal from "../components/Modal";
+import {ConfigContext} from "../contexts/ConfigContext";
 
 const Input = styled('input')({
   display: 'none',
 });
 
 export default function SettingsDialog(props) {
-  const [dccConfig, setDccConfig] = useContext(DccContext);
+  const [config, setConfig] = useContext(ConfigContext);
 
   const handleDccConfigChange = (e) => {
     const s = e.currentTarget.id.split("-");
@@ -34,14 +38,14 @@ export default function SettingsDialog(props) {
     }
     window.api.checkPath(data.value).then(exists => {
       data.valid = exists;
-      return setDccConfig(data, "modify");
-    }).then(() => console.log("all finished!"));
+      return setConfig("dccConfig", data, "modify");
+    })
   }
 
   const handleRemoveDcc = (e) => {
     const target_id = e.currentTarget.id.split("-")[1];
     const data = {index: target_id};
-    setDccConfig(data, "remove");
+    setConfig("dccConfig", data, "remove");
   }
 
   const handleFileInput = e => {
@@ -59,7 +63,7 @@ export default function SettingsDialog(props) {
       field: "path",
       value: filepath
     }
-    setDccConfig(data, "modify");
+    setConfig("dccConfig", data, "modify");
   }
 
   function renderDcc(dcc, index) {
@@ -74,6 +78,7 @@ export default function SettingsDialog(props) {
         >
           <RemoveCircleOutlineIcon style={{color: "red", fontSize: "2rem"}} />
         </IconButton>
+        <Divider flexItem orientation="vertical" />
         <div className={styles.gridContainer}>
           <div className={styles.gridItemPath}>
             <TextField
@@ -147,53 +152,81 @@ export default function SettingsDialog(props) {
   }
 
   const handleAddDcc = (e) => {
-    setDccConfig({}, "add");
+    setConfig("dccConfig", {}, "add");
   }
 
   const handleRevertDefaultsDcc = (e) => {
-    setDccConfig({}, "revertToDefaults");
+    setConfig("dccConfig", {}, "revertToDefaults");
   }
 
   return (
-    <Dialog open={props.open} onClose={props.onClose} sx={dialogStyle}>
-      <DialogTitle>Settings</DialogTitle>
-      <DialogContent style={{height: "350px", margin: "20px", padding: "20px", border: "solid darkgrey 1px", borderRadius: "10px"}}>
-        <DialogContentText>Server Details</DialogContentText>
-        <TextField
-          margin="dense"
-          id="server-address"
-          label="Address"
-          fullWidth
-          variant="standard"
-          value="localhost"
-          disabled
-        />
-        <TextField
-          margin="dense"
-          id="server-password"
-          label="Password"
-          fullWidth
-          variant="standard"
-          disabled
-        />
-      </DialogContent>
-      <DialogContent style={{margin: "20px", padding: "20px", border: "solid darkgrey 1px", borderRadius: "10px"}}>
-        <div style={dccBar}>
-          <DialogContentText>DCC config</DialogContentText>
-          <Stack direction="row" alignItems="center" spacing={2}>
+    <Modal open={props.open} onClose={props.onClose} title="Settings" maxWidth="lg"
+      closeButton>
+      <div className={styles.container}>
+        <DialogContentText style={{alignSelf: "flex-start"}}>
+          Server Details
+        </DialogContentText>
+        <div className={styles.insideContainer}>
+          <TextField
+            margin="dense"
+            id="server-address"
+            label="Address"
+            fullWidth
+            variant="standard"
+            value={config.serverDetails.address}
+            onChange={e => setConfig("serverDetails", {address: e.target.value})}
+          />
+          <TextField
+            margin="dense"
+            id="server-password"
+            label="Password"
+            fullWidth
+            variant="standard"
+            value={config.serverDetails.password}
+            onChange={e => setConfig("serverDetails", {password: e.target.value})}
+          />
+        </div>
+        <Divider flexItem style={{marginTop: "20px", marginBottom: "20px"}} />
+        <DialogContentText style={{alignSelf: "flex-start"}}>
+          Access
+        </DialogContentText>
+        <div className={styles.insideContainer}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={config.access.remote}
+                  onChange={e => setConfig("access", {remote: e.target.checked})}
+                />}
+              label="Remote"
+              style={{alignSelf: "flex-start"}}
+            />
+            <TextField
+              margin="dense"
+              id="projects-dir"
+              label="Projects directory"
+              fullWidth
+              variant="standard"
+              disabled={config.access.remote}
+              value={config.access.projectsDir}
+              onChange={e => setConfig("access", {projectsDir: e.target.value})}
+            />
+        </div>
+        <Divider flexItem style={{marginTop: "20px", marginBottom: "20px"}} />
+        <DialogContentText style={{alignSelf: "flex-start"}}>
+          DCC config
+        </DialogContentText>
+        <div className={styles.insideContainer}>
+          <Stack direction="row" alignItems="center" spacing={2} style={{alignSelf: "flex-end"}}>
             <Button variant="outlined" onClick={handleAddDcc}>Add</Button>
             <Button variant="outlined" onClick={handleRevertDefaultsDcc}>Revert to defaults</Button>
           </Stack>
+          <List
+            sx={{ width: '100%' }}
+          >
+            {config.dccConfig.map((dcc, index) => renderDcc(dcc, index))}
+          </List>
         </div>
-        <List
-          sx={{ width: '100%' }}
-        >
-          {dccConfig.map((dcc, index) => renderDcc(dcc, index))}
-        </List>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={props.onClose}>Close</Button>
-      </DialogActions>
-    </Dialog>
+      </div>
+    </Modal>
   )
 }

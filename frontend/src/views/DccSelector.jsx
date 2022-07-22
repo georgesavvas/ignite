@@ -3,7 +3,7 @@ import styles from "./DccSelector.module.css";
 import Typography from '@mui/material/Typography';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import { Button } from "@mui/material";
-import {DccContext} from "../contexts/DccContext";
+import {ConfigContext} from "../contexts/ConfigContext";
 import {ContextContext} from "../contexts/ContextContext";
 import { useSnackbar } from 'notistack';
 import clientRequest from "../services/clientRequest";
@@ -24,7 +24,7 @@ const dccNames = {
 function DccSelector(props) {
   // const dir_kind = props.entity.dir_kind;
   // const dir_kind_formatted = dir_kind.charAt(0).toUpperCase() + dir_kind.slice(1)
-  const [dccConfig, setDccConfig] = useContext(DccContext);
+  const [config, setConfig] = useContext(ConfigContext);
   const [selectedDcc, setSelectedDcc] = useState("");
   const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
@@ -34,7 +34,7 @@ function DccSelector(props) {
   }
 
   const getDcc = () => {
-    for(const dcc of dccConfig) {
+    for(const dcc of config.dccConfig) {
       if (dcc.name === selectedDcc) return dcc;
     }
   }
@@ -94,7 +94,7 @@ function DccSelector(props) {
     <div style={style}>
       <div style={{margin: "10px", overflow: "hidden"}}>
         <Typography variant="h5" style={{marginBottom: "10px"}}>Scene Launcher</Typography>
-        {dccConfig.map((dcc, index) => formatDcc(dcc, index))}
+        {config.dccConfig.map((dcc, index) => formatDcc(dcc, index))}
         <div style={{width: "100%", display: "grid", justifyContent: "center", marginTop: "20px"}}>
           <Button
             size="large"

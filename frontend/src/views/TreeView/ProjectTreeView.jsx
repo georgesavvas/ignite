@@ -18,6 +18,8 @@ import ContextMenu, { handleContextMenu } from "../../components/ContextMenu";
 import { CopyToClipboard, ShowInExplorer } from "../ContextActions";
 import { DeleteDir, RenameDir, CreateDir } from "../ContextActions";
 import { useSnackbar } from 'notistack';
+import { ConfigContext } from "../../contexts/ConfigContext";
+import BuildFileURL from "../../services/BuildFileURL";
 
 const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
   color: theme.palette.text.secondary,
@@ -153,7 +155,7 @@ StyledTreeItem.propTypes = {
 };
 
 function ProjectTreeView(props) {
-  const [isLoading, setIsLoading] = useState(true);
+  const [config, setConfig] = useContext(ConfigContext);
   const [expandedItems, setExpandedItems] = useState(["root"]);
   const [modalData, setModalData] = useState({});
   const [selectedItems, setSelectedItems] = useState("root");
@@ -216,7 +218,7 @@ function ProjectTreeView(props) {
 
   const handleNodeToggle = (event, nodeIds) => {
     let iconClicked = event.target.closest(".MuiTreeItem-iconContainer")
-    if(iconClicked) {
+    if(iconClicked || nodeIds.length > expandedItems.length) {
       setExpandedItems(nodeIds);
     }
   }
@@ -229,6 +231,7 @@ function ProjectTreeView(props) {
   const renderTree = (nodes) => {
     const filter_string = nodes.filter_strings.join(" ")
     const hide = props.filter && !filter_string.includes(props.filter);
+    const path = BuildFileURL(nodes.path, config, {pathOnly: true});
     return (
       <StyledTreeItem
         key={nodes.id}
@@ -237,7 +240,7 @@ function ProjectTreeView(props) {
         labelIcon={DIRECTORYICONS[nodes.icon]}
         labelInfo={nodes.dir_kind}
         dir_kind={nodes.dir_kind}
-        dir_path={nodes.path}
+        dir_path={path}
         onContextOpen={handleContextMenuSelection}
         style={hide ? {display: "none"} : null}
       >

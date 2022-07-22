@@ -14,6 +14,9 @@ import loadExplorerSettings from "../../utils/loadExplorerSettings";
 import saveExplorerSettings from "../../utils/saveExplorerSettings";
 import { LinearProgress } from "@mui/material";
 import { useSnackbar } from 'notistack';
+import BuildFileURL from "../../services/BuildFileURL";
+import { ConfigContext } from "../../contexts/ConfigContext";
+
 
 const debounced = debounce(fn => fn(), 500);
 
@@ -21,6 +24,7 @@ const defaultViewType = "grid";
 const defaultTileSize = 5;
 
 function Explorer() {
+  const [config, setConfig] = useContext(ConfigContext);
   const [refreshValue, setRefreshValue] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [loadedData, setLoadedData] = useState([]);
@@ -74,21 +78,28 @@ function Explorer() {
     const data = {
       page: pages.current,
       limit: tilesPerPage,
-      path: currentContext.path,
+      path: BuildFileURL(currentContext.path, config, {reverse: true, pathOnly: true}),
       query: query
     };
-    console.log(data);
     const method = methods[resultType];
     setIsLoading(true);
-    serverRequest(method, data).then((resp) => {
+    if (!Object.entries(config.access).length) return;
+    serverRequest(method, data).then(resp => {
       setIsLoading(false);
       setLoadedData(resp.data);
       setPages((prevPages) => ({...prevPages, total: resp.pages.total}));
     });
-  }, [pages.current, resultType, refreshValue, currentContext, tilesPerPage, query]);
+  }, [pages.current, resultType, refreshValue, currentContext, config.access, tilesPerPage, query]);
 
   useEffect(() => {
     const _tiles = loadedData.reduce(function(obj, entity) {
+      entity.path = BuildFileURL(entity.path, config, {pathOnly: true});
+      if (entity.components) {
+        entity.components.forEach(comp => {
+          comp.path = BuildFileURL(comp.path, config, {pathOnly: true});
+        })
+      }
+      if (entity.scene) entity.scene = BuildFileURL(entity.scene, config, {pathOnly: true});
       if (entity.dir_kind === "assetversion") {
         obj[entity.result_id] = <AssetTile key={entity.result_id} entity={entity}
           onSelected={handleEntitySelection} size={tileSize * 40} viewType={viewType}
