@@ -17,9 +17,21 @@ function createWindow () {
     "linux": "media/desktop_icon/linux/ignite.png"
   }
 
+  const splash = new BrowserWindow({
+    width: 500, 
+    height: 300, 
+    transparent: true, 
+    frame: false, 
+    alwaysOnTop: true 
+  });
+
+  splash.loadFile("public/splash.html");
+  splash.center();
+
   const win = new BrowserWindow({
     width: 1280,
     height: 720,
+    show: false,
     icon: path.join(__dirname, iconPaths[platformName]),
     webPreferences: {
       nodeIntegration: true,
@@ -27,18 +39,20 @@ function createWindow () {
       preload: path.join(__dirname, "preload.js")
     }
   })
-  //load the index.html from a url
-  win.loadURL('http://localhost:3000');
 
-  // Open the DevTools.
+  win.loadURL('http://localhost:3000');
   win.webContents.openDevTools();
+
+  setTimeout(function () {
+    splash.close();
+    win.show();
+  }, 7000);
 
   ipcMain.handle("store_data", async (event, filename, data) => {
     const filepath = path.join(os.homedir(), ".ignite", filename);
     fs.writeFile(filepath, data, (err) => {
       if (err) {
         throw err;
-        return false;
       }
       else return true
     });

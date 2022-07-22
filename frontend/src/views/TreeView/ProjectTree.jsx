@@ -6,8 +6,10 @@ import OutlinedInput from '@mui/material/OutlinedInput';
 import styles from "./ProjectTree.module.css";
 import serverRequest from "../../services/serverRequest";
 import {ContextContext} from "../../contexts/ContextContext";
+import { ConfigContext } from "../../contexts/ConfigContext";
 
 export default function ProjectTree() {
+  const [config, setConfig] = useContext(ConfigContext);
   const [isLoading, setIsLoading] = useState(true);
   const [loadedData, setLoadedData] = useState({});
   const [filterValue, setFilterValue] = useState("");
@@ -19,11 +21,12 @@ export default function ProjectTree() {
       project: currentContext.project
     };
     setIsLoading(true);
+    if (!Object.entries(config.access).length) return;
     serverRequest("get_project_tree", data).then((resp) => {
       setIsLoading(false);
       setLoadedData(resp.data);
     });
-  }, [currentContext, updateTreeView]);
+  }, [currentContext, config.access, updateTreeView]);
 
   var content = [];
   if (loadedData.children === undefined) {

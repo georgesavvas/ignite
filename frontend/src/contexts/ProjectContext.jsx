@@ -8,16 +8,6 @@ export const ProjectProvider = props => {
   const [selectedProject, setSelectedProject] = useState("");
   const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
 
-  // useEffect(() => {
-  //   if (selectedProject) {
-  //     serverRequest("get_projects_root").then(resp => {
-  //       const data = resp.data;
-  //       console.log("Setting context from project to", data)
-  //       setCurrentContext(data + "/" + selectedProject);
-  //     })
-  //   }
-  // }, [selectedProject])
-
   const handleProjectChange = project => {
     serverRequest("get_projects_root").then(resp => {
       const data = resp.data;

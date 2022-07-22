@@ -16,6 +16,7 @@ import {
   ReflexElement
 } from 'react-reflex'
 import serverRequest from "../services/serverRequest";
+import { ConfigContext } from "../contexts/ConfigContext";
 
 const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 

@@ -79,8 +79,6 @@ function ComponentList(props) {
     })
   }, [])
 
-  console.log(actions);
-
   return (
     <div className={styles.container}>
       <Typography variant="h5" style={{marginBottom: "10px"}}>Components</Typography>
