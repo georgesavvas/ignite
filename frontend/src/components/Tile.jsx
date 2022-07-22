@@ -1,11 +1,14 @@
-import React, { useState, createRef } from "react";
+import React, { useState, createRef, useContext } from "react";
 import styles from "./Tile.module.css";
 import ContextMenu, { handleContextMenu } from "./ContextMenu";
+import BuildFileURL from "../services/BuildFileURL";
+import { ConfigContext } from "../contexts/ConfigContext";
 
 const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 
 function GridTile(props) {
   const [contextMenu, setContextMenu] = useState(null);
+  const [config, setConfig] = useContext(ConfigContext);
   const [progress, setProgress] = useState(0);
   const hoverArea = createRef();
   let isStatic = props.thumbnail !== undefined
@@ -39,7 +42,7 @@ function GridTile(props) {
     }
     return thumbnailPath;
   }
-  const thumbnailURL = props.thumbnail || `ign://${getSeqThumbnail()}`;
+  const thumbnailURL = props.thumbnail || BuildFileURL(getSeqThumbnail(), config);
 
   const handleClick = e => {
     if (props.onClick) props.onClick(e);
@@ -70,6 +73,7 @@ function GridTile(props) {
 
 function RowTile(props) {
   const [contextMenu, setContextMenu] = useState(null);
+  const [config, setConfig] = useContext(ConfigContext);
   const [progress, setProgress] = useState(0.5);
   const hoverArea = createRef();
   const isStatic = props.thumbnail !== undefined;
@@ -112,7 +116,7 @@ function RowTile(props) {
     }
     return thumbnailPath;
   }
-  const thumbnailURL = isStatic ? props.thumbnail : `ign://${getSeqThumbnail()}`;
+  const thumbnailURL = isStatic ? props.thumbnail : BuildFileURL(getSeqThumbnail(), config);
 
   const handleClick = e => {
     if (props.onClick) props.onClick(e);

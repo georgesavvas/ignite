@@ -128,10 +128,42 @@ def get_dcc_config():
     return data or []
 
 
-def set_dcc_config(config):
+def set_dcc_config(data):
     filepath = CONFIG_PATH / "dcc_config.yaml"
     with open(filepath, "w") as f:
-        yaml.safe_dump(config, f)
+        yaml.safe_dump(data, f)
+    return filepath
+
+
+def get_server_details():
+    filepath = CONFIG_PATH / "server_details.yaml"
+    if not filepath.exists():
+        return []
+    with open(filepath, "r") as f:
+        data = yaml.safe_load(f)
+    return data or []
+
+
+def set_server_details(data):
+    filepath = CONFIG_PATH / "server_details.yaml"
+    with open(filepath, "w") as f:
+        yaml.safe_dump(data, f)
+    return filepath
+
+
+def get_access():
+    filepath = CONFIG_PATH / "access.yaml"
+    if not filepath.exists():
+        return []
+    with open(filepath, "r") as f:
+        data = yaml.safe_load(f)
+    return data or []
+
+
+def set_access(data):
+    filepath = CONFIG_PATH / "access.yaml"
+    with open(filepath, "w") as f:
+        yaml.safe_dump(data, f)
     return filepath
 
 

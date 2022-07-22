@@ -1,9 +1,12 @@
-import { useState, createContext, useEffect } from "react";
+import { useState, createContext, useContext, useEffect } from "react";
+import BuildFileURL from "../services/BuildFileURL";
 import serverRequest from "../services/serverRequest";
+import { ConfigContext } from "../contexts/ConfigContext";
 
 export const ContextContext = createContext();
 
 export const ContextProvider = props => {
+  const [config, setConfig] = useContext(ConfigContext);
   const [currentContext, setCurrentContext, refreshContext] = useState({update: 0});
 
   useEffect(() => {
@@ -14,11 +17,17 @@ export const ContextProvider = props => {
   }, [])
 
   async function handleContextChange(path) {
+    const path_processed = BuildFileURL(path, config, {reverse: true, pathOnly: true});
     let success = false;
-    const resp = await serverRequest("get_context_info", {path: path})
-    const data = resp.data;
+    const resp = await serverRequest("get_context_info", {path: path_processed})
+    let data = resp.data;
     if (!Object.keys(data).length) return false;
+    for (const key of ["parent", "path", "posix", "project_path"]) {
+      data[key] = BuildFileURL(data[key], config, {pathOnly: true});
+    }
+    data.posix = data.posix.replaceAll("\\", "/");
     data.update = 0;
+    data.root = config.access.projectsDir;
     setCurrentContext(data);
     localStorage.setItem("context", JSON.stringify(data));
     success = true;
@@ -36,9 +45,6 @@ export const ContextProvider = props => {
   )
 };
 
-export function setProject(project, setCurrentContext) {
-  serverRequest("get_projects_root").then(resp => {
-    const data = resp.data;
-    setCurrentContext(data + "/" + project);
-  })
+export const setProject = (project, setCurrentContext) => {
+  setCurrentContext(project);
 }

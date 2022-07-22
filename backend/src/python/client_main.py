@@ -34,18 +34,52 @@ app.add_middleware(
 
 @app.get("/api/v1/get_dcc_config")
 async def get_dcc_config():
-    config = utils.get_dcc_config()
+    data = utils.get_dcc_config()
     return {
         "ok": True,
-        "data": config
+        "data": data
     }
 
 
 @app.post("/api/v1/set_dcc_config")
 async def set_dcc_config(request: Request):
     result = await request.json()
-    config = result.get("config", [])
-    utils.set_dcc_config(config)
+    data = result.get("data", [])
+    utils.set_dcc_config(data)
+    return {"ok": True}
+
+
+@app.get("/api/v1/get_server_details")
+async def get_server_details():
+    data = utils.get_server_details()
+    return {
+        "ok": True,
+        "data": data
+    }
+
+
+@app.post("/api/v1/set_server_details")
+async def set_server_details(request: Request):
+    result = await request.json()
+    data = result.get("data", [])
+    utils.set_server_details(data)
+    return {"ok": True}
+
+
+@app.get("/api/v1/get_access")
+async def get_access():
+    data = utils.get_access()
+    return {
+        "ok": True,
+        "data": data
+    }
+
+
+@app.post("/api/v1/set_access")
+async def set_access(request: Request):
+    result = await request.json()
+    data = result.get("data", [])
+    utils.set_access(data)
     return {"ok": True}
 
 
