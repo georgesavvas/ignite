@@ -155,3 +155,11 @@ def query_filter(entities, query):
 
     return filtered
 
+
+def build_path(path):
+    path = PurePath(path)
+    root = ROOT.as_posix()
+    if path.as_posix().startswith(root):
+        return path
+    else:
+        return ROOT / path
