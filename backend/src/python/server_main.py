@@ -1,6 +1,7 @@
 import os
 import math
 import json
+import logging
 from posixpath import dirname
 import uvicorn
 from pprint import pprint
@@ -8,9 +9,11 @@ from pathlib import PurePath
 from fastapi import FastAPI, Request
 from fastapi.responses import PlainTextResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from ignite_server import utils
 
 CONFIG = utils.get_config()
+ROOT = PurePath(CONFIG["projects_root"])
 ENV = os.environ
 
 from ignite_server import api
@@ -39,6 +42,7 @@ async def get_projects_root():
 @app.post("/api/v1/get_context_info")
 async def get_context_info(request: Request):
     result = await request.json()
+    pprint(result)
     path = result.get("path")
     data = api.get_context_info(path)
     return {
@@ -133,7 +137,6 @@ async def create_dirs(request: Request):
 @app.post("/api/v1/get_contents")
 async def get_contents(request: Request):
     result = await request.json()
-    pprint(result)
     query = result.get("query", {})
     data = api.get_contents(
         result.get("path", ""),
@@ -369,6 +372,10 @@ async def rename_entity(request: Request):
         "ok": ok > 0,
         "text": reasons.get(ok, "")
     }
+
+
+logging.debug(f"Attempting to mount {ROOT}")
+app.mount("/files", StaticFiles(directory=ROOT), name="projects_root")
 
 
 if __name__ == "__main__":

@@ -524,6 +524,9 @@ def get_repr_comp(target):
     if utils.is_uri(target_repr):
         target_repr = utils.uri_to_path(target_repr)
     path =  Path(target_repr)
+    if not path.is_dir():
+        logging.error(f"Couldn't resolve {path}")
+        return
     repr_asset = search(path)
     if not repr_asset:
         return {}
