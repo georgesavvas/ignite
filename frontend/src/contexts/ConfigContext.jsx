@@ -50,13 +50,11 @@ export const ConfigProvider = props => {
   const [writeIncr, setWriteIncr] = useState(0);
 
   useEffect(() => {
-    // const savedServerDetails = JSON.parse(localStorage.getItem("server_details")) || {};
     clientRequest("get_server_details").then(resp => {
       const savedServerDetails = resp.data;
       setServerDetails({...serverDetailsDefault, ...savedServerDetails});
     });
 
-    // const savedAccess = JSON.parse(localStorage.getItem("access")) || {};
     clientRequest("get_access").then(resp => {
       const savedAccess = resp.data;
       serverRequest("get_projects_root").then(resp => {
@@ -77,8 +75,6 @@ export const ConfigProvider = props => {
     clientRequest("set_server_details", {data: serverDetails})
     clientRequest("set_access", {data: access})
     clientRequest("set_dcc_config", {data: dccConfig})
-    // localStorage.setItem("server_details", JSON.stringify(serverDetails));
-    // localStorage.setItem("access", JSON.stringify(access));
   }, [writeIncr])
 
   useEffect(() => {
