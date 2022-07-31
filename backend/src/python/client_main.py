@@ -1,8 +1,6 @@
 import os
-import math
 from posixpath import dirname
 import uvicorn
-import yaml
 import logging
 from pprint import pprint
 from pathlib import PurePath
@@ -211,4 +209,4 @@ app.mount("/files", StaticFiles(directory=projects_root), name="projects_root")
 
 
 if __name__ == "__main__":
-    uvicorn.run("client_main:app", host="127.0.0.1", port=9091, log_level="info", reload=True)
+    uvicorn.run(f"{__name__}:app", host="127.0.0.1", port=9071, log_level="info", reload=False)
