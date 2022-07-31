@@ -4,7 +4,7 @@
 block_cipher = None
 
 server_a = Analysis(
-    ['src\\python\\server_main.py'],
+    ['src/python/server_main.py'],
     pathex=[],
     binaries=[],
     datas=[],
@@ -40,7 +40,7 @@ server_exe = EXE(
 )
 
 client_a = Analysis(
-    ['src\\python\\client_main.py'],
+    ['src/python/client_main.py'],
     pathex=[],
     binaries=[],
     datas=[],
