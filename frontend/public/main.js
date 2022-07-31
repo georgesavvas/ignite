@@ -4,9 +4,43 @@ const fs = require('fs').promises;
 const path = require("path");
 const child_process = require("child_process");
 
+console.log("NODE_ENV:", process.env.NODE_ENV);
+
+let platformName = process.platform;
+
+if (process.env.NODE_ENV === "dev") {
+  const pythonPaths = {
+    "win32": "../backend/env/Scripts/python.exe",
+    "darwin": "../backend/env/Scripts/python.exe",
+    "linux": "../backend/env/Scripts/python.exe"
+  }
+
+  let python = child_process.spawn(pythonPaths[platformName], ["../backend/src/python/client_main.py"]);
+  console.log("Spawned client server", python.pid);
+  python.stdout.on("data", function (data) {
+    console.log("data: ", data.toString("utf8"));
+  });
+  python.stderr.on("data", (data) => {
+    console.log(`stderr: ${data}`);
+  });
+} else {
+  const backend = path.join(process.cwd(), "resources/backend/dist/app.exe")
+  let execfile = child_process.execFile;
+  execfile(backend, {windowsHide: true}, (err, stdout, stderr) => {
+    if (err) {
+      console.log(err);
+    }
+    if (stdout) {
+    console.log(stdout);
+    }
+    if (stderr) {
+    console.log(stderr);
+    }
+  })
+}
+
 function createWindow () {
 
-  let platformName = process.platform;
   if (platformName === "win32") platformName = "win";
   else if (platformName === "darwin") platformName = "mac";
   else platformName = "linux";
@@ -40,8 +74,13 @@ function createWindow () {
     }
   })
 
-  win.loadURL('http://localhost:3000');
-  win.webContents.openDevTools();
+  if (process.env.NODE_ENV === "dev") {
+    console.log("Loading development environment...");
+    win.loadURL("http://localhost:3000");
+    win.webContents.openDevTools();
+  } else {
+    win.loadFile("public/index.html");
+  }
 
   setTimeout(function () {
     splash.close();

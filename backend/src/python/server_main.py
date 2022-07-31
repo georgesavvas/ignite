@@ -379,4 +379,4 @@ app.mount("/files", StaticFiles(directory=ROOT), name="projects_root")
 
 
 if __name__ == "__main__":
-    uvicorn.run("server_main:app", host="0.0.0.0", port=9090, log_level="info", reload=False)
+    uvicorn.run(f"{__name__}:app", host="0.0.0.0", port=9090, log_level="info", reload=False)

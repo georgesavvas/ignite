@@ -5,6 +5,7 @@
   "description": "Client app for the Ignite VFX pipeline",
   "author": "George Savvas <ignite@georgesavvas.co.uk>",
   "main": "public/main.js",
+  "homepage": ".",
   "dependencies": {
     "@emotion/react": "^11.8.2",
     "@emotion/styled": "^11.8.1",
@@ -16,7 +17,6 @@
     "@testing-library/jest-dom": "^5.16.2",
     "@testing-library/react": "^12.1.4",
     "@testing-library/user-event": "^13.5.0",
-    "kill-port": "^2.0.1",
     "lodash.debounce": "^4.0.8",
     "notistack": "^2.0.4",
     "react": "^18.2.0",
@@ -26,7 +26,6 @@
     "react-xarrows": "^2.0.2",
     "three": "^0.139.2",
     "valtio": "^1.5.2",
-    "wait-on": "^6.0.1",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
@@ -37,35 +36,10 @@
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
     "sanitize": "npx kill-port 3000",
-    "electron-dev": "cross-env BROWSER=NONE && npm run sanitize && concurrently \"npm start\" \"wait-on http://localhost:3000 && electron .\"",
-    "electron-test": "concurrently \"npm start\" \"wait-on http://localhost:3000 && electron .\""
-  },
-  "build": {
-    "appId": "GeorgeSavvas.Ignite.Frontend",
-    "dmg": {
-      "contents": [
-        {
-          "x": 110,
-          "y": 150
-        },
-        {
-          "x": 240,
-          "y": 150,
-          "type": "link",
-          "path": "/Applications"
-        }
-      ]
-    },
-    "linux": {
-      "target": [
-        "AppImage",
-        "deb"
-      ]
-    },
-    "win": {
-      "target": "NSIS",
-      "icon": "build/icon.ico"
-    }
+    "electron-dev": "npm run sanitize && concurrently \"cross-env BROWSER=none npm start\" \"wait-on http://localhost:3000 && cross-env NODE_ENV=dev electron .\"",
+    "package-win": "electron-packager . --overwrite --icon=public/media/desktop_icon/win/ignite.ico --prune=true --out=dist --version-string.CompanyName=GeorgeSavvas --version-string.FileDescription=IgniteClientDescription --version-string.ProductName=\"Ignite VFX Pipeline\"",
+    "package-mac": "electron-packager . --overwrite --icon=public/media/desktop_icon/mac/ignite.icns --prune=true --out=dist",
+    "package-linux": "electron-packager . --overwrite --icon=public/media/desktop_icon/win/ignite.png --prune=true --asar=true --out=dist"
   },
   "eslintConfig": {
     "extends": [
@@ -90,6 +64,8 @@
     "cross-env": "^7.0.3",
     "electron": "^19.0.8",
     "electron-builder": "^23.1.0",
-    "react-scripts": "^5.0.1"
+    "react-scripts": "^5.0.1",
+    "wait-on": "^6.0.1",
+    "kill-port": "^2.0.1"
   }
 }
