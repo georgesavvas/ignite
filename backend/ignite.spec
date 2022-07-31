@@ -31,7 +31,7 @@ server_exe = EXE(
     strip=False,
     upx=True,
     console=True,
-    noconfirm=True,
+    runtime_tmpdir=None,
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
@@ -67,13 +67,14 @@ client_exe = EXE(
     strip=False,
     upx=True,
     console=True,
-    noconfirm=True,
+    runtime_tmpdir=None,
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
 )
+
 coll = COLLECT(
     server_exe,
     server_a.binaries,
