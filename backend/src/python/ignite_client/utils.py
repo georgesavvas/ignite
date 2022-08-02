@@ -200,14 +200,14 @@ def launch_dcc(dcc, dcc_name, scene):
     return True
 
 
-def get_launch_cmd(dcc, dcc_name, scene):
-    scene = server_request("find", {"query": scene}).get("data", {})
+def get_launch_cmd(dcc, dcc_name, task, scene):
+    # scene = server_request("find", {"query": scene}).get("data", {})
     # if not scene:
     #     return
-    task = scene.get("task", "")
+    # task = scene.get("task", "")
     print("Getting env with (task, dcc, scene) -", task, "-", dcc, "-", scene)
     env = get_env(task, dcc, scene)
-    scene = scene.get("scene")
+    # scene = scene.get("scene")
     for config in get_dcc_config():
         if config["name"] == dcc_name:
             dcc_config = config

@@ -99,6 +99,7 @@ function Explorer() {
           comp.path = BuildFileURL(comp.path, config, {pathOnly: true});
         })
       }
+      if (entity.task) entity.task = BuildFileURL(entity.task, config, {pathOnly: true});
       if (entity.scene) entity.scene = BuildFileURL(entity.scene, config, {pathOnly: true});
       if (entity.dir_kind === "assetversion") {
         obj[entity.result_id] = <AssetTile key={entity.result_id} entity={entity}
