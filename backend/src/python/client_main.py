@@ -1,16 +1,15 @@
 import os
+import sys
 from posixpath import dirname
 import uvicorn
 import logging
-from pprint import pprint
-from pathlib import PurePath
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 ENV = os.environ
-IGNITE_SERVER_HOST = "10.101.120.31" # "127.0.0.1"
-IGNITE_SERVER_PORT = "9090"
+IGNITE_SERVER_HOST = "10.101.120.31"
+IGNITE_SERVER_PORT = "9070"
 ENV["IGNITE_SERVER_HOST"] = IGNITE_SERVER_HOST
 ENV["IGNITE_SERVER_PORT"] = IGNITE_SERVER_PORT
 
@@ -201,6 +200,12 @@ async def run_action(request: Request):
         return {"ok": False}
     api.run_action(entity, action)
     return {"ok": True}
+
+
+@app.get("/api/v1/quit")
+async def rename_entity(request: Request):
+    logging.info("Asked to shut down, cya!")
+    sys.exit()
 
 
 projects_root = CONFIG["projects_root"]
