@@ -7,6 +7,7 @@ import {ConfigContext} from "../contexts/ConfigContext";
 import {ContextContext} from "../contexts/ContextContext";
 import { useSnackbar } from 'notistack';
 import clientRequest from "../services/clientRequest";
+import BuildFileURL from "../services/BuildFileURL";
 
 const style = {
   width: "100%",
@@ -82,11 +83,7 @@ function DccSelector(props) {
 
     if (ok) enqueueSnackbar(`${dcc.name} launched!`, {variant: "success"});
     else enqueueSnackbar("Failed launching scene.", {variant: "error"});
-    setCurrentContext(prevState => {
-      const cc = {...prevState};
-      cc.update += 1;
-      return cc
-    });
+    refreshContext();
     if (props.onClose) props.onClose();
   }
 

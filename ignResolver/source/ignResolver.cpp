@@ -54,20 +54,17 @@ std::string get_uri(const std::string uri) {
     headers = curl_slist_append(headers, "charset: utf-8");
 
     
-    char* host = std::getenv("IGNITE_SERVER_HOST");
-    char* port = std::getenv("IGNITE_SERVER_PORT");
+    char* address = std::getenv("IGNITE_SERVER_ADDRESS");
     std::string address = "";
-    if (host != NULL && port != NULL) {
-        address = std::string("http://") + host + ":" + port + "/api/v1/resolve";
+    if (address != NULL) {
+        address = std::string("http://") + address + "/api/v1/resolve";
     }
-    // std::cout << address + "\n";
     std::string data = "{\"uri\":\"" + uri + "\"}";
     std::string readBuffer = "";
     curl_global_init(CURL_GLOBAL_DEFAULT);
     curl = curl_easy_init();
     if(curl) {
         curl_easy_setopt(curl, CURLOPT_URL, address.c_str());
-        // curl_easy_setopt(curl, CURLOPT_URL, "http://127.0.0.1:9090/api/v1/resolve");
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
         curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data.c_str());
         curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, data.length());

@@ -1,5 +1,6 @@
 import os
 import parse
+import yaml
 import glob
 import shutil
 import logging
@@ -18,8 +19,7 @@ IGNITE_DCC = Path(os.environ["IGNITE_DCC"])
 CONFIG_PATH = Path(Path.home(), ".ignite")
 if not CONFIG_PATH.exists():
     CONFIG_PATH.mkdir()
-IGNITE_SERVER_HOST = ENV["IGNITE_SERVER_HOST"]
-IGNITE_SERVER_PORT = ENV["IGNITE_SERVER_PORT"]
+IGNITE_SERVER_ADDRESS = ENV["IGNITE_SERVER_ADDRESS"]
 
 HUEY = utils.get_huey()
 
@@ -300,3 +300,26 @@ def run_action(entity, action):
             continue
         _action["fn"]("", "", "")
         break
+
+
+def copy_default_scene(task, dcc):
+    task = utils.server_request("find", {"query": task}).get("data")
+    if not task or not task.dir_kind == "task":
+        logging.error(f"Invalid task {task}")
+        return
+    filepath = IGNITE_DCC / "default_scenes/default_scenes.yaml"
+    if not filepath.exists():
+        logging.error(f"Default scenes config {filepath} does not exist.")
+        return
+    with open(filepath, "r") as f:
+        data = yaml.safe_load(f)
+    if dcc not in data.keys():
+        logging.error(f"Default scenes config is empty {filepath}")
+        return
+    src = IGNITE_DCC / "default_scenes" / data[dcc]
+    dest = task.get_next_scene()
+    os.makedirs(dest)
+    logging.info(f"Copying default scene {src} to {dest}")
+    shutil.copy2(src, dest)
+    utils.server_request("register_directory", {"path": dest, "dir_kind": "scene"})
+    return dest / PurePath(src).name
