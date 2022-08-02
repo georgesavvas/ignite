@@ -5,7 +5,7 @@ block_cipher = None
 
 
 a = Analysis(
-    ['src/python/server_main.py'],
+    ['src\\python\\server_main.py'],
     pathex=[],
     binaries=[],
     datas=[],
@@ -41,4 +41,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+    icon='icon.ico',
 )

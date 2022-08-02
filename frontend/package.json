@@ -37,9 +37,11 @@
     "dist": "electron-builder",
     "sanitize": "npx kill-port 3000",
     "electron-dev": "npm run sanitize && concurrently \"cross-env BROWSER=none npm start\" \"wait-on http://localhost:3000 && cross-env NODE_ENV=dev electron .\"",
-    "package-win": "npm run build && electron-packager . --overwrite --icon=public/media/desktop_icon/win/ignite.ico --prune=true --out=dist --version-string.CompanyName=GeorgeSavvas --version-string.FileDescription=IgniteClientDescription --version-string.ProductName=\"Ignite VFX Pipeline\"",
-    "package-mac": "npm run build && electron-packager . --overwrite --icon=public/media/desktop_icon/mac/ignite.icns --prune=true --out=dist",
-    "package-linux": "npm run build && electron-packager . --overwrite --icon=public/media/desktop_icon/win/ignite.png --prune=true --asar=true --out=dist"
+    "copy-backend-win": "xcopy ..\\backend\\dist\\Ignite* build /Y",
+    "copy-backend-linux": "cp ../backend/dist/Ignite* build",
+    "package-win": "npm run build && npm run copy-backend-win && electron-packager . --overwrite --icon=public/media/desktop_icon/win/ignite.ico --prune=true --out=dist --version-string.CompanyName=GeorgeSavvas --version-string.FileDescription=IgniteClientDescription --version-string.ProductName=\"Ignite VFX Pipeline\"",
+    "package-mac": "npm run build && electron-packager . --overwrite --icon=public/media/desktop_icon/mac/ignite.icns --prune=true --out=dist && npm run copy-backend-linux",
+    "package-linux": "npm run build && electron-packager . --overwrite --icon=public/media/desktop_icon/win/ignite.png --prune=true --asar=true --out=dist && npm run copy-backend-linux"
   },
   "eslintConfig": {
     "extends": [
@@ -67,5 +69,11 @@
     "react-scripts": "^5.0.1",
     "wait-on": "^6.0.1",
     "kill-port": "^2.0.1"
+  },
+  "build": {
+    "files": [
+      "build/**/*",
+      "node_modules/**/*"
+    ]
   }
 }

@@ -1,6 +1,6 @@
 import os
 import math
-import json
+import sys
 import logging
 from posixpath import dirname
 import uvicorn
@@ -374,9 +374,15 @@ async def rename_entity(request: Request):
     }
 
 
+@app.get("/api/v1/quit")
+async def rename_entity(request: Request):
+    logging.info("Asked to shut down, cya!")
+    sys.exit()
+
+
 logging.debug(f"Attempting to mount {ROOT}")
 app.mount("/files", StaticFiles(directory=ROOT), name="projects_root")
 
 
 if __name__ == "__main__":
-    uvicorn.run(f"{__name__}:app", host="0.0.0.0", port=9090, log_level="info", reload=False)
+    uvicorn.run(f"{__name__}:app", host="0.0.0.0", port=9070, log_level="info", reload=False)
