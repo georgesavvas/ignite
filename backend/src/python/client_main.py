@@ -109,11 +109,10 @@ async def get_launch_cmd(request: Request):
             "task": task,
             "dcc": dcc
         }
-        resp = utils.server_request("copy_default_scene", data)
-        scene = resp.get("scene", "")
+        scene = utils.copy_default_scene(data)
     elif new_scene and not task:
         return {"ok": False}
-    data = utils.get_launch_cmd(dcc, dcc_name, scene)
+    data = utils.get_launch_cmd(dcc, dcc_name, task, scene)
     return {
         "ok": True,
         "data": data
@@ -209,4 +208,4 @@ app.mount("/files", StaticFiles(directory=projects_root), name="projects_root")
 
 
 if __name__ == "__main__":
-    uvicorn.run(f"{__name__}:app", host="127.0.0.1", port=9071, log_level="info", reload=False)
+    uvicorn.run(f"{__name__}:app", host="127.0.0.1", port=9071, log_level="info", reload=True)

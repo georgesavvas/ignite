@@ -70,11 +70,10 @@ function DccSelector(props) {
     const data = {
       dcc: dcc_name,
       dcc_name: dcc.name,
-      task: props.task,
       scene: props.scene,
       new_scene: props.newScene
     };
-
+    console.log(data);
     const ok = await clientRequest("get_launch_cmd", data).then(resp => {
       const data = resp.data;
       console.log(data);
