@@ -16,8 +16,6 @@ IGNITE_DCC = Path(os.environ["IGNITE_DCC"])
 CONFIG_PATH = Path(Path.home(), ".ignite")
 if not CONFIG_PATH.exists():
     CONFIG_PATH.mkdir()
-IGNITE_SERVER_HOST = ENV["IGNITE_SERVER_HOST"]
-IGNITE_SERVER_PORT = ENV["IGNITE_SERVER_PORT"]
 
 HUEY = SqliteHuey(filename=IGNITE_ROOT / "common/ignite.db")
 
@@ -32,10 +30,15 @@ def get_config() -> dict:
     paths = ("projects_root",)
     for p in paths:
         config[p] = os.path.abspath(config[p])
+
+    IGNITE_SERVER_ADDRESS = config.get("server_address")
+    ENV["IGNITE_SERVER_ADDRESS"] = IGNITE_SERVER_ADDRESS
+
     return config
 
 
 CONFIG = get_config()
+IGNITE_SERVER_ADDRESS = CONFIG.get("server_address")
 ROOT = PurePath(CONFIG["projects_root"])
 
 
@@ -61,8 +64,7 @@ def replace_vars(d):
 
 def get_generic_env():
     env = {
-        "IGNITE_SERVER_HOST": IGNITE_SERVER_HOST,
-        "IGNITE_SERVER_PORT": IGNITE_SERVER_PORT
+        "IGNITE_SERVER_ADDRESS": IGNITE_SERVER_ADDRESS
     }
     env.update(replace_vars(GENERIC_ENV))
     return env
@@ -273,7 +275,7 @@ def get_explorer_cmd(filepath):
 
 
 def server_request(method, data=None):
-    url = f"http://{IGNITE_SERVER_HOST}:{IGNITE_SERVER_PORT}/api/v1/{method}"
+    url = f"http://{IGNITE_SERVER_ADDRESS}/api/v1/{method}"
     headers = {"Content-type": "application/json"}
     if not data:
         resp = requests.get(url, headers=headers).json()

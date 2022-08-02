@@ -7,16 +7,11 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-ENV = os.environ
-IGNITE_SERVER_HOST = "10.101.120.31"
-IGNITE_SERVER_PORT = "9070"
-ENV["IGNITE_SERVER_HOST"] = IGNITE_SERVER_HOST
-ENV["IGNITE_SERVER_PORT"] = IGNITE_SERVER_PORT
-
 from ignite_client import utils, api
 
 
 CONFIG = utils.get_config()
+
 
 app = FastAPI()
 origins = ["*"]

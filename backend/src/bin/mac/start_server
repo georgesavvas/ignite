@@ -1,6 +1,6 @@
 #!/bin/bash
 
 git pull --ff-only;
-lsof -P | grep ':9090' | awk '{print $2}' | xargs kill -9
+lsof -P | grep ':9070' | awk '{print $2}' | xargs kill -9
 source env/bin/activate;
 python src/python/server_main.py;

@@ -39,6 +39,7 @@ class Task(Directory):
         "exports", "scenes", "cache", "group", "build", "sequence", "shot"):
             d[s] = getattr(self, s)
         d["full_context"] = f"{self.group}/{self.context}"
+        d["next_scene"] = self.get_next_scene()
         # d["task"] = self.task.as_dict()
         return d
 

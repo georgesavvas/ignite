@@ -19,6 +19,7 @@ default_projects_root = str(Path.home() / "projects")
 if not CONFIG_PATH.is_file():
     CONFIG_PATH.parent.mkdir(parents=True, exist_ok=True)
     config = {
+        "server_address": "localhost:9070",
         "projects_root": default_projects_root
     }
     with open(CONFIG_PATH, "w") as file:
@@ -28,6 +29,7 @@ else:
         existing = yaml.safe_load(file) or {}
     if not existing.get("projects_root"):
         config = {
+            "server_address": "localhost:9070",
             "projects_root": default_projects_root
         }
         with open(CONFIG_PATH, "w") as file:

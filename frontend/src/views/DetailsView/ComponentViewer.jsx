@@ -7,6 +7,7 @@ import { OrbitControls   } from "@react-three/drei";
 import { TextureLoader } from 'three/src/loaders/TextureLoader';
 import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js';
 import { Typography } from "@mui/material";
+import BuildFileURL from "../../services/BuildFileURL";
 // import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 const style = {
@@ -61,7 +62,7 @@ function EXRViewer(props) {
   }
 
   let path = "media/no_icon.png";
-  if (comp.path) path = `http://127.0.0.1:9091/files/${comp.api_path}`;
+  if (comp.path) path = BuildFileURL(comp.api_path);
   if (!comp.static) {
     let frame = comp.first + (comp.last - comp.first) * progress;
     frame = Math.round(frame);

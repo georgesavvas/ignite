@@ -1,6 +1,6 @@
 function BuildFileURL(filepath, config, options={}) {
   if (!filepath || filepath === undefined) return "";
-
+  console.log("BuildFileURL Input -", filepath);
   const address = config.serverDetails.address;
   const remote = config.access.remote;
   const serverProjectsDir = config.access.serverProjectsDir || "";
@@ -38,12 +38,17 @@ function BuildFileURL(filepath, config, options={}) {
   // console.log(input, output, inputSlash, outputSlash);
   // console.log(filepath, "->", `${output}${filepath_processed}`);
 
-  if (options.pathOnly) return `${output}${filepath_processed}`;
-  else if (remote || options.forceRemote) {
+  if (options.pathOnly) {
+    const value = `${output}${filepath_processed}`;
+    console.log("BuildFileURL Output -", value);
+    return value;
+  } else if (remote || options.forceRemote) {
     const value = `${address}/files/${filepath_processed}`;
+    console.log("BuildFileURL Output -", value);
     return value;
   } else {
     const value = `ign://${output}${filepath_processed}`;
+    console.log("BuildFileURL Output -", value);
     return value;
   }
 }
