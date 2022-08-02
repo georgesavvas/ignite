@@ -30,6 +30,10 @@ app.add_middleware(
 )
 
 
+def log_request(request):
+    pprint(request)
+
+
 @app.get("/api/v1/get_projects_root")
 async def get_projects_root():
     data = api.get_projects_root()
@@ -42,6 +46,7 @@ async def get_projects_root():
 @app.post("/api/v1/get_context_info")
 async def get_context_info(request: Request):
     result = await request.json()
+    log_request(result)
     pprint(result)
     path = result.get("path")
     data = api.get_context_info(path)
@@ -74,6 +79,7 @@ async def get_project_names():
 @app.post("/api/v1/get_project_tree")
 async def get_project_tree(request: Request):
     result = await request.json()
+    log_request(result)
     project = api.get_project(result.get("project"))
     data = project.get_project_tree() if project else {}
     return {
@@ -85,6 +91,7 @@ async def get_project_tree(request: Request):
 @app.post("/api/v1/find")
 async def find(request: Request):
     result = await request.json()
+    log_request(result)
     query = result.get("query", "")
     entity = api.find(query)
     data = {}
@@ -98,8 +105,8 @@ async def find(request: Request):
 
 @app.post("/api/v1/resolve", response_class=PlainTextResponse)
 async def resolve(request: Request):
-    print("-", await request.body())
     result = await request.json()
+    log_request(result)
     pprint(result)
     uri = result.get("uri")
     print("Received", uri)
@@ -115,6 +122,7 @@ async def resolve(request: Request):
 @app.post("/api/v1/create_dirs")
 async def create_dirs(request: Request):
     result = await request.json()
+    log_request(result)
     path = result.get("path")
     method = result.get("method")
     dir_kind = result.get("kind")
@@ -137,6 +145,7 @@ async def create_dirs(request: Request):
 @app.post("/api/v1/get_contents")
 async def get_contents(request: Request):
     result = await request.json()
+    log_request(result)
     query = result.get("query", {})
     data = api.get_contents(
         result.get("path", ""),
@@ -167,6 +176,7 @@ async def get_contents(request: Request):
 @app.post("/api/v1/get_tasks")
 async def get_tasks(request: Request):
     result = await request.json()
+    log_request(result)
     query = result.get("query", {})
     data = api.discover_tasks(
         result.get("path"),
@@ -197,6 +207,7 @@ async def get_tasks(request: Request):
 @app.post("/api/v1/get_assets")
 async def get_assets(request: Request):
     result = await request.json()
+    log_request(result)
     query = result.get("query", {})
     data = api.discover_assets(
         result.get("path"),
@@ -227,6 +238,7 @@ async def get_assets(request: Request):
 @app.post("/api/v1/get_assetversions")
 async def get_assetversions(request: Request):
     result = await request.json()
+    log_request(result)
     query = result.get("query", {})
     data = api.discover_assetversions(
         result.get("path"),
@@ -257,6 +269,7 @@ async def get_assetversions(request: Request):
 @app.post("/api/v1/get_scenes")
 async def get_scenes(request: Request):
     result = await request.json()
+    log_request(result)
     query = result.get("query", {})
     data = api.discover_scenes(
         result.get("path"),
@@ -287,6 +300,7 @@ async def get_scenes(request: Request):
 @app.post("/api/v1/copy_default_scene")
 async def copy_default_scene(request: Request):
     result = await request.json()
+    log_request(result)
     task = result.get("task", "")
     dcc = result.get("dcc", "")
     scene = api.copy_default_scene(task, dcc)
@@ -299,6 +313,7 @@ async def copy_default_scene(request: Request):
 @app.post("/api/v1/register_directory")
 async def register_directory(request: Request):
     result = await request.json()
+    log_request(result)
     path = result.get("path", "")
     dir_kind = result.get("dir_kind", "")
     ok = api.register_directory(path, dir_kind)
@@ -308,6 +323,7 @@ async def register_directory(request: Request):
 @app.post("/api/v1/register_task")
 async def register_task(request: Request):
     result = await request.json()
+    log_request(result)
     path = result.get("path", "")
     task_type = result.get("task_type", "")
     ok = api.register_task(path, task_type)
@@ -317,6 +333,7 @@ async def register_task(request: Request):
 @app.post("/api/v1/register_scene")
 async def register_scene(request: Request):
     result = await request.json()
+    log_request(result)
     path = result.get("path", "")
     ok = api.register_scene(path)
     return {"ok": ok}
@@ -333,6 +350,7 @@ async def register_asset(request: Request):
 @app.post("/api/v1/set_repr_asset")
 async def set_repr_asset(request: Request):
     result = await request.json()
+    log_request(result)
     target = result.get("target", "")
     repr = result.get("repr", "")
     ok = api.set_repr_asset(target, repr)
@@ -350,6 +368,7 @@ async def register_assetversion(request: Request):
 @app.post("/api/v1/delete_entity")
 async def delete_entity(request: Request):
     result = await request.json()
+    log_request(result)
     path = result.get("path", "")
     entity = result.get("kind", "")
     ok = api.delete_entity(path, entity)
@@ -359,6 +378,7 @@ async def delete_entity(request: Request):
 @app.post("/api/v1/rename_entity")
 async def rename_entity(request: Request):
     result = await request.json()
+    log_request(result)
     path = result.get("path", "")
     entity = result.get("kind", "")
     new_name = result.get("name")
