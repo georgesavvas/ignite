@@ -1,0 +1,23 @@
+.container {
+  background-color: rgb(36, 36, 43);
+  box-sizing: border-box;
+  position: absolute;
+  z-index: 1000;
+  height: 100vh;
+  width: 100vw;
+  margin: 0px;
+  padding: 0px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo {
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position-x: center;
+  background-position-y: center;
+  height: 15vh;
+  width: 100%;
+}

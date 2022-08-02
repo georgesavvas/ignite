@@ -51,24 +51,24 @@ function createWindow () {
     "linux": "media/desktop_icon/linux/icon.png"
   }
 
-  const splash = new BrowserWindow({
-    width: 500, 
-    height: 300, 
-    transparent: true, 
-    frame: false, 
-    alwaysOnTop: true
-  });
+  // const splash = new BrowserWindow({
+  //   width: 500, 
+  //   height: 300, 
+  //   // transparent: true, 
+  //   frame: false, 
+  //   alwaysOnTop: true
+  // });
 
-  splash.loadFile("public/splash.html");
-  splash.center();
+  // splash.loadFile("public/splash.html");
+  // splash.center();
 
   const win = new BrowserWindow({
     width: 1280,
     height: 720,
-    show: false,
+    // show: false,
     icon: path.join(__dirname, iconPaths[platformName]),
     webPreferences: {
-      nodeIntegration: true,
+      nodeIntegration: false,
       contextIsolation: true,
       preload: path.join(__dirname, "preload.js")
     }
@@ -77,15 +77,15 @@ function createWindow () {
   if (process.env.NODE_ENV === "dev") {
     console.log("Loading development environment...");
     win.loadURL("http://localhost:3000");
-    win.webContents.openDevTools();
+    // win.webContents.openDevTools();
   } else {
     win.loadFile("build/index.html");
   }
 
-  setTimeout(function () {
-    splash.close();
-    win.show();
-  }, 700);
+  // setTimeout(function () {
+  //   splash.close();
+  //   win.show();
+  // }, 7000);
 
   win.on("close", e => {
     if (!appQuitting) {
