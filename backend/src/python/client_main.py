@@ -24,6 +24,23 @@ app.add_middleware(
 )
 
 
+# @app.websocket("/ws")
+# async def websocket_endpoint(websocket: WebSocket):
+#     print("Opening websocket...")
+#     await websocket.accept()
+#     while True:
+#         try:
+#             # Wait for any message from the client
+#             await websocket.receive_text()
+#             # Send message to the client
+#             resp = {"value": 6}
+#             await websocket.send_json(resp)
+#         except Exception as e:
+#             print("error:", e)
+#             break
+#     print("Closing websocket.")
+
+
 @app.get("/api/v1/get_dcc_config")
 async def get_dcc_config():
     data = utils.get_dcc_config()
