@@ -416,4 +416,4 @@ print("__SERVER_READY__")
 
 
 if __name__ == "__main__":
-    uvicorn.run(f"{__name__}:app", host=SERVER_HOST, port=int(SERVER_HOST), log_level="info", reload=False)
+    uvicorn.run(f"{__name__}:app", host=SERVER_HOST, port=int(SERVER_PORT), log_level="info", reload=False)
