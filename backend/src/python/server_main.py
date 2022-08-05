@@ -43,6 +43,13 @@ async def get_projects_root():
     }
 
 
+@app.get("/api/v1/ping")
+async def ping():
+    return {
+        "ok": True
+    }
+
+
 @app.post("/api/v1/get_context_info")
 async def get_context_info(request: Request):
     result = await request.json()
@@ -402,6 +409,9 @@ async def rename_entity(request: Request):
 
 logging.debug(f"Attempting to mount {ROOT}")
 app.mount("/files", StaticFiles(directory=ROOT), name="projects_root")
+
+
+print("__SERVER_READY__")
 
 
 if __name__ == "__main__":

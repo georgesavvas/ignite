@@ -31,7 +31,7 @@ def get_config() -> dict:
     for p in paths:
         config[p] = os.path.abspath(config[p])
 
-    IGNITE_SERVER_ADDRESS = config.get("server_address", "localhost:9070")
+    IGNITE_SERVER_ADDRESS = config.get("server_address")
     ENV["IGNITE_SERVER_ADDRESS"] = IGNITE_SERVER_ADDRESS
 
     return config

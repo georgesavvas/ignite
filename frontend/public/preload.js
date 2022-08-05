@@ -17,3 +17,7 @@ contextBridge.exposeInMainWorld("api", {
     return await ipcRenderer.invoke("launch_dcc", cmd, args, env);
   },
 })
+
+contextBridge.exposeInMainWorld("services", {
+  clientProgress: (callback) => ipcRenderer.on("client-progress", callback)
+})
