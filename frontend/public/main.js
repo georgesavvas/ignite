@@ -102,6 +102,7 @@ app.whenReady().then(() => {
       console.log("Client:", stderr);
     }
   })
+  console.log(backend);
   tray = new Tray("public/media/icon.png")
   const contextMenu = Menu.buildFromTemplate([
     { label: "Show", click: () => window.show() },

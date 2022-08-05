@@ -13,6 +13,7 @@ from fastapi.staticfiles import StaticFiles
 from ignite_server import utils
 
 CONFIG = utils.get_config()
+SERVER_HOST, SERVER_PORT = CONFIG["server_address"].split(":")
 ROOT = PurePath(CONFIG["projects_root"])
 ENV = os.environ
 
@@ -415,4 +416,4 @@ print("__SERVER_READY__")
 
 
 if __name__ == "__main__":
-    uvicorn.run(f"{__name__}:app", host="0.0.0.0", port=9070, log_level="info", reload=False)
+    uvicorn.run(f"{__name__}:app", host=SERVER_HOST, port=int(SERVER_HOST), log_level="info", reload=False)

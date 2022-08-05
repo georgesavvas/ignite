@@ -239,7 +239,7 @@ if __name__ == "__main__":
     uvicorn.run(
         f"{__name__}:app",
         host=CLIENT_HOST,
-        port=CLIENT_PORT,
+        port=int(CLIENT_PORT),
         log_level="info",
         reload=True
     )
