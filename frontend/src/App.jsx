@@ -43,7 +43,7 @@ function App() {
   return (
     <ThemeProvider theme={darkTheme}>
       <GlobalStyles styles={{ ...darkScrollbar() }} />
-      { isLoading ? <Splash /> : null }
+      { isLoading ? <Splash onFinished={() => setIsLoading(false)} /> : null }
       <div className="App">
         <ConfigProvider>
           <ContextProvider>

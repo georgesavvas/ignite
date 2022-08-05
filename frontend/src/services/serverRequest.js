@@ -1,5 +1,5 @@
 async function serverRequest(method, data=undefined) {
-  const resp = await fetch(`http://raspberrypi.local:9070/api/v1/${method}`, {
+  const resp = await fetch(`http://raspberrypi:9070/api/v1/${method}`, {
     method: !data ? "GET" : "POST",
     headers: {
       'Accept': 'application/json, text/plain, */*',

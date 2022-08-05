@@ -1,6 +1,6 @@
-const { app, BrowserWindow, protocol, ipcMain, dialog, Tray, Menu } = require('electron');
-const os = require('os');
-const fs = require('fs').promises;
+const { app, BrowserWindow, protocol, ipcMain, dialog, Tray, Menu } = require("electron");
+const os = require("os");
+const fs = require("fs").promises;
 const path = require("path");
 const child_process = require("child_process");
 
@@ -26,18 +26,6 @@ const backendPath = path.join(
     backendPathsDev[platformName] :
     backendPaths[platformName]
 )
-backend = child_process.execFile(
-  backendPath, {windowsHide: false}, (err, stdout, stderr) => {
-  if (err) {
-    console.log("Client:", err);
-  }
-  if (stdout) {
-    console.log("Client:", stdout);
-  }
-  if (stderr) {
-    console.log("Client:", stderr);
-  }
-})
 
 function createWindow () {
 
@@ -99,6 +87,21 @@ function createWindow () {
 
 app.whenReady().then(() => {
   window = createWindow();
+  backend = child_process.execFile(
+    backendPath, {windowsHide: false}, (err, stdout, stderr) => {
+    if (err) {
+      console.log("Client:", err);
+    }
+    if (stdout) {
+      if (stdout.includes("__CLIENT_READY__")) {
+        window.webContents.send("client-progress", 100);
+      }
+      console.log("Client:", stdout);
+    }
+    if (stderr) {
+      console.log("Client:", stderr);
+    }
+  })
   tray = new Tray("public/media/icon.png")
   const contextMenu = Menu.buildFromTemplate([
     { label: "Show", click: () => window.show() },
@@ -112,10 +115,10 @@ app.whenReady().then(() => {
   tray.on("click", () => window.show())
   tray.on("double-click", () => window.show())
 })
-app.on('ready', async () => {
+app.on("ready", async () => {
   const protocolName = "ign";
   protocol.registerFileProtocol(protocolName, (request, callback) => {
-    const url = request.url.replace(`${protocolName}://`, '');
+    const url = request.url.replace(`${protocolName}://`, "");
     try {
       return callback(decodeURIComponent(url));
     }
@@ -181,7 +184,7 @@ ipcMain.handle("launch_dcc", async (event, cmd, args, env) => {
 });
 
 ipcMain.handle("fileInput", async (default_dir="") => {
-  return dialog.showOpenDialog({properties: ['openFile'] });
+  return dialog.showOpenDialog({properties: ["openFile"] });
 });
 
 // In this file you can include the rest of your app's specific main process

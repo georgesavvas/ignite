@@ -11,6 +11,7 @@ from ignite_client import utils, api
 
 
 CONFIG = utils.get_config()
+CLIENT_HOST, CLIENT_PORT = CONFIG["client_address"].split(":")
 
 
 app = FastAPI()
@@ -39,6 +40,13 @@ app.add_middleware(
 #             print("error:", e)
 #             break
 #     print("Closing websocket.")
+
+
+@app.get("/api/v1/ping")
+async def ping():
+    return {
+        "ok": True
+    }
 
 
 @app.get("/api/v1/get_dcc_config")
@@ -224,5 +232,14 @@ logging.debug(f"Attempting to mount {projects_root}")
 app.mount("/files", StaticFiles(directory=projects_root), name="projects_root")
 
 
+print("__CLIENT_READY__")
+
+
 if __name__ == "__main__":
-    uvicorn.run(f"{__name__}:app", host="127.0.0.1", port=9071, log_level="info", reload=True)
+    uvicorn.run(
+        f"{__name__}:app",
+        host=CLIENT_HOST,
+        port=CLIENT_PORT,
+        log_level="info",
+        reload=True
+    )
