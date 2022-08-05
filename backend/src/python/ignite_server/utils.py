@@ -33,10 +33,15 @@ def get_config() -> dict:
     paths = ("projects_root",)
     for p in paths:
         config[p] = os.path.abspath(config[p])
+
+    IGNITE_SERVER_ADDRESS = config.get("server_address")
+    ENV["IGNITE_SERVER_ADDRESS"] = IGNITE_SERVER_ADDRESS
+
     return config
 
 
 CONFIG = get_config()
+IGNITE_SERVER_ADDRESS = CONFIG.get("server_address")
 ROOT = PurePath(CONFIG["projects_root"])
 
 
