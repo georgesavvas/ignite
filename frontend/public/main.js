@@ -2,58 +2,69 @@ const { app, BrowserWindow, protocol, ipcMain, dialog, Tray, Menu } = require("e
 const os = require("os");
 const fs = require("fs").promises;
 const path = require("path");
-const child_process = require("child_process");
+const { spawn } = require("child_process");
+const getPort = require("get-port");
+const axios = require("axios");
+require("v8-compile-cache");
 
 let platformName = process.platform;
 let appQuitting = false;
 let tray = null;
 let window = null;
 let backend = null;
+const isDev = process.env.NODE_ENV === "dev";
 
-const backendPaths = {
+async function clientRequest(port, method, data=undefined) {
+  console.log(`http://localhost:${port}/api/v1/${method}`);
+  const resp = await axios({
+    url: `http://localhost:${port}/api/v1/${method}`,
+    method: !data ? "get" : "post",
+    headers: {
+      'Accept': 'application/json, text/plain, */*',
+      'Content-Type': 'application/json'
+    },
+    data: JSON.stringify(data)
+  })
+  return await resp.data;
+}
+
+const iconPaths = {
+  "win32": "media/desktop_icon/win/icon.ico",
+  "darwin": "media/desktop_icon/mac/icon.icns",
+  "linux": "media/desktop_icon/linux/icon.png"
+}
+
+const serverPaths = {
+  "win32": "resources/app/build/IgniteServer.exe",
+  "darwin": "resources/app/build/IgniteServer",
+  "linux": "resources/app/build/IgniteServer"
+}
+const serverPathDev = "../backend/src/python/server_main.py"
+const serverPath = path.join(
+  process.cwd(),
+  process.env.NODE_ENV === "dev" ?
+    serverPathDev :
+    serverPaths[platformName]
+)
+
+const clientPaths = {
   "win32": "resources/app/build/IgniteClientBackend.exe",
   "darwin": "resources/app/build/IgniteClientBackend",
   "linux": "resources/app/build/IgniteClientBackend"
 }
-const backendPathsDev = {
-  "win32": "../backend/dist/IgniteClientBackend.exe",
-  "darwin": "../backend/dist/IgniteClientBackend",
-  "linux": "../backend/dist/IgniteClientBackend"
-}
-const backendPath = path.join(
+const clientPathDev = "../backend/src/python/client_main.py"
+const clientPath = path.join(
   process.cwd(),
   process.env.NODE_ENV === "dev" ?
-    backendPathsDev[platformName] :
-    backendPaths[platformName]
+    clientPathDev :
+    clientPaths[platformName]
 )
 
-function createWindow () {
-
-  if (platformName === "win32") platformName = "win";
-  else if (platformName === "darwin") platformName = "mac";
-  else platformName = "linux";
-
-  const iconPaths = {
-    "win": "media/desktop_icon/win/icon.ico",
-    "mac": "media/desktop_icon/mac/icon.icns",
-    "linux": "media/desktop_icon/linux/icon.png"
-  }
-
-  // const splash = new BrowserWindow({
-  //   width: 500, 
-  //   height: 300, 
-  //   // transparent: true, 
-  //   frame: false, 
-  //   alwaysOnTop: true
-  // });
-
-  // splash.loadFile("public/splash.html");
-  // splash.center();
-
+function createWindow (port) {
   const win = new BrowserWindow({
     width: 1280,
     height: 720,
-    // show: false,
+    show: false,
     icon: path.join(__dirname, iconPaths[platformName]),
     webPreferences: {
       nodeIntegration: false,
@@ -62,7 +73,7 @@ function createWindow () {
     }
   })
 
-  if (process.env.NODE_ENV === "dev") {
+  if (isDev) {
     console.log("Loading development environment...");
     win.loadURL("http://localhost:3000");
     // win.webContents.openDevTools();
@@ -82,35 +93,105 @@ function createWindow () {
     }
   });
 
+  ipcMain.handle("store_data", async (event, filename, data) => {
+    const filepath = path.join(os.homedir(), ".ignite", filename);
+    fs.writeFile(filepath, data, (err) => {
+      if (err) {
+        throw err;
+      }
+      else return true
+    });
+  });
+  
+  ipcMain.handle("load_data", async (event, filename) => {
+    const filepath = path.join(os.homedir(), ".ignite", filename);
+    fs.readFile(filepath, (err) => {
+      if (err) throw err;
+      return true;
+    });
+  });
+  
+  ipcMain.handle("check_path", async (event, filepath) => {
+    let valid = true;
+    try {
+      await fs.access(filepath);
+    } catch (err) {
+      valid = false;
+    }
+    return valid;
+  });
+  
+  ipcMain.handle("file_input", async (default_dir="") => {
+    return dialog.showOpenDialog({properties: ["openFile"] });
+  });
+  
+  ipcMain.handle("get_env", env_name => {
+    return process.env[env_name];
+  });
+  
+  ipcMain.handle("set_env", (env_name, env_value) => {
+    process.env[env_name] = env_value;
+  });
+
+  ipcMain.handle("get_port", () => {
+    return port;
+  });
+
   return win;
 }
 
-app.whenReady().then(() => {
-  window = createWindow();
-  backend = child_process.execFile(
-    backendPath, {windowsHide: false}, (err, stdout, stderr) => {
-    if (err) {
-      console.log("Client:", err);
-    }
-    if (stdout) {
-      if (stdout.includes("__CLIENT_READY__")) {
-        window.webContents.send("client-progress", 100);
-      }
-      console.log("Client:", stdout);
-    }
-    if (stderr) {
-      console.log("Client:", stderr);
-    }
+function createSplash () {
+  const win = new BrowserWindow({
+    width: 600,
+    height: 350,
+    transparent: true,
+    frame: false,
+    alwaysOnTop: true,
+    icon: path.join(__dirname, iconPaths[platformName])
   })
-  console.log(backend);
-  tray = new Tray("public/media/icon.png")
+  win.loadFile("public/splash.html");
+  return win;
+}
+
+app.whenReady().then(async () => {
+  const splash = createSplash();
+
+  const port = await getPort({
+    port: getPort.makeRange(9071, 9999)
+  });
+
+  window = createWindow(port);
+
+  window.webContents.once("did-finish-load", () => {
+    splash.destroy();
+    window.show();
+  });
+
+  ipcMain.handle("launch_dcc", async (event, cmd, args, env) => {
+    const proc = spawn(cmd, args, {env: env, detached: true});
+    if (proc) return true;
+  });
+
+  if (isDev) {
+    backend = spawn(`python ${clientPath} ${port}`, { detached: true, shell: true, stdio: "inherit" });
+  } else {
+    const cmd = {
+      darwin: `open -gj ${clientPath} --args`,
+      linux: `./${clientPath}`,
+      win32: `start ./${clientPath}`
+    }[platformName];
+    backend = spawn(`${cmd} ${port}`, { detached: false, shell: true, stdio: "pipe" });
+  }
+
+  if (tray === null) tray = new Tray("public/media/icon.png");
   const contextMenu = Menu.buildFromTemplate([
     { label: "Show", click: () => window.show() },
     { label: "Exit", click: () => {
-      backend.kill();
+      // backend.kill();
+      clientRequest(port, "quit");
       app.quit();
     } },
-  ])
+  ]);
   tray.setToolTip("Ignite")
   tray.setContextMenu(contextMenu)
   tray.on("click", () => window.show())
@@ -150,43 +231,3 @@ app.on("activate", () => {
     window = createWindow()
   }
 })
-
-ipcMain.handle("store_data", async (event, filename, data) => {
-  const filepath = path.join(os.homedir(), ".ignite", filename);
-  fs.writeFile(filepath, data, (err) => {
-    if (err) {
-      throw err;
-    }
-    else return true
-  });
-});
-
-ipcMain.handle("load_data", async (event, filename) => {
-  const filepath = path.join(os.homedir(), ".ignite", filename);
-  fs.readFile(filepath, (err) => {
-    if (err) throw err;
-    return true;
-  });
-});
-
-ipcMain.handle("check_path", async (event, filepath) => {
-  let valid = true;
-  try {
-    await fs.access(filepath);
-  } catch (err) {
-    valid = false;
-  }
-  return valid;
-});
-
-ipcMain.handle("launch_dcc", async (event, cmd, args, env) => {
-  const proc = child_process.spawn(cmd, args, {env: env, detached: true});
-  if (proc) return true;
-});
-
-ipcMain.handle("fileInput", async (default_dir="") => {
-  return dialog.showOpenDialog({properties: ["openFile"] });
-});
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.

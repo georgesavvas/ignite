@@ -11,7 +11,6 @@ from ignite_client import utils, api
 
 
 CONFIG = utils.get_config()
-CLIENT_HOST, CLIENT_PORT = CONFIG["client_address"].split(":")
 
 
 app = FastAPI()
@@ -232,14 +231,17 @@ logging.debug(f"Attempting to mount {projects_root}")
 app.mount("/files", StaticFiles(directory=projects_root), name="projects_root")
 
 
-print("__CLIENT_READY__")
-
-
 if __name__ == "__main__":
+    host = "localhost"
+    port = 9070
+    args = sys.argv
+    if len(args) >= 2:
+        port = int(args[1])
+    logging.info(f"Launching server at {host}:{port}")
     uvicorn.run(
         f"{__name__}:app",
-        host=CLIENT_HOST,
-        port=int(CLIENT_PORT),
+        host=host,
+        port=port,
         log_level="info",
-        reload=True
+        reload=False
     )
