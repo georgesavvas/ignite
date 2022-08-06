@@ -1,5 +1,5 @@
 import { grid } from "@mui/system";
-import React, { Suspense, useEffect, useRef, useState } from "react";
+import React, { Suspense, useEffect, useContext, useState } from "react";
 import Slider from '@mui/material/Slider';
 import * as THREE from "three";
 import { Canvas, useFrame, useLoader } from '@react-three/fiber';
@@ -7,6 +7,7 @@ import { OrbitControls   } from "@react-three/drei";
 import { TextureLoader } from 'three/src/loaders/TextureLoader';
 import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js';
 import { Typography } from "@mui/material";
+import {ConfigContext} from "../../contexts/ConfigContext";
 import BuildFileURL from "../../services/BuildFileURL";
 // import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
@@ -62,7 +63,7 @@ function EXRViewer(props) {
   }
 
   let path = "media/no_icon.png";
-  if (comp.path) path = BuildFileURL(comp.api_path);
+  if (comp.path) path = BuildFileURL(comp.api_path, props.config, {forceRemote: true});
   if (!comp.static) {
     let frame = comp.first + (comp.last - comp.first) * progress;
     frame = Math.round(frame);
@@ -131,11 +132,12 @@ function GeoViewer(props) {
 }
 
 function ComponentViewer(props) {
+  const [config, setConfig] = useContext(ConfigContext);
   const [progress, setProgress] = useState(0.5);
   
   const comp = props.comp;
   let path = "media/no_icon.png";
-  if (comp.path) path = `http://127.0.0.1:9091/files/${comp.api_path}`;
+  if (comp.path) path = BuildFileURL(comp.api_path, config, {forceRemote: true});
   if (!comp.static) {
     let frame = comp.first + (comp.last - comp.first) * progress;
     frame = Math.round(frame);
@@ -153,8 +155,8 @@ function ComponentViewer(props) {
     const exr = [".exr"];
     const vid = [".mp4", ".mov"];
     const geo = [];
-    if (img.includes(ext)) return <EXRViewer comp={comp} path={path} />;
-    else if (exr.includes(ext)) return <EXRViewer comp={comp} path={path} />;
+    if (img.includes(ext)) return <EXRViewer comp={comp} path={path} config={config} />;
+    else if (exr.includes(ext)) return <EXRViewer comp={comp} path={path} config={config} />;
     else if (vid.includes(ext)) return <VideoViewer comp={comp} path={path} />;
     else if (geo.includes(ext)) return <GeoViewer comp={comp} path={path} />;
     else return <Typography>No file preview for {comp.filename}</Typography>;

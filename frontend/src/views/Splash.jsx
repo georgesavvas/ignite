@@ -17,7 +17,7 @@ export default function Splash(props) {
   // const {clientSpring} = useSpring({ clientSpring: 100, from: { clientSpring: 0 }, config: { duration: 1000 } });
   // const {frontendSpring} = useSpring({ frontendSpring: 100, from: { frontendSpring: 0 }, config: { duration: 1000 } });
   
-  window.services.clientProgress((e, value) => {
+  window.services.client_progress((e, value) => {
     setClientProgress(value);
   })
 
