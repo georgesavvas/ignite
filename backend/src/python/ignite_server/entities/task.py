@@ -11,6 +11,10 @@ ROOT = PurePath(CONFIG["projects_root"])
 
 class Task(Directory):
     def __init__(self, path="") -> None:
+        self.dict_attrs = ("path", "dir_kind", "anchor", "project", "name", "task_type",
+        "repr", "exports", "scenes", "cache", "group", "build", "sequence", "shot",
+        "context"),
+        self.nr_attrs = ("path", "context", "exports"),
         self.task_type = "generic"
         super().__init__(path, dir_kind="task")
         self.scenes = self.path / "scenes"
@@ -34,13 +38,8 @@ class Task(Directory):
         self.update_config(config)
 
     def as_dict(self):
-        d = {}
-        for s in ("path", "dir_kind", "anchor", "project", "name", "task_type", "repr",
-        "exports", "scenes", "cache", "group", "build", "sequence", "shot"):
-            d[s] = getattr(self, s)
-        d["full_context"] = f"{self.group}/{self.context}"
+        d = super().as_dict()
         d["next_scene"] = self.get_next_scene()
-        # d["task"] = self.task.as_dict()
         return d
 
     def discover_scenes(self, dcc=[], latest=True, as_dict=False):

@@ -14,6 +14,9 @@ ROOT = PurePath(CONFIG["projects_root"])
 
 class Directory():
     def __init__(self, path="", dir_kind="directory") -> None:
+        self.dict_attrs = ("path", "dir_kind", "anchor", "project", "name", "context",
+            "repr"),
+        self.nr_attrs = ("path", "context"),
         self.project = ""
         self.group = ""
         self.name = ""
@@ -50,19 +53,16 @@ class Directory():
         project = split2[0]
         self.project = project
         self.name = split2[-1]
-        self.group, self.context = self._get_context()
+        self.context = self.get_context()
         self.load_from_config()
 
-    def _get_context(self):
+    def get_context(self):
         project_path = ROOT / self.project
         if hasattr(self, "task"):
             context = self.task.as_posix()
         else:
             context = self.path.parent.as_posix()
-        values = context.replace(project_path.as_posix() + "/", "").split("/", 1)
-        if not values or len(values) < 2:
-            values = ["", ""]
-        return values
+        return context.relative_to(project_path).as_posix()
 
     def load_from_config(self):
         with open(self.anchor, "r") as f:
@@ -72,10 +72,11 @@ class Directory():
 
     def as_dict(self):
         d = {}
-        for s in ("path", "dir_kind", "anchor", "project", "name", "context", "repr"):
-            d[s] = getattr(self, s)
-        d["full_context"] = f"{self.group}/{self.context}" if self.group else ""
-        # d["task"] = self.task.as_dict()
+        for s in self.dict_attrs:
+            value = getattr(self, s)
+            d[s] = value
+            if s in self.nr_attrs:
+                d[f"{s}_nr"] = utils.get_nr(value)
         return d
 
     def create_dir(self, name, anchor="directory", recursive=False):

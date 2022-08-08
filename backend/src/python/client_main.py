@@ -1,6 +1,7 @@
 import os
 import sys
 from posixpath import dirname
+from pprint import pprint
 import uvicorn
 import logging
 from fastapi import FastAPI, Request
@@ -41,6 +42,10 @@ app.add_middleware(
 #     print("Closing websocket.")
 
 
+def log_request(request):
+    pprint(request)
+
+
 @app.get("/api/v1/ping")
 async def ping():
     return {
@@ -60,6 +65,7 @@ async def get_dcc_config():
 @app.post("/api/v1/set_dcc_config")
 async def set_dcc_config(request: Request):
     result = await request.json()
+    log_request(result)
     data = result.get("data", [])
     utils.set_dcc_config(data)
     return {"ok": True}
@@ -77,7 +83,8 @@ async def get_server_details():
 @app.post("/api/v1/set_server_details")
 async def set_server_details(request: Request):
     result = await request.json()
-    data = result.get("data", [])
+    log_request(result)
+    data = result.get("data", {})
     utils.set_server_details(data)
     return {"ok": True}
 
@@ -94,7 +101,8 @@ async def get_access():
 @app.post("/api/v1/set_access")
 async def set_access(request: Request):
     result = await request.json()
-    data = result.get("data", [])
+    log_request(result)
+    data = result.get("data", {})
     utils.set_access(data)
     return {"ok": True}
 
@@ -102,6 +110,7 @@ async def set_access(request: Request):
 @app.post("/api/v1/launch_dcc")
 async def launch_dcc(request: Request):
     result = await request.json()
+    log_request(result)
     task = result.get("task", "")
     scene = result.get("scene", "")
     dcc = result.get("dcc", "")
@@ -123,6 +132,7 @@ async def launch_dcc(request: Request):
 @app.post("/api/v1/get_launch_cmd")
 async def get_launch_cmd(request: Request):
     result = await request.json()
+    log_request(result)
     task = result.get("task", "")
     scene = result.get("scene", "")
     dcc = result.get("dcc", "")
@@ -146,6 +156,7 @@ async def get_launch_cmd(request: Request):
 @app.post("/api/v1/show_in_explorer")
 async def show_in_explorer(request: Request):
     result = await request.json()
+    log_request(result)
     filepath = result.get("filepath")
     if not filepath:
         return {"ok": False}
@@ -156,6 +167,7 @@ async def show_in_explorer(request: Request):
 @app.post("/api/v1/get_explorer_cmd")
 async def get_explorer_cmd(request: Request):
     result = await request.json()
+    log_request(result)
     filepath = result.get("filepath")
     if not filepath:
         return {"ok": False}
@@ -169,6 +181,7 @@ async def get_explorer_cmd(request: Request):
 @app.post("/api/v1/get_env")
 async def get_env(request: Request):
     result = await request.json()
+    log_request(result)
     task = result.get("task", "")
     dcc = result.get("dcc", "")
     env = utils.get_env(task, dcc)
@@ -181,6 +194,7 @@ async def get_env(request: Request):
 @app.post("/api/v1/ingest_get_files")
 async def ingest_get_files(request: Request):
     result = await request.json()
+    log_request(result)
     dirs = result.get("dirs", "")
     resp = api.ingest_get_files(dirs)
     return {
@@ -192,6 +206,7 @@ async def ingest_get_files(request: Request):
 @app.post("/api/v1/ingest")
 async def ingest(request: Request):
     result = await request.json()
+    log_request(result)
     data = result.get("data", {})
     resp = api.ingest(data)
     return {
@@ -212,6 +227,7 @@ async def get_actions():
 @app.post("/api/v1/run_action")
 async def run_action(request: Request):
     result = await request.json()
+    log_request(result)
     entity = result.get("entity")
     action = result.get("action")
     if not entity or not action:
@@ -233,7 +249,7 @@ app.mount("/files", StaticFiles(directory=projects_root), name="projects_root")
 
 if __name__ == "__main__":
     host = "localhost"
-    port = 9070
+    port = 9071
     args = sys.argv
     if len(args) >= 2:
         port = int(args[1])
@@ -243,5 +259,5 @@ if __name__ == "__main__":
         host=host,
         port=port,
         log_level="info",
-        reload=False
+        reload=True
     )

@@ -5,6 +5,7 @@ from pathlib import Path, PurePath
 from ignite_server import utils
 from ignite_server.entities.directory import Directory
 from ignite_server.entities.asset import Asset
+from ignite_server.entities.component import Component
 from ignite_server.constants import ANCHORS, LABEL_WEIGHTS
 
 CONFIG = utils.get_config()
@@ -20,6 +21,10 @@ class AssetVersion(Directory):
         self.score = 0
         self.labels = set()
         super().__init__(path, dir_kind="assetversion")
+        self.dict_attrs = ("path", "dir_kind", "anchor", "project", "name", "version",
+            "components", "asset", "task", "uri", "labels", "context",
+            "thumbnail")
+        self.nr_attrs = ("path", "context", "thumbnail"),
         self.version = self.name
         self.version_int = 0
         if self.version.startswith("v"):
@@ -30,10 +35,8 @@ class AssetVersion(Directory):
         self.asset = self.path.parent
         self.uri = utils.get_uri(self.asset, self.version_int)
         self.task = self.asset.parent.parent
-        self.group, self.context = self._get_context()
-        self.source = ""
-        self.preview = PurePath()
-        self._fetch_components()
+        self.context = self.get_context()
+        self.fetch_components()
         self._get_score()
         
         self.thumbnail = self.get_thumbnail()
@@ -41,38 +44,19 @@ class AssetVersion(Directory):
     def __lt__(self, other):
         return self.version_int < other.version_int
 
-    def _fetch_components(self):
+    def fetch_components(self):
         path = Path(self.path)
-        anchor = ANCHORS["assetversion"]
         comps = []
-        collections, remainder = clique.assemble([str(d.name) for d in path.iterdir()])
+        collections, remainder = clique.assemble([str(d) for d in path.iterdir()])
         for c in collections:
-            filename = c.format("{head}####{tail}")
-            indexes = list(c.indexes)
-            filepath = str(self.path / filename)
-            comps.append({
-                "filename": filename,
-                "path": filepath,
-                "api_path": utils.get_api_path(filepath),
-                "name": c.head.rstrip("."),
-                "ext": c.tail,
-                "first": indexes[0],
-                "last": indexes[-1],
-                "static": 0
-            })
+            comp = Component(c)
+            comps.append(comp.as_dict())
         for r in remainder:
             r2 = PurePath(r)
-            if r2.name.startswith("."):
+            if r2.name.split("/")[-1].startswith("."):
                 continue
-            filepath = str(self.path / r2.name)
-            comps.append({
-                "filename": str(r2),
-                "path": filepath,
-                "api_path": utils.get_api_path(filepath),
-                "name": r2.stem,
-                "ext": r2.suffix,
-                "static": 1
-            })
+            comp = Component(r2)
+            comps.append(comp.as_dict())
         self.components = comps
 
     def _get_score(self):
@@ -90,17 +74,10 @@ class AssetVersion(Directory):
         return self.version == versions[-1]
 
     def as_dict(self):
-        d = {}
-        for s in (
-                "path", "dir_kind", "anchor", "project", "name", "version",
-                "components", "asset", "source", "task", "uri", "labels", "context"):
-            d[s] = getattr(self, s)
+        d = super().as_dict()
         d["build"] = self.asset
-        d["full_context"] = f"{self.group}/{self.context}"
-        d["api_path"] = utils.get_api_path(d["path"]),
-        d["thumbnail"] = self.thumbnail
-        project_path = ROOT / self.project
         d["default_name"] = ""
+        d["default_type"] = ""
         if self.components:
             c = self.components[0]
             d["default_name"] = c["name"]

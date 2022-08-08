@@ -11,6 +11,9 @@ ROOT = PurePath(CONFIG["projects_root"])
 class Asset(Directory):
     def __init__(self, path="") -> None:
         super().__init__(path, dir_kind="asset")
+        self.dict_attrs = ("path", "dir_kind", "anchor", "project", "name", "versions",
+            "latest_v", "uri", "context")
+        self.nr_attrs = ("path", "context"),
         self.uri = utils.get_uri(path)
         self._versions = []
         self._assetversions = []
@@ -102,12 +105,7 @@ class Asset(Directory):
         return self.path / "exports" / next_v
 
     def as_dict(self):
-        d = {}
-        for s in (
-            "path", "dir_kind", "anchor", "project", "name", "versions", "latest_v", "uri"
-        ):
-            d[s] = getattr(self, s)
+        d = super().as_dict()
         if self.latest_av:
             d["latest_av"] = self.latest_av.as_dict()
-            # d["thumbnail"] = d["latest_av"]["thumbnail"].as_posix()
         return d

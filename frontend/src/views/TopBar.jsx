@@ -1,11 +1,4 @@
 import React, {useEffect, useState, useContext} from "react";
-import Typography from '@mui/material/Typography';
-import FormControl from '@mui/material/FormControl';
-import Skeleton from '@mui/material/Skeleton';
-import InputLabel from '@mui/material/InputLabel';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
-import TextField from '@mui/material/TextField';
 import styles from "./TopBar.module.css";
 import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
@@ -18,9 +11,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import SettingsIcon from '@mui/icons-material/Settings';
 import SettingsDialog from "./SettingsDialog.jsx";
-import {ProjectContext} from "../contexts/ProjectContext";
 import ProjectBrowser from "./ProjectBrowser";
-import serverRequest from "../services/serverRequest";
 import Vault from "./Vault/Vault";
 
 function FeedbackIcon() {
