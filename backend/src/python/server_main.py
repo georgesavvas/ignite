@@ -38,17 +38,12 @@ def log_request(request):
 @app.get("/api/v1/get_projects_root")
 async def get_projects_root():
     data = api.get_projects_root()
-    return {
-        "ok": True,
-        "data": data
-    }
+    return {"ok": True, "data": data}
 
 
 @app.get("/api/v1/ping")
 async def ping():
-    return {
-        "ok": True
-    }
+    return {"ok": True}
 
 
 @app.post("/api/v1/get_context_info")
@@ -58,10 +53,7 @@ async def get_context_info(request: Request):
     pprint(result)
     path = result.get("path")
     data = api.get_context_info(path)
-    return {
-        "ok": True,
-        "data": data
-    }
+    return {"ok": True, "data": data}
 
 
 @app.get("/api/v1/get_projects")

@@ -11,34 +11,33 @@ from ignite_client.constants import GENERIC_ENV, DCC_ENVS, OS_NAMES
 
 
 ENV = os.environ
+API_VERSION = ENV["IGNITE_API_VERSION"]
 IGNITE_ROOT = Path(ENV["IGNITE_ROOT"])
-IGNITE_DCC = Path(os.environ["IGNITE_DCC"])
-CONFIG_PATH = Path(Path.home(), ".ignite")
-if not CONFIG_PATH.exists():
-    CONFIG_PATH.mkdir()
+CONFIG_PATH = Path(ENV["IGNITE_CONFIG_PATH"])
+CLIENT_CONFIG_PATH = Path(ENV["IGNITE_CLIENT_CONFIG_PATH"])
+DCC = Path(ENV["IGNITE_DCC"])
+COMMON = Path(ENV["IGNITE_COMMON"])
 
-HUEY = SqliteHuey(filename=IGNITE_ROOT / "common/ignite.db")
+HUEY = SqliteHuey(filename=CONFIG_PATH / "ignite.db")
 
 
 def get_config() -> dict:
-    path = os.environ["IGNITE_CLIENT_CONFIG_PATH"]
+    path = CLIENT_CONFIG_PATH
     if not os.path.isfile(path):
         raise Exception(f"Config file not found: {path}")
     logging.info(f"Reading config from {path}...")    
     with open(path, "r") as f:
         config = yaml.safe_load(f)
-    paths = ("projects_root",)
-    for p in paths:
-        config[p] = os.path.abspath(config[p])
-
-    IGNITE_SERVER_ADDRESS = config.get("server_address")
+    
+    IGNITE_SERVER_ADDRESS = config["server_details"]["address"]
+    IGNITE_SERVER_PASSWORD = config["server_details"]["password"]
     ENV["IGNITE_SERVER_ADDRESS"] = IGNITE_SERVER_ADDRESS
+    ENV["IGNITE_SERVER_PASSWORD"] = IGNITE_SERVER_PASSWORD
 
     return config
 
 
 CONFIG = get_config()
-IGNITE_SERVER_ADDRESS = CONFIG.get("server_address")
 ROOT = PurePath(CONFIG["projects_root"])
 
 
@@ -48,7 +47,7 @@ def get_huey():
 
 def replace_vars(d):
     vars = {
-        "dcc": str(IGNITE_DCC),
+        "dcc": str(DCC),
         "projects_root": server_request("get_projects_root").get("data", "")
     }
     env = {}
@@ -106,7 +105,6 @@ def get_dcc_env(dcc):
     return replace_vars(DCC_ENVS[dcc])
 
 
-
 def get_env(task="", dcc="", scene={}):
     # env = os.environ.copy()
     env = {}
@@ -121,52 +119,49 @@ def get_env(task="", dcc="", scene={}):
     return env
 
 
-def get_dcc_config():
-    filepath = CONFIG_PATH / "dcc_config.yaml"
-    if not filepath.exists():
-        return []
-    with open(filepath, "r") as f:
-        data = yaml.safe_load(f)
-    return data or []
-
-
-def set_dcc_config(data):
-    filepath = CONFIG_PATH / "dcc_config.yaml"
-    with open(filepath, "w") as f:
-        yaml.safe_dump(data, f)
-    return filepath
-
-
 def get_server_details():
-    filepath = CONFIG_PATH / "server_details.yaml"
-    if not filepath.exists():
-        return []
-    with open(filepath, "r") as f:
-        data = yaml.safe_load(f)
-    return data or []
+    config = get_config()
+    return config["server_details"] or {}
 
 
 def set_server_details(data):
-    filepath = CONFIG_PATH / "server_details.yaml"
-    with open(filepath, "w") as f:
-        yaml.safe_dump(data, f)
-    return filepath
+    config = get_config()
+    config["server_details"].update(data)
+    with open(CLIENT_CONFIG_PATH, "w") as f:
+        yaml.safe_dump(config, f)
+    
+    IGNITE_SERVER_ADDRESS = config["server_details"]["address"]
+    IGNITE_SERVER_PASSWORD = config["server_details"]["password"]
+    ENV["IGNITE_SERVER_ADDRESS"] = IGNITE_SERVER_ADDRESS
+    ENV["IGNITE_SERVER_PASSWORD"] = IGNITE_SERVER_PASSWORD
+
+    return config
+
+
+def get_dcc_config():
+    config = get_config()
+    return config["dcc_config"] or []
+
+
+def set_dcc_config(data):
+    config = get_config()
+    config["dcc_config"] = data
+    with open(CLIENT_CONFIG_PATH, "w") as f:
+        yaml.safe_dump(config, f)
+    return config
 
 
 def get_access():
-    filepath = CONFIG_PATH / "access.yaml"
-    if not filepath.exists():
-        return []
-    with open(filepath, "r") as f:
-        data = yaml.safe_load(f)
-    return data or []
+    config = get_config()
+    return config["access"] or {}
 
 
 def set_access(data):
-    filepath = CONFIG_PATH / "access.yaml"
-    with open(filepath, "w") as f:
-        yaml.safe_dump(data, f)
-    return filepath
+    config = get_config()
+    config["access"].update(data)
+    with open(CLIENT_CONFIG_PATH, "w") as f:
+        yaml.safe_dump(config, f)
+    return config
 
 
 def discover_dcc():
@@ -275,7 +270,7 @@ def get_explorer_cmd(filepath):
 
 
 def server_request(method, data=None):
-    url = f"http://{IGNITE_SERVER_ADDRESS}/api/v1/{method}"
+    url = f"http://{IGNITE_SERVER_ADDRESS}/api/{API_VERSION}/{method}"
     headers = {"Content-type": "application/json"}
     if not data:
         resp = requests.get(url, headers=headers).json()
@@ -285,7 +280,7 @@ def server_request(method, data=None):
 
 
 def get_action_files():
-    path = IGNITE_ROOT / "common/actions"
+    path = COMMON / "actions"
     files = {}
     for entity in ("scenes", "assets", "assetversions", "components"):
         entity_path = path / entity

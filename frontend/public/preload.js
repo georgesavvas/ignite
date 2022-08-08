@@ -26,4 +26,7 @@ contextBridge.exposeInMainWorld("services", {
   set_env: (env_name, env_value) => {
     ipcRenderer.invoke("set_env", env_name, env_value);
   },
+  set_envs: data => {
+    ipcRenderer.invoke("set_envs", data);
+  }
 })

@@ -76,7 +76,7 @@ function createWindow (port) {
   if (isDev) {
     console.log("Loading development environment...");
     win.loadURL("http://localhost:3000");
-    // win.webContents.openDevTools();
+    win.webContents.openDevTools();
   } else {
     win.loadFile("build/index.html");
   }
@@ -93,7 +93,7 @@ function createWindow (port) {
     }
   });
 
-  ipcMain.handle("store_data", async (event, filename, data) => {
+  ipcMain.handle("store_data", async (e, filename, data) => {
     const filepath = path.join(os.homedir(), ".ignite", filename);
     fs.writeFile(filepath, data, (err) => {
       if (err) {
@@ -103,7 +103,7 @@ function createWindow (port) {
     });
   });
   
-  ipcMain.handle("load_data", async (event, filename) => {
+  ipcMain.handle("load_data", async (e, filename) => {
     const filepath = path.join(os.homedir(), ".ignite", filename);
     fs.readFile(filepath, (err) => {
       if (err) throw err;
@@ -111,7 +111,7 @@ function createWindow (port) {
     });
   });
   
-  ipcMain.handle("check_path", async (event, filepath) => {
+  ipcMain.handle("check_path", async (e, filepath) => {
     let valid = true;
     try {
       await fs.access(filepath);
@@ -121,16 +121,24 @@ function createWindow (port) {
     return valid;
   });
   
-  ipcMain.handle("file_input", async (default_dir="") => {
+  ipcMain.handle("file_input", async (e, default_dir="") => {
     return dialog.showOpenDialog({properties: ["openFile"] });
   });
   
-  ipcMain.handle("get_env", env_name => {
+  ipcMain.handle("get_env", (e, env_name) => {
     return process.env[env_name];
   });
   
-  ipcMain.handle("set_env", (env_name, env_value) => {
+  ipcMain.handle("set_env", (e, env_name, env_value) => {
     process.env[env_name] = env_value;
+    console.log("Setting", env_name, "to", env_value, "->", process.env[env_name]);
+  });
+
+  ipcMain.handle("set_envs", (e, data) => {
+    for (const [env_name, env_value] of Object.entries(data)) {
+      process.env[env_name] = env_value;
+      console.log("Setting", env_name, "to", env_value, "->", process.env[env_name]);
+    }
   });
 
   ipcMain.handle("get_port", () => {
@@ -159,6 +167,8 @@ app.whenReady().then(async () => {
   const port = await getPort({
     port: getPort.makeRange(9071, 9999)
   });
+  console.log("Registering client port", port);
+  process.env.IGNITE_CLIENT_ADDRESS = `127.0.0.1:${port}`;
 
   window = createWindow(port);
 
@@ -167,13 +177,13 @@ app.whenReady().then(async () => {
     window.show();
   });
 
-  ipcMain.handle("launch_dcc", async (event, cmd, args, env) => {
+  ipcMain.handle("launch_dcc", async (e, cmd, args, env) => {
     const proc = spawn(cmd, args, {env: env, detached: true});
     if (proc) return true;
   });
 
   if (isDev) {
-    backend = spawn(`python ${clientPath} ${port}`, { detached: true, shell: true, stdio: "inherit" });
+    // backend = spawn(`python ${clientPath} ${port}`, { detached: true, shell: true, stdio: "inherit" });
   } else {
     const cmd = {
       darwin: `open -gj ${clientPath} --args`,
@@ -223,7 +233,7 @@ app.on("before-quit", e => {
   appQuitting = true;
 });
 
-app.on("activate", () => {
+app.on("activate", e => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   

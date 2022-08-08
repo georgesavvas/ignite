@@ -5,7 +5,7 @@ import serverRequest from "../services/serverRequest";
 export const ConfigContext = createContext();
 
 const serverDetailsDefault = {
-  address: "localhost",
+  address: "",
   password: ""
 }
 
@@ -69,9 +69,13 @@ export const ConfigProvider = props => {
   }, [])
 
   useEffect(() => {
-    if (!writeIncr) {
+    if (writeIncr <= 0) {
       return;
     }
+    window.services.set_envs({
+      IGNITE_SERVER_ADDRESS: serverDetails.address,
+      IGNITE_SERVER_PASSWORD: serverDetails.password
+    })
     clientRequest("set_server_details", {data: serverDetails})
     clientRequest("set_access", {data: access})
     clientRequest("set_dcc_config", {data: dccConfig})

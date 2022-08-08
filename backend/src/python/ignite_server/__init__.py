@@ -14,35 +14,37 @@ ignite_root = Path(DIR).parent.parent.parent.parent
 logging.info(f"Setting IGNITE_ROOT to {ignite_root}")
 ENV["IGNITE_ROOT"] = str(ignite_root)
 
-default_config = {
-    "server_address": "0.0.0.0:9070",
-    "projects_root": str(Path.home() / "projects")
-}
+def ensure_config(filepath, default={}):
+    if not filepath.is_file():
+        filepath.parent.mkdir(parents=True, exist_ok=True)
+        with open(filepath, "w") as file:
+            yaml.safe_dump(default, file)
+    elif default:
+        with open(filepath, "r") as file:
+            existing = yaml.safe_load(file) or {}
+        existing_keys = list(existing.keys())
+        changed = False
+        for k, v in default.items():
+            if k in existing_keys:
+                continue
+            existing[k] = v
+            changed = True
+        if changed:
+            with open(filepath, "w") as file:
+                yaml.safe_dump(existing, file)
 
 CONFIG_PATH = ignite_root / "common/server_config.yaml"
-if not CONFIG_PATH.is_file():
-    CONFIG_PATH.parent.mkdir(parents=True, exist_ok=True)
-    with open(CONFIG_PATH, "w") as file:
-        yaml.safe_dump(default_config, file)
-else:
-    with open(CONFIG_PATH, "r") as file:
-        existing = yaml.safe_load(file) or {}
-    existing_keys = list(existing.keys())
-    changed = False
-    for k, v in default_config.items():
-        if k in existing_keys:
-            continue
-        existing[k] = v
-        changed = True
-    if changed:
-        with open(CONFIG_PATH, "w") as file:
-            yaml.safe_dump(existing, file)
+ensure_config(CONFIG_PATH, {
+    "server_address": "0.0.0.0:9070",
+    "projects_root": str(Path.home() / "projects")
+})
+
 logging.info(f"Setting IGNITE_SERVER_CONFIG_PATH to {CONFIG_PATH}")
 logging.info(f"Setting IGNITE_SERVER_ROOT to {DIR}")
 ENV["IGNITE_SERVER_CONFIG_PATH"] = str(CONFIG_PATH)
 ENV["IGNITE_SERVER_ROOT"] = DIR
 
-dcc = Path(DIR).parent.parent.parent.parent / "dcc"
+dcc = ignite_root / "dcc"
 logging.info(f"Setting IGNITE_DCC to {dcc}")
 ENV["IGNITE_DCC"] = str(dcc)
 

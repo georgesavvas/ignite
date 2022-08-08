@@ -15,11 +15,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 
 ENV = os.environ
-IGNITE_DCC = Path(os.environ["IGNITE_DCC"])
-CONFIG_PATH = Path(Path.home(), ".ignite")
-if not CONFIG_PATH.exists():
-    CONFIG_PATH.mkdir()
-IGNITE_SERVER_ADDRESS = ENV["IGNITE_SERVER_ADDRESS"]
+DCC = Path(ENV["IGNITE_DCC"])
 
 HUEY = utils.get_huey()
 
@@ -307,7 +303,7 @@ def copy_default_scene(task, dcc):
     if not task or not task["dir_kind"] == "task":
         logging.error(f"Invalid task {task}")
         return
-    filepath = IGNITE_DCC / "default_scenes/default_scenes.yaml"
+    filepath = DCC / "default_scenes/default_scenes.yaml"
     if not filepath.exists():
         logging.error(f"Default scenes config {filepath} does not exist.")
         return
@@ -316,7 +312,7 @@ def copy_default_scene(task, dcc):
     if dcc not in data.keys():
         logging.error(f"Default scenes config is empty {filepath}")
         return
-    src = IGNITE_DCC / "default_scenes" / data[dcc]
+    src = DCC / "default_scenes" / data[dcc]
     dest = task.get["next_scene"]
     os.makedirs(dest)
     logging.info(f"Copying default scene {src} to {dest}")
