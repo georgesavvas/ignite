@@ -61,6 +61,10 @@ def validate_dirname(name, extra_chars=""):
     return re.match(f"^[a-zA-Z0-9_{extra_chars}]+$", name)
 
 
+def get_nr(path):
+    return PurePath(path).relative_to(ROOT).as_posix()
+
+
 def create_anchor(path, name):
     ensure_directory(path)
     anchor = ANCHORS.get(name)
@@ -138,11 +142,6 @@ def uri_to_path(uri):
             return path
         path = path / data[step]
     return path
-
-
-def get_api_path(path):
-    path = PurePath(path).as_posix()
-    return path.replace(ROOT.as_posix(), "")
 
 
 def query_filter(entities, query):

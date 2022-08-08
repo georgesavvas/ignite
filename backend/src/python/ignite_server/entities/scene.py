@@ -11,6 +11,9 @@ ROOT = PurePath(CONFIG["projects_root"])
 
 class Scene(Directory):
     def __init__(self, path="") -> None:
+        self.dict_attrs = ("path", "project", "name", "group" ,"dcc", "extension",
+            "version", "dir_kind", "scene", "context", "task", "version", "vsn")
+        self.nr_attrs = ("path", "context", "task", "scene"),
         self.project = ""
         self.group = ""
         self.context = ""
@@ -63,7 +66,7 @@ class Scene(Directory):
         self.extension = ext
         self.task = path=path.parent.parent
         self.dcc = ext_dcc.get(ext, "")
-        self.group, self.context = self._get_context()
+        self.context = self.get_context()
     
     def is_valid(self):
         if not self.task or not self.version or not self.task or not self.extension:
@@ -71,12 +74,7 @@ class Scene(Directory):
         return True
 
     def as_dict(self):
-        d = {}
-        for s in ("path", "project", "name", "group" ,"dcc", "extension", "version",
-                "dir_kind", "scene", "context", "task", "version",
-                "vsn"):
-            d[s] = getattr(self, s)
-        d["full_context"] = f"{self.group}/{self.context}"
+        d = super().as_dict()
         d["exports"] = os.path.join(self.task, "exports")
         return d
 

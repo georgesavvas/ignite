@@ -83,6 +83,7 @@ export const ConfigProvider = props => {
       access: access,
       dccConfig: dccConfig
     })
+    setWriteIncr(prevState => prevState + 1);
   }, [serverDetails, access, dccConfig])
   
   const addToDCCConfig = prevState => {
@@ -109,12 +110,10 @@ export const ConfigProvider = props => {
 
   const handleSetServerDetails = data => {
     setServerDetails(prevState => ({...prevState, ...data}));
-    setWriteIncr(prevState => prevState + 1);
   }
 
   const handleSetAccess = data => {
     setAccess(prevState => ({...prevState, ...data}));
-    setWriteIncr(prevState => prevState + 1);
   }
 
   const handleSetDccConfig = (data, operation) => {
@@ -132,7 +131,6 @@ export const ConfigProvider = props => {
         setDccConfig(dccConfigDefault); break;
       }
     }
-    setWriteIncr(prevState => prevState + 1);
   }
 
   const handleSetConfig = (setting, data, operation="") => {

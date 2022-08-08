@@ -25,6 +25,7 @@ const Input = styled('input')({
 });
 
 export default function SettingsDialog(props) {
+  const [serverDetailsAddress, setServerDetailsAddress] = useState("");
   const [config, setConfig] = useContext(ConfigContext);
 
   const handleDccConfigChange = (e) => {
@@ -159,6 +160,11 @@ export default function SettingsDialog(props) {
     setConfig("dccConfig", {}, "revertToDefaults");
   }
 
+  const handleServerDetailsAddressChange = e => {
+    setServerDetailsAddress(e.target.value);
+    setConfig("serverDetails", {address: e.target.value});
+  }
+
   return (
     <Modal open={props.open} onClose={props.onClose} title="Settings" maxWidth="lg"
       closeButton>
@@ -173,8 +179,8 @@ export default function SettingsDialog(props) {
             label="Address"
             fullWidth
             variant="standard"
-            value={config.serverDetails.address}
-            onChange={e => setConfig("serverDetails", {address: e.target.value})}
+            value={serverDetailsAddress}
+            onChange={handleServerDetailsAddressChange}
           />
           <TextField
             margin="dense"
