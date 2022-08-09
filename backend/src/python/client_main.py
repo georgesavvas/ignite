@@ -2,6 +2,7 @@ import os
 import sys
 from posixpath import dirname
 from pprint import pprint
+from pathlib import Path
 import uvicorn
 import logging
 from fastapi import FastAPI, Request
@@ -46,64 +47,34 @@ def log_request(request):
     pprint(request)
 
 
+def mount_root():
+    projects_root = CONFIG["projects_root"]
+    if not projects_root or not Path(projects_root).is_dir():
+        logging.warning(f"Projects root {projects_root} does not exist, skipping mounting...")
+        return
+    logging.debug(f"Attempting to mount {projects_root}")
+    app.mount("/files", StaticFiles(directory=projects_root), name="projects_root")
+
+
 @app.get("/api/v1/ping")
 async def ping():
-    return {
-        "ok": True
-    }
-
-
-@app.get("/api/v1/get_dcc_config")
-async def get_dcc_config():
-    data = utils.get_dcc_config()
-    return {
-        "ok": True,
-        "data": data
-    }
-
-
-@app.post("/api/v1/set_dcc_config")
-async def set_dcc_config(request: Request):
-    result = await request.json()
-    log_request(result)
-    data = result.get("data", [])
-    utils.set_dcc_config(data)
     return {"ok": True}
 
 
-@app.get("/api/v1/get_server_details")
-async def get_server_details():
-    data = utils.get_server_details()
-    return {
-        "ok": True,
-        "data": data
-    }
+@app.get("/api/v1/get_config")
+async def get_config():
+    data = utils.get_config()
+    return {"ok": True, "data": data}
 
 
-@app.post("/api/v1/set_server_details")
-async def set_server_details(request: Request):
+@app.post("/api/v1/set_config")
+async def set_config(request: Request):
     result = await request.json()
     log_request(result)
     data = result.get("data", {})
-    utils.set_server_details(data)
-    return {"ok": True}
-
-
-@app.get("/api/v1/get_access")
-async def get_access():
-    data = utils.get_access()
-    return {
-        "ok": True,
-        "data": data
-    }
-
-
-@app.post("/api/v1/set_access")
-async def set_access(request: Request):
-    result = await request.json()
-    log_request(result)
-    data = result.get("data", {})
-    utils.set_access(data)
+    CONFIG, mount = utils.set_config(data)
+    if mount:
+        mount_root()
     return {"ok": True}
 
 
@@ -147,10 +118,7 @@ async def get_launch_cmd(request: Request):
     elif new_scene and not task:
         return {"ok": False}
     data = utils.get_launch_cmd(dcc, dcc_name, task, scene)
-    return {
-        "ok": True,
-        "data": data
-    }
+    return {"ok": True, "data": data}
 
 
 @app.post("/api/v1/show_in_explorer")
@@ -172,10 +140,7 @@ async def get_explorer_cmd(request: Request):
     if not filepath:
         return {"ok": False}
     data = utils.get_explorer_cmd(filepath)
-    return {
-        "ok": True,
-        "data": data
-    }
+    return {"ok": True, "data": data}
 
 
 @app.post("/api/v1/get_env")
@@ -185,10 +150,7 @@ async def get_env(request: Request):
     task = result.get("task", "")
     dcc = result.get("dcc", "")
     env = utils.get_env(task, dcc)
-    return {
-        "ok": True,
-        "data": env
-    }
+    return {"ok": True, "data": env}
 
 
 @app.post("/api/v1/ingest_get_files")
@@ -197,10 +159,7 @@ async def ingest_get_files(request: Request):
     log_request(result)
     dirs = result.get("dirs", "")
     resp = api.ingest_get_files(dirs)
-    return {
-        "ok": True,
-        "data": resp
-    }
+    return {"ok": True, "data": resp}
 
 
 @app.post("/api/v1/ingest")
@@ -209,19 +168,13 @@ async def ingest(request: Request):
     log_request(result)
     data = result.get("data", {})
     resp = api.ingest(data)
-    return {
-        "ok": True,
-        "data": resp
-    }
+    return {"ok": True, "data": resp}
 
 
 @app.get("/api/v1/get_actions")
 async def get_actions():
     data = api.get_actions()
-    return {
-        "ok": True,
-        "data": data
-    }
+    return {"ok": True, "data": data}
 
 
 @app.post("/api/v1/run_action")
@@ -242,9 +195,7 @@ async def rename_entity(request: Request):
     sys.exit()
 
 
-projects_root = CONFIG["projects_root"]
-logging.debug(f"Attempting to mount {projects_root}")
-app.mount("/files", StaticFiles(directory=projects_root), name="projects_root")
+mount_root()
 
 
 if __name__ == "__main__":
