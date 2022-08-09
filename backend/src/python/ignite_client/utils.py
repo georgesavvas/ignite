@@ -28,6 +28,7 @@ def get_config() -> dict:
     logging.info(f"Reading config from {path}...")    
     with open(path, "r") as f:
         config = yaml.safe_load(f)
+    config["projects_root"] = config["access"]["projects_root"]
     
     IGNITE_SERVER_ADDRESS = config["server_details"]["address"]
     IGNITE_SERVER_PASSWORD = config["server_details"]["password"]

@@ -76,8 +76,13 @@ export const ConfigProvider = props => {
       IGNITE_SERVER_ADDRESS: serverDetails.address,
       IGNITE_SERVER_PASSWORD: serverDetails.password
     })
+    const access_formatted = {
+      projects_root: access.projectsDir,
+      server_projects_root: access.serverProjectsDir,
+      remote: access.remote
+    }
     clientRequest("set_server_details", {data: serverDetails})
-    clientRequest("set_access", {data: access})
+    clientRequest("set_access", {data: access_formatted})
     clientRequest("set_dcc_config", {data: dccConfig})
   }, [writeIncr])
 
