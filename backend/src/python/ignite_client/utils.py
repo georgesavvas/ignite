@@ -29,17 +29,34 @@ def get_config() -> dict:
     with open(path, "r") as f:
         config = yaml.safe_load(f)
     config["projects_root"] = config["access"]["projects_root"]
-    
-    IGNITE_SERVER_ADDRESS = config["server_details"]["address"]
-    IGNITE_SERVER_PASSWORD = config["server_details"]["password"]
-    ENV["IGNITE_SERVER_ADDRESS"] = IGNITE_SERVER_ADDRESS
-    ENV["IGNITE_SERVER_PASSWORD"] = IGNITE_SERVER_PASSWORD
-
     return config
 
 
 CONFIG = get_config()
+IGNITE_SERVER_ADDRESS = CONFIG["server_details"]["address"]
+IGNITE_SERVER_PASSWORD = CONFIG["server_details"]["password"]
+ENV["IGNITE_SERVER_ADDRESS"] = IGNITE_SERVER_ADDRESS
+ENV["IGNITE_SERVER_PASSWORD"] = IGNITE_SERVER_PASSWORD
 ROOT = PurePath(CONFIG["projects_root"])
+
+
+def set_config(data):
+    config = get_config()
+    old_root = config["projects_root"]
+    config.update(data)
+    new_root = config["access"]["projects_root"]
+    config["projects_root"] = new_root
+    with open(CLIENT_CONFIG_PATH, "w") as f:
+        yaml.safe_dump(config, f)
+
+    IGNITE_SERVER_ADDRESS = config["server_details"]["address"]
+    IGNITE_SERVER_PASSWORD = config["server_details"]["password"]
+    ENV["IGNITE_SERVER_ADDRESS"] = IGNITE_SERVER_ADDRESS
+    ENV["IGNITE_SERVER_PASSWORD"] = IGNITE_SERVER_PASSWORD
+    CONFIG = config
+    changed = old_root != new_root
+
+    return config, changed
 
 
 def get_huey():
@@ -118,51 +135,6 @@ def get_env(task="", dcc="", scene={}):
         env.update(get_scene_env(scene))
     env = {k: str(v) for k, v in env.items()}
     return env
-
-
-def get_server_details():
-    config = get_config()
-    return config["server_details"] or {}
-
-
-def set_server_details(data):
-    config = get_config()
-    config["server_details"].update(data)
-    with open(CLIENT_CONFIG_PATH, "w") as f:
-        yaml.safe_dump(config, f)
-    
-    IGNITE_SERVER_ADDRESS = config["server_details"]["address"]
-    IGNITE_SERVER_PASSWORD = config["server_details"]["password"]
-    ENV["IGNITE_SERVER_ADDRESS"] = IGNITE_SERVER_ADDRESS
-    ENV["IGNITE_SERVER_PASSWORD"] = IGNITE_SERVER_PASSWORD
-
-    return config
-
-
-def get_dcc_config():
-    config = get_config()
-    return config["dcc_config"] or []
-
-
-def set_dcc_config(data):
-    config = get_config()
-    config["dcc_config"] = data
-    with open(CLIENT_CONFIG_PATH, "w") as f:
-        yaml.safe_dump(config, f)
-    return config
-
-
-def get_access():
-    config = get_config()
-    return config["access"] or {}
-
-
-def set_access(data):
-    config = get_config()
-    config["access"].update(data)
-    with open(CLIENT_CONFIG_PATH, "w") as f:
-        yaml.safe_dump(config, f)
-    return config
 
 
 def discover_dcc():

@@ -50,21 +50,19 @@ export const ConfigProvider = props => {
   const [writeIncr, setWriteIncr] = useState(0);
 
   useEffect(() => {
-    clientRequest("get_server_details").then(resp => {
-      const savedServerDetails = resp.data;
+    clientRequest("get_config").then(resp => {
+      const data = resp.data;
+      console.log("Config received:", data);
+      const savedServerDetails = data.server_details;
+      const savedAccess = {
+        projectsDir: data.access.projects_root,
+        serverProjectsDir: data.access.server_projects_root,
+        remote: data.access.remote
+      }
+      const savedDccConfig = data.dcc_config;
       setServerDetails({...serverDetailsDefault, ...savedServerDetails});
-    });
-
-    clientRequest("get_access").then(resp => {
-      const savedAccess = resp.data;
-      serverRequest("get_projects_root").then(resp => {
-        const serverProjectsDir = resp.data;
-        setAccess({...accessDefault, ...savedAccess, serverProjectsDir: serverProjectsDir});
-      });
-    });
-
-    clientRequest("get_dcc_config").then((resp) => {
-      setDccConfig(resp.data);
+      setAccess({...accessDefault, ...savedAccess});
+      setDccConfig(savedDccConfig);
     });
   }, [])
 
@@ -76,14 +74,18 @@ export const ConfigProvider = props => {
       IGNITE_SERVER_ADDRESS: serverDetails.address,
       IGNITE_SERVER_PASSWORD: serverDetails.password
     })
-    const access_formatted = {
+    const accessFormatted = {
       projects_root: access.projectsDir,
       server_projects_root: access.serverProjectsDir,
       remote: access.remote
     }
-    clientRequest("set_server_details", {data: serverDetails})
-    clientRequest("set_access", {data: access_formatted})
-    clientRequest("set_dcc_config", {data: dccConfig})
+    const data = {
+      access: accessFormatted,
+      dcc_config: dccConfig,
+      server_details: serverDetails
+    }
+    console.log("Setting config:", data);
+    clientRequest("set_config", {data: data})
   }, [writeIncr])
 
   useEffect(() => {
