@@ -47,15 +47,15 @@ default_project_dir = str(Path.home() / "projects")
 
 CLIENT_CONFIG_PATH = CONFIG_PATH / "client_config.yaml"
 ensure_config(CLIENT_CONFIG_PATH, {
-    "projects_root": default_project_dir,
     "dcc_config": [],
     "server_details": {
         "address": "localhost:9070",
         "password": "",
     },
     "access": {
+        "projects_root": default_project_dir,
         "remote": False,
-        "serverProjectsDir": default_project_dir
+        "server_projects_root": default_project_dir
     }
 })
 logging.info(f"Setting IGNITE_CLIENT_CONFIG_PATH to {CLIENT_CONFIG_PATH}")
