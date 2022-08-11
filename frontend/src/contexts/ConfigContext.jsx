@@ -43,9 +43,6 @@ const dccConfigDefault = [
 ]
 
 export const ConfigProvider = props => {
-  const [serverDetails, setServerDetails] = useState({})
-  const [access, setAccess] = useState({})
-  const [dccConfig, setDccConfig] = useState([]);
   const [config, setConfig] = useState({serverDetails: {}, access: {}, dccConfig: []});
   const [writeIncr, setWriteIncr] = useState(0);
 
@@ -60,43 +57,42 @@ export const ConfigProvider = props => {
         remote: data.access.remote
       }
       const savedDccConfig = data.dcc_config;
-      setServerDetails({...serverDetailsDefault, ...savedServerDetails});
-      setAccess({...accessDefault, ...savedAccess});
-      setDccConfig(savedDccConfig);
+      window.services.set_envs({
+        IGNITE_SERVER_ADDRESS: savedServerDetails.address,
+        IGNITE_SERVER_PASSWORD: savedServerDetails.password
+      })
+      setConfig({
+        serverDetails: {...serverDetailsDefault, ...savedServerDetails},
+        access: {...accessDefault, ...savedAccess},
+        dccConfig: savedDccConfig
+      })
     });
   }, [])
 
   useEffect(() => {
+    console.log("-------", writeIncr);
     if (writeIncr <= 0) {
+      setWriteIncr(1);
       return;
     }
     window.services.set_envs({
-      IGNITE_SERVER_ADDRESS: serverDetails.address,
-      IGNITE_SERVER_PASSWORD: serverDetails.password
+      IGNITE_SERVER_ADDRESS: config.serverDetails.address,
+      IGNITE_SERVER_PASSWORD: config.serverDetails.password
     })
     const accessFormatted = {
-      projects_root: access.projectsDir,
-      server_projects_root: access.serverProjectsDir,
-      remote: access.remote
+      projects_root: config.access.projectsDir,
+      server_projects_root: config.access.serverProjectsDir,
+      remote: config.access.remote
     }
     const data = {
       access: accessFormatted,
-      dcc_config: dccConfig,
-      server_details: serverDetails
+      dcc_config: config.dccConfig,
+      server_details: config.serverDetails
     }
     console.log("Setting config:", data);
     clientRequest("set_config", {data: data})
-  }, [writeIncr])
+  }, [config])
 
-  useEffect(() => {
-    setConfig({
-      serverDetails: serverDetails,
-      access: access,
-      dccConfig: dccConfig
-    })
-    setWriteIncr(prevState => prevState + 1);
-  }, [serverDetails, access, dccConfig])
-  
   const addToDCCConfig = prevState => {
     const placeholder = {
       name: "",
@@ -120,26 +116,38 @@ export const ConfigProvider = props => {
   }
 
   const handleSetServerDetails = data => {
-    setServerDetails(prevState => ({...prevState, ...data}));
+    setConfig(prevState => ({...prevState, serverDetails: {...data}}));
   }
 
   const handleSetAccess = data => {
-    setAccess(prevState => ({...prevState, ...data}));
+    setConfig(prevState => ({...prevState, access: {...data}}));
   }
 
   const handleSetDccConfig = (data, operation) => {
     switch (operation) {
       case "add": {
-        setDccConfig(prevState => addToDCCConfig(prevState)); break;
+        setConfig(prevState => (
+          {...prevState, dccConfig: addToDCCConfig(prevState.dccConfig)}
+        ));
+        break;
       }
       case "modify": {
-        setDccConfig(prevState => modifyDCCConfig(prevState, data)); break;
+        setConfig(prevState => (
+          {...prevState, dccConfig: modifyDCCConfig(prevState.dccConfig, data)}
+        ));
+        break;
       }
       case "remove": {
-        setDccConfig(prevState => removeFromDCCConfig(prevState, data)); break;
+        setConfig(prevState => (
+          {...prevState, dccConfig: removeFromDCCConfig(prevState.dccConfig, data)}
+        ));
+        break;
       }
       case "revertToDefaults": {
-        setDccConfig(dccConfigDefault); break;
+        setConfig(prevState => (
+          {...prevState, dccConfig: addToDCCConfig(dccConfigDefault)}
+        ));
+        break;
       }
     }
   }
