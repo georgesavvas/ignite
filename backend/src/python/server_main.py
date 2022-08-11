@@ -35,9 +35,15 @@ def log_request(request):
     pprint(request)
 
 
+def error(s):
+    return {"ok": False, "error": s}
+
+
 @app.get("/api/v1/get_projects_root")
 async def get_projects_root():
     data = api.get_projects_root()
+    if not data:
+        return error("no_projects_root")
     return {"ok": True, "data": data}
 
 
@@ -50,9 +56,10 @@ async def ping():
 async def get_context_info(request: Request):
     result = await request.json()
     log_request(result)
-    pprint(result)
     path = result.get("path")
     data = api.get_context_info(path)
+    if not data:
+        return error("entity_not_found")
     return {"ok": True, "data": data}
 
 
@@ -61,19 +68,13 @@ async def get_projects():
     data = api.get_projects()
     for i, d in enumerate(data):
         d["result_id"] = i
-    return {
-        "ok": True,
-        "data": data
-    }
+    return {"ok": True, "data": data}
 
 
 @app.get("/api/v1/get_project_names")
 async def get_project_names():
     data = api.get_project_names()
-    return {
-        "ok": True,
-        "data": data
-    }
+    return {"ok": True, "data": data}
 
 
 @app.post("/api/v1/get_project_tree")
@@ -81,11 +82,10 @@ async def get_project_tree(request: Request):
     result = await request.json()
     log_request(result)
     project = api.get_project(result.get("project"))
+    if not project:
+        return {"ok": False, "data": data, "error": "entity_not_found"}
     data = project.get_project_tree() if project else {}
-    return {
-        "ok": True,
-        "data": data
-    }
+    return {"ok": True, "data": data}
 
 
 @app.post("/api/v1/find")
@@ -97,26 +97,19 @@ async def find(request: Request):
     data = {}
     if hasattr(entity, "as_dict"):
         data = entity.as_dict()
-    return {
-        "ok": data != {},
-        "data": data
-    }
+    if not data:
+        return error("entity_not_found")
+    return {"ok": True, "data": data}
 
 
+# This is used by the C++ USD resolver, expects raw strings as response
 @app.post("/api/v1/resolve", response_class=PlainTextResponse)
 async def resolve(request: Request):
     result = await request.json()
     log_request(result)
-    pprint(result)
     uri = result.get("uri")
-    print("Received", uri)
     data = api.resolve(uri)
-    print("Sending", data)
     return data
-    return {
-        "ok": True,
-        "data": data
-    }
 
 
 @app.post("/api/v1/create_dirs")
@@ -128,18 +121,14 @@ async def create_dirs(request: Request):
     dir_kind = result.get("kind")
     dirs = result.get("dirs", [])
     created_amount = api.create_dirs(path, method, dirs)
-    if created_amount:
-        s = "s" if created_amount > 1 else ""
-        if dir_kind == "directory" and created_amount > 1:
-            s = ""
-            dir_kind = "directories"
-        text = f"Created {created_amount} {dir_kind}{s}"
-    else:
-        text = f"No {dir_kind}s created."
-    return {
-        "ok": created_amount > 0,
-        "text": text
-    }
+    if not created_amount:
+        return error("generic_error")
+    s = "s" if created_amount > 1 else ""
+    if dir_kind == "directory" and created_amount > 1:
+        s = ""
+        dir_kind = "directories"
+    text = f"Created {created_amount} {dir_kind}{s}"
+    return {"ok": True, "text": text}
 
 
 @app.post("/api/v1/get_contents")
@@ -304,10 +293,9 @@ async def copy_default_scene(request: Request):
     task = result.get("task", "")
     dcc = result.get("dcc", "")
     scene = api.copy_default_scene(task, dcc)
-    return {
-        "ok": scene != False,
-        "scene": scene
-    }
+    if not scene:
+        return error("generic_error")
+    return {"ok": True, "scene": scene}
 
 
 @app.post("/api/v1/register_directory")
@@ -317,7 +305,9 @@ async def register_directory(request: Request):
     path = result.get("path", "")
     dir_kind = result.get("dir_kind", "")
     ok = api.register_directory(path, dir_kind)
-    return {"ok": ok}
+    if not ok:
+        return error("generic_error")
+    return {"ok": True}
 
 
 @app.post("/api/v1/register_task")
@@ -327,7 +317,9 @@ async def register_task(request: Request):
     path = result.get("path", "")
     task_type = result.get("task_type", "")
     ok = api.register_task(path, task_type)
-    return {"ok": ok}
+    if not ok:
+        return error("generic_error")
+    return {"ok": True}
 
 
 @app.post("/api/v1/register_scene")
@@ -336,7 +328,9 @@ async def register_scene(request: Request):
     log_request(result)
     path = result.get("path", "")
     ok = api.register_scene(path)
-    return {"ok": ok}
+    if not ok:
+        return error("generic_error")
+    return {"ok": True}
 
 
 @app.post("/api/v1/register_asset")
@@ -344,7 +338,9 @@ async def register_asset(request: Request):
     result = await request.json()
     path = result.get("path", "")
     ok = api.register_asset(path)
-    return {"ok": ok}
+    if not ok:
+        return error("generic_error")
+    return {"ok": True}
 
 
 @app.post("/api/v1/set_repr_asset")
@@ -354,7 +350,9 @@ async def set_repr_asset(request: Request):
     target = result.get("target", "")
     repr = result.get("repr", "")
     ok = api.set_repr_asset(target, repr)
-    return {"ok": ok}
+    if not ok:
+        return error("generic_error")
+    return {"ok": True}
 
 
 @app.post("/api/v1/register_assetversion")
@@ -362,7 +360,9 @@ async def register_assetversion(request: Request):
     result = await request.json()
     path = result.get("path", "")
     ok = api.register_assetversion(path)
-    return {"ok": ok}
+    if not ok:
+        return error("generic_error")
+    return {"ok": True}
 
 
 @app.post("/api/v1/delete_entity")
@@ -372,7 +372,9 @@ async def delete_entity(request: Request):
     path = result.get("path", "")
     entity = result.get("kind", "")
     ok = api.delete_entity(path, entity)
-    return {"ok": ok}
+    if not ok:
+        return error("generic_error")
+    return {"ok": True}
 
 
 @app.post("/api/v1/rename_entity")
@@ -383,15 +385,14 @@ async def rename_entity(request: Request):
     entity = result.get("kind", "")
     new_name = result.get("name")
     if not new_name:
-        return {"ok": False}
-    ok = api.rename_entity(path, entity, new_name)
-    reasons = {
+        return error("invalid_data")
+    code = api.rename_entity(path, entity, new_name)
+    codes = {
         -1: "directory not empty"
     }
-    return {
-        "ok": ok > 0,
-        "text": reasons.get(ok, "")
-    }
+    if code < 0:
+        return error(codes[code])
+    return {"ok": True, "text": reasons.get(ok, "")}
 
 
 @app.get("/api/v1/quit")

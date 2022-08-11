@@ -9,10 +9,19 @@ logging.basicConfig(level=logging.DEBUG)
 DIR = os.path.dirname(__file__)
 ENV = os.environ
 
-ignite_root = Path(DIR).parent.parent.parent.parent
+api_v = "v1"
+logging.info(f"Setting IGNITE_API_VERSION to {api_v}")
+ENV["IGNITE_API_VERSION"] = api_v
 
+ignite_root = Path(DIR).parent.parent.parent.parent
 logging.info(f"Setting IGNITE_ROOT to {ignite_root}")
 ENV["IGNITE_ROOT"] = str(ignite_root)
+
+CONFIG_PATH = Path(Path.home(), ".ignite")
+if not CONFIG_PATH.exists():
+    CONFIG_PATH.mkdir()
+logging.info(f"Setting IGNITE_CONFIG_PATH to {CONFIG_PATH}")
+ENV["IGNITE_CONFIG_PATH"] = str(CONFIG_PATH)
 
 def ensure_config(filepath, default={}):
     if not filepath.is_file():
@@ -33,15 +42,15 @@ def ensure_config(filepath, default={}):
             with open(filepath, "w") as file:
                 yaml.safe_dump(existing, file)
 
-CONFIG_PATH = ignite_root / "common/server_config.yaml"
+SERVER_CONFIG_PATH = CONFIG_PATH / "server_config.yaml"
 ensure_config(CONFIG_PATH, {
     "server_address": "0.0.0.0:9070",
     "projects_root": str(Path.home() / "projects")
 })
 
-logging.info(f"Setting IGNITE_SERVER_CONFIG_PATH to {CONFIG_PATH}")
+logging.info(f"Setting IGNITE_SERVER_CONFIG_PATH to {SERVER_CONFIG_PATH}")
 logging.info(f"Setting IGNITE_SERVER_ROOT to {DIR}")
-ENV["IGNITE_SERVER_CONFIG_PATH"] = str(CONFIG_PATH)
+ENV["IGNITE_SERVER_CONFIG_PATH"] = str(SERVER_CONFIG_PATH)
 ENV["IGNITE_SERVER_ROOT"] = DIR
 
 dcc = ignite_root / "dcc"
