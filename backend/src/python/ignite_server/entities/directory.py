@@ -14,9 +14,9 @@ ROOT = PurePath(CONFIG["projects_root"])
 
 class Directory():
     def __init__(self, path="", dir_kind="directory") -> None:
-        self.dict_attrs = ("path", "dir_kind", "anchor", "project", "name", "context",
-            "repr"),
-        self.nr_attrs = ("path", "context"),
+        self.dict_attrs = ["path", "dir_kind", "anchor", "project", "name", "context",
+            "repr"]
+        self.nr_attrs = ["path"]
         self.project = ""
         self.group = ""
         self.name = ""
@@ -59,9 +59,9 @@ class Directory():
     def get_context(self):
         project_path = ROOT / self.project
         if hasattr(self, "task"):
-            context = self.task.as_posix()
+            context = self.task
         else:
-            context = self.path.parent.as_posix()
+            context = self.path.parent
         return context.relative_to(project_path).as_posix()
 
     def load_from_config(self):

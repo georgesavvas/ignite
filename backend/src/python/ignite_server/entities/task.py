@@ -11,10 +11,10 @@ ROOT = PurePath(CONFIG["projects_root"])
 
 class Task(Directory):
     def __init__(self, path="") -> None:
-        self.dict_attrs = ("path", "dir_kind", "anchor", "project", "name", "task_type",
+        self.dict_attrs = ["path", "dir_kind", "anchor", "project", "name", "task_type",
         "repr", "exports", "scenes", "cache", "group", "build", "sequence", "shot",
-        "context"),
-        self.nr_attrs = ("path", "context", "exports"),
+        "context"]
+        self.nr_attrs = ["path", "exports"]
         self.task_type = "generic"
         super().__init__(path, dir_kind="task")
         self.scenes = self.path / "scenes"

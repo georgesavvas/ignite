@@ -7,11 +7,13 @@
         "DIRCONTEXTOPTIONS",
         "DIRECTORYICONS",
         "KINDTYPES",
+        "platformdirs",
         "PLUGINPATH",
         "Popen",
         "repr",
         "valtio",
         "Xarrow",
         "Xwrapper"
-    ]
+    ],
+    "cmake.sourceDirectory": "${workspaceFolder}/frontend/node_modules/react-spring/node_modules/react-native/ReactAndroid/src/main/java/com/facebook/hermes/instrumentation"
 }

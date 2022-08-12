@@ -11,9 +11,9 @@ ROOT = PurePath(CONFIG["projects_root"])
 
 class Scene(Directory):
     def __init__(self, path="") -> None:
-        self.dict_attrs = ("path", "project", "name", "group" ,"dcc", "extension",
-            "version", "dir_kind", "scene", "context", "task", "version", "vsn")
-        self.nr_attrs = ("path", "context", "task", "scene"),
+        self.dict_attrs = ["path", "project", "name", "group" ,"dcc", "extension",
+            "version", "dir_kind", "scene", "context", "task", "version", "vsn"]
+        self.nr_attrs = ["path", "context", "task", "scene"]
         self.project = ""
         self.group = ""
         self.context = ""

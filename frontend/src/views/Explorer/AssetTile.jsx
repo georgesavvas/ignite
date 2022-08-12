@@ -9,7 +9,7 @@ function AssetTile(props) {
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
 
-  const hasThumbnail = props.entity.thumbnail.filename !== undefined;
+  const hasThumbnail = props.entity.thumbnail && props.entity.thumbnail.filename;
   const thumbnailWidth = hasThumbnail ? "100%" : "50%";
   let currentPath = currentContext.posix.replace(currentContext.project_path, "");
   if (currentPath.startsWith("/")) currentPath = currentPath.slice(1);

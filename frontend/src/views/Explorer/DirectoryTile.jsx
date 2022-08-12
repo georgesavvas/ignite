@@ -13,10 +13,11 @@ function DirectoryTile(props) {
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
 
+  const hasThumbnail = props.entity.thumbnail && props.entity.thumbnail.filename;
   const isScene = props.entity.dir_kind === "scene";
-  const thumbnailWidth = isScene || props.entity.thumbnail ? "100%" : "50%";
+  const thumbnailWidth = isScene || hasThumbnail ? "100%" : "50%";
   const currentPath = currentContext.posix.replace(currentContext.project_path + "/", "");
-  const contextPath = props.entity.full_context.replace(currentPath, "");
+  const contextPath = props.entity.context.replace(currentPath, "");
 
   const dirData = {
     path: props.entity.path,
@@ -108,7 +109,7 @@ function DirectoryTile(props) {
     <>
       <Tile
         {...props}
-        thumbnail={props.entity.thumbnail ? undefined : thumbnailPath()}
+        thumbnail={hasThumbnail ? undefined : thumbnailPath()}
         thumbnailWidth={thumbnailWidth}
         onClick={handleClick}
         contextItems={contextItems}

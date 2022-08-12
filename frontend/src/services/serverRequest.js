@@ -1,6 +1,6 @@
 async function serverRequest(method, data=undefined) {
   const address = await window.services.get_env("IGNITE_SERVER_ADDRESS");
-  console.log("Server request:", address);
+  console.log("Server request:", address, method, data);
   if (!address) {
     console.log("Invalid server address, aborting...");
     return;
@@ -13,7 +13,9 @@ async function serverRequest(method, data=undefined) {
     },
     body: JSON.stringify(data)
   })
-  return await resp.json()
+  const resp2 = await resp.json();
+  console.log("Server response:", method, resp2);
+  return resp2;
 }
 
 export default serverRequest;

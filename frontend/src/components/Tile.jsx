@@ -11,7 +11,7 @@ function GridTile(props) {
   const [config, setConfig] = useContext(ConfigContext);
   const [progress, setProgress] = useState(0);
   const hoverArea = createRef();
-  let isStatic = props.thumbnail !== undefined
+  let isStatic = props.thumbnail !== undefined;
   if (!isStatic && !props.entity.thumbnail.path.includes("####")) isStatic = true;
 
   const tileStyle = {
