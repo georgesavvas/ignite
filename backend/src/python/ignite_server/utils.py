@@ -62,6 +62,8 @@ def validate_dirname(name, extra_chars=""):
 
 
 def get_nr(path):
+    if not path:
+        return PurePath()
     return PurePath(path).relative_to(ROOT).as_posix()
 
 

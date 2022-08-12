@@ -70,7 +70,6 @@ export const ConfigProvider = props => {
   }, [])
 
   useEffect(() => {
-    console.log("-------", writeIncr);
     if (writeIncr <= 0) {
       setWriteIncr(1);
       return;
@@ -81,7 +80,6 @@ export const ConfigProvider = props => {
     })
     const accessFormatted = {
       projects_root: config.access.projectsDir,
-      server_projects_root: config.access.serverProjectsDir,
       remote: config.access.remote
     }
     const data = {
@@ -116,11 +114,11 @@ export const ConfigProvider = props => {
   }
 
   const handleSetServerDetails = data => {
-    setConfig(prevState => ({...prevState, serverDetails: {...data}}));
+    setConfig(prevState => ({...prevState, serverDetails: {...prevState.serverDetails, ...data}}));
   }
 
   const handleSetAccess = data => {
-    setConfig(prevState => ({...prevState, access: {...data}}));
+    setConfig(prevState => ({...prevState, access: {...prevState.access, ...data}}));
   }
 
   const handleSetDccConfig = (data, operation) => {

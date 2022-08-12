@@ -17,7 +17,7 @@ PROJECT_CONFIG_FILE = "project.yaml"
 
 class Project(Directory):
     def __init__(self, name="", path="") -> None:
-        super().__init__(path, dir_kind = "project")
+        super().__init__(path, dir_kind="project")
 
     def create_dir(self, name, recursive=False):
         raise NotImplemented("create_dir not allowed for projects.")

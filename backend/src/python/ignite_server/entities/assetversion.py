@@ -21,10 +21,10 @@ class AssetVersion(Directory):
         self.score = 0
         self.labels = set()
         super().__init__(path, dir_kind="assetversion")
-        self.dict_attrs = ("path", "dir_kind", "anchor", "project", "name", "version",
+        self.dict_attrs = ["path", "dir_kind", "anchor", "project", "name", "version",
             "components", "asset", "task", "uri", "labels", "context",
-            "thumbnail")
-        self.nr_attrs = ("path", "context", "thumbnail"),
+            "thumbnail"]
+        self.nr_attrs = ["path", "thumbnail"]
         self.version = self.name
         self.version_int = 0
         if self.version.startswith("v"):
@@ -106,7 +106,7 @@ class AssetVersion(Directory):
             c["priority"] = priority
             candidates.append(c)
         if not candidates:
-            return {}
+            return
         return sorted(candidates, key=lambda c: c["priority"])[0]
 
     def set_labels(self, labels):

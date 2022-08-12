@@ -1,6 +1,6 @@
 async function clientRequest(method, data=undefined) {
   const address = await window.services.get_env("IGNITE_CLIENT_ADDRESS");
-  console.log("Client request:", address);
+  console.log("Client request:", address, method, data);
   if (!address) {
     console.log("Invalid client address, aborting...");
     return;
@@ -13,7 +13,9 @@ async function clientRequest(method, data=undefined) {
     },
     body: JSON.stringify(data)
   })
-  return await resp.json()
+  const resp2 = await resp.json();
+  console.log("Client response:", method, resp2);
+  return resp2;
 }
 
 export default clientRequest;

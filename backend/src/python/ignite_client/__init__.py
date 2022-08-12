@@ -2,6 +2,7 @@ import os
 import logging
 import yaml
 from pathlib import Path
+from platformdirs import user_config_dir
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -18,9 +19,10 @@ ignite_root = Path(DIR).parent.parent.parent.parent
 logging.info(f"Setting IGNITE_ROOT to {ignite_root}")
 ENV["IGNITE_ROOT"] = str(ignite_root)
 
-CONFIG_PATH = Path(Path.home(), ".ignite")
+# CONFIG_PATH = Path(user_config_dir("ignite"))
+CONFIG_PATH = Path.home() / ".ignite"
 if not CONFIG_PATH.exists():
-    CONFIG_PATH.mkdir()
+    CONFIG_PATH.mkdir(parents=True, exist_ok=True)
 logging.info(f"Setting IGNITE_CONFIG_PATH to {CONFIG_PATH}")
 ENV["IGNITE_CONFIG_PATH"] = str(CONFIG_PATH)
 

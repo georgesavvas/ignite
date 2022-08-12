@@ -46,6 +46,8 @@ def set_config(data):
     config.update(data)
     new_root = config["access"]["projects_root"]
     config["projects_root"] = new_root
+    server_root = server_request("get_projects_root")["data"]
+    config["access"]["server_projects_root"] = server_root
     with open(CLIENT_CONFIG_PATH, "w") as f:
         yaml.safe_dump(config, f)
 

@@ -90,10 +90,10 @@ def get_context_info(path):
             "root": ROOT.as_posix(),
             "name": name,
             "path": str(path),
-            "path_nr": utils.build_nr(path),
+            "path_nr": utils.get_nr(path),
             "posix": path.as_posix(),
             "parent": str(path.parent),
-            "parent_nr": utils.build_nr(path.parent),
+            "parent_nr": utils.get_nr(path.parent),
             "project": project.strip(),
             "project_path": (ROOT / project).as_posix(),
             "dir_kind": kind,
@@ -190,7 +190,12 @@ def _find_from_path(path):
             break
     else:
         return
-    return entity(path=path)
+    obj = None
+    try:
+        obj = entity(path=path)
+    except Exception as e:
+        logging.error(e)
+    return obj
 
 
 def get_dir_kind(path, append_task=False):
@@ -528,11 +533,13 @@ def get_repr_comp(target):
     path =  Path(target_repr)
     if not path.is_dir():
         logging.error(f"Couldn't resolve {path}")
-        return
+        return {}
     repr_asset = search(path)
     if not repr_asset:
         return {}
     asset = find(repr_asset)
+    if not asset:
+        return {}
     return asset.latest_av.get_thumbnail()
 
 

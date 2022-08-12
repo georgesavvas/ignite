@@ -3,6 +3,7 @@ import platform
 import yaml
 import logging
 from pathlib import Path
+from platformdirs import user_config_dir
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -17,9 +18,10 @@ ignite_root = Path(DIR).parent.parent.parent.parent
 logging.info(f"Setting IGNITE_ROOT to {ignite_root}")
 ENV["IGNITE_ROOT"] = str(ignite_root)
 
-CONFIG_PATH = Path(Path.home(), ".ignite")
+# CONFIG_PATH = Path(user_config_dir("ignite"))
+CONFIG_PATH = Path.home() / ".ignite"
 if not CONFIG_PATH.exists():
-    CONFIG_PATH.mkdir()
+    CONFIG_PATH.mkdir(parents=True, exist_ok=True)
 logging.info(f"Setting IGNITE_CONFIG_PATH to {CONFIG_PATH}")
 ENV["IGNITE_CONFIG_PATH"] = str(CONFIG_PATH)
 
@@ -43,7 +45,7 @@ def ensure_config(filepath, default={}):
                 yaml.safe_dump(existing, file)
 
 SERVER_CONFIG_PATH = CONFIG_PATH / "server_config.yaml"
-ensure_config(CONFIG_PATH, {
+ensure_config(SERVER_CONFIG_PATH, {
     "server_address": "0.0.0.0:9070",
     "projects_root": str(Path.home() / "projects")
 })

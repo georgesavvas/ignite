@@ -21,6 +21,7 @@ export const ContextProvider = props => {
     let success = false;
     const resp = await serverRequest("get_context_info", {path: path_processed})
     let data = resp.data;
+    if (!data) return false;
     if (!Object.keys(data).length) return false;
     for (const key of ["parent", "path", "posix", "project_path"]) {
       data[key] = BuildFileURL(data[key], config, {pathOnly: true});
