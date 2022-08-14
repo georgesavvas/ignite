@@ -21,6 +21,7 @@ export default function ProjectTree() {
       project: currentContext.project
     };
     setIsLoading(true);
+    if (!config.access) return;
     if (!Object.entries(config.access).length) return;
     serverRequest("get_project_tree", data).then((resp) => {
       setIsLoading(false);

@@ -24,7 +24,7 @@ class AssetVersion(Directory):
         self.dict_attrs = ["path", "dir_kind", "anchor", "project", "name", "version",
             "components", "asset", "task", "uri", "labels", "context",
             "thumbnail"]
-        self.nr_attrs = ["path", "thumbnail"]
+        self.nr_attrs = ["path"]
         self.version = self.name
         self.version_int = 0
         if self.version.startswith("v"):

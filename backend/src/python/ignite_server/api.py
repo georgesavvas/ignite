@@ -14,7 +14,10 @@ PROJECT_ANCHOR = ANCHORS["project"]
 ROOT = PurePath(CONFIG["projects_root"])
 KINDS = {v: k for k, v in ANCHORS.items()}
 if not Path(ROOT).is_dir():
-    os.makedirs(ROOT)
+    try:
+        os.makedirs(ROOT)
+    except Exception as e:
+        logging.error(e)
 IGNITE_SERVER_ROOT = Path(ENV["IGNITE_SERVER_ROOT"])
 IGNITE_DCC = Path(ENV["IGNITE_DCC"])
 
@@ -240,6 +243,8 @@ def create_dirs(path, method, dirs):
 def get_contents(path, latest=False, as_dict=False):
     path = Path(path)
     contents = []
+    if not path.is_dir():
+        return contents
     for x in path.iterdir():
         if not x.is_dir():
             continue
