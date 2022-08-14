@@ -526,7 +526,7 @@ def get_repr_comp(target):
             if x.name in anchors:
                 anchor = KINDS[x.name]
                 with open(x, "r") as f:
-                    config = yaml.safe_load(f)
+                    config = yaml.safe_load(f) or {}
                 their_repr = config.get("repr", "")
                 if their_repr:
                     return search(Path(their_repr))

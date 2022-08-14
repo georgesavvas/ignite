@@ -34,15 +34,17 @@ function GridTile(props) {
 
   function getSeqThumbnail() {
     const thumbnail = props.entity.thumbnail
-    let thumbnailPath = thumbnail.path || "media/no_icon.png"
-    if (!thumbnail.static) {
-      let frame = thumbnail.first + (thumbnail.last - thumbnail.first) * progress;
+    const hasThumbnail = thumbnail && thumbnail !== {} || thumbnail.path === "";
+    let thumbnailPath = thumbnail.path
+    if (hasThumbnail && !thumbnail.static) {
+      let frame = thumbnail.first_frame + (thumbnail.last_frame - thumbnail.first_frame) * progress;
       frame = Math.round(frame);
       thumbnailPath = thumbnailPath.replace("####", frame);
     }
-    return thumbnailPath;
+    if (!hasThumbnail) return "media/no_icon.png";
+    return BuildFileURL(thumbnailPath, config);
   }
-  const thumbnailURL = props.thumbnail || BuildFileURL(getSeqThumbnail(), config);
+  const thumbnailURL = props.thumbnail || getSeqThumbnail();
 
   const handleClick = e => {
     if (props.onClick) props.onClick(e);

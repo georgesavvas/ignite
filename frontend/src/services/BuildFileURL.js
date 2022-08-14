@@ -3,11 +3,9 @@ function BuildFileURL(filepath, config, options={}) {
   // console.log("BuildFileURL Input -", filepath);
   const address = config.serverDetails.address;
   const remote = config.access.remote;
-  const serverProjectsDir = config.access.serverProjectsDir || "";
+
+  let serverProjectsDir = config.access.serverProjectsDir || "";
   let projectsDir = config.access.projectsDir || "";
-  if (projectsDir.endsWith("/") || projectsDir.endsWith("\\")) {
-    projectsDir = projectsDir.slice(0, -1)
-  }
 
   let input = serverProjectsDir;
   let output = projectsDir;
@@ -15,39 +13,39 @@ function BuildFileURL(filepath, config, options={}) {
     input = projectsDir;
     output = serverProjectsDir;
   }
+  const isWinPath = output.includes("\\");
+  input = input.replaceAll("\\","/");
+  output = output.replaceAll("\\","/");
 
-  const inputSlash = input.includes("/") ? "/" : "\\";
-  const outputSlash = output.includes("/") ? "/" : "\\";
-  input += inputSlash;
-  output += outputSlash;
+  if (!input.endsWith("/")) input += "/";
+  if (!output.endsWith("/")) output += "/";
 
-  let filepath_processed = filepath;
+  let unix_path = filepath.replaceAll("\\", "/");
 
   // This is to allow processing of posix paths. It will convert them to windows paths
   // if needed.
-  filepath_processed = filepath_processed.replaceAll(outputSlash, inputSlash);
-  if (filepath_processed.startsWith(input)) {
-    filepath_processed = filepath_processed.replace(input, "");
+  if (unix_path.startsWith(input)) {
+    unix_path = unix_path.replace(input, "");
   }
-  
-  filepath_processed = filepath_processed.replaceAll(inputSlash, outputSlash);
-  if (filepath_processed.startsWith(output)) {
-    filepath_processed = filepath_processed.replace(output, "");
+  if (unix_path.startsWith(output)) {
+    unix_path = unix_path.replace(output, "");
   }
 
-  // console.log(input, output, inputSlash, outputSlash);
+  // console.log(input, output);
   // console.log(filepath, "->", `${output}${filepath_processed}`);
 
   if (options.pathOnly) {
-    const value = `${output}${filepath_processed}`;
+    const platform_path = isWinPath ? unix_path.replaceAll("/", "\\") : unix_path;
+    const platform_output = isWinPath ? output.replaceAll("/", "\\") : output;
+    const value = `${platform_output}${platform_path}`;
     // console.log("BuildFileURL Output -", value);
     return value;
   } else if (remote || options.forceRemote) {
-    const value = `${address}/files/${filepath_processed}`;
+    const value = `${address}/files/${unix_path}`;
     // console.log("BuildFileURL Output -", value);
     return value;
   } else {
-    const value = `ign://${output}${filepath_processed}`;
+    const value = `ign://${output}${unix_path}`;
     // console.log("BuildFileURL Output -", value);
     return value;
   }
