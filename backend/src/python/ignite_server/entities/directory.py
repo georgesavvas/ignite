@@ -76,6 +76,7 @@ class Directory():
             value = getattr(self, s)
             d[s] = value
             if s in self.nr_attrs:
+                logging.info(f"Getting nr_path of {s}")
                 d[f"{s}_nr"] = utils.get_nr(value)
         return d
 

@@ -39,13 +39,13 @@ class Component():
         self.last_frame = 0
 
     def load_from_clique_collection(self, c):
-        path = "/".join(c.head.split("/")[:-1])
+        path = PurePath(c.format("{head}####{tail}"))
         indexes = list(c.indexes)
-        name = c.head.split("/")[-1].rstrip(".")
+        name = path.name
         ext = c.tail
-        self.name = name
-        self.filename = c.format(f"{name}####{ext}")
-        self.path = path
+        self.name = path.stem.replace(".####", "")
+        self.filename = name
+        self.path = str(path)
         self.path_nr = utils.get_nr(path)
         self.ext = ext
         self.static = False
