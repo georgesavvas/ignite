@@ -3,6 +3,7 @@ import math
 import sys
 import logging
 from posixpath import dirname
+from pathlib import Path
 import uvicorn
 from pprint import pprint
 from pathlib import PurePath
@@ -37,6 +38,14 @@ def log_request(request):
 
 def error(s):
     return {"ok": False, "error": s}
+
+
+def mount_root():
+    if not ROOT or not Path(ROOT).is_dir():
+        logging.warning(f"Projects root {ROOT} does not exist, skipping mounting...")
+        return
+    logging.debug(f"Attempting to mount {ROOT}")
+    app.mount("/files", StaticFiles(directory=ROOT), name="projects_root")
 
 
 @app.get("/api/v1/get_projects_root")
@@ -83,7 +92,7 @@ async def get_project_tree(request: Request):
     log_request(result)
     project = api.get_project(result.get("project"))
     if not project:
-        return {"ok": False, "data": data, "error": "entity_not_found"}
+        return error("entity_not_found")
     data = project.get_project_tree() if project else {}
     return {"ok": True, "data": data}
 
@@ -401,8 +410,7 @@ async def rename_entity(request: Request):
     sys.exit()
 
 
-logging.debug(f"Attempting to mount {ROOT}")
-app.mount("/files", StaticFiles(directory=ROOT), name="projects_root")
+mount_root()
 
 
 print("__SERVER_READY__")

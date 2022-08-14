@@ -47,6 +47,10 @@ def log_request(request):
     pprint(request)
 
 
+def error(s):
+    return {"ok": False, "error": s}
+
+
 def mount_root():
     projects_root = CONFIG["projects_root"]
     if not projects_root or not Path(projects_root).is_dir():
