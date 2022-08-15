@@ -19,6 +19,7 @@ import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import { Stack, Divider } from '@mui/material';
 import Modal from "../components/Modal";
 import {ConfigContext} from "../contexts/ConfigContext";
+import clientRequest from '../services/clientRequest';
 
 const Input = styled('input')({
   display: 'none',
@@ -152,12 +153,21 @@ export default function SettingsDialog(props) {
     justifyContent: "space-between"
   }
 
-  const handleAddDcc = (e) => {
-    setConfig("dccConfig", {}, "add");
+  const handleAddDcc = e => {
+    setConfig("dccConfig", [], "add");
   }
 
-  const handleRevertDefaultsDcc = (e) => {
-    setConfig("dccConfig", {}, "revertToDefaults");
+  const handleDiscoverDcc = e => {
+    clientRequest("discover_dcc").then(resp => {
+      const new_config = resp.data;
+      let existing_paths = [];
+      config.dccConfig.forEach(config => {
+        existing_paths.push(config.path);
+      })
+      const filtered = new_config.filter(config => !existing_paths.includes(config.path));
+      console.log(`Previously had ${existing_paths.length} configs, discovered ${new_config.length}, adding ${filtered.length}`);
+      setConfig("dccConfig", filtered, "add");
+    });
   }
 
   const handleServerDetailsAddressChange = e => {
@@ -224,7 +234,7 @@ export default function SettingsDialog(props) {
         <div className={styles.insideContainer}>
           <Stack direction="row" alignItems="center" spacing={2} style={{alignSelf: "flex-end"}}>
             <Button variant="outlined" onClick={handleAddDcc}>Add</Button>
-            <Button variant="outlined" onClick={handleRevertDefaultsDcc}>Revert to defaults</Button>
+            <Button variant="outlined" onClick={handleDiscoverDcc}>Discover</Button>
           </Stack>
           <List
             sx={{ width: '100%' }}

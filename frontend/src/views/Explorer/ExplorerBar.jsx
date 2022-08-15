@@ -29,6 +29,7 @@ function ExplorerBar(props) {
   const [newSceneOpen, setNewSceneOpen] = useState(false);
   const [ingestOpen, setIngestOpen] = useState(false);
   const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
+  const [filterValue, setFilterValue] = useState("");
 
   const handleResultTypeChange = (e, value) => {
     if (value !== null) props.onResultTypeChange(value);
@@ -40,6 +41,12 @@ function ExplorerBar(props) {
 
   const handleGoBack = e => {
     setCurrentContext(currentContext.parent);
+  }
+
+  const handleFilterChange = e => {
+    const value = e.target.value;
+    setFilterValue(value);
+    props.onFilterChange(value);
   }
 
   return (
@@ -83,7 +90,9 @@ function ExplorerBar(props) {
           size="small"
           placeholder="Filter"
           variant="outlined"
-          onChange={props.onFilterChange}
+          value={filterValue}
+          error={filterValue !== ""}
+          onChange={handleFilterChange}
           style={{flexGrow: 1}}
         />
         <FormControlLabel control={<Checkbox defaultChecked onChange={props.onLatestChange} />} label="Latest" />

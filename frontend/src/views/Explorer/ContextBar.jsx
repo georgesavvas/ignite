@@ -23,11 +23,12 @@ export default function ContextBar() {
     }
   },[currentContext]);
 
-  const handlePathChange = e => {
-    setCurrentContext(e.target.value).then((success => {
+  const handlePathChange = value => {
+    setCurrentContext(value).then((success => {
       if (!success) {
         setContextPathError([true, "Not found"]);
         enqueueSnackbar("Path not found", {variant: "error"});
+        setContextPath(currentContext.path);
       }
     }))
   }
@@ -37,7 +38,9 @@ export default function ContextBar() {
   }
 
   const handleBlur = e => {
-    handlePathChange(e)
+    const value = e.target.value;
+    console.log(currentContext.path, value);
+    if (currentContext.path !== value) handlePathChange(value);
     setIsTextField(false);
   }
 

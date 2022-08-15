@@ -7,19 +7,14 @@ import {ConfigContext} from "../contexts/ConfigContext";
 import {ContextContext} from "../contexts/ContextContext";
 import { useSnackbar } from 'notistack';
 import clientRequest from "../services/clientRequest";
-import BuildFileURL from "../services/BuildFileURL";
+import {DCCINFO} from "../constants/dccInfo";
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Switch from '@mui/material/Switch';
 
 const style = {
   width: "100%",
   height: "100%"
-}
-
-const dccNames = {
-  houdini: ["hmaster", "hescape", "houdini"],
-  maya: ["maya"],
-  blender: ["blender"],
-  nuke: ["nuke"],
-  unreal: ["unreal"]
 }
 
 function DccSelector(props) {
@@ -27,6 +22,7 @@ function DccSelector(props) {
   // const dir_kind_formatted = dir_kind.charAt(0).toUpperCase() + dir_kind.slice(1)
   const [config, setConfig] = useContext(ConfigContext);
   const [selectedDcc, setSelectedDcc] = useState("");
+  const [showAll, setShowAll] = useState(false);
   const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
@@ -40,19 +36,33 @@ function DccSelector(props) {
     }
   }
 
-  const getDccName = (dcc) => {
-    for(const _dcc of Object.keys(dccNames)) {
-        for(const dcc_keyword of dccNames[_dcc]) {
-          if (dcc.toLowerCase().includes(dcc_keyword)) return _dcc;
-        }
-    }
-    return "unknown";
+  const getDccName = path => {
+    const name = path.replaceAll("\\", "/").split("/").at(-1).split(".")[0]
+    let dcc_name = "unknown";
+    DCCINFO.forEach(dcc => {
+      dcc.keywords.forEach(keyword => {
+        if (name.toLowerCase().includes(keyword)) dcc_name = dcc.name;
+      });
+    });
+    return dcc_name;
+  }
+
+  const getDccIcon = path => {
+    const name = path.replaceAll("\\", "/").split("/").at(-1).split(".")[0]
+    let icon = "media/dcc/unknown.png";
+    DCCINFO.forEach(dcc => {
+      dcc.keywords.forEach(keyword => {
+        if (name.toLowerCase().includes(keyword)) icon = dcc.icon;
+      });
+    });
+    return `url(${icon})`;
   }
 
   function formatDcc(dcc, index) {
-    const dcc_name = getDccName(dcc.path.split("/").at(-1).split("\\").at(-1).split(".")[0]);
-    const dccIcon = `url(media/dcc/${dcc_name}.png)`;
+    const dccIcon = getDccIcon(dcc.path);
+    const relevant = dcc.exts.includes(props.scene.extension);
     const containerStyle = {
+      display: relevant || showAll ? null : "none",
       borderColor: dcc.name === selectedDcc ? "rgb(252, 140, 3)" : "rgb(70,70,70)"
     }
 
@@ -66,17 +76,17 @@ function DccSelector(props) {
 
   async function handleLaunchClick(e) {
     const dcc = getDcc();
-    const dcc_name = getDccName(dcc.path.split("/").at(-1).split("\\").at(-1).split(".")[0]);
+    const dcc_name = getDccName(dcc.path);
     const data = {
       dcc: dcc_name,
       dcc_name: dcc.name,
       scene: props.scene,
-      new_scene: props.newScene
+      new_scene: props.newScene,
+      task: props.task
     };
     console.log(data);
     const ok = await clientRequest("get_launch_cmd", data).then(resp => {
       const data = resp.data;
-      console.log(data);
       return window.api.launch_dcc(data.cmd, data.args, data.env);
     });
 
@@ -86,11 +96,25 @@ function DccSelector(props) {
     if (props.onClose) props.onClose();
   }
 
+  let dccConfigSorted = config.dccConfig;
+  dccConfigSorted.sort((a, b) => a.name.localeCompare(b.name));
+
   return (
     <div style={style}>
       <div style={{margin: "10px", overflow: "hidden"}}>
-        <Typography variant="h5" style={{marginBottom: "10px"}}>Scene Launcher</Typography>
-        {config.dccConfig.map((dcc, index) => formatDcc(dcc, index))}
+        <div className={styles.topBar}>
+          <Typography variant="h5">
+            Scene Launcher
+          </Typography>
+          <FormControlLabel 
+            control={
+              <Switch checked={showAll} onChange={e => setShowAll(e.target.checked)} />
+            }
+            label="Show all"
+            labelPlacement="start"
+          />
+        </div>
+        {dccConfigSorted.map((dcc, index) => formatDcc(dcc, index))}
         <div style={{width: "100%", display: "grid", justifyContent: "center", marginTop: "20px"}}>
           <Button
             size="large"

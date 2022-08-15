@@ -114,11 +114,7 @@ async def get_launch_cmd(request: Request):
     dcc_name = result.get("dcc_name", "")
     new_scene = result.get("new_scene", False)
     if new_scene and task:
-        data = {
-            "task": task,
-            "dcc": dcc
-        }
-        scene = utils.copy_default_scene(data)
+        scene = utils.copy_default_scene(task, dcc)
     elif new_scene and not task:
         return {"ok": False}
     data = utils.get_launch_cmd(dcc, dcc_name, task, scene)
@@ -178,6 +174,12 @@ async def ingest(request: Request):
 @app.get("/api/v1/get_actions")
 async def get_actions():
     data = api.get_actions()
+    return {"ok": True, "data": data}
+
+
+@app.get("/api/v1/discover_dcc")
+async def discover_dcc():
+    data = utils.discover_dcc()
     return {"ok": True, "data": data}
 
 

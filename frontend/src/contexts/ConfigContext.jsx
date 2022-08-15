@@ -15,32 +15,11 @@ const accessDefault = {
   serverProjectsDir: ""
 }
 
-const dccConfigDefault = [
-  {
-    name: "Houdini 19",
-    path: "C:\\Program Files\\Side Effects Software\\Houdini 19.0.506\\bin\\hmaster.exe",
-    valid: true,
-    exts: ["hip, hipnc"]
-  },
-  {
-    name: "Maya",
-    path: "C:\\Program Files\\Autodesk\\Maya2023\\bin\\maya.exe",
-    valid: true,
-    exts: ["ma"]
-  },
-  {
-    name: "Blender",
-    path: "blender.exe",
-    valid: true,
-    exts: []
-  },
-  {
-    name: "Nuke",
-    path: "nuke.exe",
-    valid: true,
-    exts: []
-  }
-]
+const placeholder_config = {
+  path: "",
+  exts: "",
+  name: ""
+}
 
 export const ConfigProvider = props => {
   const [config, setConfig] = useState({serverDetails: {}, access: {}, dccConfig: []});
@@ -91,13 +70,18 @@ export const ConfigProvider = props => {
     clientRequest("set_config", {data: data})
   }, [config])
 
-  const addToDCCConfig = prevState => {
-    const placeholder = {
-      name: "",
-      path: "",
-      exts: ""
-    };
-    return [...prevState, placeholder];
+  const addToDCCConfig = (config, data) => {
+    if (!data) {
+      return [...config, ...placeholder_config]
+    }
+    let existing_paths = [];
+    config.forEach(existing => {
+      existing_paths.push(existing.path);
+    });
+    const filtered = data.filter(
+      new_config => !existing_paths.includes(new_config.path)
+    );
+    return [...config, ...filtered];
   }
 
   const modifyDCCConfig = (config, data) => {
@@ -125,7 +109,7 @@ export const ConfigProvider = props => {
     switch (operation) {
       case "add": {
         setConfig(prevState => (
-          {...prevState, dccConfig: addToDCCConfig(prevState.dccConfig)}
+          {...prevState, dccConfig: addToDCCConfig(prevState.dccConfig, data)}
         ));
         break;
       }
@@ -138,12 +122,6 @@ export const ConfigProvider = props => {
       case "remove": {
         setConfig(prevState => (
           {...prevState, dccConfig: removeFromDCCConfig(prevState.dccConfig, data)}
-        ));
-        break;
-      }
-      case "revertToDefaults": {
-        setConfig(prevState => (
-          {...prevState, dccConfig: addToDCCConfig(dccConfigDefault)}
         ));
         break;
       }

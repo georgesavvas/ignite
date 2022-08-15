@@ -15,15 +15,17 @@ function GridTile(props) {
   if (!isStatic && !props.entity.thumbnail.path.includes("####")) isStatic = true;
 
   const tileStyle = {
-    "borderColor": props.selected ? "rgb(252, 140, 3)" : "rgb(50, 50, 50)",
+    borderColor: props.selected ? "rgb(252, 140, 3)" : "rgb(50, 50, 50)",
+    transition: "all 0.2s"
   }
 
   const thumbnailStyle = {
-    width: props.thumbnailWidth || "100%"
+    width: props.thumbnailWidth || "100%",
+    transition: "all 0.2s"
   }
 
   const barStyle = {
-    "left": `${progress * 100}%`
+    left: `${progress * 100}%`
   }
 
   const handleMouseMove = (e) => {
@@ -38,7 +40,7 @@ function GridTile(props) {
     let thumbnailPath = thumbnail.path
     if (hasThumbnail && !thumbnail.static) {
       let frame = thumbnail.first_frame + (thumbnail.last_frame - thumbnail.first_frame) * progress;
-      frame = Math.round(frame);
+      frame = clamp(Math.round(frame), thumbnail.first_frame, thumbnail.last_frame);
       thumbnailPath = thumbnailPath.replace("####", frame);
     }
     if (!hasThumbnail) return "media/no_icon.png";
@@ -56,7 +58,7 @@ function GridTile(props) {
       <ContextMenu items={props.contextItems} contextMenu={contextMenu}
         setContextMenu={setContextMenu}
       />
-      <div style={tileStyle} className={styles.tile} onClick={handleClick}
+      <div className={styles.tile + " " + styles.gridTile} style={tileStyle} onClick={handleClick}
         onContextMenu={e => handleContextMenu(e, contextMenu, setContextMenu)}
       >
         <img src={thumbnailURL} className={styles.thumbnail} style={thumbnailStyle} />
@@ -81,13 +83,15 @@ function RowTile(props) {
   const isStatic = props.thumbnail !== undefined;
 
   const tileStyle = {
-    "borderColor": props.selected ? "rgb(252, 140, 3)" : "rgb(50, 50, 50)",
-    "height": props.size * 0.5625,
-    "flexDirection": "row"
+    borderColor: props.selected ? "rgb(252, 140, 3)" : "rgb(50, 50, 50)",
+    // height: props.size * 0.5625,
+    flexDirection: "row",
+    transition: "height 0.2s"
   };
 
   const thumbnailStyle = {
-    "width": props.thumbnailWidth || "100%"
+    width: props.thumbnailWidth || "100%",
+    transition: "height 0.2s, width 0.2s"
   }
 
   const thumbnailContainer = {
@@ -99,7 +103,7 @@ function RowTile(props) {
   }
 
   const barStyle = {
-    "left": props.size * progress
+    left: props.size * progress
   }
 
   const handleMouseMove = (e) => {
@@ -112,8 +116,8 @@ function RowTile(props) {
     const thumbnail = props.entity.thumbnail
     let thumbnailPath = thumbnail.path || "media/no_icon.png"
     if (!thumbnail.static) {
-      let frame = thumbnail.first + (thumbnail.last - thumbnail.first) * progress;
-      frame = Math.round(frame);
+      let frame = thumbnail.first_frame + (thumbnail.last_frame - thumbnail.first_frame) * progress;
+      frame = clamp(Math.round(frame), thumbnail.first_frame, thumbnail.last_frame);
       thumbnailPath = thumbnailPath.replace("####", frame);
     }
     return thumbnailPath;

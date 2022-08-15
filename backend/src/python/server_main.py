@@ -36,6 +36,15 @@ def log_request(request):
     pprint(request)
 
 
+def process_request(req):
+    # remap paths if needed
+    client_root = req.get("client_root")
+    if client_root:
+        if req.get("path"):
+            req["path"] = utils.remap_path(req["path"], client_root)
+    return req
+
+
 def error(s):
     return {"ok": False, "error": s}
 
@@ -101,8 +110,9 @@ async def get_project_tree(request: Request):
 async def find(request: Request):
     result = await request.json()
     log_request(result)
-    query = result.get("query", "")
-    entity = api.find(query)
+    result = process_request(result)
+    path = result.get("path", "")
+    entity = api.find(path)
     data = {}
     if hasattr(entity, "as_dict"):
         data = entity.as_dict()
@@ -311,6 +321,7 @@ async def copy_default_scene(request: Request):
 async def register_directory(request: Request):
     result = await request.json()
     log_request(result)
+    result = process_request(result)
     path = result.get("path", "")
     dir_kind = result.get("dir_kind", "")
     ok = api.register_directory(path, dir_kind)
@@ -323,6 +334,7 @@ async def register_directory(request: Request):
 async def register_task(request: Request):
     result = await request.json()
     log_request(result)
+    result = process_request(result)
     path = result.get("path", "")
     task_type = result.get("task_type", "")
     ok = api.register_task(path, task_type)
@@ -335,6 +347,7 @@ async def register_task(request: Request):
 async def register_scene(request: Request):
     result = await request.json()
     log_request(result)
+    result = process_request(result)
     path = result.get("path", "")
     ok = api.register_scene(path)
     if not ok:
@@ -345,6 +358,8 @@ async def register_scene(request: Request):
 @app.post("/api/v1/register_asset")
 async def register_asset(request: Request):
     result = await request.json()
+    log_request(result)
+    result = process_request(result)
     path = result.get("path", "")
     ok = api.register_asset(path)
     if not ok:
@@ -367,6 +382,8 @@ async def set_repr_asset(request: Request):
 @app.post("/api/v1/register_assetversion")
 async def register_assetversion(request: Request):
     result = await request.json()
+    log_request(result)
+    result = process_request(result)
     path = result.get("path", "")
     ok = api.register_assetversion(path)
     if not ok:
@@ -401,7 +418,7 @@ async def rename_entity(request: Request):
     }
     if code < 0:
         return error(codes[code])
-    return {"ok": True, "text": reasons.get(ok, "")}
+    return {"ok": True, "text": codes.get(code, "")}
 
 
 @app.get("/api/v1/quit")
@@ -413,9 +430,6 @@ async def rename_entity(request: Request):
 mount_root()
 
 
-print("__SERVER_READY__")
-
-
 if __name__ == "__main__":
     logging.info(f"Launching server at {SERVER_HOST}:{SERVER_PORT}")
-    uvicorn.run(f"{__name__}:app", host=SERVER_HOST, port=int(SERVER_PORT), log_level="info", reload=False)
+    uvicorn.run(f"{__name__}:app", host=SERVER_HOST, port=int(SERVER_PORT), log_level="info", reload=True)
