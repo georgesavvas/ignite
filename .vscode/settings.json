@@ -3,7 +3,9 @@
     "python.linting.pylintEnabled": false,
     "python.linting.enabled": true,
     "cSpell.words": [
+        "Allegorithmic",
         "bottomness",
+        "DCCINFO",
         "DIRCONTEXTOPTIONS",
         "DIRECTORYICONS",
         "KINDTYPES",

@@ -1,19 +1,19 @@
 TOOLS = {
     "oiiotool": {
         "win": "oiiotool.exe",
-        "mac": "oiiotool",
+        "darwin": "oiiotool",
         "linux": "oiiotool"
     },
     "ffmpeg": {
         "win": "ffmpeg.exe",
-        "mac": "ffmpeg",
+        "darwin": "ffmpeg",
         "linux": "ffmpeg"
     }
 }
 
 OS_NAMES = {
     "Windows": "win",
-    "Darwin": "mac",
+    "Darwin": "darwin",
     "Linux": "linux"
 }
 

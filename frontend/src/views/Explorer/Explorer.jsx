@@ -127,9 +127,8 @@ function Explorer() {
     setPages((prevPages) => ({...prevPages, current: value}));
   };
 
-  const handleFilterChange = e => {
+  const handleFilterChange = value => {
     setIsLoading(true);
-    const value = e.target.value;
     debounced(() => setQuery((prevState) => ({...prevState, filter_string: value})));
   }
 
@@ -159,7 +158,8 @@ function Explorer() {
     overflowY: "auto",
     gridTemplateColumns: `repeat(auto-fill, minmax(${tileSize * 40}px, 1fr))`,
     gridGap: "10px",
-    padding: "10px"
+    padding: "10px",
+    transition: "0.2s"
   }
 
   if (viewType === "row") {

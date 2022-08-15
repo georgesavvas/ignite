@@ -2,12 +2,16 @@ import os
 import logging
 import platform
 import yaml
+import glob
 import subprocess
 import requests
 import importlib
+import shutil
+from copy import deepcopy
+from pprint import pprint
 from pathlib import PurePath, Path
 from huey import SqliteHuey
-from ignite_client.constants import GENERIC_ENV, DCC_ENVS, OS_NAMES
+from ignite_client.constants import GENERIC_ENV, DCC_ENVS, OS_NAMES, DCC_DISCOVERY
 
 
 ENV = os.environ
@@ -19,6 +23,9 @@ DCC = Path(ENV["IGNITE_DCC"])
 COMMON = Path(ENV["IGNITE_COMMON"])
 
 HUEY = SqliteHuey(filename=CONFIG_PATH / "ignite.db")
+
+
+OS_NAME = OS_NAMES[platform.system()]
 
 
 def get_config() -> dict:
@@ -42,23 +49,29 @@ ROOT = PurePath(CONFIG["projects_root"])
 
 def set_config(data):
     config = get_config()
-    old_root = config["projects_root"]
+    old_config = deepcopy(config)
     config.update(data)
-    new_root = config["access"]["projects_root"]
-    config["projects_root"] = new_root
+    config["projects_root"] = config["access"]["projects_root"]
     server_root = server_request("get_projects_root")["data"]
     config["access"]["server_projects_root"] = server_root
-    with open(CLIENT_CONFIG_PATH, "w") as f:
-        yaml.safe_dump(config, f)
+    changed = old_config != config
 
+    global CONFIG, ROOT, IGNITE_SERVER_ADDRESS, IGNITE_SERVER_PASSWORD
+    CONFIG = config
     IGNITE_SERVER_ADDRESS = config["server_details"]["address"]
     IGNITE_SERVER_PASSWORD = config["server_details"]["password"]
     ENV["IGNITE_SERVER_ADDRESS"] = IGNITE_SERVER_ADDRESS
     ENV["IGNITE_SERVER_PASSWORD"] = IGNITE_SERVER_PASSWORD
-    CONFIG = config
-    changed = old_root != new_root
+    ROOT = PurePath(config["projects_root"])
 
-    return config, changed
+    if not changed:
+        return config, False
+
+    with open(CLIENT_CONFIG_PATH, "w") as f:
+        yaml.safe_dump(config, f)
+
+    root_changed = old_config["projects_root"] != config["projects_root"]
+    return config, root_changed
 
 
 def get_huey():
@@ -90,7 +103,7 @@ def get_generic_env():
 
 
 def get_task_env(path):
-    task = server_request("find", {"query": path}).get("data", {})
+    task = server_request("find", {"path": path}).get("data", {})
     if not task or not task.get("dir_kind") == "task":
         return {}
     env = {
@@ -140,30 +153,55 @@ def get_env(task="", dcc="", scene={}):
 
 
 def discover_dcc():
-    pass
+    config = []
+    for name, data in DCC_DISCOVERY.items():
+        paths = data["paths"][OS_NAME]
+        path = None
+        logging.info(f"Attempting to find {name}...")
+        for p in paths:
+            logging.info(f"Searching at {p}")
+            available = glob.glob(p)
+            if available:
+                path = available[0]
+                logging.info(f"Found {available}")
+                logging.info(f"Choosing {path}")
+                break
+        else:
+            logging.info(f"Found nothing.")
+            continue
+        args = data.get("args")
+        if args:
+            logging.info(f"Appending args {args}")
+            path += f" {args}"
+        dcc = {
+            "exts": data["exts"],
+            "name": data["label"],
+            "path": path
+        }
+        config.append(dcc)
+    return config
 
 
 def launch_dcc(dcc, dcc_name, scene):
-    scene = server_request("find", {"query": scene}).get("data", {})
+    scene = server_request("find", {"path": scene}).get("data", {})
     if not scene:
         return
     task = scene.get("task", "")
     env = get_env(task, dcc, scene)
     scene = scene.get("scene")
-    for config in get_dcc_config():
+    for config in CONFIG["dcc_config"]:
         if config["name"] == dcc_name:
             dcc_config = config
             break
     else:
         return
 
-    os_name = OS_NAMES[platform.system()]
     os_cmd = {
         "win": [],
-        "mac": ["open", "-a"],
+        "darwin": ["open", "-a"],
         "linux": []
     }
-    cmd = os_cmd[os_name]
+    cmd = os_cmd[OS_NAME]
     cmd += [dcc_config["path"]]
     cmd.append(scene)
     subprocess.Popen(cmd, env=env)
@@ -178,20 +216,19 @@ def get_launch_cmd(dcc, dcc_name, task, scene):
     print("Getting env with (task, dcc, scene) -", task, "-", dcc, "-", scene)
     env = get_env(task, dcc, scene)
     scene = scene.get("scene")
-    for config in get_dcc_config():
+    for config in CONFIG.get("dcc_config", []):
         if config["name"] == dcc_name:
             dcc_config = config
             break
     else:
         return
 
-    os_name = OS_NAMES[platform.system()]
     os_cmd = {
         "win": [],
-        "mac": ["open", "-a"],
+        "darwin": ["open", "-a"],
         "linux": []
     }
-    cmd = os_cmd[os_name]
+    cmd = os_cmd[OS_NAME]
     cmd += [dcc_config["path"]]
     if scene:
         cmd.append(scene)
@@ -203,6 +240,40 @@ def get_launch_cmd(dcc, dcc_name, task, scene):
     return data
 
 
+def copy_default_scene(task, dcc):
+    task = server_request("find", {"path": task}).get("data")
+    if not task or not task["dir_kind"] == "task":
+        logging.error(f"Invalid task {task}")
+        return
+    filepath = DCC / "default_scenes/default_scenes.yaml"
+    if not filepath.exists():
+        logging.error(f"Default scenes config {filepath} does not exist.")
+        return
+    with open(filepath, "r") as f:
+        data = yaml.safe_load(f)
+    if dcc not in data.keys():
+        logging.error(f"Default scenes config is empty {filepath}")
+        return
+    src = DCC / "default_scenes" / data[dcc]
+    dest = Path(task.get("next_scene"))
+    dest.mkdir(parents=True, exist_ok=True)
+    logging.info(f"Copying default scene {src} to {dest}")
+    shutil.copy2(src, dest)
+    data = {
+        "client_root": str(ROOT),
+        "path": str(dest),
+        "dir_kind": "scene"
+    }
+    server_request("register_directory", data)
+    scene_path = dest / PurePath(src).name
+    data = {
+        "client_root": str(ROOT),
+        "path": str(scene_path)
+    }
+    scene = server_request("find", data).get("data")
+    return scene
+
+
 def show_in_explorer(filepath):
     filepath = Path(filepath)
     if not filepath.is_dir():
@@ -211,10 +282,9 @@ def show_in_explorer(filepath):
     if not filepath.is_dir():
         return False
 
-    os_name = OS_NAMES[platform.system()]
-    if os_name == "win":
+    if OS_NAME == "win":
         os.startfile(filepath)
-    elif os_name == "mac":
+    elif OS_NAME == "darwin":
         subprocess.Popen(["open", filepath])
     else:
         subprocess.Popen(["xdg-open", filepath])
@@ -229,13 +299,12 @@ def get_explorer_cmd(filepath):
     if not filepath.is_dir():
         return False
 
-    os_name = OS_NAMES[platform.system()]
     cmds = {
         "win": ["explorer.exe", filepath],
-        "mac": ["open", filepath],
+        "darwin": ["open", filepath],
         "linux": ["xdg-open", filepath]
     }
-    cmd = cmds[os_name]
+    cmd = cmds[OS_NAME]
     data = {
         "cmd": cmd[0],
         "args": cmd[1:],

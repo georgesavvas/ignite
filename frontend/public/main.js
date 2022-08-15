@@ -66,10 +66,12 @@ function createWindow (port) {
     height: 720,
     show: false,
     icon: path.join(__dirname, iconPaths[platformName]),
+    backgroundColor: "#141414",
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
-      preload: path.join(__dirname, "preload.js")
+      preload: path.join(__dirname, "preload.js"),
+      enableBlinkFeatures: "CSSGridTemplatePropertyInterpolation"
     }
   })
 
@@ -154,6 +156,7 @@ function createSplash () {
     height: 350,
     transparent: true,
     frame: false,
+    backgroundColor: "#141414",
     alwaysOnTop: true,
     icon: path.join(__dirname, iconPaths[platformName])
   })

@@ -67,7 +67,7 @@ os_name = platform.system()
 if os_name == "Windows":
     os_name = "win"
 elif os_name == "Darwin":
-    os_name = "mac"
+    os_name = "darwin"
 else:
     os_name = "linux"
 tools = Path(DIR).parent.parent.parent / "tools"

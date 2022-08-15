@@ -33,15 +33,12 @@ def get_config() -> dict:
     paths = ("projects_root",)
     for p in paths:
         config[p] = os.path.abspath(config[p])
-
-    IGNITE_SERVER_ADDRESS = config.get("server_address")
-    ENV["IGNITE_SERVER_ADDRESS"] = IGNITE_SERVER_ADDRESS
-
     return config
 
 
 CONFIG = get_config()
 IGNITE_SERVER_ADDRESS = CONFIG.get("server_address")
+ENV["IGNITE_SERVER_ADDRESS"] = IGNITE_SERVER_ADDRESS
 ROOT = PurePath(CONFIG["projects_root"])
 
 
@@ -169,3 +166,12 @@ def build_path(path):
         return path
     else:
         return ROOT / path
+
+
+def remap_path(path, client_root):
+    path = PurePath(path)
+    client_root = PurePath(client_root)
+    if ROOT == client_root:
+        return str(path)
+    rel = path.relative_to(client_root)
+    return ROOT / rel
