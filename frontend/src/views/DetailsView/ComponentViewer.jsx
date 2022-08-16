@@ -9,6 +9,7 @@ import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js';
 import { Typography } from "@mui/material";
 import {ConfigContext} from "../../contexts/ConfigContext";
 import BuildFileURL from "../../services/BuildFileURL";
+import { clamp } from "../../utils/math";
 // import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 const style = {
@@ -58,15 +59,16 @@ function EXRViewer(props) {
   const comp = props.comp;
 
   const handleFrameChange = value => {
-    const new_progress = (value - comp.first) / (comp.last - comp.first);
+    const new_progress = (value - comp.first_frame) / (comp.last_frame - comp.first_frame);
     setProgress(new_progress);
   }
 
   let path = "media/no_icon.png";
-  if (comp.path) path = BuildFileURL(comp.api_path, props.config, {forceRemote: true});
+  if (comp.path) path = BuildFileURL(comp.path, props.config, {forceRemote: true});
   if (!comp.static) {
-    let frame = comp.first + (comp.last - comp.first) * progress;
+    let frame = comp.first_frame + (comp.last_frame - comp.first_frame) * progress;
     frame = Math.round(frame);
+    frame = clamp(frame, comp.first_frame, comp.last_frame);
     path = path.replace("####", frame);
   }
   
@@ -86,8 +88,8 @@ function EXRViewer(props) {
           step={1}
           onChange={(e, value) => handleFrameChange(value)}
           marks
-          min={comp.first}
-          max={comp.last}
+          min={comp.first_frame}
+          max={comp.last_frame}
         />
       </div>
       <Canvas orthographic camera={{ zoom: 100, position: [0, 0, 1] }}>
@@ -139,13 +141,13 @@ function ComponentViewer(props) {
   let path = "media/no_icon.png";
   if (comp.path) path = BuildFileURL(comp.api_path, config, {forceRemote: true});
   if (!comp.static) {
-    let frame = comp.first + (comp.last - comp.first) * progress;
+    let frame = comp.first_frame + (comp.last_frame - comp.first_frame) * progress;
     frame = Math.round(frame);
     path = path.replace("####", frame);
   }
 
   const handleFrameChange = value => {
-    const new_progress = (value - comp.first) / (comp.last - comp.first);
+    const new_progress = (value - comp.first_frame) / (comp.last_frame - comp.first_frame);
     setProgress(new_progress);
   }
 

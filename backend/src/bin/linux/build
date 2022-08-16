@@ -1,0 +1,2 @@
+pyinstaller src/python/server_main.py --noconfirm --onefile --name=IgniteServer --icon=../icon.icns
+pyinstaller src/python/client_main.py --noconfirm --onefile --name=IgniteClientBackend --icon=../icons.icns

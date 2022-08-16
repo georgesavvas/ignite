@@ -3,8 +3,7 @@ import styles from "./Tile.module.css";
 import ContextMenu, { handleContextMenu } from "./ContextMenu";
 import BuildFileURL from "../services/BuildFileURL";
 import { ConfigContext } from "../contexts/ConfigContext";
-
-const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
+import { clamp } from "../utils/math";
 
 function GridTile(props) {
   const [contextMenu, setContextMenu] = useState(null);
@@ -15,13 +14,11 @@ function GridTile(props) {
   if (!isStatic && !props.entity.thumbnail.path.includes("####")) isStatic = true;
 
   const tileStyle = {
-    borderColor: props.selected ? "rgb(252, 140, 3)" : "rgb(50, 50, 50)",
-    transition: "all 0.2s"
+    borderColor: props.selected ? "rgb(252, 140, 3)" : "rgb(50, 50, 50)"
   }
 
   const thumbnailStyle = {
-    width: props.thumbnailWidth || "100%",
-    transition: "all 0.2s"
+    width: props.thumbnailWidth || "100%"
   }
 
   const barStyle = {
@@ -85,13 +82,11 @@ function RowTile(props) {
   const tileStyle = {
     borderColor: props.selected ? "rgb(252, 140, 3)" : "rgb(50, 50, 50)",
     // height: props.size * 0.5625,
-    flexDirection: "row",
-    transition: "height 0.2s"
+    flexDirection: "row"
   };
 
   const thumbnailStyle = {
-    width: props.thumbnailWidth || "100%",
-    transition: "height 0.2s, width 0.2s"
+    width: props.thumbnailWidth || "100%"
   }
 
   const thumbnailContainer = {

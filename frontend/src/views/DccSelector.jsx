@@ -52,9 +52,10 @@ function DccSelector(props) {
     let icon = "media/dcc/unknown.png";
     DCCINFO.forEach(dcc => {
       dcc.keywords.forEach(keyword => {
-        if (name.toLowerCase().includes(keyword)) icon = dcc.icon;
+        if (name.toLowerCase().replaceAll(" ", "").includes(keyword)) icon = dcc.icon;
       });
     });
+    console.log(`url(${icon})`);
     return `url(${icon})`;
   }
 
