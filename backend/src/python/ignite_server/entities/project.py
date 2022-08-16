@@ -12,12 +12,14 @@ from ignite_server.constants import ANCHORS
 CONFIG = utils.get_config()
 ROOT = PurePath(CONFIG["projects_root"])
 GROUP_ANCHOR = ANCHORS["group"]
-PROJECT_CONFIG_FILE = "project.yaml"
 
 
 class Project(Directory):
     def __init__(self, name="", path="") -> None:
+        if not path and name:
+            path = ROOT / name
         super().__init__(path, dir_kind="project")
+        self.project = self.name
 
     def create_dir(self, name, recursive=False):
         raise NotImplemented("create_dir not allowed for projects.")
@@ -53,15 +55,6 @@ class Project(Directory):
         for d in dirs:
             dir_path = path / d
             setattr(self, f"{d}_path", dir_path)
-
-    def load_config(self):
-        path = self.config_path / PROJECT_CONFIG_FILE
-        with open(path, "r") as f:
-            config = yaml.safe_load(f)
-        config = config or {}
-        self.short_name = config.get("short_name", "")
-        self.status = config.get("status", "open")
-        self.created = config.get("created", 0)
     
     def set_short_name(self, name):
         if not utils.validate_dirname(name): 
