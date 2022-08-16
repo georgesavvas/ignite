@@ -41,7 +41,7 @@ function BuildFileURL(filepath, config, options={}) {
     // console.log("BuildFileURL Output -", value);
     return value;
   } else if (remote || options.forceRemote) {
-    const value = `${address}/files/${unix_path}`;
+    const value = `http://${address}/files/${unix_path}`;
     // console.log("BuildFileURL Output -", value);
     return value;
   } else {

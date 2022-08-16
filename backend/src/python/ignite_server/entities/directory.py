@@ -57,6 +57,8 @@ class Directory():
         self.load_from_config()
 
     def get_context(self):
+        if self.dir_kind == "group":
+            return ""
         project_path = ROOT / self.project
         if hasattr(self, "task"):
             context = self.task
@@ -76,7 +78,6 @@ class Directory():
             value = getattr(self, s)
             d[s] = value
             if s in self.nr_attrs:
-                logging.info(f"Getting nr_path of {s}")
                 d[f"{s}_nr"] = utils.get_nr(value)
         return d
 

@@ -30,7 +30,7 @@ export default function ProjectTree() {
   }, [currentContext, config.access, updateTreeView]);
 
   var content = [];
-  if (loadedData.children === undefined) {
+  if (!loadedData || !loadedData.children) {
     content = <Skeleton
         variant="rectangular"
         animation="wave"

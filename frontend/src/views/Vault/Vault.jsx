@@ -1,8 +1,11 @@
-import React from 'react'
+import React, { useState } from "react";
+import Modal from "../../components/Modal";
 
-function Vault() {
+function Vault(props) {
   return (
-    <div>Vault</div>
+    <Modal open={props.open} onClose={props.onClose} title="Vault" maxWidth="lg"
+    closeButton>
+    </Modal>
   )
 }
 

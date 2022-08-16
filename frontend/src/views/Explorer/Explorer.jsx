@@ -142,40 +142,47 @@ function Explorer() {
   }
 
   const handleTilesPerPageChange = value => {
-    setExplorerSettings(prevState => {
-      prevState.tilesPerPage = value;
-    })
-  }
+    setExplorerSettings(prevState => ({...prevState, tilesPerPage: value}))
+  };
 
   const handleResultTypeChange = value => {
     const savedViewType = explorerSettings.saved[value].current;
     const savedTileSize = explorerSettings.saved[value][savedViewType];
     setExplorerSettings(prevState => {
-      prevState.currentResultType = value;
-      prevState.currentViewType = savedViewType;
-      prevState.currentTileSize = savedTileSize;
-      return prevState;
+      return {
+        ...prevState,
+        currentResultType: value,
+        currentViewType: savedViewType,
+        currentTileSize: savedTileSize
+      }
     })
-  }
+  };
 
   const handleViewTypeChange = value => {
     const currentResultType = explorerSettings.currentResultType;
     const savedTileSize = explorerSettings.saved[currentResultType][value];
     setExplorerSettings(prevState => {
-      prevState.currentViewType = value;
-      prevState.currentTileSize = savedTileSize;
-      prevState.saved[currentResultType].current = value;
-      return prevState;
+      const saved = prevState.saved;
+      saved[currentResultType].current = value;
+      return {
+        ...prevState,
+        saved: saved,
+        currentViewType: value,
+        currentTileSize: savedTileSize
+      }
     })
-  }
+  };
 
   const handleTileSizeChange = value => {
     const currentResultType = explorerSettings.currentResultType;
     const currentViewType = explorerSettings.currentViewType;
     setExplorerSettings(prevState => {
-      prevState.currentTileSize = value;
-      prevState.saved[currentResultType][currentViewType] = value;
-      return prevState;
+      const saved = prevState.saved;
+      saved[currentResultType][currentViewType] = value;
+      return {
+        ...prevState,
+        currentTileSize: value
+      }
     })
   }
 
@@ -189,8 +196,7 @@ function Explorer() {
     overflowY: "auto",
     gridTemplateColumns: `repeat(auto-fill, minmax(${explorerSettings.currentTileSize * 40}px, 1fr))`,
     gridGap: "10px",
-    padding: "10px",
-    transition: "0.2s"
+    padding: "10px"
   }
 
   if (explorerSettings.currentViewType === "row") {

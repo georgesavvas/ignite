@@ -37,6 +37,7 @@
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
     "sanitize": "npx kill-port 3000",
+    "electron": "electron .",
     "electron-dev": "npm run sanitize && concurrently \"cross-env BROWSER=none npm start\" \"wait-on http://localhost:3000 && cross-env NODE_ENV=dev electron .\"",
     "copy-backend-win": "xcopy ..\\backend\\dist\\Ignite* build /Y",
     "copy-backend-linux": "cp ../backend/dist/Ignite* build",

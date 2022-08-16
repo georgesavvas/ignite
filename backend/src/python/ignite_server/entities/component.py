@@ -11,6 +11,9 @@ ROOT = PurePath(CONFIG["projects_root"])
 
 class Component():
     def __init__(self, path=None) -> None:
+        self.dict_attrs = ["name", "filename", "path", "ext", "static", "first_frame",
+            "last_frame"]
+        self.nr_attrs = ["path"]
         self.name = ""
         self.filename = ""
         self.path = ""
@@ -54,7 +57,9 @@ class Component():
 
     def as_dict(self):
         d = {}
-        for s in ("name", "filename", "path", "ext", "static", "first_frame",
-                "last_frame"):
-            d[s] = getattr(self, s)
+        for s in self.dict_attrs:
+            value = getattr(self, s)
+            d[s] = value
+            if s in self.nr_attrs:
+                d[f"{s}_nr"] = utils.get_nr(value)
         return d

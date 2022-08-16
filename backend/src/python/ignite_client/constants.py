@@ -156,7 +156,9 @@ DCC_DISCOVERY = {
             "win": [
                 "C:/Program Files/Adobe/Adobe Photoshop */Photoshop.exe"
             ],
-            "darwin": [],
+            "darwin": [
+                "/Applications/Adobe Photoshop */Adobe Photoshop *"
+            ],
             "linux": []
         }
     },
@@ -165,9 +167,11 @@ DCC_DISCOVERY = {
         "exts": ["aep"],
         "paths": {
             "win": [
-                "C:/Program Files/Adobe/Adobe After Effects */Adobe After Effects 2020"
+                "C:/Program Files/Adobe/Adobe After Effects */Adobe After Effects *"
             ],
-            "darwin": [],
+            "darwin": [
+                "/Applications/Adobe After Effects */Adobe After Effects *"
+            ],
             "linux": []
         }
     },
@@ -178,7 +182,9 @@ DCC_DISCOVERY = {
             "win": [
                 "C:/Program Files/Adobe/Adobe Premiere Pro */Adobe Premiere Pro.exe"
             ],
-            "darwin": [],
+            "darwin": [
+                "/Applications/Adobe Premiere Pro */Adobe Premiere Pro *"
+            ],
             "linux": []
         }
     },
@@ -187,9 +193,11 @@ DCC_DISCOVERY = {
         "exts": ["ai", "eps"],
         "paths": {
             "win": [
-                "C:/Program Files/Adobe/Adobe Illustrator */Adobe Illustrator 2020"
+                "C:/Program Files/Adobe/Adobe Illustrator */Adobe Illustrator *"
             ],
-            "darwin": [],
+            "darwin": [
+                "/Applications/Adobe Illustrator */Adobe Illustrator *"
+            ],
             "linux": []
         }
     },

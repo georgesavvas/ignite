@@ -1,8 +1,8 @@
 import os
 import re
-from xml.sax.handler import property_encoding
 import yaml
 import time
+import logging
 from pathlib import Path, PurePath
 from ignite_server import utils
 from ignite_server.entities.directory import Directory
@@ -29,13 +29,16 @@ class Project(Directory):
             utils.ensure_directory(path)
             if d in ("global", "rnd", "assets", "shots"):
                 utils.create_anchor(path, GROUP_ANCHOR)
-        config = {
-            "status": "open",
-            "short_name": "",
-            "created": time.time()
-        }
-        with open(self.anchor, "w") as f:
-            yaml.safe_dump(config, f)
+        if not Path(self.anchor).exists():
+            config = {
+                "status": "open",
+                "short_name": "",
+                "created": time.time()
+            }
+            with open(self.anchor, "w") as f:
+                yaml.safe_dump(config, f)
+        else:
+            logging.warning("Initialising an existing project!?")
         self.load_from_path()
 
     def load_from_path(self):

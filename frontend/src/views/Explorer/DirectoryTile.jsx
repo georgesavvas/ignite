@@ -7,9 +7,6 @@ import { CopyToClipboard, ShowInExplorer } from "../ContextActions";
 import { DIRCONTEXTOPTIONS } from "../../constants";
 
 function DirectoryTile(props) {
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [createModalOpen, setCreateModalOpen] = useState(false);
-  const [renameModalOpen, setRenameModalOpen] = useState(false);
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
 
@@ -17,7 +14,8 @@ function DirectoryTile(props) {
   const isScene = props.entity.dir_kind === "scene";
   const thumbnailWidth = isScene || hasThumbnail ? "100%" : "50%";
   const currentPath = currentContext.posix.replace(currentContext.project_path + "/", "");
-  const contextPath = props.entity.context.replace(currentPath, "");
+  let contextPath = props.entity.context.replace(currentPath, "");
+  if (contextPath.startsWith("/")) contextPath = contextPath.slice(1);
 
   const dirData = {
     path: props.entity.path,

@@ -11,7 +11,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import SettingsIcon from '@mui/icons-material/Settings';
 import SettingsDialog from "./SettingsDialog.jsx";
-import ProjectBrowser from "./ProjectBrowser";
+import ProjectBrowser from "./ProjectBrowser/ProjectBrowser";
 import Vault from "./Vault/Vault";
 
 function FeedbackIcon() {
@@ -48,14 +48,7 @@ export default function TopBar() {
 
   return (
     <>
-      <Dialog open={vaultOpen} onClose={() => setVaultOpen(false)} sx={vaultDialogStyle}>
-        <DialogContent style={{overflow: "hidden"}}>
-          <Vault />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setVaultOpen(false)}>Close</Button>
-        </DialogActions>
-      </Dialog>
+      <Vault open={vaultOpen} onClose={() => setVaultOpen(false)} />
       <ProjectBrowser
         open={projectBrowserOpen}
         onClose={() => setProjectBrowserOpen(false)}

@@ -15,6 +15,7 @@ function AssetTile(props) {
   if (currentPath.startsWith("/")) currentPath = currentPath.slice(1);
   let contextPath = props.entity.context.replace(currentPath, "");
   if (contextPath.startsWith("/")) contextPath = contextPath.slice(1);
+
   const dirData = {
     kind: props.entity.dir_kind,
     path: props.entity.path
