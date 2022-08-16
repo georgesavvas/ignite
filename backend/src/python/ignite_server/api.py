@@ -43,7 +43,7 @@ def get_projects() -> list:
     from ignite_server.entities.project import Project
     projects = Path(ROOT).iterdir()
     projects = [p for p in projects if not p.name.startswith(".")]
-    projects = [Project(path=ROOT / p.name).as_dict() for p in projects if (Path(p) / PROJECT_ANCHOR).exists()]
+    projects = [Project(path=p).as_dict() for p in projects if (Path(p) / PROJECT_ANCHOR).exists()]
     return projects
 
 
