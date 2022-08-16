@@ -28,8 +28,8 @@ const Browser = props => {
   const [loadedData, setLoadedData] = useState([]);
   const [tiles, setTiles] = useState([]);
 
-  const handleSelection = project => {
-    setProject(project.name, setCurrentContext);
+  const handleSelection = entity => {
+    setProject(entity.name, setCurrentContext);
     props.onClose();
   }
 
@@ -37,7 +37,6 @@ const Browser = props => {
     if (!props.open) return;
     setIsLoading(true);
     serverRequest("get_projects").then(resp => {
-      console.log(resp.data);
       setIsLoading(false);
       setLoadedData(resp.data);
     });
@@ -45,7 +44,10 @@ const Browser = props => {
 
   useEffect(() => {
     const _tiles = loadedData.reduce(function(obj, entity) {
-      obj[entity.result_id] = <ProjectTile key={entity.result_id} entity={entity} onSelected={handleSelection} selected={""} />;
+      obj[entity.result_id] = <ProjectTile key={entity.result_id} viewType="grid"
+                                entity={entity} onSelected={handleSelection}
+                                selected={""}
+                              />;
       return obj;
     }, {});
     setTiles(_tiles);
@@ -69,7 +71,7 @@ const Browser = props => {
 
 export default function ProjectBrowser(props) {
   return (
-    <Modal open={props.open} onClose={props.onClose} title="Vault" maxWidth="lg"
+    <Modal open={props.open} onClose={props.onClose} title="Project Browser" maxWidth="lg"
     closeButton>
       {Browser(props)}
     </Modal>
