@@ -380,8 +380,6 @@ def discover_assets(path, asset_kinds=[], as_dict=False):
 
 
 def discover_assetversions(path, asset_kinds=[], latest=False, as_dict=False):
-    from ignite_server.entities.assetversion import AssetVersion
-
     assetversions = []
     assets = discover_assets(path, asset_kinds=asset_kinds)
     for asset in assets:
@@ -576,3 +574,21 @@ def rename_entity(path, entity_type, new_name):
     path = Path(path)
     path.rename(path.parent / new_name)
     return 1
+
+
+def add_tags(path, tags):
+    from ignite_server.entities.assetversion import AssetVersion
+
+    tags_processed = [tag.strip() for tag in tags.split(",")]
+    av = AssetVersion(path)
+    av.add_tags(tags_processed)
+    return True
+
+
+def remove_tags(path, tags, all=False):
+    from ignite_server.entities.assetversion import AssetVersion
+
+    tags_processed = [tag.strip() for tag in tags.split(",")]
+    av = AssetVersion(path)
+    av.remove_tags(tags_processed, all=all)
+    return True

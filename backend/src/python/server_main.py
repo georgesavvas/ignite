@@ -421,6 +421,35 @@ async def rename_entity(request: Request):
     return {"ok": True, "text": codes.get(code, "")}
 
 
+@app.post("/api/v1/add_tags")
+async def add_tags(request: Request):
+    result = await request.json()
+    log_request(result)
+    path = result.get("path", "")
+    tags = result.get("tags", [])
+    if not path or not tags:
+        return error("invalid_data")
+    ok = api.add_tags(path, tags)
+    if not ok:
+        return error("generic_error")
+    return {"ok": True}
+
+
+@app.post("/api/v1/remove_tags")
+async def remove_tags(request: Request):
+    result = await request.json()
+    log_request(result)
+    path = result.get("path", "")
+    tags = result.get("tags", [])
+    all = result.get("all")
+    if not path or not (tags or all):
+        return error("invalid_data")
+    ok = api.remove_tags(path, tags=tags, all=all)
+    if not ok:
+        return error("generic_error")
+    return {"ok": True}
+
+
 @app.get("/api/v1/quit")
 async def rename_entity(request: Request):
     logging.info("Asked to shut down, cya!")

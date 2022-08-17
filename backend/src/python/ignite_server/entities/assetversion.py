@@ -38,6 +38,7 @@ class AssetVersion(Directory):
         self.context = self.get_context()
         self.fetch_components()
         self._get_score()
+        self.tags = self.get_tags()
         
         self.thumbnail = self.get_thumbnail()
 
@@ -110,18 +111,19 @@ class AssetVersion(Directory):
         return sorted(candidates, key=lambda c: c["priority"])[0]
 
     def get_tags(self):
-        asset = Asset(self.path)
+        asset = Asset(self.asset)
         tags = asset.get_tags()
-        return tags.get(self.version, ())
+        return sorted(tags.get(self.version, []))
 
     def set_tags(self, tags):
-        asset = Asset(self.path)
+        asset = Asset(self.asset)
         asset.set_tags(self.version, tags)
+        self.tags = sorted(tags)
     
     def add_tags(self, tags):
-        asset = Asset(self.path)
-        asset.add_tags(self.version, tags)
+        asset = Asset(self.asset)
+        self.tags = sorted(asset.add_tags(self.version, tags))
     
     def remove_tags(self, tags=[], all=False):
-        asset = Asset(self.path)
-        asset.remove_tags(self.version, tags=tags, all=all)
+        asset = Asset(self.asset)
+        self.tags = sorted(asset.remove_tags(self.version, tags=tags, all=all))

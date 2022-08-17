@@ -120,22 +120,25 @@ class Asset(Directory):
         asset_tags = self.get_tags()
         asset_tags[version] = tags
         self.update_config({"tags": asset_tags})
+        return asset_tags[version]
     
     def add_tags(self, version, tags):
         asset_tags = self.get_tags()
-        existing = list(asset_tags.get(version, ()))
+        existing = asset_tags.get(version, [])
         existing += tags
-        asset_tags[version] = set(existing)
+        asset_tags[version] = list(set(existing))
         self.update_config({"tags": asset_tags})
+        return asset_tags[version]
     
     def remove_tags(self, version, tags=[], all=False):
         asset_tags = self.get_tags()
-        existing = asset_tags.get(version, ())
+        existing = asset_tags.get(version, [])
         if all:
-            existing = set()
+            existing = []
         for tag in tags:
             if tag not in existing:
                 continue
             existing.remove(tag)
-        asset_tags[version] = set(existing)
+        asset_tags[version] = list(set(existing))
         self.update_config({"tags": asset_tags})
+        return asset_tags[version]
