@@ -24,6 +24,7 @@
     "react-reflex": "^4.0.6",
     "react-spring": "^9.5.2",
     "react-xarrows": "^2.0.2",
+    "string-to-color": "^2.2.2",
     "three": "^0.139.2",
     "v8-compile-cache": "^2.3.0",
     "valtio": "^1.5.2",

@@ -53,8 +53,8 @@ function ProjectTile(props) {
   //   ))
   // }
 
-  const handleClick = (e) => {
-    props.onSelected(props.project);
+  const handleClick = e => {
+    props.onSelected(props.entity);
   }
 
   function thumbnailPath() {

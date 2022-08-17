@@ -16,8 +16,12 @@ import DccSelector from "../DccSelector";
 import Ingest from "../Ingest/Ingest";
 import ContextBar from "./ContextBar";
 import Modal from "../../components/Modal";
+import SortIcon from '@mui/icons-material/Sort';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import { IconButton } from "@mui/material";
+import ContextMenu, { handleContextMenu } from "../../components/ContextMenu";
 
-const style = {
+const style = { 
   display: "flex",
   justifyContent: "space-between",
   padding: "10px",
@@ -28,6 +32,7 @@ const style = {
 function ExplorerBar(props) {
   const [newSceneOpen, setNewSceneOpen] = useState(false);
   const [ingestOpen, setIngestOpen] = useState(false);
+  const [filterMenu, setFilterMenu] = useState(null);
   const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
   const [filterValue, setFilterValue] = useState("");
 
@@ -49,11 +54,47 @@ function ExplorerBar(props) {
     props.onFilterChange(value);
   }
 
+  const filterOptions = [
+    {
+      label: "Name (A-Z)",
+      fn: () => {},
+    },
+    {
+      label: "Name (Z-A)",
+      fn: () => {}
+    },
+    {
+      label: "Date (Newest first)",
+      fn: () => {}
+    },
+    {
+      label: "Date (Oldest first)",
+      fn: () => {}
+    },
+    {
+      label: "Version (Higher first)",
+      fn: () => {}
+    },
+    {
+      label: "Version (Lowest first)",
+      fn: () => {}
+    }
+  ]
+
+  const handleSortClicked = e => {
+    handleContextMenu(e, filterMenu, setFilterMenu);
+  }
+
   return (
     <div>
+      <ContextMenu items={filterOptions} contextMenu={filterMenu}
+        setContextMenu={setFilterMenu}
+      />
       <div style={style}>
         <Modal open={newSceneOpen} onClose={() => setNewSceneOpen(false)} maxWidth="xs">
-          <DccSelector task={currentContext.path} newScene={true} onClose={() => setNewSceneOpen(false)} />
+          <DccSelector task={currentContext.path} newScene={true}
+            onClose={() => setNewSceneOpen(false)}
+          />
         </Modal>
         <Ingest open={ingestOpen} onClose={() => setIngestOpen(false)}
           refresh={props.onRefresh} task={currentContext.path}
@@ -95,6 +136,9 @@ function ExplorerBar(props) {
           onChange={handleFilterChange}
           style={{flexGrow: 1}}
         />
+        <IconButton onClick={handleSortClicked}>
+          <SortIcon />
+        </IconButton>
         <FormControlLabel control={<Checkbox defaultChecked onChange={props.onLatestChange} />} label="Latest" />
         <Button variant="outlined" onClick={props.onRefresh}>Refresh</Button>
       </div>

@@ -1,16 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import Typography from '@mui/material/Typography';
 import ComponentViewer from "./ComponentViewer";
 import ComponentList from "./ComponentList";
 import Tag, { TagContainer } from "./Tag";
 import saveReflexLayout from "../../utils/saveReflexLayout";
 import loadReflexLayout from "../../utils/loadReflexLayout";
+import { ConfigContext } from "../../contexts/ConfigContext";
 import {
   ReflexContainer,
   ReflexSplitter,
   ReflexElement
 } from 'react-reflex'
 import URI from "../../components/URI";
+import serverRequest from "../../services/serverRequest";
+import BuildFileURL from "../../services/BuildFileURL";
 
 const splitterStyle = {
   borderColor: "rgb(80,80,80)",
@@ -31,6 +34,7 @@ const defaultFlexRations = {
 function AssetDetails(props) {
   const [flexRatios, setFlexRatios] = useState(defaultFlexRations);
   const [selectedCompName, setSelectedCompName] = useState("");
+  const [config, setConfig] = useContext(ConfigContext);
 
   useEffect(() => {
     const data = loadReflexLayout();
@@ -67,6 +71,17 @@ function AssetDetails(props) {
 
   const selectedComp = getComp(selectedCompName);
 
+  const handleTagAdd = tag_name => {
+    const data = {
+      path: BuildFileURL(props.entity.path, config, {pathOnly: true, reverse: true}),
+      name: tag_name
+    };
+    serverRequest("add_tag", data).then(resp => {
+      if (resp.ok) console.log("done");
+      else console.log("failed");
+    })
+  }
+
   return (
     <div style={style}>
       <ReflexContainer orientation="horizontal">
@@ -83,8 +98,8 @@ function AssetDetails(props) {
               <URI uri={props.entity.uri} />
               {/* <Typography color="rgb(252, 140, 3)">URI: {props.entity.uri}</Typography> */}
             </div>
-            <TagContainer>
-              {props.entity.labels.map((tag, index) => <Tag name={tag} key={index} />)}
+            <TagContainer onAdd={handleTagAdd}>
+              {props.entity.tags.map((tag, index) => <Tag name={tag} key={index} />)}
             </TagContainer>
           </ReflexElement>
           <ReflexSplitter style={splitterStyle} />

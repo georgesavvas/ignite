@@ -1,4 +1,5 @@
 import os
+import yaml
 from pathlib import Path, PurePath
 from ignite_server import utils
 from ignite_server.entities.directory import Directory
@@ -109,3 +110,32 @@ class Asset(Directory):
         if self.latest_av:
             d["latest_av"] = self.latest_av.as_dict()
         return d
+    
+    def get_tags(self):
+        with open(self.anchor, "r") as f:
+            config = yaml.safe_load(f) or {}
+        return config.get("tags", {})
+
+    def set_tags(self, version, tags):
+        asset_tags = self.get_tags()
+        asset_tags[version] = tags
+        self.update_config({"tags": asset_tags})
+    
+    def add_tags(self, version, tags):
+        asset_tags = self.get_tags()
+        existing = list(asset_tags.get(version, ()))
+        existing += tags
+        asset_tags[version] = set(existing)
+        self.update_config({"tags": asset_tags})
+    
+    def remove_tags(self, version, tags=[], all=False):
+        asset_tags = self.get_tags()
+        existing = asset_tags.get(version, ())
+        if all:
+            existing = set()
+        for tag in tags:
+            if tag not in existing:
+                continue
+            existing.remove(tag)
+        asset_tags[version] = set(existing)
+        self.update_config({"tags": asset_tags})
