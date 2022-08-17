@@ -6,6 +6,7 @@ import Tag, { TagContainer } from "./Tag";
 import saveReflexLayout from "../../utils/saveReflexLayout";
 import loadReflexLayout from "../../utils/loadReflexLayout";
 import { ConfigContext } from "../../contexts/ConfigContext";
+import {ContextContext} from "../../contexts/ContextContext";
 import {
   ReflexContainer,
   ReflexSplitter,
@@ -14,6 +15,9 @@ import {
 import URI from "../../components/URI";
 import serverRequest from "../../services/serverRequest";
 import BuildFileURL from "../../services/BuildFileURL";
+import { useSnackbar } from 'notistack';
+import { CopyToClipboard, ShowInExplorer } from "../ContextActions";
+import ContextMenu, { handleContextMenu } from "../../components/ContextMenu";
 
 const splitterStyle = {
   borderColor: "rgb(80,80,80)",
@@ -35,6 +39,9 @@ function AssetDetails(props) {
   const [flexRatios, setFlexRatios] = useState(defaultFlexRations);
   const [selectedCompName, setSelectedCompName] = useState("");
   const [config, setConfig] = useContext(ConfigContext);
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const [contextMenu, setContextMenu] = useState(null);
+  const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
 
   useEffect(() => {
     const data = loadReflexLayout();
@@ -71,42 +78,71 @@ function AssetDetails(props) {
 
   const selectedComp = getComp(selectedCompName);
 
-  const handleTagAdd = tag_name => {
+  const handleAddTags = tags => {
     const data = {
       path: BuildFileURL(props.entity.path, config, {pathOnly: true, reverse: true}),
-      name: tag_name
+      tags: tags
     };
-    serverRequest("add_tag", data).then(resp => {
+    serverRequest("add_tags", data).then(resp => {
       if (resp.ok) console.log("done");
       else console.log("failed");
+      refreshContext();
     })
   }
 
+  const handleOnDeleteTagClicked = name => {
+    const data = {
+      path: BuildFileURL(props.entity.path, config, {pathOnly: true, reverse: true}),
+      tags: name
+    };
+    serverRequest("add_tags", data).then(resp => {
+      if (resp.ok) console.log("done");
+      else console.log("failed");
+      refreshContext();
+    })
+  }
+
+  const contextItems = [
+    {
+      label: "Copy tags",
+      fn: () =>  CopyToClipboard(props.entity.tags.join(", "), enqueueSnackbar)
+    },
+    // {
+    //   label: "Add tags",
+    //   fn: () => ShowInExplorer(props.entity.path, enqueueSnackbar)
+    // }
+  ]
+
   return (
     <div style={style}>
+      <ContextMenu items={contextItems} contextMenu={contextMenu}
+        setContextMenu={setContextMenu}
+      />
       <ReflexContainer orientation="horizontal">
-          <ReflexElement flex={flexRatios["asset.viewer"]} name={"asset.viewer"} onStopResize={handleResized}>
-            <ComponentViewer comp={selectedComp} />
-          </ReflexElement>
-          <ReflexSplitter style={splitterStyle} />
-          <ReflexElement flex={flexRatios["asset.details"]} name={"asset.details"} onStopResize={handleResized}>
-            <div style={{margin: "10px", overflow: "hidden"}}>
-              <Typography variant="h5">Asset Details</Typography>
-              <Typography>Name: {props.entity.name}</Typography>
-              <Typography>Path: {props.entity.path}</Typography>
-              <Typography>Context: {props.entity.context}</Typography>
-              <URI uri={props.entity.uri} />
-              {/* <Typography color="rgb(252, 140, 3)">URI: {props.entity.uri}</Typography> */}
-            </div>
-            <TagContainer onAdd={handleTagAdd}>
-              {props.entity.tags.map((tag, index) => <Tag name={tag} key={index} />)}
-            </TagContainer>
-          </ReflexElement>
-          <ReflexSplitter style={splitterStyle} />
-          <ReflexElement flex={flexRatios["asset.comps"]} name={"asset.comps"} onStopResize={handleResized}>
-            <ComponentList components={props.entity.components} selectedComp={selectedComp} onSelect={setSelectedCompName} />
-          </ReflexElement>
-        </ReflexContainer>
+        <ReflexElement flex={flexRatios["asset.viewer"]} name={"asset.viewer"} onStopResize={handleResized}>
+          <ComponentViewer comp={selectedComp} />
+        </ReflexElement>
+        <ReflexSplitter style={splitterStyle} />
+        <ReflexElement flex={flexRatios["asset.details"]} name={"asset.details"} onStopResize={handleResized}>
+          <div style={{margin: "10px", overflow: "hidden"}}>
+            <Typography variant="h5">Asset Details</Typography>
+            <Typography>Name: {props.entity.name}</Typography>
+            <Typography>Path: {props.entity.path}</Typography>
+            <Typography>Context: {props.entity.context}</Typography>
+            <URI uri={props.entity.uri} />
+            {/* <Typography color="rgb(252, 140, 3)">URI: {props.entity.uri}</Typography> */}
+          </div>
+          <TagContainer onAdd={handleAddTags}>
+            {props.entity.tags.map((tag, index) => <Tag name={tag} key={index}
+              onDelete={handleOnDeleteTagClicked}
+            />)}
+          </TagContainer>
+        </ReflexElement>
+        <ReflexSplitter style={splitterStyle} />
+        <ReflexElement flex={flexRatios["asset.comps"]} name={"asset.comps"} onStopResize={handleResized}>
+          <ComponentList components={props.entity.components} selectedComp={selectedComp} onSelect={setSelectedCompName} />
+        </ReflexElement>
+      </ReflexContainer>
     </div>
   )
 }

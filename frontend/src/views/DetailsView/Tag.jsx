@@ -2,8 +2,11 @@ import React, { useState } from 'react'
 import styles from "./Tag.module.css";
 import ClearIcon from '@mui/icons-material/Clear';
 import AddIcon from '@mui/icons-material/Add';
-import { TextField } from '@mui/material';
+import { TextField, Typography } from '@mui/material';
 import Modal from "../../components/Modal";
+import { useSnackbar } from 'notistack';
+import { CopyToClipboard, ShowInExplorer } from "../ContextActions";
+import ContextMenu, { handleContextMenu } from "../../components/ContextMenu";
 const stc = require("string-to-color");
 
 const namedStyles = {
@@ -19,19 +22,44 @@ const namedStyles = {
 }
 
 export function TagContainer(props) {
-  const [newTagOpen, setNewTagOpen] = useState(false);
-  const [newTagName, setNewTagName] = useState("");
+  const [newTagsOpen, setNewTagsOpen] = useState(false);
+  const [newTagsName, setNewTagsName] = useState("");
+  const [contextMenu, setContextMenu] = useState(null);
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+
+  const contextItems = [
+    {
+      label: "Copy tag",
+      fn: () =>  CopyToClipboard(props.name, enqueueSnackbar)
+    },
+    {
+      label: "Remove tag",
+      fn: () => {}
+    }
+  ]
+
+  const handleAddTagsClicked = e => {
+    props.onAdd(newTagsName);
+    setNewTagsOpen(false);
+  }
 
   return (
     <>
-    <Modal open={newTagOpen} onClose={() => setNewTagOpen(false)} maxWidth="xs" closeButton
-      title="Add Tag" buttonLabel="Create" onButtonClicked={props.onAdd(newTagName)}>
-      <TextField onChange={e => setNewTagName(e.target.value)} size="small" label="Tag" />
+    <ContextMenu items={contextItems} contextMenu={contextMenu}
+      setContextMenu={setContextMenu}
+    />
+    <Modal open={newTagsOpen} onClose={() => setNewTagsOpen(false)} maxWidth="md"
+      closeButton onButtonClicked={handleAddTagsClicked} buttonLabel="Create"
+      title="Add Tags" 
+    >
+      <Typography variant="caption">Multiple tags can be separated by comma</Typography>
+      <TextField onChange={e => setNewTagsName(e.target.value)} value={newTagsName} 
+        size="small" fullWidth
+      />
     </Modal>
     <div className={styles.container}>
       {props.children}
-      <Tag name="Add Tag" />
-      <EditTag add onClick={() => setNewTagOpen(true)} />
+      <EditTag add onClick={() => setNewTagsOpen(true)} />
     </div>
     </>
   )
@@ -49,7 +77,7 @@ function Tag(props) {
     >
       {props.name}
       {isHovered && !props.add ?
-        <ClearIcon style={{cursor: "pointer"}} onClick={props.onDelete} /> :
+        <ClearIcon style={{cursor: "pointer"}} onClick={() => props.onDelete(props.name)} /> :
         null
       }
     </div>
