@@ -6,7 +6,7 @@ from ignite_server import utils
 from ignite_server.entities.directory import Directory
 from ignite_server.entities.asset import Asset
 from ignite_server.entities.component import Component
-from ignite_server.constants import ANCHORS, LABEL_WEIGHTS
+from ignite_server.constants import TAG_WEIGHTS
 
 CONFIG = utils.get_config()
 ROOT = PurePath(CONFIG["projects_root"])
@@ -19,12 +19,12 @@ for name, exts in COMP_TYPES.items():
 class AssetVersion(Directory):
     def __init__(self, path) -> None:
         self.score = 0
-        self.labels = set()
+        self.tags = set()
         super().__init__(path, dir_kind="assetversion")
         self.dict_attrs = ["path", "dir_kind", "anchor", "project", "name", "version",
-            "components", "asset", "task", "uri", "labels", "context",
+            "components", "asset", "task", "uri", "tags", "context",
             "thumbnail"]
-        self.nr_attrs = ["path"]
+        self.nr_attrs = ["path", "asset", "task"]
         self.version = self.name
         self.version_int = 0
         if self.version.startswith("v"):
@@ -61,10 +61,10 @@ class AssetVersion(Directory):
 
     def _get_score(self):
         score = 0
-        for label in self.labels:
-            if label not in LABEL_WEIGHTS:
+        for tag in self.tags:
+            if tag not in TAG_WEIGHTS:
                 continue
-            score += LABEL_WEIGHTS[label]
+            score += TAG_WEIGHTS[tag]
         if self.is_latest:
             score += 1
         self.score = score
@@ -109,20 +109,19 @@ class AssetVersion(Directory):
             return
         return sorted(candidates, key=lambda c: c["priority"])[0]
 
-    def set_labels(self, labels):
-        self.labels = set(labels)
-        self.update_config({"labels": labels})
+    def get_tags(self):
+        asset = Asset(self.path)
+        tags = asset.get_tags()
+        return tags.get(self.version, ())
+
+    def set_tags(self, tags):
+        asset = Asset(self.path)
+        asset.set_tags(self.version, tags)
     
-    def add_labels(self, labels):
-        self.labels += labels
-        self.labels = set(self.labels)
-        self.update_config({"labels": self.labels})
+    def add_tags(self, tags):
+        asset = Asset(self.path)
+        asset.add_tags(self.version, tags)
     
-    def remove_labels(self, labels=[], all=False):
-        if all:
-            self.labels = set()
-        for label in labels:
-            if label not in self.labels:
-                continue
-            self.labels.remove(label)
-        self.update_config({"labels": self.labels})
+    def remove_tags(self, tags=[], all=False):
+        asset = Asset(self.path)
+        asset.remove_tags(self.version, tags=tags, all=all)

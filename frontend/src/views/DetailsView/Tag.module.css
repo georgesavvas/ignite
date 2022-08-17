@@ -2,10 +2,27 @@
     display: flex;
     gap: 10px;
     padding: 10px;
+    min-height: 40px;
 }
 
 .tag {
     border-radius: 5px;
     padding: 8px;
     background-color: whitesmoke;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+}
+
+.tagEdit {
+    border-radius: 5px;
+    padding-left: 8px;
+    padding-right: 8px;
+    background-color: rgb(0,150,50);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
 }

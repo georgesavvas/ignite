@@ -17,7 +17,7 @@ OS_NAMES = {
     "Linux": "linux"
 }
 
-LABEL_WEIGHTS = {
+TAG_WEIGHTS = {
     "approved": 1,
     "deprecated": -100
 }
