@@ -95,7 +95,7 @@ function AssetDetails(props) {
       path: BuildFileURL(props.entity.path, config, {pathOnly: true, reverse: true}),
       tags: name
     };
-    serverRequest("add_tags", data).then(resp => {
+    serverRequest("remove_tags", data).then(resp => {
       if (resp.ok) console.log("done");
       else console.log("failed");
       refreshContext();
