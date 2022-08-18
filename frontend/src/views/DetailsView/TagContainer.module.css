@@ -2,27 +2,34 @@
     display: flex;
     gap: 10px;
     padding: 10px;
-    min-height: 40px;
+    /* min-height: 30px; */
+    border: solid 1px;
+    border-color: rgb(40, 40, 40);
+    border-radius: 5px;
+    margin: 10px;
 }
 
 .tag {
     border-radius: 5px;
-    padding: 8px;
+    padding: 5px;
+    padding-left: 8px;
+    padding-right: 8px;
     background-color: whitesmoke;
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 5px;
+    min-height: 25px;
 }
 
 .tagEdit {
     border-radius: 5px;
-    padding-left: 8px;
-    padding-right: 8px;
-    background-color: rgb(0,150,50);
+    padding: 5px;
+    background-color: rgb(0, 150, 50);
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 5px;
+    min-height: 25px;
     cursor: pointer;
 }

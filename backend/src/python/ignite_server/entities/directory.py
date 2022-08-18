@@ -15,11 +15,12 @@ ROOT = PurePath(CONFIG["projects_root"])
 class Directory():
     def __init__(self, path="", dir_kind="directory") -> None:
         self.dict_attrs = ["path", "dir_kind", "anchor", "project", "name", "context",
-            "repr"]
+            "repr", "tags"]
         self.nr_attrs = ["path"]
         self.project = ""
         self.group = ""
         self.name = ""
+        self.tags = []
         self.dir_kind = dir_kind
         self.context = ""
         self.repr = None
@@ -145,3 +146,31 @@ class Directory():
             return False
         print("Success.")
         return True
+
+    def get_tags(self):
+        with open(self.anchor, "r") as f:
+            config = yaml.safe_load(f) or {}
+        return config.get("tags", [])
+
+    def set_tags(self, tags):
+        self.update_config({"tags": tags})
+        return tags
+    
+    def add_tags(self, tags):
+        existing = self.get_tags()
+        existing += tags
+        existing = list(set(existing))
+        self.update_config({"tags": existing})
+        return existing
+    
+    def remove_tags(self, tags=[], all=False):
+        existing = self.get_tags()
+        if all:
+            existing = []
+        for tag in tags:
+            if tag not in existing:
+                continue
+            existing.remove(tag)
+        existing = list(set(existing))
+        self.update_config({"tags": existing})
+        return existing

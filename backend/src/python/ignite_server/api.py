@@ -577,18 +577,14 @@ def rename_entity(path, entity_type, new_name):
 
 
 def add_tags(path, tags):
-    from ignite_server.entities.assetversion import AssetVersion
-
     tags_processed = [tag.strip() for tag in tags.split(",")]
-    av = AssetVersion(path)
-    av.add_tags(tags_processed)
+    entity = find(path)
+    entity.add_tags(tags_processed)
     return True
 
 
 def remove_tags(path, tags, all=False):
-    from ignite_server.entities.assetversion import AssetVersion
-
     tags_processed = [tag.strip() for tag in tags.split(",")]
-    av = AssetVersion(path)
-    av.remove_tags(tags_processed, all=all)
+    entity = find(path)
+    entity.remove_tags(tags_processed, all=all)
     return True

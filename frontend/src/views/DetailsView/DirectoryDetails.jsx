@@ -1,18 +1,17 @@
 import React, { useState, useRef } from "react";
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
+import TagContainer from "./TagContainer";
 import { TextField } from "@mui/material";
 import Modal from "../../components/Modal";
 import serverRequest from "../../services/serverRequest";
+import Attributes from "./Attributes";
 
 const style = {
   width: "100%",
-  height: "100%"
+  height: "100%",
+  display: "flex",
+  flexDirection: "column"
 }
 
 function ReprAssetModal(props) {
@@ -64,6 +63,8 @@ function DirectoryDetails(props) {
         <Typography>Repr Asset: {props.entity.repr}</Typography>
         <Button onClick={() => setReptModalOpen(true)}>Choose asset</Button>
       </div>
+      <TagContainer entityPath={props.entity.path} tags={props.entity.tags} />
+      <Attributes />
     </div>
   )
 }

@@ -13,7 +13,7 @@ class Task(Directory):
     def __init__(self, path="") -> None:
         self.dict_attrs = ["path", "dir_kind", "anchor", "project", "name", "task_type",
         "repr", "exports", "scenes", "cache", "group", "build", "sequence", "shot",
-        "context"]
+        "context", "tags"]
         self.nr_attrs = ["path", "exports"]
         self.task_type = "generic"
         super().__init__(path, dir_kind="task")

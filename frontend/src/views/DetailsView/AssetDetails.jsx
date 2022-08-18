@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import Typography from '@mui/material/Typography';
 import ComponentViewer from "./ComponentViewer";
 import ComponentList from "./ComponentList";
-import Tag, { TagContainer } from "./Tag";
+import TagContainer from "./TagContainer";
 import saveReflexLayout from "../../utils/saveReflexLayout";
 import loadReflexLayout from "../../utils/loadReflexLayout";
 import { ConfigContext } from "../../contexts/ConfigContext";
@@ -39,9 +39,9 @@ function AssetDetails(props) {
   const [flexRatios, setFlexRatios] = useState(defaultFlexRations);
   const [selectedCompName, setSelectedCompName] = useState("");
   const [config, setConfig] = useContext(ConfigContext);
+  const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const [contextMenu, setContextMenu] = useState(null);
-  const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
 
   useEffect(() => {
     const data = loadReflexLayout();
@@ -132,11 +132,7 @@ function AssetDetails(props) {
             <URI uri={props.entity.uri} />
             {/* <Typography color="rgb(252, 140, 3)">URI: {props.entity.uri}</Typography> */}
           </div>
-          <TagContainer onAdd={handleAddTags}>
-            {props.entity.tags.map((tag, index) => <Tag name={tag} key={index}
-              onDelete={handleOnDeleteTagClicked}
-            />)}
-          </TagContainer>
+          <TagContainer entityPath={props.entity.path} tags={props.entity.tags} />
         </ReflexElement>
         <ReflexSplitter style={splitterStyle} />
         <ReflexElement flex={flexRatios["asset.comps"]} name={"asset.comps"} onStopResize={handleResized}>
