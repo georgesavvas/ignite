@@ -100,8 +100,16 @@ function Explorer() {
     });
   }, [pages.current, explorerSettings.currentResultType, explorerSettings.tilesPerPage, refreshValue, currentContext, config.access, query]);
 
+  // useEffect(() => {
+  //   if (!selectedEntity) return;
+  //   loadedData.forEach(entity => {
+  //     if (entity.path === selectedEntity.path) setSelectedEntity(entity);
+  //   })
+  // }, [loadedData]);
+
   useEffect(() => {
     const _tiles = loadedData.reduce(function(obj, entity) {
+      if (entity.path === selectedEntity.path) setSelectedEntity(entity);
       entity.path = BuildFileURL(entity.path, config, {pathOnly: true});
       if (entity.components) {
         entity.components.forEach(comp => {
@@ -126,7 +134,7 @@ function Explorer() {
       return obj;
     }, {});
     setTiles(_tiles);
-  }, [loadedData, selectedEntity, explorerSettings.currentViewType, explorerSettings.currentTileSize])
+  }, [loadedData, selectedEntity.path, explorerSettings.currentViewType, explorerSettings.currentTileSize])
 
   const forceUpdate = () => {
     setRefreshValue((prevRefresh) => (prevRefresh + 1))
