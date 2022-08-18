@@ -35,13 +35,17 @@ const rows = [
 ]
 
 function Attributes(props) {
+
+  let data = props.attribs || [];
+  data.push({id: data.length});
+
   return (
     <div className={styles.container}>
       <Typography variant="h5" style={{marginBottom: "10px"}}>Attributes</Typography>
       <div className={styles.attributeList}>
         <DataGrid
           disableSelectionOnClick
-          rows={rows}
+          rows={data}
           columns={columns}
           experimentalFeatures={{ newEditingApi: true }}
         />
