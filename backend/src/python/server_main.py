@@ -450,6 +450,20 @@ async def remove_tags(request: Request):
     return {"ok": True}
 
 
+@app.post("/api/v1/set_attributes")
+async def set_attributes(request: Request):
+    result = await request.json()
+    log_request(result)
+    path = result.get("path", "")
+    attributes = result.get("attributes", [])
+    if not path or not attributes:
+        return error("invalid_data")
+    ok = api.set_attributes(path, attributes)
+    if not ok:
+        return error("generic_error")
+    return {"ok": True}
+
+
 @app.get("/api/v1/quit")
 async def rename_entity(request: Request):
     logging.info("Asked to shut down, cya!")
