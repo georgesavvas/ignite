@@ -15,12 +15,13 @@ ROOT = PurePath(CONFIG["projects_root"])
 class Directory():
     def __init__(self, path="", dir_kind="directory") -> None:
         self.dict_attrs = ["path", "dir_kind", "anchor", "project", "name", "context",
-            "repr", "tags"]
+            "repr", "tags", "attributes"]
         self.nr_attrs = ["path"]
         self.project = ""
         self.group = ""
         self.name = ""
         self.tags = []
+        self.attributes = []
         self.dir_kind = dir_kind
         self.context = ""
         self.repr = None
@@ -174,3 +175,49 @@ class Directory():
         existing = list(set(existing))
         self.update_config({"tags": existing})
         return existing
+
+    def get_attributes(self):
+        root = ROOT.as_posix()
+        path = Path(path)
+        parent = path.parent
+        iter = 1
+        parent_attribs = []
+        while root in parent.as_posix():
+            contents = parent.glob(".ign_*.yaml")
+            if not contents:
+                parent = parent.parent
+                iter +=1
+                continue
+            with open(contents[0], "r") as f:
+                config = yaml.safe_load(f) or {}
+            dir_attribs = config.get("attributes")
+            if dir_attribs:
+                parent_attribs.append(dir_attribs)
+            parent = parent.parent
+            iter +=1
+            if iter > 20:
+                raise Exception(f"Reached iteration limit when walking directory: {path}")
+        parent_attribs.reverse()
+        attributes = {}
+        for attribs in parent_attribs:
+            attributes.update(attribs)
+        parent_keys = list(attributes.keys())
+
+        with open(self.anchor, "r") as f:
+            config = yaml.safe_load(f) or {}
+        current_attribs = config.get("attributes", {})
+        current_keys = list(current_attribs.keys())
+        attributes.update(current_attribs)
+
+        attributes_formatted = []
+        i = 0
+        for k, v in attributes.items():
+            attributes_formatted.append({
+                "id": i,
+                "name": k,
+                "inherited": v if k in parent_keys else "",
+                "override": v if k in current_keys else ""
+            })
+            i += 1
+
+        return attributes_formatted
