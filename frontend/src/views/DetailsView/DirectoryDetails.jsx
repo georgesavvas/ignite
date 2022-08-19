@@ -64,7 +64,7 @@ function DirectoryDetails(props) {
         <Button onClick={() => setReptModalOpen(true)}>Choose asset</Button>
       </div>
       <TagContainer entityPath={props.entity.path} tags={props.entity.tags} />
-      <Attributes />
+      <Attributes entityPath={props.entity.path} attributes={props.entity.attributes} />
     </div>
   )
 }

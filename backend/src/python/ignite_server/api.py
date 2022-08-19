@@ -588,3 +588,18 @@ def remove_tags(path, tags, all=False):
     entity = find(path)
     entity.remove_tags(tags_processed, all=all)
     return True
+
+
+def set_attributes(path, attributes):
+    attributes_processed = {}
+    for attrib in attributes:
+        name = attrib["name"]
+        override = attrib["override"]
+        if not name or not override:
+            continue
+        attributes_processed[name] = override
+    if not attributes_processed:
+        return True
+    entity = find(path)
+    entity.set_attributes(attributes_processed)
+    return True

@@ -9,7 +9,7 @@
 
 .topBar {
     display: flex;
-    align-items:flex-end;
+    margin-bottom: 5px;
     justify-content: space-between;
 }
 
