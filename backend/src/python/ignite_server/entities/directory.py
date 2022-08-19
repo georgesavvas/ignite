@@ -149,9 +149,10 @@ class Directory():
         return True
 
     def get_tags(self):
-        with open(self.anchor, "r") as f:
-            config = yaml.safe_load(f) or {}
-        return config.get("tags", [])
+        return self.tags
+        # with open(self.anchor, "r") as f:
+        #     config = yaml.safe_load(f) or {}
+        # return config.get("tags", [])
 
     def set_tags(self, tags):
         self.update_config({"tags": tags})
@@ -176,7 +177,8 @@ class Directory():
         self.update_config({"tags": existing})
         return existing
 
-    def get_attributes(self):
+    @property
+    def attributes(self):
         root = ROOT.as_posix()
         path = Path(path)
         parent = path.parent
@@ -210,14 +212,17 @@ class Directory():
         attributes.update(current_attribs)
 
         attributes_formatted = []
-        i = 0
         for k, v in attributes.items():
             attributes_formatted.append({
-                "id": i,
                 "name": k,
                 "inherited": v if k in parent_keys else "",
                 "override": v if k in current_keys else ""
             })
             i += 1
 
+        print("-----", attributes_formatted)
         return attributes_formatted
+
+    def set_attributes(self, attributes):
+        self.update_config({"attributes": attributes})
+        return True
