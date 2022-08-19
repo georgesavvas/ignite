@@ -20,30 +20,28 @@ const columns = [
   { field: "override", headerName: "Override", editable: true, flex: 1 }
 ];
 
+function useApiRef() {
+  const apiRef = useRef(null);
+  const _columns = useMemo(
+    () =>
+      columns.concat({
+        field: "__HIDDEN__",
+        width: 0,
+        renderCell: (params) => {
+          apiRef.current = params.api;
+          return null;
+        }
+      }),
+    [columns]
+  );
+
+  return { apiRef, columns: _columns };
+}
+
 function Attributes(props) {
 
-  function useApiRef() {
-    const apiRef = useRef(null);
-    const _columns = useMemo(
-      () =>
-        columns.concat({
-          field: "__HIDDEN__",
-          width: 0,
-          renderCell: (params) => {
-            apiRef.current = params.api;
-            return null;
-          }
-        }),
-      [columns]
-    );
-  
-    return { apiRef, columns: _columns };
-  }
-
-  const handleAddAttrib = e => {
-    const value = e.target.value;
-    apiRef.current.startCellEditMode({ id: 1, field: "name" });
-  }
+  let data = props.attribs || [];
+  data.push({id: data.length});
 
   return (
     <div className={styles.container}>
@@ -67,7 +65,7 @@ function Attributes(props) {
       <div className={styles.attributeList}>
         <DataGrid
           disableSelectionOnClick
-          rows={rows}
+          rows={data}
           columns={columns}
           isCellEditable={params => params.row.inherited === ""}
           experimentalFeatures={{ newEditingApi: true }}
