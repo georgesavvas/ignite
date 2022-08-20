@@ -76,6 +76,8 @@ def create_anchor(path, name):
 
 
 def get_uri(path, version=None):
+    if not path:
+        return ""
     splt = PurePath(path).as_posix().split(ROOT.as_posix(), 1)[1].replace("/exports", "").split("/")[1:]
     project = splt[0]
     group = splt[1]

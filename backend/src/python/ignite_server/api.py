@@ -240,7 +240,17 @@ def create_dirs(path, method, dirs):
     return created
 
 
-def get_contents(path, latest=False, as_dict=False):
+def sort_results(results, sort):
+    if sort and results:
+        keys = list(results[0].keys())
+        field = sort["field"]
+        reverse = sort.get("reverse", False)
+        if field in keys:
+            results.sort(key=lambda c: c[field], reverse=reverse)
+    return results
+
+
+def get_contents(path, latest=False, sort=None, as_dict=False):
     path = Path(path)
     contents = []
     if not path.is_dir():
@@ -264,6 +274,7 @@ def get_contents(path, latest=False, as_dict=False):
             if not d.get("repr"):
                 continue
             d["thumbnail"] = get_repr_comp(d["path"])
+        contents = sort_results(contents, sort)
     return contents
 
 
@@ -297,7 +308,7 @@ def get_task(path):
     return task
 
 
-def discover_tasks(path, task_types=[], as_dict=False):
+def discover_tasks(path, task_types=[], sort=None, as_dict=False):
     from ignite_server.entities.task import Task
 
     def discover(path, l=[]):
@@ -336,10 +347,11 @@ def discover_tasks(path, task_types=[], as_dict=False):
     tasks = [Task(path=task["path"]) for task in data]
     if as_dict:
         tasks = [t.as_dict() for t in tasks]
+        tasks = sort_results(tasks, sort)
     return tasks
 
 
-def discover_assets(path, asset_kinds=[], as_dict=False):
+def discover_assets(path, asset_kinds=[], sort=None, as_dict=False, single=False):
     from ignite_server.entities.asset import Asset
 
     def discover(path, l=[]):
@@ -366,20 +378,26 @@ def discover_assets(path, asset_kinds=[], as_dict=False):
                     with open(d["anchor"], "r") as f:
                         config = yaml.safe_load(f)
                         config = config or {}
+                if single and l:
+                    return l
                 discover(x, l)
             if d["dir_kind"] == "asset":
                 if not asset_kinds or d["asset_kind"] in asset_kinds:
                     l.append(d)
+                    if single:
+                        return
+
         return l
 
     data = discover(Path(path))
     assets = [Asset(path=asset["path"]) for asset in data]
     if as_dict:
         assets = [a.as_dict() for a in assets]
+        assets = sort_results(assets, sort)
     return assets
 
 
-def discover_assetversions(path, asset_kinds=[], latest=False, as_dict=False):
+def discover_assetversions(path, asset_kinds=[], latest=False, sort=None, as_dict=False):
     assetversions = []
     assets = discover_assets(path, asset_kinds=asset_kinds)
     for asset in assets:
@@ -392,10 +410,11 @@ def discover_assetversions(path, asset_kinds=[], latest=False, as_dict=False):
         assetversions += avs
     if as_dict:
         assetversions = [av.as_dict() for av in assetversions]
+        assetversions = sort_results(assetversions, sort)
     return assetversions
 
 
-def discover_scenes(path, dcc=[], latest=False, as_dict=False):
+def discover_scenes(path, dcc=[], latest=False, sort=None, as_dict=False):
     from ignite_server.entities.scene import Scene
 
     path = Path(path)
@@ -438,6 +457,7 @@ def discover_scenes(path, dcc=[], latest=False, as_dict=False):
     scenes = [Scene(path=scene["path"]) for scene in data]
     if as_dict:
         scenes = [s.as_dict() for s in scenes]
+        scenes = sort_results(scenes, sort)
     return scenes
 
 
@@ -505,11 +525,23 @@ def set_repr_asset(target, repr):
     if not target_entity:
         return
     if not repr_entity:
-        return
+        target_entity.set_repr("")
+        return True
     if repr_entity.dir_kind == "assetversion":
         repr_entity = find(repr_entity.asset)
     target_entity.set_repr(repr_entity.uri)
     return True
+
+
+def get_repr(target):
+    print("for:", target)
+    assets = discover_assets(target, single=True)
+    if not assets:
+        print("found nothing...")
+        return ""
+    asset = assets[0]
+    print("repr found:", asset)
+    return asset.uri
 
 
 def get_repr_comp(target):
@@ -543,7 +575,10 @@ def get_repr_comp(target):
     asset = find(repr_asset)
     if not asset:
         return {}
-    return asset.latest_av.get_thumbnail()
+    latest_av = asset.latest_av
+    if not latest_av:
+        return {}
+    return latest_av.get_thumbnail()
 
 
 def delete_entity(path, entity_type):
@@ -593,13 +628,11 @@ def remove_tags(path, tags, all=False):
 def set_attributes(path, attributes):
     attributes_processed = {}
     for attrib in attributes:
-        name = attrib["name"]
-        override = attrib["override"]
+        name = attrib.get("name")
+        override = attrib.get("override")
         if not name or not override:
             continue
         attributes_processed[name] = override
-    if not attributes_processed:
-        return True
     entity = find(path)
     entity.set_attributes(attributes_processed)
     return True

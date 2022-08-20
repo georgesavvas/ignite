@@ -7,7 +7,7 @@ import { useSnackbar } from "notistack";
 import { CopyToClipboard } from "../ContextActions";
 import ContextMenu, { handleContextMenu } from "../../components/ContextMenu";
 import clientRequest from "../../services/clientRequest";
-import { DataGrid } from '@mui/x-data-grid';
+import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormHelperText from '@mui/material/FormHelperText';
@@ -15,10 +15,13 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import { rgbToHex } from "@mui/material";
 import serverRequest from "../../services/serverRequest";
+import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 
 const shouldBeEditable = params => {
   const row = params.row;
   if (params.field !== "name" && !row.name) return;
+  if (row.inherited) return;
+  console.log(params);
   return true;
 }
 
@@ -36,32 +39,7 @@ const gridStyles = {
   }
 }
 
-const columns = [
-  { field: "name", headerName: "Name", editable: shouldBeEditable, flex: 1, cellClassName: getRowStyle},
-  { field: "inherited", headerName: "Inherited", flex: 1, cellClassName: getRowStyle },
-  { field: "override", headerName: "Override", editable: shouldBeEditable, flex: 1, cellClassName: getRowStyle }
-];
-
-function useApiRef() {
-  const apiRef = useRef(null);
-  const _columns = useMemo(
-    () =>
-      columns.concat({
-        field: "__HIDDEN__",
-        width: 0,
-        renderCell: (params) => {
-          apiRef.current = params.api;
-          return null;
-        }
-      }),
-    [columns]
-  );
-
-  return { apiRef, columns: _columns };
-}
-
 function Attributes(props) {
-  const { apiRef, columns } = useApiRef();
   const [data, setData] = useState([]);
 
   useEffect(() => {
@@ -69,6 +47,36 @@ function Attributes(props) {
     attribs.forEach((attrib, index) => attrib.id = index);
     setData(attribs || []);
   }, [props.attributes]);
+
+  useEffect(() => {
+    serverRequest("set_attributes", {path: props.entityPath, attributes: data})
+  }, [data]);
+
+  const actions = {
+    field: "actions",
+    type: "actions",
+    headerName: "Actions",
+    width: 80,
+    cellClassName: "actions",
+    getActions: params => {
+      if (!shouldBeEditable(params)) return [];
+      return [
+        <GridActionsCellItem
+          icon={<DeleteIcon />}
+          label="Delete"
+          onClick={handleDelete(params.id)}
+          color="inherit"
+        />,
+      ];
+    }
+  }
+  
+  const columns = [
+    { field: "name", headerName: "Name", flex: 1, editable: true, cellClassName: getRowStyle},
+    { field: "inherited", headerName: "Inherited", flex: 1, editable: true, cellClassName: getRowStyle },
+    { field: "override", headerName: "Override", flex: 1, editable: true, cellClassName: getRowStyle },
+    actions
+  ];
 
   const handleAddAttrib = e => {
     let value = e.target.value;
@@ -89,15 +97,13 @@ function Attributes(props) {
         attrib.override = newValues.override;
       }
     })
-    console.log("Sending:", attribs);
-    serverRequest(
-      "set_attributes",
-      {path: props.entityPath, attributes: attribs}).then(resp => {
-        console.log(resp);
-      }
-    )
+    setData(attribs);
     return newValues;
   }
+
+  const handleDelete = id => () => {
+    setData(prevState => prevState.filter(row => row.id !== id));
+  };
 
   const handleError = error => {
     console.log(error);
@@ -127,8 +133,8 @@ function Attributes(props) {
           sx={gridStyles}
           disableSelectionOnClick
           rows={data}
-          columns={columns.slice(0, -1)}
-          isCellEditable={params => !params.row.inherited || params.row.inherited === ""}
+          columns={columns}
+          isCellEditable={shouldBeEditable}
           processRowUpdate={handleEdit}
           onProcessRowUpdateError={handleError}
           experimentalFeatures={{ newEditingApi: true }}

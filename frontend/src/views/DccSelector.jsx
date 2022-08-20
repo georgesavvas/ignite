@@ -18,13 +18,15 @@ const style = {
 }
 
 function DccSelector(props) {
-  // const dir_kind = props.entity.dir_kind;
-  // const dir_kind_formatted = dir_kind.charAt(0).toUpperCase() + dir_kind.slice(1)
   const [config, setConfig] = useContext(ConfigContext);
   const [selectedDcc, setSelectedDcc] = useState("");
   const [showAll, setShowAll] = useState(false);
   const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+
+  useEffect(() => {
+    if (!props.scene) setShowAll(true);
+  }, [props.scene]);
 
   const handleDccClick = (e) => {
     setSelectedDcc(e.currentTarget.id);
@@ -55,13 +57,12 @@ function DccSelector(props) {
         if (name.toLowerCase().replaceAll(" ", "").includes(keyword)) icon = dcc.icon;
       });
     });
-    console.log(`url(${icon})`);
     return `url(${icon})`;
   }
 
   function formatDcc(dcc, index) {
     const dccIcon = getDccIcon(dcc.path);
-    const relevant = dcc.exts.includes(props.scene.extension);
+    const relevant = props.scene ? dcc.exts.includes(props.scene.extension) : true;
     const containerStyle = {
       display: relevant || showAll ? null : "none",
       borderColor: dcc.name === selectedDcc ? "rgb(252, 140, 3)" : "rgb(70,70,70)"
@@ -85,7 +86,6 @@ function DccSelector(props) {
       new_scene: props.newScene,
       task: props.task
     };
-    console.log(data);
     const ok = await clientRequest("get_launch_cmd", data).then(resp => {
       const data = resp.data;
       return window.api.launch_dcc(data.cmd, data.args, data.env);
@@ -101,34 +101,35 @@ function DccSelector(props) {
   dccConfigSorted.sort((a, b) => a.name.localeCompare(b.name));
 
   return (
-    <div style={style}>
-      <div style={{margin: "10px", overflow: "hidden"}}>
-        <div className={styles.topBar}>
-          <Typography variant="h5">
-            Scene Launcher
-          </Typography>
-          <FormControlLabel 
-            control={
-              <Switch checked={showAll} onChange={e => setShowAll(e.target.checked)} />
-            }
-            label="Show all"
-            labelPlacement="start"
-          />
-        </div>
+    <div className={styles.container}>
+      <div className={styles.topBar}>
+        <Typography variant="h5">
+          Scene Launcher
+        </Typography>
+        <FormControlLabel 
+          control={
+            <Switch checked={showAll} onChange={e => setShowAll(e.target.checked)} />
+          }
+          label="Show all"
+          labelPlacement="start"
+          disabled={!props.scene}
+        />
+      </div>
+      <div className={styles.dccList}>
         {dccConfigSorted.map((dcc, index) => formatDcc(dcc, index))}
-        <div style={{width: "100%", display: "grid", justifyContent: "center", marginTop: "20px"}}>
-          <Button
-            size="large"
-            variant="outlined"
-            color="ignite"
-            startIcon={<RocketLaunchIcon />}
-            style={{width: "200px"}}
-            onClick={handleLaunchClick}
-            disabled={!selectedDcc}
-          >
-            Launch
-          </Button>
-        </div>
+      </div>
+      <div style={{width: "100%", display: "grid", justifyContent: "center", marginTop: "20px"}}>
+        <Button
+          size="large"
+          variant="outlined"
+          color="ignite"
+          startIcon={<RocketLaunchIcon />}
+          style={{width: "200px"}}
+          onClick={handleLaunchClick}
+          disabled={!selectedDcc}
+        >
+          Launch
+        </Button>
       </div>
     </div>
   )

@@ -1,6 +1,6 @@
 import os
 from pathlib import Path, PurePath
-from ignite_server.constants import DCC_EXTENSIONS
+from ignite_server.constants import ANCHORS, DCC_EXTENSIONS
 from ignite_server import utils
 from ignite_server.entities.directory import Directory
 from ignite_server.entities.task import Task
@@ -20,6 +20,7 @@ class Scene(Directory):
         self.context = ""
         self.name = ""
         self.extension = ""
+        self.tags = []
         self.dir_kind = "scene"
         self.dcc = ""
         self.version = ""
@@ -28,7 +29,14 @@ class Scene(Directory):
         self.scene = PurePath()
         self.task = None
         if self.path:
+            path = Path(path)
             self.path = PurePath(self.path)
+            anchor = ANCHORS["scene"]
+            self.anchor = path / anchor
+            if not self.anchor.is_file():
+                raise Exception(
+                    f"Invalid scene or missing anchor: {self.anchor}"
+                )
             self.load_from_path()
 
     def __repr__(self):

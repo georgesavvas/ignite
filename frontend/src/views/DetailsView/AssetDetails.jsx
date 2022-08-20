@@ -11,13 +11,14 @@ import {
   ReflexContainer,
   ReflexSplitter,
   ReflexElement
-} from 'react-reflex'
-import URI from "../../components/URI";
+} from 'react-reflex';
 import serverRequest from "../../services/serverRequest";
 import BuildFileURL from "../../services/BuildFileURL";
 import { useSnackbar } from 'notistack';
 import { CopyToClipboard, ShowInExplorer } from "../ContextActions";
 import ContextMenu, { handleContextMenu } from "../../components/ContextMenu";
+import URI from "../../components/URI";
+import Path from "../../components/Path";
 
 const splitterStyle = {
   borderColor: "rgb(80,80,80)",
@@ -31,8 +32,15 @@ const style = {
 
 const defaultFlexRations = {
   "asset.viewer": 0.4,
-  "asset.details": 0.2,
-  "asset.comps": 0.4
+  "asset.details": 0.25,
+  "asset.comps": 0.35
+}
+
+const rowStyle = {
+  display: "flex",
+  alignItems: "center",
+  gap: "10px",
+  marginTop: "5px"
 }
 
 function AssetDetails(props) {
@@ -125,12 +133,15 @@ function AssetDetails(props) {
         <ReflexSplitter style={splitterStyle} />
         <ReflexElement flex={flexRatios["asset.details"]} name={"asset.details"} onStopResize={handleResized}>
           <div style={{margin: "10px", overflow: "hidden"}}>
-            <Typography variant="h5">Asset Details</Typography>
-            <Typography>Name: {props.entity.name}</Typography>
-            <Typography>Path: {props.entity.path}</Typography>
-            <Typography>Context: {props.entity.context}</Typography>
-            <URI uri={props.entity.uri} />
-            {/* <Typography color="rgb(252, 140, 3)">URI: {props.entity.uri}</Typography> */}
+            <Typography variant="h5">{props.entity.name}</Typography>
+            <div style={rowStyle}>
+              <Typography>Path:</Typography>
+              <Path path={props.entity.path} />
+            </div>
+            <div style={rowStyle}>
+              <Typography>URI:</Typography>
+              <URI uri={props.entity.uri} />
+            </div>
           </div>
           <TagContainer entityPath={props.entity.path} tags={props.entity.tags} />
         </ReflexElement>

@@ -6,6 +6,8 @@ import { TextField } from "@mui/material";
 import Modal from "../../components/Modal";
 import serverRequest from "../../services/serverRequest";
 import Attributes from "./Attributes";
+import URI from "../../components/URI";
+import Path from "../../components/Path";
 
 const style = {
   width: "100%",
@@ -35,6 +37,13 @@ function ReprAssetModal(props) {
   )
 }
 
+const rowStyle = {
+  display: "flex",
+  alignItems: "center",
+  gap: "10px",
+  marginTop: "5px"
+}
+
 function DirectoryDetails(props) {
   const [reprModalOpen, setReptModalOpen] = useState(false);
   const dir_kind = props.entity.dir_kind;
@@ -57,11 +66,17 @@ function DirectoryDetails(props) {
         onClose={() => setReptModalOpen(false)}
       />
       <div style={{margin: "10px", overflow: "hidden"}}>
-        <Typography variant="h5">{dir_kind_formatted} Details</Typography>
-        <Typography>Name: {props.entity.name}</Typography>
-        <Typography>Path: {props.entity.path}</Typography>
-        <Typography>Repr Asset: {props.entity.repr}</Typography>
-        <Button onClick={() => setReptModalOpen(true)}>Choose asset</Button>
+        <Typography variant="h5" style={{marginBottom: "10px"}}>{props.entity.name}</Typography>
+        {/* <Typography>{dir_kind_formatted}</Typography> */}
+        <div style={rowStyle}>
+        <Typography>Path:</Typography>
+          <Path path={props.entity.path} />
+        </div>
+        <div style={rowStyle}>
+          <Typography>Repr Asset:</Typography>
+          <URI uri={props.entity.repr} />
+          <Button variant="outlined" onClick={() => setReptModalOpen(true)} color="ignite">Choose</Button>
+        </div>
       </div>
       <TagContainer entityPath={props.entity.path} tags={props.entity.tags} />
       <Attributes entityPath={props.entity.path} attributes={props.entity.attributes} />

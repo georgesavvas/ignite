@@ -54,30 +54,34 @@ function ExplorerBar(props) {
     props.onFilterChange(value);
   }
 
+  const handleSortChange = (field, reverse) => {
+    props.setQuery(prevState => ({...prevState, sort: {field: field, reverse: reverse}}));
+  }
+
   const filterOptions = [
     {
       label: "Name (A-Z)",
-      fn: () => {},
+      fn: () => handleSortChange("name", false),
     },
     {
       label: "Name (Z-A)",
-      fn: () => {}
+      fn: () => handleSortChange("name", true),
     },
     {
       label: "Date (Newest first)",
-      fn: () => {}
+      fn: () => handleSortChange("date", true),
     },
     {
       label: "Date (Oldest first)",
-      fn: () => {}
+      fn: () => handleSortChange("date", false),
     },
     {
       label: "Version (Higher first)",
-      fn: () => {}
+      fn: () => handleSortChange("version", true),
     },
     {
       label: "Version (Lowest first)",
-      fn: () => {}
+      fn: () => handleSortChange("version", false),
     }
   ]
 

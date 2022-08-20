@@ -10,8 +10,11 @@ import {ContextContext} from "../../contexts/ContextContext";
 import { DeleteDir, RenameDir, CreateDir } from "../ContextActions";
 import serverRequest from "../../services/serverRequest";
 import debounce from 'lodash.debounce';
+import { DIRCONTEXTOPTIONS } from "../../constants";
+import { CopyToClipboard, ShowInExplorer } from "../ContextActions";
 import loadExplorerSettings from "../../utils/loadExplorerSettings";
 import saveExplorerSettings from "../../utils/saveExplorerSettings";
+import ContextMenu, { handleContextMenu } from "../../components/ContextMenu";
 import { LinearProgress } from "@mui/material";
 import { useSnackbar } from 'notistack';
 import BuildFileURL from "../../services/BuildFileURL";
@@ -50,12 +53,13 @@ function Explorer() {
   const [isLoading, setIsLoading] = useState(true);
   const [loadedData, setLoadedData] = useState([]);
   const [pages, setPages] = useState({total: 1, current: 1});
-  const [query, setQuery] = useState({latest: 1});
+  const [query, setQuery] = useState({latest: 1, sort: {field: "name", reverse: false}});
   const [explorerSettings, setExplorerSettings] = useState(defaultExplorerSettings);
   const [tiles, setTiles] = useState([]);
   const [modalData, setModalData] = useState({});
   const [selectedEntity, setSelectedEntity] = useContext(EntityContext);
   const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
+  const [contextMenu, setContextMenu] = useState(null);
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
   const methods = {
@@ -211,6 +215,61 @@ function Explorer() {
     tileContainerStyle.gridTemplateColumns = `repeat(1, 1fr)`;
   }
 
+  function getGenericContextItems(data, enqueueSnackbar) {
+    return [
+      {
+        label: "Copy path",
+        fn: () =>  CopyToClipboard(data.path, enqueueSnackbar)
+      },
+      {
+        label: "Open in file explorer",
+        fn: () => ShowInExplorer(data.path, enqueueSnackbar),
+        divider: true
+      },
+      {
+        label: "Rename",
+        fn: () => data.handleClick("rename", data)
+      },
+      {
+        label: "Delete",
+        fn: () => data.handleClick("delete", data),
+        divider: true
+      }
+    ]
+  }
+
+  const handleClick = (action, data) => {
+    handleContextMenuSelection(action, data);
+    handleClose();
+  }
+
+  const handleClose = () => {
+    setContextMenu(null);
+  };
+  
+  function getSpecificContextItems(data) {
+    return DIRCONTEXTOPTIONS[data.kind].map(contextOption => (
+      {
+        label: contextOption.label,
+        value: contextOption.name,
+        dir_path: data.path,
+        fn: () => data.handleClick(
+          "create", {...data, method: contextOption.name, kind: contextOption.dir_kind}
+        )
+      }
+    ))
+  }
+
+  const itemData = {
+    path: currentContext.path,
+    kind: currentContext.dir_kind,
+    // name: labelText,
+    handleClick: handleClick
+  }
+
+  let contextItems = getGenericContextItems(itemData, enqueueSnackbar);
+  contextItems = contextItems.concat(getSpecificContextItems(itemData));
+
   return (
     <div className={classes.container}>
       <CreateDir open={modalData.createOpen} enqueueSnackbar={enqueueSnackbar}
@@ -225,6 +284,9 @@ function Explorer() {
         onClose={() => setModalData(prevState => ({...prevState, renameOpen: false}))}
         data={modalData} fn={refreshContext}
       />
+      <ContextMenu items={contextItems} contextMenu={contextMenu}
+        setContextMenu={setContextMenu}
+      />
       <ExplorerBar
         onRefresh={forceUpdate}
         onFilterChange={handleFilterChange}
@@ -234,13 +296,20 @@ function Explorer() {
         onLatestChange={handleLatestChange}
         onViewTypeChange={handleViewTypeChange}
         enqueueSnackbar={enqueueSnackbar}
+        setQuery={setQuery}
       />
       <Divider />
       <LinearProgress color="ignite" style={{width: "100%", minHeight: "2px", visibility: isLoading ? "visible" : "hidden"}} />
-      <div style={tileContainerStyle}>
+      <div
+        style={tileContainerStyle}
+        onContextMenu={e => handleContextMenu(e, contextMenu, setContextMenu)}
+      >
         {Object.keys(tiles).map((k) => tiles[k])}
       </div>
-      <div className={classes.layoutHelper} />
+      <div
+        className={classes.layoutHelper}
+        onContextMenu={e => handleContextMenu(e, contextMenu, setContextMenu)}
+      />
       <Divider />
       <PageBar pages={pages.total} onChange={handlePageChange} tileSize={explorerSettings.currentTileSize} onTilesPerPageChange={e => handleTilesPerPageChange(e.target.value)} onTileSizeChange={e => handleTileSizeChange(e.target.value)}/>
     </div>
