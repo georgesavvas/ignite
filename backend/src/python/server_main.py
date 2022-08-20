@@ -158,6 +158,7 @@ async def get_contents(request: Request):
     data = api.get_contents(
         result.get("path", ""),
         latest=query.get("latest", 0),
+        sort=query.get("sort"),
         as_dict=True
     )
     data = utils.query_filter(data, query)
@@ -189,6 +190,7 @@ async def get_tasks(request: Request):
     data = api.discover_tasks(
         result.get("path"),
         latest=query.get("latest", 0),
+        sort=query.get("sort"),
         as_dict=True
     )
     data = utils.query_filter(data, query)
@@ -220,6 +222,7 @@ async def get_assets(request: Request):
     data = api.discover_assets(
         result.get("path"),
         latest=query.get("latest", 0),
+        sort=query.get("sort"),
         as_dict=True
     )
     data = utils.query_filter(data, query)
@@ -251,6 +254,7 @@ async def get_assetversions(request: Request):
     data = api.discover_assetversions(
         result.get("path"),
         latest=query.get("latest", 0),
+        sort=query.get("sort"),
         as_dict=True
     )
     data = utils.query_filter(data, query)
@@ -282,6 +286,7 @@ async def get_scenes(request: Request):
     data = api.discover_scenes(
         result.get("path"),
         latest=query.get("latest", 0),
+        sort=query.get("sort"),
         as_dict=True
     )
     data = utils.query_filter(data, query)

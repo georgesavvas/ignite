@@ -120,7 +120,7 @@ def make_tasks(loader, tasks, mute=""):
     for i in range(amount):
         index = str(i + 1)
         name = tasks[i]
-        loader.parm("name_" + index).set(name)
+        loader.parm("task_" + index).set(name)
         if name == mute:
             tog = 0
         loader.parm("tog_" + index).set(tog)

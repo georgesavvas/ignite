@@ -11,8 +11,7 @@ function AssetTile(props) {
 
   const hasThumbnail = props.entity.thumbnail && props.entity.thumbnail.filename;
   const thumbnailWidth = hasThumbnail ? "100%" : "50%";
-  let currentPath = currentContext.posix.replace(currentContext.project_path, "");
-  if (currentPath.startsWith("/")) currentPath = currentPath.slice(1);
+  const currentPath = currentContext.path_nr.replace(currentContext.project + "/", "");
   let contextPath = props.entity.context.replace(currentPath, "");
   if (contextPath.startsWith("/")) contextPath = contextPath.slice(1);
 

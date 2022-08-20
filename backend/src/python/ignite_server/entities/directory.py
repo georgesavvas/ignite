@@ -21,10 +21,10 @@ class Directory():
         self.group = ""
         self.name = ""
         self.tags = []
-        self.attributes = []
+        self._attributes = []
         self.dir_kind = dir_kind
         self.context = ""
-        self.repr = None
+        self._repr = None
         self.path = ""
         if path:
             path = Path(path)
@@ -136,7 +136,17 @@ class Directory():
             uri = utils.get_uri(uri)
         self.repr = uri
         self.update_config({"repr": uri})
-    
+
+    @property
+    def repr(self):
+        if not self._repr:
+            return api.get_repr(self.path)
+        return self._repr
+
+    @repr.setter
+    def repr(self, value):
+        self._repr = value
+
     def delete(self):
         print("About to delete", self.path)
         try:
@@ -180,17 +190,16 @@ class Directory():
     @property
     def attributes(self):
         root = ROOT.as_posix()
-        path = Path(path)
-        parent = path.parent
+        parent = Path(self.path.parent)
         iter = 1
         parent_attribs = []
         while root in parent.as_posix():
-            contents = parent.glob(".ign_*.yaml")
+            contents = next(parent.glob(".ign_*.yaml"), None)
             if not contents:
                 parent = parent.parent
                 iter +=1
                 continue
-            with open(contents[0], "r") as f:
+            with open(contents, "r") as f:
                 config = yaml.safe_load(f) or {}
             dir_attribs = config.get("attributes")
             if dir_attribs:
@@ -198,7 +207,7 @@ class Directory():
             parent = parent.parent
             iter +=1
             if iter > 20:
-                raise Exception(f"Reached iteration limit when walking directory: {path}")
+                raise Exception(f"Reached iteration limit when walking directory: {self.path}")
         parent_attribs.reverse()
         attributes = {}
         for attribs in parent_attribs:
@@ -218,10 +227,12 @@ class Directory():
                 "inherited": v if k in parent_keys else "",
                 "override": v if k in current_keys else ""
             })
-            i += 1
 
-        print("-----", attributes_formatted)
         return attributes_formatted
+
+    @attributes.setter
+    def attributes(self, value):
+        self._attributes = value
 
     def set_attributes(self, attributes):
         self.update_config({"attributes": attributes})

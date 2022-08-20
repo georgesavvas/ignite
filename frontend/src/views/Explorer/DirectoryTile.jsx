@@ -13,7 +13,7 @@ function DirectoryTile(props) {
   const hasThumbnail = props.entity.thumbnail && props.entity.thumbnail.filename;
   const isScene = props.entity.dir_kind === "scene";
   const thumbnailWidth = isScene || hasThumbnail ? "100%" : "50%";
-  const currentPath = currentContext.posix.replace(currentContext.project_path + "/", "");
+  const currentPath = currentContext.path_nr.replace(currentContext.project + "/", "");
   let contextPath = props.entity.context.replace(currentPath, "");
   if (contextPath.startsWith("/")) contextPath = contextPath.slice(1);
 
