@@ -80,6 +80,7 @@ def get_huey():
 
 def replace_vars(d):
     vars = {
+        "os": OS_NAME,
         "dcc": str(DCC),
         "projects_root": server_request("get_projects_root").get("data", "")
     }

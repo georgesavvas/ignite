@@ -17,7 +17,7 @@ add_definitions(-DCURL_STATICLIB)
 target_compile_options(ignResolver PUBLIC -Zc:inline-)
 
 if( MSVC )
-    set_target_properties(ignResolver PROPERTIES LINK_FLAGS "/NODEFAULTLIB:hboost_python37-vc141-mt-x64.lib" )
+    set_target_properties(ignResolver PROPERTIES LINK_FLAGS "/NODEFAULTLIB:hboost_python39-vc142-mt-x64-1_72.lib" )
 endif()
 
 target_include_directories(ignResolver PRIVATE .)
@@ -36,8 +36,8 @@ target_link_directories(ignResolver PUBLIC
     $ENV{HOUDINI_ROOT}/custom/houdini/dsolib
     )
 target_link_libraries(ignResolver
-    $ENV{PYTHON_ROOT}/libs/python37.lib
-    hboost_python37-mt-x64.lib
+    $ENV{PYTHON_ROOT}/libs/python39.lib
+    hboost_python39-mt-x64.lib
     libpxr_ar.lib
     libpxr_arch.lib
     libpxr_pxOsd.lib

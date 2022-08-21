@@ -20,11 +20,13 @@ function URI(props) {
     // }
   ]
 
+  if (!props.uri) return null;
+
   return (
     <>
       <ContextMenu items={contextItems} contextMenu={contextMenu} setContextMenu={setContextMenu} />
       <div className={styles.container} onClick={e => handleContextMenu(e, contextMenu, setContextMenu)}>
-        <Typography>{props.uri}</Typography>
+        <Typography style={{color: "rgb(252, 140, 3)"}}>{props.uri}</Typography>
       </div>
     </>
   )

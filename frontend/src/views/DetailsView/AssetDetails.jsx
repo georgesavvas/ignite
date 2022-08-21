@@ -134,14 +134,8 @@ function AssetDetails(props) {
         <ReflexElement flex={flexRatios["asset.details"]} name={"asset.details"} onStopResize={handleResized}>
           <div style={{margin: "10px", overflow: "hidden"}}>
             <Typography variant="h5">{props.entity.name}</Typography>
-            <div style={rowStyle}>
-              <Typography>Path:</Typography>
-              <Path path={props.entity.path} />
-            </div>
-            <div style={rowStyle}>
-              <Typography>URI:</Typography>
-              <URI uri={props.entity.uri} />
-            </div>
+            <URI uri={props.entity.uri} />
+            <Path path={props.entity.path} />
           </div>
           <TagContainer entityPath={props.entity.path} tags={props.entity.tags} />
         </ReflexElement>

@@ -47,10 +47,9 @@ export default function ContextBar() {
   const getSectionPaths = () => {
     if (!currentContext.posix) return {};
     let sectionPaths = {};
-    const rootLength = currentContext.root.split("/").length;
-    const sections = currentContext.posix.replace("/scenes/", "/").replace("/exports/", "/").split("/");
-    sections.slice(rootLength).map((section, index) => {
-      sectionPaths[section] = sections.slice(0, rootLength + index + 1).join("/")
+    const sections = currentContext.path_nr.replace("/scenes/", "/").replace("/exports/", "/").split("/");
+    sections.map((section, index) => {
+      sectionPaths[section] = sections.slice(0, index + 1).join("/")
     })
     return sectionPaths;
   }

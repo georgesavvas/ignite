@@ -11,9 +11,7 @@
                 }
             },
             "LibraryPath": "../IgniteResolver.dll",
-            "Name": "IgniteResolver", 
-            "ResourcePath": "resources",
-            "Root": "..",
+            "Name": "IgniteResolver",
             "Type": "library"
         }
     ]

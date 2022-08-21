@@ -40,7 +40,7 @@ function GridTile(props) {
       frame = clamp(Math.round(frame), thumbnail.first_frame, thumbnail.last_frame);
       thumbnailPath = thumbnailPath.replace("####", frame);
     }
-    if (!hasThumbnail) return "media/no_icon.png";
+    if (!hasThumbnail) return "";
     return BuildFileURL(thumbnailPath, config);
   }
   const thumbnailURL = props.thumbnail || getSeqThumbnail();
@@ -50,6 +50,8 @@ function GridTile(props) {
     props.onSelected(props.entity);
   }
 
+  const ThumbComp = props.thumbnailComp;
+
   return (
     <>
       <ContextMenu items={props.contextItems} contextMenu={contextMenu}
@@ -58,7 +60,10 @@ function GridTile(props) {
       <div className={styles.tile + " " + styles.gridTile} style={tileStyle} onClick={handleClick}
         onContextMenu={e => handleContextMenu(e, contextMenu, setContextMenu)}
       >
-        <img src={thumbnailURL} className={styles.thumbnail} style={thumbnailStyle} />
+        {ThumbComp ? <ThumbComp sx={{ fontSize: props.size * 0.25 }} className={styles.thumbnail} /> : null}
+        {!ThumbComp && thumbnailURL ?
+          <img src={thumbnailURL} className={styles.thumbnail} style={thumbnailStyle} />
+          : null}
         <div className={styles.hoverArea} onMouseMove={isStatic ? null : handleMouseMove} ref={hoverArea}>
           <div className={styles.overlay}>
             <div className={styles.topGrad} />
@@ -109,7 +114,7 @@ function RowTile(props) {
 
   function getSeqThumbnail() {
     const thumbnail = props.entity.thumbnail
-    let thumbnailPath = thumbnail.path || "media/no_icon.png"
+    let thumbnailPath = thumbnail.path || ""
     if (!thumbnail.static) {
       let frame = thumbnail.first_frame + (thumbnail.last_frame - thumbnail.first_frame) * progress;
       frame = clamp(Math.round(frame), thumbnail.first_frame, thumbnail.last_frame);
@@ -124,6 +129,8 @@ function RowTile(props) {
     props.onSelected(props.entity);
   }
 
+  const ThumbComp = props.thumbnailComp;
+
   return (
     <>
       <ContextMenu items={props.contextItems} contextMenu={contextMenu}
@@ -133,7 +140,10 @@ function RowTile(props) {
         onContextMenu={e => handleContextMenu(e, contextMenu, setContextMenu)}
       >
         <div style={thumbnailContainer}>
+        {ThumbComp ? <ThumbComp sx={{ fontSize: props.size * 0.5 }} className={styles.thumbnail} /> : null}
+        {!ThumbComp && thumbnailURL ?
           <img src={thumbnailURL} className={styles.thumbnail} style={thumbnailStyle} />
+          : null}
         </div>
         <div className={styles.hoverArea} style={{"maxWidth": props.size}}
           onMouseMove={isStatic ? null : handleMouseMove} ref={hoverArea}

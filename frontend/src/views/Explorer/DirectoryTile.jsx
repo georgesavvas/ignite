@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography';
 import { ContextContext } from "../../contexts/ContextContext";
 import { useSnackbar } from 'notistack';
 import { CopyToClipboard, ShowInExplorer } from "../ContextActions";
-import { DIRCONTEXTOPTIONS } from "../../constants";
+import { DIRECTORYICONS, DIRCONTEXTOPTIONS } from "../../constants";
 
 function DirectoryTile(props) {
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
@@ -103,11 +103,15 @@ function DirectoryTile(props) {
   let contextItems = getGenericContextItems(props.entity);
   contextItems = contextItems.concat(getSpecificContextItems(props.entity));
 
+  const icon = props.entity.icon && props.entity.icon in DIRECTORYICONS ?
+    DIRECTORYICONS[props.entity.icon] : undefined;
+
   return (
     <>
       <Tile
         {...props}
         thumbnail={hasThumbnail ? undefined : thumbnailPath()}
+        thumbnailComp={icon}
         thumbnailWidth={thumbnailWidth}
         onClick={handleClick}
         contextItems={contextItems}
