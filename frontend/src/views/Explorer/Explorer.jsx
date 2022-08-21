@@ -248,6 +248,7 @@ function Explorer() {
   };
   
   function getSpecificContextItems(data) {
+    if (!(data.kind in DIRCONTEXTOPTIONS)) return [];
     return DIRCONTEXTOPTIONS[data.kind].map(contextOption => (
       {
         label: contextOption.label,

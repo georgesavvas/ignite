@@ -534,13 +534,10 @@ def set_repr_asset(target, repr):
 
 
 def get_repr(target):
-    print("for:", target)
     assets = discover_assets(target, single=True)
     if not assets:
-        print("found nothing...")
         return ""
     asset = assets[0]
-    print("repr found:", asset)
     return asset.uri
 
 

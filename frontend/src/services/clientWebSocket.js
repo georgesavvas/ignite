@@ -1,6 +1,11 @@
-function clientWebSocket(method, data=undefined) {
-  const ws = new WebSocket(`ws://127.0.0.1:9091/ws/${method}`);
+export async function createSocket() {
+  const address = await window.services.get_env("IGNITE_SERVER_ADDRESS")
+  const ws = new WebSocket(`ws://${address}/ws/main`);
   return ws;
 }
 
-export default clientWebSocket;
+export async function socketRequest(method, data=undefined) {
+  const address = await window.services.get_env("IGNITE_SERVER_ADDRESS");
+  const ws = new WebSocket(`ws://${address}/ws/main`);
+  return ws;
+}

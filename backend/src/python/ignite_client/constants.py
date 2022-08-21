@@ -11,7 +11,7 @@ DCC_ENVS = {
         "HOUDINI_PATH": "{dcc}/houdini;&",
         "HOUDINI_MENU_PATH": "{dcc}/houdini;&",
         "HOUDINI_OTLSCAN_PATH": "&;{dcc}/houdini/otls",
-        "PXR_PLUGINPATH_NAME": "{dcc}/houdini/dso/resources"
+        "PXR_PLUGINPATH_NAME": "{dcc}/houdini/dso/19.5/{os}/resources"
     }
 }
 

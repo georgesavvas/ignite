@@ -7,6 +7,12 @@
 #include "pxr/usd/ar/defineResolver.h"
 #include "pxr/usd/ar/assetInfo.h"
 #include "pxr/usd/ar/resolverContext.h"
+#include <pxr/base/tf/fileUtils.h>
+#include <pxr/base/tf/stringUtils.h>
+#include <pxr/base/tf/pathUtils.h>
+#include <pxr/base/tf/stringUtils.h>
+#include <pxr/base/tf/diagnostic.h>
+#include <pxr/base/vt/value.h>
 
 //  #include "pxr/base/arch/fileSystem.h"
 //  #include "pxr/base/arch/systemInfo.h"
@@ -42,7 +48,7 @@ static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *use
    return size * nmemb;
 }
 
-std::string get_uri(const std::string uri) {
+std::string resolve_uri(const std::string uri) {
     // std::cout << "Attempting to resolve " + uri + "\n";
 
     CURL *curl;
@@ -54,11 +60,9 @@ std::string get_uri(const std::string uri) {
     headers = curl_slist_append(headers, "charset: utf-8");
 
     
-    char* address = std::getenv("IGNITE_SERVER_ADDRESS");
-    std::string address = "";
-    if (address != NULL) {
-        address = std::string("http://") + address + "/api/v1/resolve";
-    }
+    char* address_var = std::getenv("IGNITE_SERVER_ADDRESS");
+    std::string address = address_var ? address_var : "";
+    address = std::string("http://") + address + "/api/v1/resolve";
     std::string data = "{\"uri\":\"" + uri + "\"}";
     std::string readBuffer = "";
     curl_global_init(CURL_GLOBAL_DEFAULT);
@@ -85,32 +89,51 @@ PXR_NAMESPACE_OPEN_SCOPE
 AR_DEFINE_RESOLVER(IgniteResolver, ArResolver);
 
 
-IgniteResolver::IgniteResolver() : ArDefaultResolver() {
-    // std::cout << "Creating Ignite USD Resolver\n";
+IgniteResolver::IgniteResolver() {
 }
 
 IgniteResolver::~IgniteResolver() {
-    // std::cout << "Removing Ignite USD Resolver\n";
 }
 
-std::string
-IgniteResolver::Resolve(const std::string& path) {
-    if (is_uri(path)) {
-        return get_uri(path);
-    }
-    
-    return ArDefaultResolver::Resolve(path);
+ArResolvedPath
+IgniteResolver::_Resolve(const std::string& assetURI) const {
+    ArResolvedPath resolvedPath = _ResolveForNewAsset(assetURI);
 
+    return TfPathExists(resolvedPath) ? resolvedPath : ArResolvedPath();
 }
 
-std::string
-IgniteResolver::ResolveWithAssetInfo(const std::string& path, ArAssetInfo* assetInfo) {
-    if (is_uri(path)) {
-        return get_uri(path);
+ArResolvedPath
+IgniteResolver::_ResolveForNewAsset(const std::string& assetURI) const {
+    std::cout << "_ResolveForNewAsset input " + assetURI << std::endl;
+    if (assetURI.empty()) {
+        std::cout << "_ResolveForNewAsset reject empty " + assetURI << std::endl;
+        return ArResolvedPath();
     }
 
-    return ArDefaultResolver::ResolveWithAssetInfo(path, assetInfo);
+    if (!is_uri(assetURI)) {
+        std::cout << "_ResolveForNewAsset reject not uri " + assetURI << std::endl;
+        return ArResolvedPath();
+    }
 
+    std::string resolvedPath = resolve_uri(assetURI);
+
+    std::cout << "_ResolveForNewAsset output " + resolvedPath << std::endl;
+
+    return ArResolvedPath(resolvedPath);
 }
+
+// std::shared_ptr<ArAsset>
+// IgniteResolver::_OpenAsset(const ArResolvedPath& resolvedPath) const {
+//     return ArFilesystemAsset::Open(resolvedPath);
+// }
+
+// std::shared_ptr<ArWritableAsset>
+// IgniteResolver::_OpenAssetForWrite(
+//     const ArResolvedPath& resolvedPath,
+//     WriteMode writeMode) const
+// {
+//     return ArFilesystemWritableAsset::Create(
+//         _ResolveForNewAsset(resolvedPath), writeMode);
+// }
 
 PXR_NAMESPACE_CLOSE_SCOPE

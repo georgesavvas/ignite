@@ -20,11 +20,13 @@ function Path(props) {
     // }
   ]
 
+  if (!props.path) return null;
+
   return (
     <>
       <ContextMenu items={contextItems} contextMenu={contextMenu} setContextMenu={setContextMenu} />
       <div className={styles.container} onClick={e => handleContextMenu(e, contextMenu, setContextMenu)}>
-        <Typography>{props.path}</Typography>
+        <Typography style={{color: "cadetblue"}}>{props.path}</Typography>
       </div>
     </>
   )

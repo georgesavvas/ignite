@@ -22,6 +22,11 @@ const tileContainerStyle = {
   padding: "10px"
 }
 
+const splitterStyle = {
+  borderColor: "rgb(80,80,80)",
+  backgroundColor: "rgb(80,80,80)"
+}
+
 const Browser = props => {
   const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
   const [isLoading, setIsLoading] = useState(false);
@@ -58,20 +63,20 @@ const Browser = props => {
       <div style={tileContainerStyle}>
         {Object.keys(tiles).map((k) => tiles[k])}
       </div>
-      {/* <ReflexContainer orientation="vertical">
+      <ReflexContainer orientation="vertical">
         <ReflexElement flex={0.2}>
         </ReflexElement>
         <ReflexSplitter style={splitterStyle} />
         <ReflexElement flex={0.7}>
         </ReflexElement>
-      </ReflexContainer> */}
+      </ReflexContainer>
     </div>
   )
 }
 
 export default function ProjectBrowser(props) {
   return (
-    <Modal open={props.open} onClose={props.onClose} title="Project Browser" maxWidth="lg"
+    <Modal open={props.open} onClose={props.onClose} title="Project Browser" fullWidth maxWidth="xl"
     closeButton>
       {Browser(props)}
     </Modal>

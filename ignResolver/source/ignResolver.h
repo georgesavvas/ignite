@@ -18,35 +18,26 @@ public:
     IgniteResolver();
     virtual ~IgniteResolver();
 
-    virtual std::string Resolve(const std::string& path) override;
+    // virtual std::string Resolve(const std::string& path) override;
 
-    virtual std::string ResolveWithAssetInfo(
-        const std::string& path,
-        ArAssetInfo* assetInfo) override;
+    // virtual std::string ResolveWithAssetInfo(
+    //     const std::string& path,
+    //     ArAssetInfo* assetInfo) override;
 
-    // AR_API
-    //     virtual std::string GetExtension(const std::string& path) override;
-    // AR_API
-    //     virtual std::string Resolve(const std::string& path) override;
+protected:
+    ArResolvedPath _Resolve(
+        const std::string& assetURI) const override;
 
-    // AR_API
-    //     virtual std::string ResolveWithAssetInfo(
-    //         const std::string& path, 
-    //         ArAssetInfo* assetInfo) override;
-    // AR_API
-    //     virtual void UpdateAssetInfo(
-    //        const std::string& identifier,
-    //        const std::string& filePath,
-    //        const std::string& fileVersion,
-    //        ArAssetInfo* assetInfo) override;
-    // AR_API
-    //     virtual VtValue GetModificationTimestamp(
-    //         const std::string& path,
-    //         const std::string& resolvedPath) override;
-    // AR_API
-    //     virtual bool FetchToLocalResolvedPath(
-    //         const std::string& path,
-    //         const std::string& resolvedPath) override;
+    ArResolvedPath _ResolveForNewAsset(
+        const std::string& assetURI) const override;
+
+    // std::shared_ptr<ArAsset> _OpenAsset(
+    //     const ArResolvedPath& resolvedPath) const override;
+
+    // std::shared_ptr<ArWritableAsset>
+    // _OpenAssetForWrite(
+    //     const ArResolvedPath& resolvedPath,
+    //     WriteMode writeMode) const override;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

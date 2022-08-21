@@ -7,7 +7,7 @@ from pathlib import Path
 import uvicorn
 from pprint import pprint
 from pathlib import PurePath
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, WebSocket
 from fastapi.responses import PlainTextResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -22,10 +22,9 @@ from ignite_server import api
 
 
 app = FastAPI()
-origins = ["*"]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -473,6 +472,23 @@ async def set_attributes(request: Request):
 async def rename_entity(request: Request):
     logging.info("Asked to shut down, cya!")
     sys.exit()
+
+
+@app.websocket("/ws/main")
+async def websocket_endpoint(websocket: WebSocket):
+    print("---------------", "Opening websocket...")
+    await websocket.accept()
+    while True:
+        try:
+            # Wait for any message from the client
+            await websocket.receive_text()
+            # Send message to the client
+            resp = {"value": 6}
+            await websocket.send_json(resp)
+        except Exception as e:
+            print("error:", e)
+            break
+    print("Closing websocket.")
 
 
 mount_root()

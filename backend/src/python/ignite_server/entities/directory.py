@@ -81,6 +81,9 @@ class Directory():
             d[s] = value
             if s in self.nr_attrs:
                 d[f"{s}_nr"] = utils.get_nr(value)
+        d["icon"] = self.dir_kind
+        if hasattr(self, "task_type"):
+            d["icon"] += "_" + self.task_type
         return d
 
     def create_dir(self, name, anchor="directory", recursive=False):
@@ -139,8 +142,8 @@ class Directory():
 
     @property
     def repr(self):
-        if not self._repr:
-            return api.get_repr(self.path)
+        # if not self._repr:
+        #     return api.get_repr(self.path)
         return self._repr
 
     @repr.setter

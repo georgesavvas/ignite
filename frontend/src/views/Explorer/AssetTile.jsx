@@ -4,6 +4,8 @@ import Typography from '@mui/material/Typography';
 import { ContextContext } from "../../contexts/ContextContext";
 import { useSnackbar } from 'notistack';
 import { CopyToClipboard, ShowInExplorer } from "../ContextActions";
+import URI from "../../components/URI";
+import Path from "../../components/Path";
 
 function AssetTile(props) {
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
@@ -56,9 +58,11 @@ function AssetTile(props) {
       </>
     ); else return(
       <>
-        <Typography align="left">{props.entity.name}</Typography>
-        <Typography align="left">{props.entity.version}</Typography>
-        <Typography align="left">{props.entity.context}</Typography>
+        <Typography align="left">{props.entity.name} - {props.entity.version}</Typography>
+        <URI uri={props.entity.uri} />
+        <Path path={props.entity.path} />
+        <Typography align="left"></Typography>
+        {/* <Typography align="left">{props.entity.context}</Typography> */}
       </>
     )
   }

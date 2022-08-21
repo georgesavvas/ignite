@@ -4,6 +4,7 @@ import MenuItem from '@mui/material/MenuItem';
 
 export function handleContextMenu(event, contextMenu, setContextMenu) {
   event.preventDefault();
+  event.stopPropagation();
   setContextMenu(
     contextMenu === null
       ? {

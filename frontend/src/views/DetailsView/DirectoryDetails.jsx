@@ -32,7 +32,7 @@ function ReprAssetModal(props) {
       onButtonClicked={handleSave}
       maxWidth="sm"
     >
-      <TextField inputRef={uriField} fullWidth color="ignite" size="small" label="Asset URI" />
+      <TextField style={{marginTop: "10px"}} inputRef={uriField} autoFocus fullWidth color="ignite" size="small" label="Asset" />
     </Modal>
   )
 }
@@ -67,15 +67,11 @@ function DirectoryDetails(props) {
       />
       <div style={{margin: "10px", overflow: "hidden"}}>
         <Typography variant="h5" style={{marginBottom: "10px"}}>{props.entity.name}</Typography>
-        {/* <Typography>{dir_kind_formatted}</Typography> */}
-        <div style={rowStyle}>
-        <Typography>Path:</Typography>
-          <Path path={props.entity.path} />
-        </div>
+        <Path path={props.entity.path} />
         <div style={rowStyle}>
           <Typography>Repr Asset:</Typography>
           <URI uri={props.entity.repr} />
-          <Button variant="outlined" onClick={() => setReptModalOpen(true)} color="ignite">Choose</Button>
+          <Button variant="outlined" size="small" onClick={() => setReptModalOpen(true)} color="ignite">Choose</Button>
         </div>
       </div>
       <TagContainer entityPath={props.entity.path} tags={props.entity.tags} />
