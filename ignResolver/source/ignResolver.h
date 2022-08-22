@@ -25,6 +25,14 @@ public:
     //     ArAssetInfo* assetInfo) override;
 
 protected:
+    std::string _CreateIdentifier(
+        const std::string& assetPath,
+        const ArResolvedPath& anchorAssetPath) const override;
+
+    std::string _CreateIdentifierForNewAsset(
+        const std::string& assetPath,
+        const ArResolvedPath& anchorAssetPath) const override;
+
     ArResolvedPath _Resolve(
         const std::string& assetURI) const override;
 

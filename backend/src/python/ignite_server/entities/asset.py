@@ -13,7 +13,7 @@ class Asset(Directory):
     def __init__(self, path="") -> None:
         super().__init__(path, dir_kind="asset")
         self.dict_attrs = ["path", "dir_kind", "anchor", "project", "name", "versions",
-            "latest_v", "uri", "context"]
+            "latest_v", "uri", "context", "next_path"]
         self.nr_attrs = ["path"]
         self.uri = utils.get_uri(path)
         self._versions = []
@@ -93,17 +93,19 @@ class Asset(Directory):
         self._best_v = best_av.version
         self._best_av = best_av
 
+    @property
     def next_version(self):
-        if self.version:
-            version = int(self.version.lstrip("v"))
+        if self.latest_v:
+            version = int(self.latest_v.lstrip("v"))
             version += 1
-            return str(version).zfill(3)
+            return "v" + str(version).zfill(3)
         else:
             return "v001"
     
+    @property
     def next_path(self):
-        next_v = self.next_version()
-        return self.path / "exports" / next_v
+        next_v = self.next_version
+        return self.path / next_v
 
     def as_dict(self):
         d = super().as_dict()

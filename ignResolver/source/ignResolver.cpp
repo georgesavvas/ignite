@@ -95,6 +95,43 @@ IgniteResolver::IgniteResolver() {
 IgniteResolver::~IgniteResolver() {
 }
 
+std::string
+IgniteResolver::_CreateIdentifier(
+    const std::string& assetPath,
+    const ArResolvedPath& anchorAssetPath) const
+{
+    // Ar will call this function if either assetPath or anchorAssetPath
+    // have a URI scheme that is associated with this resolver.
+    std::cout << "_CreateIdentifier input " + assetPath + " " + anchorAssetPath.GetPathString() << std::endl;
+    if (assetPath.empty()) {
+        return assetPath;
+    }
+
+    if (!anchorAssetPath) {
+        return TfNormPath(assetPath);
+    }
+
+    // If assetPath has a URI scheme it must be an absolute URI so we
+    // just return the normalized URI as the asset's identifier.
+    if (assetPath.length() > 4 &&
+        assetPath.substr(0, 4).compare("ign:") == 0) {
+        return assetPath;
+    }
+
+    // Otherwise anchor assetPath to anchorAssetPath and return the
+    // normalized URI.
+    return TfStringCatPaths(anchorAssetPath, assetPath);
+}
+
+std::string
+IgniteResolver::_CreateIdentifierForNewAsset(
+    const std::string& assetPath,
+    const ArResolvedPath& anchorAssetPath) const
+{
+    // Resolving is the same for reading and writing assets.
+    return _CreateIdentifier(assetPath, anchorAssetPath);
+}
+
 ArResolvedPath
 IgniteResolver::_Resolve(const std::string& assetURI) const {
     ArResolvedPath resolvedPath = _ResolveForNewAsset(assetURI);
