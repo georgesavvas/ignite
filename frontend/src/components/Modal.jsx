@@ -30,7 +30,7 @@ function Modal(props) {
       <DialogActions>
         {
           props.buttonLabel ?
-          <Button onClick={props.onButtonClicked} {...props.buttonProps}>{props.buttonLabel}</Button> :
+          <Button type="submit" onClick={props.onButtonClicked} {...props.buttonProps}>{props.buttonLabel}</Button> :
           null
         }
         {props.closeButton ? <Button onClick={props.onClose}>Close</Button> : null}

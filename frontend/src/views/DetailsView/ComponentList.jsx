@@ -46,10 +46,15 @@ function Component({comp, onSelect, selectedComp, actions}) {
     },
   ]
 
+  const data = {
+    kind: "component",
+    entity: comp
+  };
+
   contextItems = contextItems.concat(actions.map(action => (
     {
       label: action.label,
-      fn: () => clientRequest("run_action", {entity: "components", action: action.label})
+      fn: () => clientRequest("run_action", {...data, action: action.label})
     }
   )));
 
@@ -75,7 +80,7 @@ function ComponentList(props) {
 
   useEffect(() => {
     clientRequest("get_actions").then(resp => {
-      setActions(resp.data.components);
+      setActions(resp.data.component || []);
     })
   }, [])
 

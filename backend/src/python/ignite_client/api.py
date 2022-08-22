@@ -285,13 +285,17 @@ def get_actions():
 
 
 @HUEY.task()
-def run_action(entity, action):
-    actions = utils.discover_actions().get(entity)
+def run_action(entity, kind, action):
+    actions = utils.discover_actions().get(kind)
     if not actions:
-        logging.error(f"Couldn't find action {entity} {action}")
+        logging.error(f"Couldn't find action {kind} {action}")
+        print("Available are:")
+        pprint(utils.discover_actions())
         return
     for _action in actions:
         if _action["label"] != action:
             continue
-        _action["fn"]("", "", "")
+
+        result = _action["fn"](entity)
+        pprint("Action result:", result)
         break
