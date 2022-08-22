@@ -213,7 +213,8 @@ def get_launch_cmd(dcc, dcc_name, task, scene):
     # scene = server_request("find", {"query": scene}).get("data", {})
     # if not scene:
     #     return
-    # task = scene.get("task", "")
+    if not task:
+        task = scene.get("task", "")
     print("Getting env with (task, dcc, scene) -", task, "-", dcc, "-", scene)
     env = get_env(task, dcc, scene)
     scene = scene.get("scene")

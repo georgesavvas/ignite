@@ -70,12 +70,21 @@ const ingestDialogStyle = {
 }
 
 function Ingest(props) {
-  let ruleTemplate = {};
+  const RULETEMPLATE = {
+    file_target: "*",
+    file_target_type: "filename",
+    task: props.task,
+    name: "",
+    comp: "",
+    rule: "",
+    replace_target: "",
+    replace_value: ""
+  }
 
   const [flexRatios, setFlexRatios] = useState(defaultFlexRations);
   const [ingestDirs, setIngestDirs] = useState("");
   const [ingestFiles, setIngestFiles] = useState([]);
-  const [ingestRules, setIngestRules] = useState([{...ruleTemplate, colour: getRandomColour()}]);
+  const [ingestRules, setIngestRules] = useState([{...RULETEMPLATE, colour: getRandomColour()}]);
   const [ingestAssets, setIngestAssets] = useState([]);
   const [connections, setConnections] = useState({});
   const [loading, setLoading] = useState(false);
@@ -83,18 +92,9 @@ function Ingest(props) {
 
   useEffect(() => {
     if (!props.open) return;
-    ruleTemplate = {
-      file_target: "*",
-      file_target_type: "filename",
-      task: props.task,
-      name: "",
-      comp: "",
-      rule: "",
-      replace_target: "",
-      replace_value: ""
-    }
+    
     setIngestDirs("");
-    setIngestRules([{...ruleTemplate, colour: getRandomColour()}]);
+    setIngestRules([{...RULETEMPLATE, colour: getRandomColour()}]);
     setIngestAssets([]);
   }, [])
 
@@ -165,7 +165,7 @@ function Ingest(props) {
     setLoading(true);
     switch (action) {
       case "add":
-        const rule = {...ruleTemplate, colour: getRandomColour()}
+        const rule = {...RULETEMPLATE, colour: getRandomColour()}
         setIngestRules(prevState => [...prevState, rule]);
         break
       case "remove":

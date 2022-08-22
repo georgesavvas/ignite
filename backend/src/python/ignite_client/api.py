@@ -242,17 +242,17 @@ def ingest_asset(data):
         return
     task = Path(data["task"])
     asset = task / "exports" / name
-    asset_entity = None
+    asset_dict = None
     if asset.exists():
-        asset_entity = utils.server_request(
-            "find", {"query": asset.as_posix()}
+        asset_dict = utils.server_request(
+            "find", {"path": asset.as_posix()}
         ).get("data")
-        if not asset_entity:
+        if not asset_dict:
             logging.error(f"Tried to create an asset at {asset} but couldn't, possibly directory exists already.")
             return
-    if asset_entity:
+    if asset_dict:
         print("Ingesting on top of existing asset.")
-        new_version_path = asset_entity.next_path()
+        new_version_path = Path(asset_dict["next_path"])
     else:
         asset.mkdir()
         asset_path = asset.as_posix()
@@ -261,7 +261,7 @@ def ingest_asset(data):
             print("Failed.")
             return
         new_version_path = asset / "v001"
-    new_version_path.mkdir()
+    new_version_path.mkdir(parents=True)
     for comp in comps:
         comp_path = Path(comp.get("source"))
         comp_name = comp.get("name") or comp_path.stem

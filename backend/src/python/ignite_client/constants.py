@@ -57,6 +57,21 @@ DCC_DISCOVERY = {
             ]
         }
     },
+    "hython": {
+        "label": "Hython",
+        "exts": ["hip", "hipnc"],
+        "paths": {
+            "win": [
+                "C:/Program Files/Side Effects Software/Houdini *.*.*/bin/hython.exe"
+            ],
+            "darwin": [
+                "/Applications/Houdini/Houdini*.*.*/Frameworks/Houdini.framework/Versions/Current/Resources/bin/hython"
+            ],
+            "linux": [
+                "/opt/hfs*.*.*/bin/hython"
+            ]
+        }
+    },
     "maya": {
         "label": "Maya",
         "exts": ["ma", "mb"],

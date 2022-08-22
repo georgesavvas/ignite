@@ -493,6 +493,7 @@ def register_task(path, task_type):
     utils.create_anchor(path, "task")
     task = find(path)
     if not task:
+        logging.error(f"Failed to register task at {path}")
         return
     task.set_task_type(task_type)
     return True
@@ -506,7 +507,8 @@ def register_scene(path):
 def register_asset(path):
     utils.create_anchor(path, "asset")
     av = find(path)
-    if not av.dir_kind == "asset":
+    if not av or not av.dir_kind == "asset":
+        logging.error(f"Failed to register asset at {path}")
         return
     return True
 
@@ -514,7 +516,8 @@ def register_asset(path):
 def register_assetversion(path):
     utils.create_anchor(path, "assetversion")
     av = find(path)
-    if not av.dir_kind == "assetversion":
+    if not av or not av.dir_kind == "assetversion":
+        logging.error(f"Failed to register assetversion at {path}")
         return
     return True
 

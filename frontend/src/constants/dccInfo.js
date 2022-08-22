@@ -1,6 +1,6 @@
 export const DCCINFO = [
   {
-    keywords: ["houdini", "hescape", "hmaster"],
+    keywords: ["houdini", "hescape", "hmaster", "hython"],
     icon: "media/dcc/houdini.png",
     name: "houdini"
   },
