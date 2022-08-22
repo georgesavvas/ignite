@@ -148,10 +148,10 @@ def uri_to_path(uri):
 def query_filter(entities, query):
     filtered = []
 
-    filter_string = query.get("filter_string")
+    filter_string = query.get("filter_string", "").strip()
     if filter_string:
         for entity in entities:
-            s = str(entity.get("path", ""))
+            s = str(entity.values())
             if filter_string in s:
                 filtered.append(entity)
 

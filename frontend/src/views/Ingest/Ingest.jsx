@@ -10,12 +10,13 @@ import LinearProgress from '@mui/material/LinearProgress';
 import Xarrow, { Xwrapper, useXarrow } from 'react-xarrows';
 import saveReflexLayout from "../../utils/saveReflexLayout";
 import loadReflexLayout from "../../utils/loadReflexLayout";
+import {ContextContext} from "../../contexts/ContextContext";
 import {
   ReflexContainer,
   ReflexSplitter,
   ReflexElement
 } from 'react-reflex'
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import debounce from 'lodash.debounce';
 import clientRequest from "../../services/clientRequest";
 
@@ -70,10 +71,20 @@ const ingestDialogStyle = {
 }
 
 function Ingest(props) {
+  const [flexRatios, setFlexRatios] = useState(defaultFlexRations);
+  const [ingestDirs, setIngestDirs] = useState("");
+  const [ingestFiles, setIngestFiles] = useState([]);
+  const [ingestRules, setIngestRules] = useState([{}]);
+  const [ingestAssets, setIngestAssets] = useState([]);
+  const [connections, setConnections] = useState({});
+  const [loading, setLoading] = useState(false);
+  const updateXarrow = useXarrow();
+  const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
+
   const RULETEMPLATE = {
     file_target: "*",
     file_target_type: "filename",
-    task: props.task,
+    task: currentContext.path,
     name: "",
     comp: "",
     rule: "",
@@ -81,22 +92,13 @@ function Ingest(props) {
     replace_value: ""
   }
 
-  const [flexRatios, setFlexRatios] = useState(defaultFlexRations);
-  const [ingestDirs, setIngestDirs] = useState("");
-  const [ingestFiles, setIngestFiles] = useState([]);
-  const [ingestRules, setIngestRules] = useState([{...RULETEMPLATE, colour: getRandomColour()}]);
-  const [ingestAssets, setIngestAssets] = useState([]);
-  const [connections, setConnections] = useState({});
-  const [loading, setLoading] = useState(false);
-  const updateXarrow = useXarrow();
-
   useEffect(() => {
     if (!props.open) return;
     
     setIngestDirs("");
     setIngestRules([{...RULETEMPLATE, colour: getRandomColour()}]);
     setIngestAssets([]);
-  }, [])
+  }, [props.open])
 
   useEffect(() => {
     const data = loadReflexLayout();
@@ -165,7 +167,7 @@ function Ingest(props) {
     setLoading(true);
     switch (action) {
       case "add":
-        const rule = {...RULETEMPLATE, colour: getRandomColour()}
+        const rule = {...RULETEMPLATE, colour: getRandomColour()};
         setIngestRules(prevState => [...prevState, rule]);
         break
       case "remove":
@@ -195,6 +197,7 @@ function Ingest(props) {
   }
 
   function handleCreate() {
+    setLoading(true);
     const data = {
       dirs: ingestDirs,
       rules: ingestRules,
@@ -206,8 +209,9 @@ function Ingest(props) {
       } else {
         props.enqueueSnackbar("Ingest failed.", {variant: "error"});
       }
-      props.refresh();
-      // props.onClose();
+      setLoading(false);
+      refreshContext();
+      props.onClose();
     });
   }
 

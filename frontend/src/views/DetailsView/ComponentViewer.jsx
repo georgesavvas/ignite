@@ -15,7 +15,7 @@ import { clamp } from "../../utils/math";
 const style = {
   // border: "solid red 1px",
   // aspectRatio: 16 / 9,
-  backgroundColor: "rgb(0,0,0)",
+  backgroundColor: "rgb(30,30,30)",
   position: "relative",
   height: "100%",
   width: "100%",
@@ -45,7 +45,6 @@ function Scene({path}) {
   path = path || "media/no_icon.png";
   const loader = path.includes(".exr") ? EXRLoader : TextureLoader
   const colorMap = useLoader(loader, path);
-  // console.log(colorMap);
   return(
     <mesh>
       <planeGeometry attach="geometry" args={[1.77, 1]} />
@@ -95,7 +94,7 @@ function EXRViewer(props) {
       <Canvas orthographic camera={{ zoom: 100, position: [0, 0, 1] }}>
         <OrbitControls enableRotate={false} enableDamping={false} zoomSpeed={3} mouseButtons=
         {mouseButtons} />
-        <ambientLight intensity={0.5} />
+        <ambientLight intensity={0.75} />
         <Suspense fallback={null}>
           <Scene path={path} />
         </Suspense>
@@ -105,6 +104,7 @@ function EXRViewer(props) {
 }
 
 function VideoViewer(props) {
+  console.log(props)
   return (
     // <TransformWrapper limitToBounds={false}>
     //   <TransformComponent>
@@ -139,7 +139,7 @@ function ComponentViewer(props) {
   
   const comp = props.comp;
   let path = "media/no_icon.png";
-  if (comp.path) path = BuildFileURL(comp.api_path, config, {forceRemote: true});
+  if (comp.path_nr) path = BuildFileURL(comp.path_nr, config, {forceRemote: true});
   if (!comp.static) {
     let frame = comp.first_frame + (comp.last_frame - comp.first_frame) * progress;
     frame = Math.round(frame);

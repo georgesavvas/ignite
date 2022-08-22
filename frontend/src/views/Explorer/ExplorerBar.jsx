@@ -96,12 +96,11 @@ function ExplorerBar(props) {
       />
       <div style={style}>
         <Modal open={newSceneOpen} onClose={() => setNewSceneOpen(false)} maxWidth="xs">
-          <DccSelector task={currentContext.path} newScene={true}
+          <DccSelector newScene={true}
             onClose={() => setNewSceneOpen(false)}
           />
         </Modal>
         <Ingest open={ingestOpen} onClose={() => setIngestOpen(false)}
-          refresh={props.onRefresh} task={currentContext.path}
           enqueueSnackbar={props.enqueueSnackbar}
         />
         <Stack direction="row" spacing={1} >
@@ -144,7 +143,7 @@ function ExplorerBar(props) {
           <SortIcon />
         </IconButton>
         <FormControlLabel control={<Checkbox defaultChecked onChange={props.onLatestChange} />} label="Latest" />
-        <Button variant="outlined" onClick={props.onRefresh}>Refresh</Button>
+        <Button variant="outlined" onClick={refreshContext}>Refresh</Button>
       </div>
       <div style={{...style, padding: "0 10px 10px 10px"}}>
         <Button

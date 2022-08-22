@@ -49,7 +49,6 @@ const defaultExplorerSettings = {
 
 function Explorer() {
   const [config, setConfig] = useContext(ConfigContext);
-  const [refreshValue, setRefreshValue] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [loadedData, setLoadedData] = useState([]);
   const [pages, setPages] = useState({total: 1, current: 1});
@@ -102,7 +101,7 @@ function Explorer() {
       setLoadedData(resp.data);
       setPages((prevPages) => ({...prevPages, total: resp.pages.total}));
     });
-  }, [pages.current, explorerSettings.currentResultType, explorerSettings.tilesPerPage, refreshValue, currentContext, config.access, query]);
+  }, [pages.current, explorerSettings.currentResultType, explorerSettings.tilesPerPage, currentContext, config.access, query]);
 
   // useEffect(() => {
   //   if (!selectedEntity) return;
@@ -139,10 +138,6 @@ function Explorer() {
     }, {});
     setTiles(_tiles);
   }, [loadedData, selectedEntity.path, explorerSettings.currentViewType, explorerSettings.currentTileSize])
-
-  const forceUpdate = () => {
-    setRefreshValue((prevRefresh) => (prevRefresh + 1))
-  }
 
   const handlePageChange = (e, value) => {
     setPages((prevPages) => ({...prevPages, current: value}));
@@ -289,7 +284,6 @@ function Explorer() {
         setContextMenu={setContextMenu}
       />
       <ExplorerBar
-        onRefresh={forceUpdate}
         onFilterChange={handleFilterChange}
         resultType={explorerSettings.currentResultType}
         onResultTypeChange={handleResultTypeChange}

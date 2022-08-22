@@ -44,6 +44,7 @@ IGNITE_SERVER_ADDRESS = CONFIG["server_details"]["address"]
 IGNITE_SERVER_PASSWORD = CONFIG["server_details"]["password"]
 ENV["IGNITE_SERVER_ADDRESS"] = IGNITE_SERVER_ADDRESS
 ENV["IGNITE_SERVER_PASSWORD"] = IGNITE_SERVER_PASSWORD
+IGNITE_CLIENT_ADDRESS = ENV["IGNITE_CLIENT_ADDRESS"]
 ROOT = PurePath(CONFIG["projects_root"])
 
 
@@ -97,7 +98,8 @@ def replace_vars(d):
 
 def get_generic_env():
     env = {
-        "IGNITE_SERVER_ADDRESS": IGNITE_SERVER_ADDRESS
+        "IGNITE_SERVER_ADDRESS": IGNITE_SERVER_ADDRESS,
+        "IGNITE_CLIENT_ADDRESS": IGNITE_CLIENT_ADDRESS
     }
     env.update(replace_vars(GENERIC_ENV))
     return env
@@ -328,7 +330,7 @@ def server_request(method, data=None):
 def get_action_files():
     path = COMMON / "actions"
     files = {}
-    for entity in ("scenes", "assets", "assetversions", "components"):
+    for entity in ("scene", "asset", "assetversion", "component"):
         entity_path = path / entity
         if not entity_path.exists():
             continue

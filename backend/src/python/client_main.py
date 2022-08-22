@@ -12,6 +12,7 @@ from fastapi.staticfiles import StaticFiles
 from ignite_client import utils, api
 
 
+ENV = os.environ
 CONFIG = utils.get_config()
 
 
@@ -187,11 +188,12 @@ async def discover_dcc():
 async def run_action(request: Request):
     result = await request.json()
     log_request(result)
+    kind = result.get("kind")
     entity = result.get("entity")
     action = result.get("action")
     if not entity or not action:
         return {"ok": False}
-    api.run_action(entity, action)
+    api.run_action(entity, kind, action)
     return {"ok": True}
 
 
@@ -210,6 +212,9 @@ if __name__ == "__main__":
     args = sys.argv
     if len(args) >= 2:
         port = int(args[1])
+    IGNITE_CLIENT_ADDRESS = f"{host}:{port}"
+    logging.info(f"Setting IGNITE_CLIENT_ADDRESS to {IGNITE_CLIENT_ADDRESS}")
+    ENV["IGNITE_CLIENT_ADDRESS"] = IGNITE_CLIENT_ADDRESS
     logging.info(f"Launching server at {host}:{port}")
     uvicorn.run(
         f"{__name__}:app",
