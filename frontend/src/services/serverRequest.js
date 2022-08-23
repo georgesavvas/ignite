@@ -2,9 +2,9 @@ import { createSocket, socketRequest } from "./clientWebSocket";
 
 async function serverRequest(method, data=undefined) {
   const address = await window.services.get_env("IGNITE_SERVER_ADDRESS");
-  const WS = await createSocket();
+  // const WS = await createSocket();
   console.log("Server request:", address, method, data);
-  console.log(WS);
+  // console.log(WS);
   if (!address) {
     console.log("Invalid server address, aborting...");
     return;

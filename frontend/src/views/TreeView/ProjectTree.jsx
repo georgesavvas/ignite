@@ -17,12 +17,12 @@ export default function ProjectTree() {
   const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
 
   useEffect(() => {
+    if (!config.access) return;
+    if (!Object.entries(config.access).length) return;
     const data = {
       project: currentContext.project
     };
     setIsLoading(true);
-    if (!config.access) return;
-    if (!Object.entries(config.access).length) return;
     serverRequest("get_project_tree", data).then((resp) => {
       setIsLoading(false);
       setLoadedData(resp.data);
