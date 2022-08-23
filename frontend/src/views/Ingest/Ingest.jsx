@@ -123,12 +123,14 @@ function Ingest(props) {
   }, [])
 
   useEffect(() => {
+    if (!props.open) return;
     setLoading(true);
     getFiles();
     getOutput();
   }, [ingestDirs])
 
   useEffect(() => {
+    if (!props.open) return;
     getOutput();
   }, [ingestRules])
 

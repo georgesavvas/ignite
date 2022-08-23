@@ -47,9 +47,9 @@
     "copy-dcc-linux": "cp ../backend/dist/Ignite* build",
     "copy-common-win": "xcopy ..\\backend\\dist\\Ignite* build /Y",
     "copy-common-linux": "cp ../backend/dist/Ignite* build",
-    "package-win": "npm run build && npm run copy-backend-win && electron-packager . --overwrite --icon=public/media/desktop_icon/win/ignite.ico --prune=true --out=dist --version-string.CompanyName=GeorgeSavvas --version-string.FileDescription=IgniteClientDescription --version-string.ProductName=\"Ignite VFX Pipeline\"",
-    "package-mac": "npm run build && electron-packager . --overwrite --icon=public/media/desktop_icon/mac/ignite.icns --prune=true --out=dist && npm run copy-backend-linux",
-    "package-linux": "npm run build && electron-packager . --overwrite --icon=public/media/desktop_icon/win/ignite.png --prune=true --asar=true --out=dist && npm run copy-backend-linux"
+    "package-win": "npm run build && npm run copy-backend-win && electron-packager . --overwrite --icon=public/media/desktop_icon/win/icon.ico --prune=true --out=dist --version-string.CompanyName=GeorgeSavvas --version-string.FileDescription=IgniteClientDescription --version-string.ProductName=\"Ignite VFX Pipeline\"",
+    "package-mac": "npm run build && electron-packager . --overwrite --icon=public/media/desktop_icon/mac/icon.icns --prune=true --out=dist && npm run copy-backend-linux",
+    "package-linux": "npm run build && electron-packager . --overwrite --icon=public/media/desktop_icon/win/icon.png --prune=true --asar=true --out=dist && npm run copy-backend-linux"
   },
   "eslintConfig": {
     "extends": [
