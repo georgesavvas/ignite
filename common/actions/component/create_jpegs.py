@@ -12,5 +12,6 @@ def main(entity):
     from ignite_server.media import convert_img
     
     input = PurePath(entity["path"])
-    output = input.with_suffix(".jpg")
+    name = input.name.replace("_acescg", "")
+    output = input.with_name(name).with_suffix(".jpg")
     convert_img(str(input), str(output))

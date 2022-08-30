@@ -6,13 +6,36 @@ const { spawn } = require("child_process");
 const getPort = require("get-port");
 const axios = require("axios");
 require("v8-compile-cache");
+const uuid4 = require("uuid4");
+const osu = require('node-os-utils')
+const XMLParser = require('./xml2json');
 
+const sessionID = uuid4();
+process.env.IGNITE_SESSION_ID = sessionID;
 let platformName = process.platform;
 let appQuitting = false;
 let tray = null;
 let window = null;
 let backend = null;
 const isDev = process.env.NODE_ENV === "dev";
+
+const cpu = osu.cpu;
+const mem = osu.mem;
+const getResourceUsage = async () => {
+  const cpu_data = await cpu.usage();
+  const mem_data = await mem.info();
+  let gpu;
+  smi((err, data) => {
+    if (!err) gpu = data;
+    else console.log(err);
+  });
+  const usage = {
+    cpu: cpu_data,
+    mem: mem_data.usedMemPercentage,
+    gpu: gpu
+  }
+  return usage;
+}
 
 async function clientRequest(port, method, data=undefined) {
   console.log(`http://localhost:${port}/api/v1/${method}`);
@@ -146,6 +169,11 @@ function createWindow (port) {
   ipcMain.handle("get_port", () => {
     return port;
   });
+
+  setInterval(async () => {
+    const data = await getResourceUsage();
+    win.webContents.send("resource_usage", data);
+  }, 2000);
 
   return win;
 }

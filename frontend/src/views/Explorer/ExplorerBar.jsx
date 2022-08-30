@@ -96,7 +96,7 @@ function ExplorerBar(props) {
       />
       <div style={style}>
         <Modal open={newSceneOpen} onClose={() => setNewSceneOpen(false)} maxWidth="xs">
-          <DccSelector newScene={true}
+          <DccSelector newScene={true} task={currentContext.path}
             onClose={() => setNewSceneOpen(false)}
           />
         </Modal>

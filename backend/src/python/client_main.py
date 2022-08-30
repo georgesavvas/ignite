@@ -221,5 +221,6 @@ if __name__ == "__main__":
         host=host,
         port=port,
         log_level="info",
-        reload=True
+        reload=True,
+        workers=2
     )

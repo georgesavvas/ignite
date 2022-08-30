@@ -1,5 +1,5 @@
 import ProjectTree from '../views/TreeView/ProjectTree';
-import TopBar from "../views/TopBar";
+import TopBar from "../views/TopBar/TopBar";
 import styles from "./Home.module.css";
 import Explorer from "../views/Explorer/Explorer";
 import Divider from '@mui/material/Divider';

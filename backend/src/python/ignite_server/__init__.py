@@ -10,6 +10,14 @@ logging.basicConfig(level=logging.DEBUG)
 DIR = os.path.dirname(__file__)
 ENV = os.environ
 
+OS_NAME = platform.system()
+if OS_NAME == "Windows":
+    OS_NAME = "win"
+elif OS_NAME == "Darwin":
+    OS_NAME = "darwin"
+else:
+    OS_NAME = "linux"
+
 api_v = "v1"
 logging.info(f"Setting IGNITE_API_VERSION to {api_v}")
 ENV["IGNITE_API_VERSION"] = api_v
@@ -63,15 +71,10 @@ ocio = dcc / "ocio/aces_1.2/config.ocio"
 logging.info(f"Setting OCIO to {ocio}")
 ENV["OCIO"] = str(ocio)
 
-os_name = platform.system()
-if os_name == "Windows":
-    os_name = "win"
-elif os_name == "Darwin":
-    os_name = "darwin"
-else:
-    os_name = "linux"
-tools = Path(DIR).parent.parent.parent / "tools"
-path = tools / os_name
-if path.is_dir():
-    s = ";".join([str(x) for x in path.iterdir() if x.is_dir()])
-    ENV["PATH"] = s + ";" + str(path) + ";" + ENV.get("PATH", "")
+tools = ignite_root / "tools" / OS_NAME
+logging.info(f"Setting IGNITE_TOOLS to {tools}")
+ENV["IGNITE_TOOLS"] = str(tools)
+
+if tools.is_dir():
+    s = ";".join([str(x) for x in tools.iterdir() if x.is_dir()])
+    ENV["PATH"] = s + ";" + str(tools) + ";" + ENV.get("PATH", "")

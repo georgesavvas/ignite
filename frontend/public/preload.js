@@ -19,7 +19,11 @@ contextBridge.exposeInMainWorld("api", {
 })
 
 contextBridge.exposeInMainWorld("services", {
-  client_progress: (callback) => ipcRenderer.on("client_progress", callback),
+  client_progress: callback => ipcRenderer.on("client_progress", callback),
+  onResourceUsage: callback => {
+    ipcRenderer.removeAllListeners("resource_usage");
+    ipcRenderer.on('resource_usage', callback);
+  },
   get_env: env_name => {
     return ipcRenderer.invoke("get_env", env_name);
   },

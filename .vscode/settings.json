@@ -9,6 +9,7 @@
         "DCCINFO",
         "DIRCONTEXTOPTIONS",
         "DIRECTORYICONS",
+        "hypercorn",
         "KINDTYPES",
         "platformdirs",
         "PLUGINPATH",
@@ -16,6 +17,8 @@
         "repr",
         "RULETEMPLATE",
         "valtio",
+        "vmem",
+        "VRAM",
         "Xarrow",
         "Xwrapper"
     ],

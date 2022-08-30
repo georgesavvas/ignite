@@ -50,11 +50,17 @@ class AssetVersion(Directory):
         comps = []
         collections, remainder = clique.assemble([str(d) for d in path.iterdir()])
         for c in collections:
+            if c.head.split("/")[-1].startswith("."):
+                continue
+            if ".temp." in c.head:
+                continue
             comp = Component(c)
             comps.append(comp.as_dict())
         for r in remainder:
             r2 = PurePath(r)
             if r2.name.split("/")[-1].startswith("."):
+                continue
+            if ".temp." in r2.name:
                 continue
             comp = Component(r2)
             comps.append(comp.as_dict())
