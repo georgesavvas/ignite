@@ -13,8 +13,10 @@ def main(entity):
     
     input = PurePath(entity["path"])
     if input.suffix in [".exr"]:
-        output = input.with_suffix(".jpg")
+        name = input.name.replace("_acescg", "")
+        output = input.with_name(name).with_suffix(".jpg")
         convert_img(str(input), str(output))
         input = output
-    output = input.with_name("viewable.mp4")
+    stem = input.stem.split(".#")[0]
+    output = input.with_stem(stem).with_suffix(".mp4")
     encode(str(input), str(output))

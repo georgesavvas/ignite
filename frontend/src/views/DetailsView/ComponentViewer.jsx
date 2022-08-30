@@ -43,8 +43,12 @@ const sliderContainerStyle = {
 
 function Scene({path}) {
   path = path || "media/no_icon.png";
-  const loader = path.includes(".exr") ? EXRLoader : TextureLoader
+  const isExr = path.includes(".exr");
+  const loader = isExr ? EXRLoader : TextureLoader
   const colorMap = useLoader(loader, path);
+  if (isExr) {
+    colorMap.encoding = THREE.sRGBEncoding;
+  };
   return(
     <mesh>
       <planeGeometry attach="geometry" args={[1.77, 1]} />
@@ -79,7 +83,7 @@ function EXRViewer(props) {
 
   return (
     <div style={{position: "relative", height: "100%", width: "100%"}}>
-      <div style={sliderContainerStyle}>
+      <div style={{...sliderContainerStyle, display: comp.static ? "none" : "inherit"}}>
         <Slider
           defaultValue={comp.first}
           valueLabelDisplay="auto"
@@ -104,15 +108,10 @@ function EXRViewer(props) {
 }
 
 function VideoViewer(props) {
-  console.log(props)
   return (
-    // <TransformWrapper limitToBounds={false}>
-    //   <TransformComponent>
-        <video width="100%" height="100%" controls>
-          <source src={props.path} type="video/mp4" />
-        </video>
-    //   </TransformComponent>
-    // </TransformWrapper>
+    <video key={Math.random()} width="100%" height="100%" style={{overflow: "hidden"}} loop controls>
+      <source src={props.path} type="video/mp4" />
+    </video>
   )
 }
 

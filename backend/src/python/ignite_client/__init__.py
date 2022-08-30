@@ -1,6 +1,7 @@
 import os
 import logging
 import yaml
+import platform
 from pathlib import Path
 from platformdirs import user_config_dir
 
@@ -10,6 +11,14 @@ logging.basicConfig(level=logging.DEBUG)
 
 DIR = os.path.dirname(__file__)
 ENV = os.environ
+
+OS_NAME = platform.system()
+if OS_NAME == "Windows":
+    OS_NAME = "win"
+elif OS_NAME == "Darwin":
+    OS_NAME = "darwin"
+else:
+    OS_NAME = "linux"
 
 api_v = "v1"
 logging.info(f"Setting IGNITE_API_VERSION to {api_v}")
@@ -70,6 +79,10 @@ ENV["IGNITE_COMMON"] = str(common)
 dcc = ignite_root / "dcc"
 logging.info(f"Setting IGNITE_DCC to {dcc}")
 ENV["IGNITE_DCC"] = str(dcc)
+
+tools = ignite_root / "tools" / OS_NAME
+logging.info(f"Setting IGNITE_TOOLS to {tools}")
+ENV["IGNITE_TOOLS"] = str(tools)
 
 ocio = dcc / "ocio/aces_1.2/config.ocio"
 logging.info(f"Setting OCIO to {ocio}")

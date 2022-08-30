@@ -7,16 +7,20 @@ from pathlib import Path
 import uvicorn
 from pprint import pprint
 from pathlib import PurePath
-from fastapi import FastAPI, Request, WebSocket
+from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
 from fastapi.responses import PlainTextResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from ignite_server import utils
+from ignite_server.socket_manager import SocketManager
 
 CONFIG = utils.get_config()
 SERVER_HOST, SERVER_PORT = CONFIG["server_address"].split(":")
 ROOT = PurePath(CONFIG["projects_root"])
 ENV = os.environ
+
+ASSET_UPDATES_MANAGER = SocketManager()
+PROCESSES_MANAGER = SocketManager()
 
 from ignite_server import api
 
@@ -474,21 +478,30 @@ async def rename_entity(request: Request):
     sys.exit()
 
 
-@app.websocket("/ws/main")
-async def websocket_endpoint(websocket: WebSocket):
-    print("---------------", "Opening websocket...")
-    await websocket.accept()
+@app.websocket("/ws/asset_updates/{session_id}")
+async def asset_updates(websocket: WebSocket, session_id: str):
+    if session_id:
+        await ASSET_UPDATES_MANAGER.connect(websocket, session_id)
     while True:
         try:
-            # Wait for any message from the client
-            await websocket.receive_text()
-            # Send message to the client
-            resp = {"value": 6}
-            await websocket.send_json(resp)
+            received = await websocket.receive_json()
+            logging.info(f"Websocket asset_updates received {received}")
         except Exception as e:
             print("error:", e)
             break
-    print("Closing websocket.")
+
+
+@app.websocket("/ws/processes/{session_id}")
+async def processes(websocket: WebSocket, session_id: str):
+    if session_id:
+        await PROCESSES_MANAGER.connect(websocket, session_id)
+    while True:
+        try:
+            received = await websocket.receive_text()
+            logging.info(f"Websocket processes received {received}")
+        except Exception as e:
+            print("error:", e)
+            break
 
 
 mount_root()
@@ -496,4 +509,4 @@ mount_root()
 
 if __name__ == "__main__":
     logging.info(f"Launching server at {SERVER_HOST}:{SERVER_PORT}")
-    uvicorn.run(f"{__name__}:app", host=SERVER_HOST, port=int(SERVER_PORT), log_level="info", reload=True)
+    uvicorn.run(f"{__name__}:app", host=SERVER_HOST, port=int(SERVER_PORT), log_level="info", reload=True, workers=4)

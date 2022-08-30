@@ -30,7 +30,7 @@ def setup(kwargs, context):
         lopnet = objecttoolutils.genericTool(kwargs, "lopnet", "lopnet")
         kwargs["loader"] = lopnet.createNode(kwargs["hda_name"], "StageLoader")
 
-    if ENV.get("PHASE", "") == "build":
+    if ENV.get("BUILD"):
         create_asset_layout(kwargs)
     elif ENV.get("SHOT") == "0000":
         create_sequence_layout(kwargs)

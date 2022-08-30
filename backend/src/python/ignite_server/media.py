@@ -23,7 +23,8 @@ def convert_img(input, output):
 
     tool = TOOLS.get("oiiotool").get(os_name)
     cmd = f"{tool} --frames {range} --framepadding {padding} {input} "
-    cmd += f"--colorconvert \"ACES - ACEScg\" \"Output - sRGB\" -o {output}"
+    # cmd += f"--colorconvert \"ACES - ACEScg\" \"Output - sRGB\" -o {output}"
+    cmd += f"--autocc -o {output}"
     print(cmd)
     os.system(cmd)
     # exit_code = -1

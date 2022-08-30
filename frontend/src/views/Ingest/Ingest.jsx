@@ -138,14 +138,18 @@ function Ingest(props) {
     saveReflexLayout(data)
   }
 
-  const getFiles = () => getFilesDebounced(
+  const getFiles = () => {
+    setLoading(true);
+    getFilesDebounced(
       {"dirs": ingestDirs},
       resp => {
         setIngestFiles(resp.data.trimmed);
+        setLoading(false);
       }
-  )
+  )}
 
   const getOutput = () => {
+    setLoading(true);
     const data = {
       dirs: ingestDirs,
       rules: ingestRules,
@@ -161,16 +165,18 @@ function Ingest(props) {
   )}
 
   const handleDirsChange = e => {
-    const dirs =e.target.value;
+    const dirs = e.target.value;
     setIngestDirs(dirs);
   }
 
   const handleRulesChange = (e, action, index=-1, index2=-1) => {
-    setLoading(true);
+    // setLoading(true);
     switch (action) {
       case "add":
-        const rule = {...RULETEMPLATE, colour: getRandomColour()};
-        setIngestRules(prevState => [...prevState, rule]);
+        setIngestRules(prevState => {
+          const rule = {...RULETEMPLATE, colour: getRandomColour()};
+          return [...prevState, rule]
+        });
         break
       case "remove":
         setIngestRules(prevState => {
@@ -192,6 +198,14 @@ function Ingest(props) {
         setIngestRules(prevState => {
           const rules = [...prevState];
           [rules[index], rules[index2]] = [rules[index2], rules[index]]
+          return rules;
+        })
+        break
+      case "move":
+        setIngestRules(prevState => {
+          const rules = [...prevState];
+          const ruleToMove = rules.splice(index, 1)[0];
+          rules.splice(index2, 0, ruleToMove);
           return rules;
         })
         break
@@ -245,7 +259,7 @@ function Ingest(props) {
               </ReflexElement>
               <ReflexSplitter style={splitterStyle} onResize={updateXarrow} />
               <ReflexElement flex={flexRatios["ingest.rules"]} name="ingest.rules" onStopResize={handleResize}>
-                <Rules rules={ingestRules} onRulesChange={handleRulesChange} setLoading={setLoading} />
+                <Rules rules={ingestRules} onRulesChange={handleRulesChange} setRules={setIngestRules} setLoading={setLoading} />
               </ReflexElement>
               <ReflexSplitter style={splitterStyle} onResize={updateXarrow} />
               <ReflexElement flex={flexRatios["ingest.output"]} name="ingest.output" onStopResize={handleResize}>

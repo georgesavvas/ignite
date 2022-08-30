@@ -514,6 +514,11 @@ def register_asset(path):
 
 
 def register_assetversion(path):
+    asset_path = PurePath(path).parent
+    asset = find(asset_path)
+    if not asset:
+        logging.warning(f"Asset anchor was missing (but created) when registering assetversion {path}")
+        utils.create_anchor(asset_path, "asset")
     utils.create_anchor(path, "assetversion")
     av = find(path)
     if not av or not av.dir_kind == "assetversion":

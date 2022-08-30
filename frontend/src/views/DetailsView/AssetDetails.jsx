@@ -43,6 +43,17 @@ const rowStyle = {
   marginTop: "5px"
 }
 
+const compExtensionPreviewPriority = [
+  ".mp4",
+  ".mov",
+  ".jpg",
+  ".jpeg",
+  ".png",
+  ".tif",
+  ".tiff",
+  ".exr"
+]
+
 function AssetDetails(props) {
   const [flexRatios, setFlexRatios] = useState(defaultFlexRations);
   const [selectedCompName, setSelectedCompName] = useState("");
@@ -71,7 +82,20 @@ function AssetDetails(props) {
       "asset.comps": comps[1] / fullWidth
     };
     setFlexRatios(ratios);
-  }, [])
+  }, []);
+
+  useEffect(() => {
+    if (!props.entity.components) {
+      setSelectedCompName("");
+      return;
+    }
+    props.entity.components.forEach(comp => {
+      if (compExtensionPreviewPriority.includes(comp.ext)) {
+        setSelectedCompName(comp.filename);
+        return;
+      }
+    })
+  }, [props.entity]);
 
   const handleResized = data => {
     saveReflexLayout(data)
