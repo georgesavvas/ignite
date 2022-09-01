@@ -7,7 +7,7 @@ from pathlib import Path
 import uvicorn
 from pprint import pprint
 from pathlib import PurePath
-from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, Request, WebSocket
 from fastapi.responses import PlainTextResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -20,7 +20,6 @@ ROOT = PurePath(CONFIG["projects_root"])
 ENV = os.environ
 
 ASSET_UPDATES_MANAGER = SocketManager()
-PROCESSES_MANAGER = SocketManager()
 
 from ignite_server import api
 
@@ -486,19 +485,6 @@ async def asset_updates(websocket: WebSocket, session_id: str):
         try:
             received = await websocket.receive_json()
             logging.info(f"Websocket asset_updates received {received}")
-        except Exception as e:
-            print("error:", e)
-            break
-
-
-@app.websocket("/ws/processes/{session_id}")
-async def processes(websocket: WebSocket, session_id: str):
-    if session_id:
-        await PROCESSES_MANAGER.connect(websocket, session_id)
-    while True:
-        try:
-            received = await websocket.receive_text()
-            logging.info(f"Websocket processes received {received}")
         except Exception as e:
             print("error:", e)
             break

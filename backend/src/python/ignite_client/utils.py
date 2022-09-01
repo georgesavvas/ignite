@@ -350,11 +350,13 @@ def discover_actions():
             module = importlib.machinery.SourceFileLoader(
                 file.name, str(file)
             ).load_module()
+            task = HUEY.task()(module.main)
             entity_action = {
                 "label": module.LABEL,
                 "source": file,
                 "exts": module.EXTENSIONS,
-                "fn": module.main #HUEY.task()(module.main)
+                "fn": task# module.main
             }
+            HUEY.unregister_post_execute(module.main)
             actions[entity].append(entity_action)
     return actions

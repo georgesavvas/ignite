@@ -1,3 +1,4 @@
 title "IGNITE WORKER"
-%0\..\..\..\..\env\Scripts\activate && python %0\..\..\..\python\huey_consumer ignite_client.huey.HUEY -S
+cd %0\..\..\..\python
+..\..\env\Scripts\activate && huey_consumer ignite_client.huey.HUEY -S
 PAUSE

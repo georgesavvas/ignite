@@ -1,3 +1,4 @@
+ECHO OFF
 cd backend
 start src\bin\win\server.bat
 start src\bin\win\client.bat

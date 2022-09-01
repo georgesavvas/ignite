@@ -8,11 +8,10 @@ const ResourceBox = props => {
   };
   return (
     <div className={styles.resourceBoxContainer}>
-      <Typography variant="caption" className={styles.type}>{props.label}</Typography>
-      {/* <div className={styles.resourceBoxValue}> */}
-        <Typography variant="caption" className={styles.type}>{props.value}%</Typography>
-      {/* </div> */}
-      <div className={styles.resourceBoxBackground} style={style}></div>
+      <Typography variant="caption" className={styles.type}>{props.label}:</Typography>
+      <Typography variant="caption" className={styles.type}>{Math.round(props.value)}%</Typography>
+      <div className={styles.resourceBoxBackground} style={style} />
+      <div className={styles.resourceBoxBackgroundFilled} />
     </div>
   )
 };
@@ -22,18 +21,13 @@ export default function SystemResources() {
 
   window.services.onResourceUsage((_event, data) => {
     setUsageData(data);
-    console.log(data);
   })
 
   return (
     <div className={styles.container}>
       <ResourceBox label="CPU" value={usageData.cpu} />
-      <Divider orientation="vertical" />
-      <ResourceBox label="GPU" value={usageData.gpu} />
-      <Divider orientation="vertical" />
+      {/* <Divider orientation="vertical" /> */}
       <ResourceBox label="RAM" value={usageData.mem} />
-      <Divider orientation="vertical" />
-      <ResourceBox label="VRAM" value={usageData.vram} />
     </div>
   )
 }

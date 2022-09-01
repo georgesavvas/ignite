@@ -8,7 +8,6 @@ const axios = require("axios");
 require("v8-compile-cache");
 const uuid4 = require("uuid4");
 const osu = require('node-os-utils')
-const XMLParser = require('./xml2json');
 
 const sessionID = uuid4();
 process.env.IGNITE_SESSION_ID = sessionID;
@@ -24,15 +23,9 @@ const mem = osu.mem;
 const getResourceUsage = async () => {
   const cpu_data = await cpu.usage();
   const mem_data = await mem.info();
-  let gpu;
-  smi((err, data) => {
-    if (!err) gpu = data;
-    else console.log(err);
-  });
   const usage = {
     cpu: cpu_data,
     mem: mem_data.usedMemPercentage,
-    gpu: gpu
   }
   return usage;
 }

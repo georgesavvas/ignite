@@ -6,16 +6,10 @@ import IconButton from '@mui/material/IconButton';
 import HelpIcon from '@mui/icons-material/Help';
 import BugReportIcon from '@mui/icons-material/BugReport';
 import ThumbsUpDownIcon from '@mui/icons-material/ThumbsUpDown';
-import Dialog from '@mui/material/Dialog';
-import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
 import SettingsIcon from '@mui/icons-material/Settings';
 import SettingsDialog from "../SettingsDialog.jsx";
 import ProjectBrowser from "../ProjectBrowser/ProjectBrowser";
-import { serverSocket } from "../../services/serverWebSocket";
-import { ConfigContext } from "../../contexts/ConfigContext";
 import Vault from "../Vault/Vault";
-import SystemResources from "./SystemResources";
 
 function FeedbackIcon() {
   const style = {
@@ -27,16 +21,6 @@ function FeedbackIcon() {
   return (
     <img src="media/feedback.png" style={style} />
   )
-}
-
-const createProcessesSocket = (config, sessionID) => {
-  return serverSocket("processes", config, sessionID);
-}
-
-const destroySocket = socket => {
-  if (!socket) return;
-  if (socket.interval) clearInterval(socket.interval);
-  socket.close();
 }
 
 const vaultDialogStyle = {
@@ -53,28 +37,13 @@ const vaultDialogStyle = {
 }
 
 export default function TopBar() {
-  const [config, setConfig] = useContext(ConfigContext);
   const [isLoading, setIsLoading] = useState(true);
   const [projects, setProjects] = useState([]);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [projectBrowserOpen, setProjectBrowserOpen] = useState(false);
   const [vaultOpen, setVaultOpen] = useState(false);
-  const [socket, setSocket] = useState();
 
-  useEffect(() => {
-    if (!config.serverDetails.address) return;
-    if (socket) return;
-    window.services.get_env("IGNITE_SESSION_ID").then(resp => {
-      const ws = createProcessesSocket(config, resp);
-      ws.onmessage = data => console.log("PROCESSES RECEIVED:", data);
-      // ws.interval = setInterval(() => ws.send("ping"), 2000);
-      setSocket(ws);
-    })
-    return (() => {
-      destroySocket(socket);
-      setSocket();
-    })
-  }, [config.serverDetails])
+  
 
   return (
     <>
@@ -95,9 +64,6 @@ export default function TopBar() {
             Project Browser
           </Button>
           <Button variant="outlined" color="ignite" onClick={() => setVaultOpen(true)}>Vault</Button>
-        </div>
-        <div className={styles.systemResourcesContainer}>
-          <SystemResources />
         </div>
         <div className={styles.logoContainer}>
           <img src="media/ignite_logo.png" className={styles.logo} />
