@@ -40,10 +40,13 @@ export const ConfigProvider = props => {
         IGNITE_SERVER_ADDRESS: savedServerDetails.address,
         IGNITE_SERVER_PASSWORD: savedServerDetails.password
       })
-      setConfig({
-        serverDetails: {...serverDetailsDefault, ...savedServerDetails},
-        access: {...accessDefault, ...savedAccess},
-        dccConfig: savedDccConfig
+      window.services.get_env("IGNITE_CLIENT_ADDRESS").then(resp => {
+        setConfig({
+          serverDetails: {...serverDetailsDefault, ...savedServerDetails},
+          access: {...accessDefault, ...savedAccess},
+          dccConfig: savedDccConfig,
+          clientAddress: resp
+        })
       })
     });
   }, [])

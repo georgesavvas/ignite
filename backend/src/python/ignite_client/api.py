@@ -7,6 +7,7 @@ from string import Formatter
 from fnmatch import fnmatch
 from pathlib import PurePath, Path
 from pprint import pprint
+import huey
 from ignite_client import utils
 
 
@@ -284,7 +285,7 @@ def get_actions():
     return actions
 
 
-@HUEY.task()
+# @HUEY.task()
 def run_action(entity, kind, action):
     actions = utils.discover_actions().get(kind)
     if not actions:
@@ -296,6 +297,7 @@ def run_action(entity, kind, action):
         if _action["label"] != action:
             continue
 
-        result = _action["fn"](entity)
-        pprint("Action result:", result)
+        task = _action["fn"].s(entity)
+        result = HUEY.enqueue(task)
+        print("Action result:", result)
         break

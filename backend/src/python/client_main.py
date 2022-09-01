@@ -5,15 +5,18 @@ from pprint import pprint
 from pathlib import Path
 import uvicorn
 import logging
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from ignite_server.socket_manager import SocketManager
 
 from ignite_client import utils, api
 
 
 ENV = os.environ
 CONFIG = utils.get_config()
+
+PROCESSES_MANAGER = SocketManager()
 
 
 app = FastAPI()
@@ -27,21 +30,17 @@ app.add_middleware(
 )
 
 
-# @app.websocket("/ws")
-# async def websocket_endpoint(websocket: WebSocket):
-#     print("Opening websocket...")
-#     await websocket.accept()
-#     while True:
-#         try:
-#             # Wait for any message from the client
-#             await websocket.receive_text()
-#             # Send message to the client
-#             resp = {"value": 6}
-#             await websocket.send_json(resp)
-#         except Exception as e:
-#             print("error:", e)
-#             break
-#     print("Closing websocket.")
+@app.websocket("/ws/processes/{session_id}")
+async def processes(websocket: WebSocket, session_id: str):
+    if session_id:
+        await PROCESSES_MANAGER.connect(websocket, session_id)
+    while True:
+        try:
+            received = await websocket.receive_text()
+            logging.info(f"Websocket processes received {received}")
+        except Exception as e:
+            print("error:", e)
+            break
 
 
 def log_request(request):

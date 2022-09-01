@@ -4,6 +4,7 @@ import styles from "./Home.module.css";
 import Explorer from "../views/Explorer/Explorer";
 import Divider from '@mui/material/Divider';
 import Details from '../views/DetailsView/Details';
+import TaskManager from "../views/TaskManager/TaskManager";
 import saveReflexLayout from "../utils/saveReflexLayout";
 import loadReflexLayout from "../utils/loadReflexLayout";
 import {
@@ -62,7 +63,15 @@ export default function Home() {
       <div className={styles.contents}>
         <ReflexContainer orientation="vertical">
           <ReflexElement flex={flexRatios["home.tree"]} name="home.tree" onStopResize={handleResized}>
-            <ProjectTree />
+            <ReflexContainer>
+              <ReflexElement flex={0.75}>
+                <ProjectTree />
+              </ReflexElement>
+              <ReflexSplitter style={splitterStyle} />
+              <ReflexElement flex={0.25}>
+                <TaskManager />
+              </ReflexElement>
+            </ReflexContainer>
           </ReflexElement>
           <ReflexSplitter style={splitterStyle} />
           <ReflexElement flex={flexRatios["home.explorer"]} name="home.explorer" onStopResize={handleResized}>
