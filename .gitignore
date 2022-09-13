@@ -1,5 +1,8 @@
 *.DS_Store
 
+*.secret*
+installer/
+
 common/server_config.yaml
 common/client_config.yaml
 common/ignite.db*
