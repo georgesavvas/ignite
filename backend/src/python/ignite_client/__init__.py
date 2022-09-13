@@ -3,7 +3,7 @@ import logging
 import yaml
 import platform
 from pathlib import Path
-from platformdirs import user_config_dir
+from platformdirs import user_config_dir, site_config_dir
 
 
 logging.basicConfig(level=logging.DEBUG)
