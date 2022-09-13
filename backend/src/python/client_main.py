@@ -8,15 +8,17 @@ import logging
 from fastapi import FastAPI, Request, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from ignite_server.socket_manager import SocketManager
 
+from ignite_server.socket_manager import SocketManager
 from ignite_client import utils, api
+from ignite_client.task_manager import TaskManager
 
 
 ENV = os.environ
 CONFIG = utils.get_config()
 
 PROCESSES_MANAGER = SocketManager()
+TASK_MANAGER = TaskManager()
 
 
 app = FastAPI()

@@ -1,7 +1,0 @@
-{
-  "dependencies": {
-    "@mui/x-data-grid": "^5.15.2",
-    "node-nvidia-smi": "^1.0.0",
-    "node-os-utils": "^1.3.7"
-  }
-}

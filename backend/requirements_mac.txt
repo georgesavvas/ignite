@@ -60,3 +60,4 @@ uvicorn==0.17.5
 wcwidth==0.2.5
 wrapt==1.13.3
 python-socketio-5.7.1
+colorthief
