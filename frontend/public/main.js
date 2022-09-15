@@ -10,6 +10,7 @@ const uuid4 = require("uuid4");
 const osu = require('node-os-utils')
 
 const sessionID = uuid4();
+const appPath = app.getAppPath();
 process.env.IGNITE_SESSION_ID = sessionID;
 let platformName = process.platform;
 let appQuitting = false;
@@ -51,26 +52,26 @@ const iconPaths = {
 }
 
 const serverPaths = {
-  "win32": "resources/app/build/IgniteServer.exe",
-  "darwin": "resources/app/build/IgniteServer",
-  "linux": "resources/app/build/IgniteServer"
+  "win32": "IgniteServer.exe",
+  "darwin": "IgniteServer",
+  "linux": "IgniteServer"
 }
 const serverPathDev = "../backend/src/python/server_main.py"
 const serverPath = path.join(
-  process.cwd(),
+  appPath,
   process.env.NODE_ENV === "dev" ?
     serverPathDev :
     serverPaths[platformName]
 )
 
 const clientPaths = {
-  "win32": "resources/app/build/IgniteClientBackend.exe",
-  "darwin": "resources/app/build/IgniteClientBackend",
-  "linux": "resources/app/build/IgniteClientBackend"
+  "win32": "IgniteClientBackend.exe",
+  "darwin": "IgniteClientBackend",
+  "linux": "IgniteClientBackend"
 }
 const clientPathDev = "../backend/src/python/client_main.py"
 const clientPath = path.join(
-  process.cwd(),
+  appPath,
   process.env.NODE_ENV === "dev" ?
     clientPathDev :
     clientPaths[platformName]
