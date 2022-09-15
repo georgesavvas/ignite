@@ -1,0 +1,17 @@
+*:
+  karma:
+    picture: ${EXPORTS}/${OS}/${VS}/main_acescg.$F4.exr
+    camera: /cameras/camMain
+  ifd:
+    vm_picture: ${EXPORTS}/${OS}/${VS}/main_acescg.$F4.exr
+    vm_tmpsharedstorage: $CACHE/ifds/storage/${VS}
+    camera: /obj/camMain
+  geometry:
+    sopoutput: ${EXPORTS}/${OS}/${VS}/main.$F4.bgeo.sc
+  comp:
+    copoutput: ${EXPORTS}/${OS}/${VS}/main_acescg.$F4.exr
+  opengl:
+    camera: ${EXPORTS}/${OS}/${VS}/main_acescg.$F4.exr
+    picture: ${EXPORTS}/${OS}/${VS}/main_acescg.$F4.exr
+  dop:
+    dopoutput: $CACHE/sim/${VS}/$OS.$SF.sim
