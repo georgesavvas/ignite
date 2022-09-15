@@ -202,8 +202,9 @@ function Explorer() {
     display: "grid",
     overflowY: "auto",
     gridTemplateColumns: `repeat(auto-fill, minmax(${explorerSettings.currentTileSize * 40}px, 1fr))`,
-    gridGap: "10px",
-    padding: "10px"
+    gridGap: "5px",
+    padding: "5px",
+    paddingTop: "0px"
   }
 
   if (explorerSettings.currentViewType === "row") {
@@ -259,7 +260,6 @@ function Explorer() {
   const itemData = {
     path: currentContext.path,
     kind: currentContext.dir_kind,
-    // name: labelText,
     handleClick: handleClick
   }
 

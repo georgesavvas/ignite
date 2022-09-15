@@ -86,7 +86,7 @@ function RowTile(props) {
 
   const tileStyle = {
     borderColor: props.selected ? "rgb(252, 140, 3)" : "rgb(50, 50, 50)",
-    // height: props.size * 0.5625,
+    height: `${props.size * 0.25}px`,
     flexDirection: "row"
   };
 
@@ -95,9 +95,11 @@ function RowTile(props) {
   }
 
   const thumbnailContainer = {
-    minWidth: props.size,
-    height: props.size * 0.5625,
-    maxWidth: props.size,
+    // minWidth: props.size * 0.25,
+    // height: props.size * 0.25 * 0.5625,
+    // maxWidth: props.size * 0.25,
+    height: "100%",
+    aspectRatio: 16 / 9,
     position: "relative",
     borderRight: "solid 1px rgb(40, 40, 40)"
   }

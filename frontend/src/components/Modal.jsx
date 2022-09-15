@@ -9,8 +9,6 @@ import Button from '@mui/material/Button';
 const dialogStyle = {
   "& .MuiDialog-container": {
     "& .MuiPaper-root": {
-      // width: "100%",
-      // maxWidth: "80vw",
       backgroundColor: "rgb(20,20,20)",
       backgroundImage: "none"
     },
