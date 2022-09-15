@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mainMenu>
+
+  <addScriptItem id="h.ignite_save">
+    <label>Save As Next Version (Ignite)</label>
+    <parent>file_menu</parent>
+    <insertBefore>h.save_as</insertBefore>
+    <scriptPath>C:\dev\ignite\cg\houdini\python\ign_save_next_version.py</scriptPath>
+  </addScriptItem>
+
+  <menuBar>
+    <subMenu id="ignite">
+      <label>Ignite</label>
+
+      <actionItem id="h.save">
+        <label>Save</label>
+      </actionItem>
+
+      <scriptItem id="h.ignite_save">
+        <label>Save As Next Version</label>
+      </scriptItem>
+
+      <separatorItem/>
+
+      <scriptItem id="h.ignite_comment">
+        <label>Set Scene Comment</label>
+      </scriptItem>
+
+      <scriptItem id="h.ignite_thumbnail">
+        <label>Set Scene Thumbnail</label>
+      </scriptItem>
+
+      <scriptItem id="h.ignite_preview">
+        <label>Set Scene Preview</label>
+      </scriptItem>
+    </subMenu>
+  </menuBar>
+
+</mainMenu>

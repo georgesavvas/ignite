@@ -1,0 +1,18 @@
+{
+    "Plugins": [
+        {
+            "Info": {
+                "Types": {
+                    "IgniteResolver": {
+                        "bases": ["ArResolver"],
+			"uriSchemes": ["ign"],
+                        "displayName": "Ignite Asset Resolver"
+                    }
+                }
+            },
+            "LibraryPath": "../IgniteResolver.dll",
+            "Name": "IgniteResolver",
+            "Type": "library"
+        }
+    ]
+}
