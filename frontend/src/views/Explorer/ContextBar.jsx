@@ -7,6 +7,7 @@ import { CopyToClipboard } from "../ContextActions";
 import { DIRECTORYICONS } from "../../constants";
 import ContextBarLink from './ContextBarLink';
 import IgnTextField from '../../components/IgnTextField';
+import IgnButton from "../../components/IgnButton";
 
 export default function ContextBar() {
   const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
@@ -60,7 +61,6 @@ export default function ContextBar() {
       {isTextField ?
         <IgnTextField
           id="outlined-basic"
-          size="small"
           fullWidth={true}
           placeholder="Location"
           variant="outlined"
