@@ -29,14 +29,8 @@ export default function ProjectTree() {
     });
   }, [currentContext, config.access, updateTreeView]);
 
-  var content = [];
-  if (!loadedData || !loadedData.children) {
-    content = <Skeleton
-        variant="rectangular"
-        animation="wave"
-        className={styles.skeleton}
-      />;
-  } else {
+  var content = null;
+  if (loadedData && loadedData.children) {
     // var filteredData = Object.assign({}, loadedData);;
     // var disabled = {};
     // filterData(filteredData, disabled);

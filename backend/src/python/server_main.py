@@ -35,6 +35,7 @@ app.add_middleware(
 
 
 def log_request(request):
+    print("Request data:")
     pprint(request)
 
 
@@ -48,6 +49,7 @@ def process_request(req):
 
 
 def error(s):
+    logging.error(s)
     return {"ok": False, "error": s}
 
 
@@ -80,6 +82,7 @@ async def get_context_info(request: Request):
     data = api.get_context_info(path)
     if not data:
         return error("entity_not_found")
+    print("Result:", data)
     return {"ok": True, "data": data}
 
 
@@ -166,6 +169,7 @@ async def get_contents(request: Request):
     data = utils.query_filter(data, query)
     limit = result.get("limit", 20)
     total = len(data)
+    print(f"{total} results")
     pages = int(math.ceil(total/limit))
     page = result.get("page", 1)
     start = (page - 1) * limit

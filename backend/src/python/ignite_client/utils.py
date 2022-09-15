@@ -32,16 +32,16 @@ def get_config() -> dict:
     path = CLIENT_CONFIG_PATH
     if not os.path.isfile(path):
         raise Exception(f"Config file not found: {path}")
-    logging.info(f"Reading config from {path}...")    
+    logging.info(f"Reading config from {path}")    
     with open(path, "r") as f:
         config = yaml.safe_load(f)
-    config["projects_root"] = config["access"]["projects_root"]
+    config["projects_root"] = config["access"].get("projects_root", "")
     return config
 
 
 CONFIG = get_config()
-IGNITE_SERVER_ADDRESS = CONFIG["server_details"]["address"]
-IGNITE_SERVER_PASSWORD = CONFIG["server_details"]["password"]
+IGNITE_SERVER_ADDRESS = CONFIG["server_details"].get("address", "")
+IGNITE_SERVER_PASSWORD = CONFIG["server_details"].get("password", "")
 ENV["IGNITE_SERVER_ADDRESS"] = IGNITE_SERVER_ADDRESS
 ENV["IGNITE_SERVER_PASSWORD"] = IGNITE_SERVER_PASSWORD
 ROOT = PurePath(CONFIG["projects_root"])
@@ -52,15 +52,13 @@ def set_config(data):
 
     config = get_config()
     old_config = deepcopy(config)
-    pprint(config)
     config.update(data)
-    pprint(config)
-    IGNITE_SERVER_ADDRESS = config["server_details"]["address"]
-    IGNITE_SERVER_PASSWORD = config["server_details"]["password"]
+    IGNITE_SERVER_ADDRESS = config["server_details"].get("address", "")
+    IGNITE_SERVER_PASSWORD = config["server_details"].get("password", "")
     ENV["IGNITE_SERVER_ADDRESS"] = IGNITE_SERVER_ADDRESS
     ENV["IGNITE_SERVER_PASSWORD"] = IGNITE_SERVER_PASSWORD
 
-    config["projects_root"] = config["access"]["projects_root"]
+    config["projects_root"] = config["access"].get("projects_root", "")
     server_root = server_request("get_projects_root")["data"]
     config["access"]["server_projects_root"] = server_root
     changed = old_config != config

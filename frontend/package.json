@@ -48,7 +48,7 @@
     "electron-dev": "npm run sanitize && concurrently \"cross-env BROWSER=none npm start\" \"wait-on http://localhost:3000 && cross-env NODE_ENV=dev electron .\"",
     "package": "npm run build && electron-builder",
     "deploy-win": "..\\.secret && electron-builder --publish always",
-    "deploy-linux": "source ../.secret && electron-builder --publish always"
+    "deploy-unix": "source ../.secret && electron-builder --publish always"
   },
   "eslintConfig": {
     "extends": [

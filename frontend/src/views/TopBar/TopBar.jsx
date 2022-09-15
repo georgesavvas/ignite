@@ -1,6 +1,6 @@
 import React, {useEffect, useState, useContext} from "react";
 import styles from "./TopBar.module.css";
-import Button from '@mui/material/Button';
+import IgnButton from "../../components/IgnButton";
 import ButtonGroup from '@mui/material/ButtonGroup';
 import IconButton from '@mui/material/IconButton';
 import HelpIcon from '@mui/icons-material/Help';
@@ -53,33 +53,32 @@ export default function TopBar() {
       <SettingsDialog open={settingsOpen} onClose={() => setSettingsOpen(false)} />
       <div className={styles.container}>
         <div className={styles.leftSide}>
-          <Button
+          <IgnButton
             variant="outlined"
             color="ignite"
-            size="small"
             style={{minWidth: "180px"}}
             onClick={() => setProjectBrowserOpen(true)}
           >
             Project Browser
-          </Button>
-          <Button variant="outlined" size="small" color="ignite" onClick={() => setVaultOpen(true)}>Vault</Button>
+          </IgnButton>
+          <IgnButton variant="outlined" color="ignite" onClick={() => setVaultOpen(true)}>Vault</IgnButton>
         </div>
         <div className={styles.logoContainer}>
           <img src="media/ignite_logo.png" className={styles.logo} />
         </div>
         <div className={styles.rightSide}>
-          <ButtonGroup variant="text" size="small">
-            <IconButton size="small">
+          <ButtonGroup variant="text" >
+            <IconButton>
               <HelpIcon />
             </IconButton>
-            <IconButton size="small">
+            <IconButton>
               <BugReportIcon />
             </IconButton>
-            <IconButton size="small">
+            <IconButton>
               <ThumbsUpDownIcon />
               {/* <FeedbackIcon /> */}
             </IconButton>
-            <IconButton size="small" style={{marginLeft: "10px"}} onClick={() => setSettingsOpen(true)}>
+            <IconButton style={{marginLeft: "10px"}} onClick={() => setSettingsOpen(true)}>
               <SettingsIcon />
             </IconButton>
           </ButtonGroup>
