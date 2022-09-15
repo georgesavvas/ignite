@@ -26,8 +26,12 @@ const Input = styled('input')({
 });
 
 export default function SettingsDialog(props) {
-  const [serverDetailsAddress, setServerDetailsAddress] = useState("");
+  const [serverAddress, setServerAddress] = useState("");
   const [config, setConfig] = useContext(ConfigContext);
+
+  useEffect(() => {
+    setServerAddress(config.serverDetails.address)
+  }, [config.serverDetails.address])
 
   const handleDccConfigChange = (e) => {
     const s = e.currentTarget.id.split("-");
@@ -170,8 +174,8 @@ export default function SettingsDialog(props) {
     });
   }
 
-  const handleServerDetailsAddressChange = e => {
-    setServerDetailsAddress(e.target.value);
+  const handleServerAddressChange = e => {
+    setServerAddress(e.target.value);
     setConfig("serverDetails", {address: e.target.value});
   }
 
@@ -189,8 +193,8 @@ export default function SettingsDialog(props) {
             label="Address"
             fullWidth
             variant="standard"
-            value={serverDetailsAddress}
-            onChange={handleServerDetailsAddressChange}
+            value={serverAddress}
+            onChange={handleServerAddressChange}
           />
           <TextField
             margin="dense"

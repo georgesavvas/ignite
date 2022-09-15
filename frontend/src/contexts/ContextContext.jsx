@@ -38,7 +38,7 @@ export const ContextProvider = props => {
       setSocket();
     })
   }, [config.serverDetails])
-  console.log(config)
+
   async function handleContextChange(path) {
     const path_processed = BuildFileURL(path, config, {reverse: true, pathOnly: true});
     let success = false;
