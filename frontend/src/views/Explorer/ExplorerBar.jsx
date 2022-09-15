@@ -1,7 +1,6 @@
 import React, {useEffect, useState, useContext} from "react";
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
-import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import ToggleButton from '@mui/material/ToggleButton';
@@ -19,14 +18,15 @@ import Modal from "../../components/Modal";
 import SortIcon from '@mui/icons-material/Sort';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { IconButton } from "@mui/material";
+import IgnTextField from "../../components/IgnTextField";
 import ContextMenu, { handleContextMenu } from "../../components/ContextMenu";
 
 const style = { 
   display: "flex",
   justifyContent: "space-between",
-  padding: "10px",
+  padding: "5px",
   alignItems: "center",
-  gap: "10px"
+  gap: "5px"
 }
 
 function ExplorerBar(props) {
@@ -111,9 +111,9 @@ function ExplorerBar(props) {
             size="small"
             onChange={handleResultTypeChange}
           >
-            <ToggleButton value="dynamic">Dynamic</ToggleButton>
-            <ToggleButton value="assets">Assets</ToggleButton>
-            <ToggleButton value="scenes">Scenes</ToggleButton>
+            <ToggleButton size="small" value="dynamic">Dynamic</ToggleButton>
+            <ToggleButton size="small" value="assets">Assets</ToggleButton>
+            <ToggleButton size="small" value="scenes">Scenes</ToggleButton>
           </ToggleButtonGroup>
           <ToggleButtonGroup
             value={props.viewType}
@@ -121,35 +121,36 @@ function ExplorerBar(props) {
             exclusive
             size="small"
           >
-            <ToggleButton value="grid">
+            <ToggleButton size="small" value="grid">
               <GridViewIcon />
             </ToggleButton>
-            <ToggleButton value="row">
+            <ToggleButton size="small" value="row">
               <RowViewIcon />
             </ToggleButton>
           </ToggleButtonGroup>
         </Stack>
-        <TextField
+        <IgnTextField
           id="filterField"
           size="small"
           placeholder="Filter"
+          fullWidth
           variant="outlined"
           value={filterValue}
           error={filterValue !== ""}
           onChange={handleFilterChange}
-          style={{flexGrow: 1}}
         />
-        <IconButton onClick={handleSortClicked}>
+        <IconButton size="small" onClick={handleSortClicked}>
           <SortIcon />
         </IconButton>
         <FormControlLabel control={<Checkbox defaultChecked onChange={props.onLatestChange} />} label="Latest" />
-        <Button variant="outlined" onClick={refreshContext}>Refresh</Button>
+        <Button size="small" variant="outlined" onClick={refreshContext}>Refresh</Button>
       </div>
       <div style={{...style, padding: "0 10px 10px 10px"}}>
         <Button
             style={{maxWidth: "35px"}}
             variant="outlined"
             onClick={handleGoBack}
+            size="small"
             disabled={currentContext.dir_kind === "project"}
           >
             <ArrowUpwardIcon />
@@ -159,6 +160,7 @@ function ExplorerBar(props) {
           style={{minWidth: "120px"}}
           color="ignite" 
           variant="outlined"
+          size="small"
           onClick={() => setIngestOpen(true)}
         >
           Ingest
@@ -167,6 +169,7 @@ function ExplorerBar(props) {
           style={{minWidth: "120px"}}
           color="ignite"
           variant="outlined"
+          size="small"
           disabled={currentContext.dir_kind !== "task"}
           onClick={() => setNewSceneOpen(true)}
         >

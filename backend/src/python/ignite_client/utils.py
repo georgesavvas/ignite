@@ -17,12 +17,12 @@ from ignite_client.constants import GENERIC_ENV, DCC_ENVS, OS_NAMES, DCC_DISCOVE
 ENV = os.environ
 API_VERSION = ENV["IGNITE_API_VERSION"]
 IGNITE_ROOT = Path(ENV["IGNITE_ROOT"])
-CONFIG_PATH = Path(ENV["IGNITE_CONFIG_PATH"])
+USER_CONFIG_PATH = Path(ENV["IGNITE_USER_CONFIG_PATH"])
 CLIENT_CONFIG_PATH = Path(ENV["IGNITE_CLIENT_CONFIG_PATH"])
 DCC = Path(ENV["IGNITE_DCC"])
-COMMON = Path(ENV["IGNITE_COMMON"])
+CONFIG_PATH = Path(ENV["IGNITE_CONFIG_PATH"])
 
-HUEY = SqliteHuey(filename=CONFIG_PATH / "ignite.db")
+HUEY = SqliteHuey(filename=USER_CONFIG_PATH / "ignite.db")
 
 
 OS_NAME = OS_NAMES[platform.system()]
@@ -48,20 +48,24 @@ ROOT = PurePath(CONFIG["projects_root"])
 
 
 def set_config(data):
+    global CONFIG, ROOT, IGNITE_SERVER_ADDRESS, IGNITE_SERVER_PASSWORD
+
     config = get_config()
     old_config = deepcopy(config)
+    pprint(config)
     config.update(data)
+    pprint(config)
+    IGNITE_SERVER_ADDRESS = config["server_details"]["address"]
+    IGNITE_SERVER_PASSWORD = config["server_details"]["password"]
+    ENV["IGNITE_SERVER_ADDRESS"] = IGNITE_SERVER_ADDRESS
+    ENV["IGNITE_SERVER_PASSWORD"] = IGNITE_SERVER_PASSWORD
+
     config["projects_root"] = config["access"]["projects_root"]
     server_root = server_request("get_projects_root")["data"]
     config["access"]["server_projects_root"] = server_root
     changed = old_config != config
 
-    global CONFIG, ROOT, IGNITE_SERVER_ADDRESS, IGNITE_SERVER_PASSWORD
     CONFIG = config
-    IGNITE_SERVER_ADDRESS = config["server_details"]["address"]
-    IGNITE_SERVER_PASSWORD = config["server_details"]["password"]
-    ENV["IGNITE_SERVER_ADDRESS"] = IGNITE_SERVER_ADDRESS
-    ENV["IGNITE_SERVER_PASSWORD"] = IGNITE_SERVER_PASSWORD
     ROOT = PurePath(config["projects_root"])
 
     if not changed:
@@ -330,7 +334,7 @@ def server_request(method, data=None):
 
 
 def get_action_files():
-    path = COMMON / "actions"
+    path = CONFIG_PATH / "actions"
     files = {}
     for entity in ("scene", "asset", "assetversion", "component"):
         entity_path = path / entity
@@ -350,13 +354,11 @@ def discover_actions():
             module = importlib.machinery.SourceFileLoader(
                 file.name, str(file)
             ).load_module()
-            task = HUEY.task()(module.main)
             entity_action = {
                 "label": module.LABEL,
                 "source": file,
                 "exts": module.EXTENSIONS,
-                "fn": task# module.main
+                "fn": module.main
             }
-            HUEY.unregister_post_execute(module.main)
             actions[entity].append(entity_action)
     return actions

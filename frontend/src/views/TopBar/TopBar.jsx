@@ -43,8 +43,6 @@ export default function TopBar() {
   const [projectBrowserOpen, setProjectBrowserOpen] = useState(false);
   const [vaultOpen, setVaultOpen] = useState(false);
 
-  
-
   return (
     <>
       <Vault open={vaultOpen} onClose={() => setVaultOpen(false)} />
@@ -58,29 +56,30 @@ export default function TopBar() {
           <Button
             variant="outlined"
             color="ignite"
+            size="small"
             style={{minWidth: "180px"}}
             onClick={() => setProjectBrowserOpen(true)}
           >
             Project Browser
           </Button>
-          <Button variant="outlined" color="ignite" onClick={() => setVaultOpen(true)}>Vault</Button>
+          <Button variant="outlined" size="small" color="ignite" onClick={() => setVaultOpen(true)}>Vault</Button>
         </div>
         <div className={styles.logoContainer}>
           <img src="media/ignite_logo.png" className={styles.logo} />
         </div>
         <div className={styles.rightSide}>
-          <ButtonGroup variant="text">
-            <IconButton>
+          <ButtonGroup variant="text" size="small">
+            <IconButton size="small">
               <HelpIcon />
             </IconButton>
-            <IconButton>
+            <IconButton size="small">
               <BugReportIcon />
             </IconButton>
-            <IconButton>
+            <IconButton size="small">
               <ThumbsUpDownIcon />
               {/* <FeedbackIcon /> */}
             </IconButton>
-            <IconButton style={{marginLeft: "10px"}} onClick={() => setSettingsOpen(true)}>
+            <IconButton size="small" style={{marginLeft: "10px"}} onClick={() => setSettingsOpen(true)}>
               <SettingsIcon />
             </IconButton>
           </ButtonGroup>

@@ -285,7 +285,7 @@ def get_actions():
     return actions
 
 
-# @HUEY.task()
+@HUEY.task()
 def run_action(entity, kind, action):
     actions = utils.discover_actions().get(kind)
     if not actions:
@@ -297,7 +297,6 @@ def run_action(entity, kind, action):
         if _action["label"] != action:
             continue
 
-        task = _action["fn"].s(entity)
-        result = HUEY.enqueue(task)
+        result = _action["fn"](entity)
         print("Action result:", result)
         break

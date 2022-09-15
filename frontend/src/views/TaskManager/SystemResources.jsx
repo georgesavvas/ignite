@@ -4,7 +4,7 @@ import React, { useState } from "react";
 
 const ResourceBox = props => {
   const style = {
-    right: `${props.value}%`
+    right: `${100 - props.value}%`
   };
   return (
     <div className={styles.resourceBoxContainer}>
