@@ -1,13 +1,7 @@
 .container {
-    /* min-height: 70px;
-    max-height: 70px;
-    margin: 0px; */
-    padding: 5px 10px;
+    padding: 5px 7px;
     display: grid;
-    /* grid-auto-flow: column; */
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    /* align-items: center;
-    justify-content: space-between; */
     box-sizing: border-box;
 }
 
@@ -20,7 +14,7 @@
 .logo {
     display: block;
     margin: auto;
-    height: 40px;
+    height: 30px;
 }
 
 .leftSide {

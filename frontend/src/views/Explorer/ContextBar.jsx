@@ -1,12 +1,12 @@
 import { Breadcrumbs } from '@mui/material';
 import { useSnackbar } from 'notistack';
 import React, {useEffect, useState, useContext, useRef} from "react";
-import TextField from '@mui/material/TextField';
 import styles from "./ContextBar.module.css";
 import { ContextContext } from "../../contexts/ContextContext";
 import { CopyToClipboard } from "../ContextActions";
 import { DIRECTORYICONS } from "../../constants";
 import ContextBarLink from './ContextBarLink';
+import IgnTextField from '../../components/IgnTextField';
 
 export default function ContextBar() {
   const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
@@ -58,7 +58,7 @@ export default function ContextBar() {
   return (
     <div className={styles.container} onClick={handleBreadCrumbClick}>
       {isTextField ?
-        <TextField
+        <IgnTextField
           id="outlined-basic"
           size="small"
           fullWidth={true}

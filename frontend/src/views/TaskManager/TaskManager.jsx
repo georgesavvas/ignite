@@ -19,20 +19,21 @@ export default function TaskManager(props) {
   const [socket, setSocket] = useState();
   const [config, setConfig] = useContext(ConfigContext);
 
-  useEffect(() => {
-    if (!config.serverDetails.address) return;
-    if (socket) return;
-    window.services.get_env("IGNITE_SESSION_ID").then(resp => {
-      const ws = createProcessesSocket(config, resp);
-      ws.onmessage = data => console.log("PROCESSES RECEIVED:", data);
-      ws.interval = setInterval(() => ws.send("ping"), 2000);
-      setSocket(ws);
-    })
-    return (() => {
-      destroySocket(socket);
-      setSocket();
-    })
-  }, [config.serverDetails])
+  // useEffect(() => {
+  //   if (!config.serverDetails.address) return;
+  //   if (socket) return;
+  //   window.services.get_env("IGNITE_SESSION_ID").then(resp => {
+  //     const ws = createProcessesSocket(config, resp);
+  //     if (!ws) return;
+  //     ws.onmessage = data => console.log("PROCESSES RECEIVED:", data);
+  //     ws.interval = setInterval(() => ws.send("ping"), 2000);
+  //     setSocket(ws);
+  //   })
+  //   return (() => {
+  //     destroySocket(socket);
+  //     setSocket();
+  //   })
+  // }, [config.serverDetails])
 
   return (
     <div>

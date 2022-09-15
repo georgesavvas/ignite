@@ -26,12 +26,12 @@ ignite_root = Path(DIR).parent.parent.parent.parent
 logging.info(f"Setting IGNITE_ROOT to {ignite_root}")
 ENV["IGNITE_ROOT"] = str(ignite_root)
 
-# CONFIG_PATH = Path(user_config_dir("ignite"))
-CONFIG_PATH = Path.home() / ".ignite"
-if not CONFIG_PATH.exists():
-    CONFIG_PATH.mkdir(parents=True, exist_ok=True)
-logging.info(f"Setting IGNITE_CONFIG_PATH to {CONFIG_PATH}")
-ENV["IGNITE_CONFIG_PATH"] = str(CONFIG_PATH)
+# USER_CONFIG_PATH = Path(user_config_dir("ignite"))
+USER_CONFIG_PATH = Path.home() / ".ignite"
+if not USER_CONFIG_PATH.exists():
+    USER_CONFIG_PATH.mkdir(parents=True, exist_ok=True)
+logging.info(f"Setting IGNITE_USER_CONFIG_PATH to {USER_CONFIG_PATH}")
+ENV["IGNITE_USER_CONFIG_PATH"] = str(USER_CONFIG_PATH)
 
 def ensure_config(filepath, default={}):
     if not filepath.is_file():
@@ -52,18 +52,22 @@ def ensure_config(filepath, default={}):
             with open(filepath, "w") as file:
                 yaml.safe_dump(existing, file)
 
-SERVER_CONFIG_PATH = CONFIG_PATH / "server_config.yaml"
-ensure_config(SERVER_CONFIG_PATH, {
+SERVER_USER_CONFIG_PATH = USER_CONFIG_PATH / "server_config.yaml"
+ensure_config(SERVER_USER_CONFIG_PATH, {
     "server_address": "0.0.0.0:9070",
     "projects_root": str(Path.home() / "projects")
 })
 
-logging.info(f"Setting IGNITE_SERVER_CONFIG_PATH to {SERVER_CONFIG_PATH}")
+logging.info(f"Setting IGNITE_SERVER_USER_CONFIG_PATH to {SERVER_USER_CONFIG_PATH}")
 logging.info(f"Setting IGNITE_SERVER_ROOT to {DIR}")
-ENV["IGNITE_SERVER_CONFIG_PATH"] = str(SERVER_CONFIG_PATH)
+ENV["IGNITE_SERVER_USER_CONFIG_PATH"] = str(SERVER_USER_CONFIG_PATH)
 ENV["IGNITE_SERVER_ROOT"] = DIR
 
-dcc = ignite_root / "dcc"
+CONFIG_PATH = ignite_root / "config"
+logging.info(f"Setting IGNITE_CONFIG_PATH to {CONFIG_PATH}")
+ENV["IGNITE_CONFIG_PATH"] = str(CONFIG_PATH)
+
+dcc = CONFIG_PATH / "dcc"
 logging.info(f"Setting IGNITE_DCC to {dcc}")
 ENV["IGNITE_DCC"] = str(dcc)
 
