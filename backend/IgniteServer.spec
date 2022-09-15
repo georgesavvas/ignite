@@ -5,7 +5,7 @@ block_cipher = None
 
 
 a = Analysis(
-    ['src\\python\\server_main.py'],
+    ['src/python/server_main.py'],
     pathex=[],
     binaries=[],
     datas=[],
@@ -35,10 +35,17 @@ exe = EXE(
     upx=True,
     upx_exclude=[],
     runtime_tmpdir=None,
-    console=True,
+    console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+    icon='../frontend/public/media/desktop_icon/mac/icon.icns',
+)
+app = BUNDLE(
+    exe,
+    name='IgniteServer.app',
+    icon='../frontend/public/media/desktop_icon/mac/icon.icns',
+    bundle_identifier=None,
 )

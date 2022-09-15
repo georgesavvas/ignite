@@ -46,18 +46,9 @@
     "sanitize": "npx kill-port 3000",
     "electron": "electron .",
     "electron-dev": "npm run sanitize && concurrently \"cross-env BROWSER=none npm start\" \"wait-on http://localhost:3000 && cross-env NODE_ENV=dev electron .\"",
-    "copy-backend-win": "xcopy ..\\backend\\dist\\Ignite* build /Y",
-    "copy-backend-linux": "cp ../backend/dist/Ignite* build",
-    "copy-dcc-win": "xcopy ..\\backend\\dist\\Ignite* build /Y",
-    "copy-dcc-linux": "cp ../backend/dist/Ignite* build",
-    "copy-common-win": "xcopy ..\\backend\\dist\\Ignite* build /Y",
-    "copy-common-linux": "cp ../backend/dist/Ignite* build",
-    "copy-files-win": "npm run copy-backend-win && npm run copy-dcc-win && npm run copy-common-win",
-    "copy-files-linux": "npm run copy-backend-linux && npm run copy-dcc-linus && npm run copy-common-linux",
-    "package-win": "npm run build && electron-builder",
-    "package-mac": "npm run build && electron-builder",
-    "package-linux": "npm run build && npm run copy-files-linux && electron-builder",
-    "deploy": "..\\.secret && electron-builder --publish always"
+    "package": "npm run build && electron-builder",
+    "deploy-win": "..\\.secret && electron-builder --publish always",
+    "deploy-linux": "source ../.secret && electron-builder --publish always"
   },
   "eslintConfig": {
     "extends": [
@@ -89,6 +80,7 @@
   "build": {
     "appId": "com.ignitevfx.client",
     "productName": "ignite",
+    "artifactName": "${productName}-setup-${version}.${ext}",
     "extraMetadata": {
       "main": "build/main.js"
     },
@@ -106,7 +98,6 @@
       "buildResources": "assets"
     },
     "nsisWeb": {
-      "artifactName": "${productName}-setup-${version}.${ext}"
     },
     "dmg": {
       "contents": [
@@ -127,16 +118,18 @@
       "target": [
         "AppImage",
         "deb"
-      ]
+      ],
+      "publish": ["github"]
     },
     "win": {
       "target": "nsis",
-      "artifactName": "${productName}-setup-${version}.${ext}",
       "icon": "public/media/desktop_icon/win/icon.ico",
       "publish": ["github"]
     },
     "mac": {
-      "icon": "public/media/desktop_icon/mac/icon.png"
+      "icon": "public/media/desktop_icon/mac/icon.icns",
+      "target": "dmg",
+      "publish": ["github"]
     }
   },
   "repository": {
