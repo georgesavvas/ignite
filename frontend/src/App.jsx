@@ -24,7 +24,8 @@ const darkTheme = createTheme({
   },
   typography: {
     allVariants: {
-      color: "lightgrey"
+      color: "lightgrey",
+      fontSize: "12px"
     }
   },
 });
