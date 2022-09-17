@@ -61,7 +61,6 @@ function AssetTile(props) {
         <Typography align="left">{props.entity.name} - {props.entity.version}</Typography>
         <URI uri={props.entity.uri} />
         <Path path={props.entity.path} />
-        <Typography align="left"></Typography>
         {/* <Typography align="left">{props.entity.context}</Typography> */}
       </>
     )
@@ -71,6 +70,7 @@ function AssetTile(props) {
     <>
       <Tile {...props} contextItems={contextItems} thumbnailWidth={thumbnailWidth}
         thumbnail={hasThumbnail ? undefined : "media/no_icon_grey.png"}
+        columnWidths={["200px", "500px", "500px"]}
       >
         {details()}
       </Tile>

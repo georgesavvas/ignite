@@ -202,8 +202,8 @@ function Explorer() {
     display: "grid",
     overflowY: "auto",
     gridTemplateColumns: `repeat(auto-fill, minmax(${explorerSettings.currentTileSize * 40}px, 1fr))`,
-    gridGap: "5px",
-    padding: "5px",
+    gridGap: "3px",
+    padding: "3px",
     paddingTop: "0px"
   }
 

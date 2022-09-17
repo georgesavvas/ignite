@@ -115,6 +115,7 @@ function DirectoryTile(props) {
         thumbnailWidth={thumbnailWidth}
         onClick={handleClick}
         contextItems={contextItems}
+        columnWidths={["200px", "200px", "500px"]}
       >
         {details()}
       </Tile>
