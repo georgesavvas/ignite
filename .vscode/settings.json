@@ -12,6 +12,8 @@
         "hypercorn",
         "KINDTYPES",
         "Mult",
+        "onmaximum",
+        "onreconnect",
         "platformdirs",
         "PLUGINPATH",
         "Popen",
