@@ -83,10 +83,10 @@ function RowTile(props) {
   const [progress, setProgress] = useState(0.5);
   const hoverArea = createRef();
   const isStatic = props.thumbnail !== undefined;
+  const sizeMult = 0.25;
 
   const tileStyle = {
     borderColor: props.selected ? "rgb(252, 140, 3)" : "rgb(50, 50, 50)",
-    height: `${props.size * 0.25}px`,
     flexDirection: "row"
   };
 
@@ -95,9 +95,8 @@ function RowTile(props) {
   }
 
   const thumbnailContainer = {
-    // minWidth: props.size * 0.25,
-    // height: props.size * 0.25 * 0.5625,
-    // maxWidth: props.size * 0.25,
+    minWidth: props.size * sizeMult,
+    maxWidth: props.size * sizeMult,
     height: "100%",
     aspectRatio: 16 / 9,
     position: "relative",
@@ -105,12 +104,12 @@ function RowTile(props) {
   }
 
   const barStyle = {
-    left: props.size * progress
+    left: props.size * sizeMult * progress
   }
 
   const handleMouseMove = (e) => {
     const rect = hoverArea.current.getBoundingClientRect();
-    const width = (e.clientX - rect.left) / props.size;
+    const width = (e.clientX - rect.left) / (props.size * sizeMult);
     setProgress(clamp(width, 0, 1));
   }
 
@@ -133,6 +132,10 @@ function RowTile(props) {
 
   const ThumbComp = props.thumbnailComp;
 
+  const gridStyle = {
+    gridTemplateColumns: props.columnWidths.join(" ")
+  }
+
   return (
     <>
       <ContextMenu items={props.contextItems} contextMenu={contextMenu}
@@ -147,12 +150,12 @@ function RowTile(props) {
           <img src={thumbnailURL} className={styles.thumbnail} style={thumbnailStyle} />
           : null}
         </div>
-        <div className={styles.hoverArea} style={{"maxWidth": props.size}}
+        <div className={styles.hoverArea} style={{"maxWidth": props.size * sizeMult}}
           onMouseMove={isStatic ? null : handleMouseMove} ref={hoverArea}
         >
           {isStatic ? null : <div className={styles.bar} style={barStyle} />}
         </div>
-        <div style={{"paddingLeft": "6px"}}>
+        <div className={styles.rowContents} style={gridStyle}>
           {props.children}
         </div>
       </div>

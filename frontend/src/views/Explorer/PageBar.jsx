@@ -7,9 +7,9 @@ import IgnTextField from "../../components/IgnTextField";
 
 const style = {
   margin: "0px",
-  padding: "10px",
-  paddingLeft: "20px",
-  paddingRight: "20px",
+  padding: "5px",
+  paddingLeft: "5px",
+  paddingRight: "15px",
   maxHeight: "60px",
   maxWidth: "100%",
   width: "100%",

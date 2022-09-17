@@ -17,7 +17,7 @@ import ContextBar from "./ContextBar";
 import Modal from "../../components/Modal";
 import SortIcon from '@mui/icons-material/Sort';
 import FilterListIcon from '@mui/icons-material/FilterList';
-import { IconButton } from "@mui/material";
+import { IconButton, Typography } from "@mui/material";
 import IgnTextField from "../../components/IgnTextField";
 import IgnButton from "../../components/IgnButton";
 import ContextMenu, { handleContextMenu } from "../../components/ContextMenu";
@@ -25,7 +25,7 @@ import ContextMenu, { handleContextMenu } from "../../components/ContextMenu";
 const style = { 
   display: "flex",
   justifyContent: "space-between",
-  padding: "5px",
+  padding: "1px",
   alignItems: "center",
   gap: "5px"
 }
@@ -91,7 +91,7 @@ function ExplorerBar(props) {
   }
 
   return (
-    <div>
+    <div style={{padding: "5px", display: "flex", flexDirection: "column", gap: "5px"}}>
       <ContextMenu items={filterOptions} contextMenu={filterMenu}
         setContextMenu={setFilterMenu}
       />
@@ -112,9 +112,15 @@ function ExplorerBar(props) {
             onChange={handleResultTypeChange}
             size="small"
           >
-            <ToggleButton value="dynamic">Dynamic</ToggleButton>
-            <ToggleButton value="assets">Assets</ToggleButton>
-            <ToggleButton value="scenes">Scenes</ToggleButton>
+            <ToggleButton value="dynamic" style={{height: "34.25px"}}>
+              <Typography variant="button">Dynamic</Typography>
+            </ToggleButton>
+            <ToggleButton value="assets" style={{height: "34.25px"}}>
+            <Typography variant="button">Assets</Typography>
+            </ToggleButton>
+            <ToggleButton value="scenes" style={{height: "34.25px"}}>
+            <Typography variant="button">Scenes</Typography>
+            </ToggleButton>
           </ToggleButtonGroup>
           <ToggleButtonGroup
             value={props.viewType}
@@ -122,10 +128,10 @@ function ExplorerBar(props) {
             exclusive
             size="small"
           >
-            <ToggleButton value="grid">
+            <ToggleButton value="grid" style={{height: "34.25px"}}>
               <GridViewIcon />
             </ToggleButton>
-            <ToggleButton value="row">
+            <ToggleButton value="row" style={{height: "34.25px"}}>
               <RowViewIcon />
             </ToggleButton>
           </ToggleButtonGroup>
@@ -139,18 +145,19 @@ function ExplorerBar(props) {
           error={filterValue !== ""}
           onChange={handleFilterChange}
         />
-        <IconButton onClick={handleSortClicked}>
+        <IconButton onClick={handleSortClicked} style={{height: "34.25px"}}>
           <SortIcon />
         </IconButton>
-        <FormControlLabel control={<Checkbox defaultChecked onChange={props.onLatestChange} />} label="Latest" />
+        <FormControlLabel style={{height: "34.25px"}} control={<Checkbox defaultChecked onChange={props.onLatestChange} />} label="Latest" />
         <IgnButton variant="outlined" style={{minWidth: "90px"}} onClick={refreshContext}>Refresh</IgnButton>
       </div>
-      <div style={{...style, padding: "0 5px 5px 5px"}}>
+      <div style={style}>
         <IgnButton
-            style={{maxWidth: "35px"}}
             variant="outlined"
             onClick={handleGoBack}
             disabled={currentContext.dir_kind === "project"}
+            size="small"
+            style={{minWidth: "35px"}}
           >
             <ArrowUpwardIcon />
         </IgnButton>

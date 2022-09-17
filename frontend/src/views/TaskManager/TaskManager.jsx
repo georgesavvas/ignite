@@ -37,7 +37,7 @@ export default function TaskManager(props) {
 
   return (
     <div>
-      <SystemResources />
+      {/* <SystemResources /> */}
       <div className={styles.container}>
         {/* <Task state="running" />
         <Task state="running" progress={0.4} />

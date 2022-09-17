@@ -2,9 +2,10 @@ import { grid } from "@mui/system";
 import React, { Suspense, useEffect, useContext, useState } from "react";
 import Slider from '@mui/material/Slider';
 import * as THREE from "three";
-import { Canvas, useFrame, useLoader } from '@react-three/fiber';
+import { Canvas, useFrame, useLoader, useThree, extend } from '@react-three/fiber';
 import { OrbitControls   } from "@react-three/drei";
 import { TextureLoader } from 'three/src/loaders/TextureLoader';
+import { USDZLoader } from "../../utils/threejsDev/USDLoader";
 import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js';
 import { Typography } from "@mui/material";
 import {ConfigContext} from "../../contexts/ConfigContext";
@@ -46,13 +47,19 @@ function Scene({path}) {
   const isExr = path.includes(".exr");
   const loader = isExr ? EXRLoader : TextureLoader
   const colorMap = useLoader(loader, path);
-  if (isExr) {
+
+  if (!isExr) {
     colorMap.encoding = THREE.sRGBEncoding;
   };
+
+  const width = colorMap.source.data.width;
+  const height = colorMap.source.data.height;
+  const ratio = width / height;
+
   return(
     <mesh>
-      <planeGeometry attach="geometry" args={[1.77, 1]} />
-      <meshStandardMaterial map={colorMap} />
+      <planeGeometry attach="geometry" args={[ratio, 1]} />
+      <meshBasicMaterial map={colorMap} />
     </mesh>
   )
 }
@@ -95,12 +102,48 @@ function EXRViewer(props) {
           max={comp.last_frame}
         />
       </div>
-      <Canvas orthographic camera={{ zoom: 100, position: [0, 0, 1] }}>
+      <Canvas orthographic camera={{ zoom: 350, position: [0, 0, 1] }}>
         <OrbitControls enableRotate={false} enableDamping={false} zoomSpeed={3} mouseButtons=
         {mouseButtons} />
-        <ambientLight intensity={0.75} />
+        {/* <ambientLight intensity={0.75} /> */}
         <Suspense fallback={null}>
           <Scene path={path} />
+        </Suspense>
+      </Canvas>
+    </div>
+  )
+}
+
+function UsdScene({path}) {
+  const usd = useLoader(USDZLoader, path);
+  console.log(usd);
+  // extend(usd)
+  return(
+    <mesh>
+      {/* <usd /> */}
+      {/* {[usd]} */}
+      {/* <primitive object={usd.parent.parent} /> */}
+      {/* <planeGeometry args={[1, 1]} /> */}
+      {/* <planeGeometry attach="geometry" args={[ratio, 1]} />
+      <meshBasicMaterial map={colorMap} /> */}
+    </mesh>
+  )
+}
+
+function UsdViewer(props) {
+  const comp = props.comp;
+
+  let path = "";
+  if (comp.path) path = BuildFileURL(comp.path, props.config, {forceRemote: true});
+  path = "test.usdz";
+  
+  return (
+    <div style={{position: "relative", height: "100%", width: "100%"}}>
+      <Canvas camera={{ zoom: 100, position: [0, 0, 1] }}>
+        <OrbitControls />
+        <ambientLight intensity={0.75} />
+        <Suspense fallback={null}>
+          <UsdScene path={path} />
         </Suspense>
       </Canvas>
     </div>
@@ -156,10 +199,12 @@ function ComponentViewer(props) {
     const exr = [".exr"];
     const vid = [".mp4", ".mov"];
     const geo = [];
+    const usd = [".usd", ".usdc", ".usda", ".usdz"]
     if (img.includes(ext)) return <EXRViewer comp={comp} path={path} config={config} />;
     else if (exr.includes(ext)) return <EXRViewer comp={comp} path={path} config={config} />;
     else if (vid.includes(ext)) return <VideoViewer comp={comp} path={path} />;
     else if (geo.includes(ext)) return <GeoViewer comp={comp} path={path} />;
+    // else if (usd.includes(ext)) return <UsdViewer comp={comp} config={config} />;
     else return <Typography>No file preview for {comp.filename}</Typography>;
   }
 
