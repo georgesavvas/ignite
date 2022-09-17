@@ -29,6 +29,7 @@
     "react-sortablejs": "^6.1.4",
     "react-spring": "^9.5.2",
     "react-xarrows": "^2.0.2",
+    "sockette": "^2.0.6",
     "string-to-color": "^2.2.2",
     "three": "^0.139.2",
     "uuid4": "^2.0.3",
@@ -89,16 +90,27 @@
       "node_modules/**/*"
     ],
     "extraFiles": [
-      {"from": "../backend/dist/", "to": "."},
-      {"from": "../dcc/", "to": "dcc"},
-      {"from": "../common/", "to": "common"},
-      {"from": "../tools/", "to": "tools"}
+      {
+        "from": "../backend/dist/",
+        "to": "."
+      },
+      {
+        "from": "../dcc/",
+        "to": "dcc"
+      },
+      {
+        "from": "../common/",
+        "to": "common"
+      },
+      {
+        "from": "../tools/",
+        "to": "tools"
+      }
     ],
-    "directories":{
+    "directories": {
       "buildResources": "assets"
     },
-    "nsisWeb": {
-    },
+    "nsisWeb": {},
     "dmg": {
       "contents": [
         {
@@ -119,17 +131,23 @@
         "AppImage",
         "deb"
       ],
-      "publish": ["github"]
+      "publish": [
+        "github"
+      ]
     },
     "win": {
       "target": "nsis",
       "icon": "public/media/desktop_icon/win/icon.ico",
-      "publish": ["github"]
+      "publish": [
+        "github"
+      ]
     },
     "mac": {
       "icon": "public/media/desktop_icon/mac/icon.icns",
       "target": "dmg",
-      "publish": ["github"]
+      "publish": [
+        "github"
+      ]
     }
   },
   "repository": {

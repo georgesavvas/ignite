@@ -68,7 +68,7 @@ function Component({comp, onSelect, selectedComp, actions}) {
         </div>
         <div className={styles.spacer} />
         <IconButton onClick={e => handleCopy(e, comp.path)}>
-          <CopyIcon />
+          <CopyIcon style={{fontSize: "20px"}} />
         </IconButton>
       </div>
     </div>

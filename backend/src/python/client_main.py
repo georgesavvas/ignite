@@ -10,8 +10,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from ignite_server.socket_manager import SocketManager
-from ignite_client import utils, api
 from ignite_client.task_manager import TaskManager
+from ignite_client import utils, api
 
 
 ENV = os.environ
@@ -39,7 +39,7 @@ async def processes(websocket: WebSocket, session_id: str):
     while True:
         try:
             received = await websocket.receive_text()
-            logging.info(f"Websocket processes received {received}")
+            websocket.send_json({"data": TASK_MANAGER.amount()})
         except Exception as e:
             print("error:", e)
             break

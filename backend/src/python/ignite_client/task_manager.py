@@ -1,4 +1,8 @@
 import logging
+from ignite_client import utils
+
+
+HUEY = utils.get_huey()
 
 
 class TaskManager:
@@ -6,7 +10,8 @@ class TaskManager:
         self.tasks = []
 
     def add(self, task):
-        self.tasks.append(task)
+        self.tasks.insert(0, task)
+        HUEY.enqueue(task)
 
     def remove(self, task):
         self.tasks.remove(task)

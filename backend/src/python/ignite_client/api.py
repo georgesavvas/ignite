@@ -9,6 +9,8 @@ from pathlib import PurePath, Path
 from pprint import pprint
 import huey
 from ignite_client import utils
+# from ignite_client.task_manager import TaskManager
+from client_main import TASK_MANAGER
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -18,6 +20,7 @@ ENV = os.environ
 DCC = Path(ENV["IGNITE_DCC"])
 
 HUEY = utils.get_huey()
+# TASK_MANAGER = TaskManager()
 
 
 def ingest(data):
@@ -286,17 +289,28 @@ def get_actions():
 
 
 @HUEY.task()
+def _run_action(action, entity):
+    result = action["fn"](entity)
+    print("Action result:", result)
+    return result
+
+
 def run_action(entity, kind, action):
     actions = utils.discover_actions().get(kind)
     if not actions:
         logging.error(f"Couldn't find action {kind} {action}")
         print("Available are:")
-        pprint(utils.discover_actions())
+        pprint(actions)
         return
     for _action in actions:
         if _action["label"] != action:
             continue
 
-        result = _action["fn"](entity)
-        print("Action result:", result)
+        task = _run_action.s(_action, entity)
+        TASK_MANAGER.add(task)
         break
+    else:
+        logging.error(f"Couldn't find action {kind} {action}")
+        print("Available are:")
+        pprint(actions)
+        return
