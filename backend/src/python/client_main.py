@@ -39,9 +39,7 @@ async def processes(websocket: WebSocket, session_id: str):
     while True:
         try:
             received = await websocket.receive_text()
-            print(received, websocket)
-            websocket.send_text("hi")
-            websocket.send_json({"data": TASK_MANAGER.amount()})
+            await websocket.send_json({"data": TASK_MANAGER.report()})
         except Exception as e:
             print("error:", e)
             break
@@ -196,7 +194,7 @@ async def run_action(request: Request):
     action = result.get("action")
     if not entity or not action:
         return {"ok": False}
-    api.run_action(entity, kind, action)
+    api.run_action(TASK_MANAGER, entity, kind, action)
     return {"ok": True}
 
 

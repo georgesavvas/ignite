@@ -7,29 +7,43 @@ import WatchLaterOutlinedIcon from '@mui/icons-material/WatchLaterOutlined';
 import DirectionsRunOutlinedIcon from '@mui/icons-material/DirectionsRunOutlined';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PendingOutlinedIcon from '@mui/icons-material/PendingOutlined';
+import ClearIcon from '@mui/icons-material/Clear';
 
-export default function Task(props) {
+const Task = props => {
+
+  const getStatusIcon = () => {
+    const state = props.state;
+    switch (state) {
+      case "paused": return <PauseIcon />;
+      case "queueing": return <WatchLaterOutlinedIcon />;
+      default: return <DirectionsRunOutlinedIcon />;
+    }
+  }
+
+  const getActionButton = () => {
+    const state = props.state;
+    switch (state) {
+      case "paused": return <PlayArrowIcon />;
+      default: return <PauseIcon />;
+    }
+  }
+
   return (
     <div className={styles.container}>
-      <CircularProgress size={30} thickness={3} variant={props.progress || props.state !== "running" ? "determinate" : "indeterminate"} value={props.progress ? props.progress * 100 : 0} />
-      <div className={styles.label}>
-        <Typography
-          variant="caption"
-          component="div"
-          color="text.secondary"
-        >
-          {/* {`${Math.round(props.progress || 0 * 100)}%`} */}
-        </Typography>
-        {props.state !== "running" ? null :
-          <PlayArrowIcon style={{width: "20px", height: "20px"}} />
-        }
-        {props.state !== "pending" ? null :
-          <PendingOutlinedIcon style={{width: "25px", height: "25px"}} />
-        }
-        {props.state !== "queued" ? null :
-          <WatchLaterOutlinedIcon style={{width: "25px", height: "25px"}} />
-        }
+      <div className={styles.topBar}>
+        <Typography className={styles.title} align="center">{props.task.name}</Typography>
+        <div className={styles.progressBar} />
+      </div>
+      <div className={styles.details}>
+        {getStatusIcon()}
+        <Typography>{props.task.asset.name}</Typography>
+        <Typography>{props.task.component.name}</Typography>
+        <div className={styles.spacer} />
+        {getActionButton()}
+        <ClearIcon />
       </div>
     </div>
   )
 }
+
+export default Task;

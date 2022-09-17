@@ -354,9 +354,10 @@ def discover_actions():
             ).load_module()
             entity_action = {
                 "label": module.LABEL,
-                "source": file,
+                "source": file.as_posix(),
                 "exts": module.EXTENSIONS,
-                "fn": module.main
+                # "fn": module.main,
+                "module_path": module.__file__
             }
             actions[entity].append(entity_action)
     return actions

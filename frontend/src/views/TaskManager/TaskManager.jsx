@@ -11,25 +11,33 @@ const createProcessesSocket = (config, sessionID, websocketConfig) => {
 
 const destroySocket = socket => {
   if (!socket) return;
-  if (socket.interval) clearInterval(socket.interval);
+  // if (socket.interval) clearInterval(socket.interval);
   socket.close();
+}
+
+const defaultTask = {
+  name: "Create MP4",
+  asset: {name: "beauty", context: "build/campfire/model/coal"},
+  component: {name: "render_acescg.####.exr"}
 }
 
 export default function TaskManager(props) {
   const [socket, setSocket] = useState();
   const [config, setConfig] = useContext(ConfigContext);
+  const [tasks, setTasks] = useState([defaultTask]);
 
   useEffect(() => {
     if (!config.serverDetails.address) return;
     if (socket) return;
     window.services.get_env("IGNITE_SESSION_ID").then(resp => {
-      const websocketConfig = {};
+      const websocketConfig = {
+        onmessage: e => console.log(JSON.parse(e.data))
+      };
       const ws = createProcessesSocket(config, resp, websocketConfig);
       if (!ws) return;
-      ws.interval = setInterval(() => {
-        ws.send("ping");
-        console.log("sending...");
-      }, 2000)
+      // ws.interval = setInterval(() => {
+      //   ws.send("ping");
+      // }, 2000)
       setSocket(ws);
     })
     return (() => {
@@ -42,12 +50,9 @@ export default function TaskManager(props) {
     <div>
       {/* <SystemResources /> */}
       <div className={styles.container}>
-        {/* <Task state="running" />
-        <Task state="running" progress={0.4} />
-        <Task state="running" progress={0.1} />
-        <Task state="queued" />
-        <Task state="pending" /> */}
-        {/* <div className={styles.fade} /> */}
+        {tasks.map((task, index) =>
+          <Task key={index} state="running" progress={0.4} task={task} />
+        )}
       </div>
     </div>
   )

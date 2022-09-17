@@ -3,6 +3,7 @@ import parse
 import glob
 import shutil
 import logging
+import importlib
 from string import Formatter
 from fnmatch import fnmatch
 from pathlib import PurePath, Path
@@ -10,7 +11,6 @@ from pprint import pprint
 import huey
 from ignite_client import utils
 # from ignite_client.task_manager import TaskManager
-from client_main import TASK_MANAGER
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -20,7 +20,6 @@ ENV = os.environ
 DCC = Path(ENV["IGNITE_DCC"])
 
 HUEY = utils.get_huey()
-# TASK_MANAGER = TaskManager()
 
 
 def ingest(data):
@@ -282,20 +281,24 @@ def ingest_asset(data):
 
 def get_actions():
     actions = utils.discover_actions()
-    for entity in actions.keys():
-        for action in actions[entity]:
-            del action["fn"]
+    # for entity in actions.keys():
+    #     for action in actions[entity]:
+    #         del action["fn"]
     return actions
 
 
 @HUEY.task()
 def _run_action(action, entity):
-    result = action["fn"](entity)
+    module_path = PurePath(action["module_path"])
+    module = importlib.machinery.SourceFileLoader(
+        module_path.name, str(module_path)
+    ).load_module()
+    result = module.main(entity)
     print("Action result:", result)
     return result
 
 
-def run_action(entity, kind, action):
+def run_action(manager, entity, kind, action):
     actions = utils.discover_actions().get(kind)
     if not actions:
         logging.error(f"Couldn't find action {kind} {action}")
@@ -305,9 +308,10 @@ def run_action(entity, kind, action):
     for _action in actions:
         if _action["label"] != action:
             continue
-
         task = _run_action.s(_action, entity)
-        TASK_MANAGER.add(task)
+        task.ignite_action = _action
+        task.ignite_entity = entity
+        manager.add(task)
         break
     else:
         logging.error(f"Couldn't find action {kind} {action}")
