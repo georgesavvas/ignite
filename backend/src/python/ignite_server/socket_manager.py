@@ -6,10 +6,11 @@ class SocketManager:
         self.connections = []
 
     async def connect(self, websocket, session_id):
-        for ws, id in self.connections:
+        for i, (ws, id) in enumerate(self.connections):
             if session_id == id:
                 logging.warning(f"Closing websocket {session_id}")
-                await ws.close()
+                self.connections.pop(i)
+                break
         await websocket.accept()
         self.connections.append((websocket, session_id))
         logging.info(f"Total connections: {len(self.connections)}")

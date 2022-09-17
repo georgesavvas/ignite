@@ -5,8 +5,8 @@ import SystemResources from "./SystemResources";
 import { clientSocket } from "../../services/clientWebSocket";
 import { ConfigContext } from "../../contexts/ConfigContext";
 
-const createProcessesSocket = (config, sessionID) => {
-  return clientSocket("processes", config, sessionID);
+const createProcessesSocket = (config, sessionID, websocketConfig) => {
+  return clientSocket("processes", config, sessionID, websocketConfig);
 }
 
 const destroySocket = socket => {
@@ -19,21 +19,24 @@ export default function TaskManager(props) {
   const [socket, setSocket] = useState();
   const [config, setConfig] = useContext(ConfigContext);
 
-  // useEffect(() => {
-  //   if (!config.serverDetails.address) return;
-  //   if (socket) return;
-  //   window.services.get_env("IGNITE_SESSION_ID").then(resp => {
-  //     const ws = createProcessesSocket(config, resp);
-  //     if (!ws) return;
-  //     ws.onmessage = data => console.log("PROCESSES RECEIVED:", data);
-  //     ws.interval = setInterval(() => ws.send("ping"), 2000);
-  //     setSocket(ws);
-  //   })
-  //   return (() => {
-  //     destroySocket(socket);
-  //     setSocket();
-  //   })
-  // }, [config.serverDetails])
+  useEffect(() => {
+    if (!config.serverDetails.address) return;
+    if (socket) return;
+    window.services.get_env("IGNITE_SESSION_ID").then(resp => {
+      const websocketConfig = {};
+      const ws = createProcessesSocket(config, resp, websocketConfig);
+      if (!ws) return;
+      ws.interval = setInterval(() => {
+        ws.send("ping");
+        console.log("sending...");
+      }, 2000)
+      setSocket(ws);
+    })
+    return (() => {
+      destroySocket(socket);
+      setSocket();
+    })
+  }, [config.serverDetails])
 
   return (
     <div>

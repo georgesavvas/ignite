@@ -39,6 +39,8 @@ async def processes(websocket: WebSocket, session_id: str):
     while True:
         try:
             received = await websocket.receive_text()
+            print(received, websocket)
+            websocket.send_text("hi")
             websocket.send_json({"data": TASK_MANAGER.amount()})
         except Exception as e:
             print("error:", e)
