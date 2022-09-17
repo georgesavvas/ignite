@@ -1,0 +1,4 @@
+#!/bin/bash
+cd src/python
+source ../../env/bin/activate;
+huey_consumer ignite_client.huey.HUEY -S;

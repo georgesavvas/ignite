@@ -1,17 +1,87 @@
 .container {
-    position: relative;
-    /* border: solid blue 2px; */
+    border: solid rgb(70, 70, 70) 1px;
+    border-radius: 3px;
+    width: 100%;
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    /* align-items: center; */
+    overflow: clip;
+    box-sizing: border-box;
 }
 
-.label {
+.title {
     position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    align-items: center;
-    justify-content: center;
+    /* top: 1px; */
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+}
+
+.spacer {
+    width: 100%;
+}
+
+.details {
     display: flex;
+    height: 30px;
+    /* justify-content: space-around; */
+    align-items: center;
+    /* gap: 5px; */
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.topBar {
+    /* background-color: rgb(100, 100, 100); */
+    height: 20px;
+    width: 100%;
+    position: relative;
+}
+
+/* .progressBar {
+    height: 20px;
+    position: absolute;
+} */
+
+.progressBar {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    background-color: rgb(0, 40, 0);
+    box-sizing: border-box;
+}
+
+.progressBar:after {
+    content:"";
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background-image: -webkit-gradient(linear, 0 0, 100% 100%, color-stop(.25, rgba(255, 255, 255, .2)), color-stop(.25, transparent), color-stop(.5, transparent), color-stop(.5, rgba(255, 255, 255, .2)), color-stop(.75, rgba(255, 255, 255, .2)), color-stop(.75, transparent), to(transparent));
+    /* z-index: 1; */
+    -webkit-background-size: 50px 50px;
+    -moz-background-size: 50px 50px;
+    background-size: 50px 50px;
+    -webkit-animation: move 2s linear infinite;
+    overflow: hidden;
+}
+
+@-webkit-keyframes move {
+    0% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: 50px 50px;
+    }
+}
+@keyframes move {
+    0% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: 50px 50px;
+    }
 }
