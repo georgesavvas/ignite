@@ -2,15 +2,13 @@ import logging
 from ignite_client import utils
 
 
-HUEY = utils.get_huey()
-
-
-class TaskManager:
-    def __init__(self):
+class TaskManager():
+    def __init__(self, huey):
         self.tasks = []
+        self.huey = huey
 
     def add(self, task):
-        result = HUEY.enqueue(task)
+        result = self.huey.enqueue(task)
         result.ignite_action = task.ignite_action
         result.ignite_entity = task.ignite_entity
         self.tasks.insert(0, result)
@@ -33,6 +31,8 @@ class TaskManager:
                 "result": task()
             }
         return data
-
-
-manager = TaskManager()
+    
+    def get(self, task_id):
+        for task in self.tasks:
+            if task.id == task_id:
+                return task

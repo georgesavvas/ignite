@@ -12,7 +12,8 @@ from pprint import pprint
 from pathlib import PurePath, Path
 from huey import SqliteHuey
 from ignite_client.constants import GENERIC_ENV, DCC_ENVS, OS_NAMES, DCC_DISCOVERY
-
+from ignite_server.socket_manager import SocketManager
+from ignite_client.task_manager import TaskManager
 
 ENV = os.environ
 API_VERSION = ENV["IGNITE_API_VERSION"]
@@ -23,7 +24,8 @@ DCC = Path(ENV["IGNITE_DCC"])
 CONFIG_PATH = Path(ENV["IGNITE_CONFIG_PATH"])
 
 HUEY = SqliteHuey(filename=USER_CONFIG_PATH / "ignite.db")
-
+PROCESSES_MANAGER = SocketManager()
+TASK_MANAGER = TaskManager(HUEY)
 
 OS_NAME = OS_NAMES[platform.system()]
 

@@ -8,45 +8,62 @@ import DirectionsRunOutlinedIcon from '@mui/icons-material/DirectionsRunOutlined
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PendingOutlinedIcon from '@mui/icons-material/PendingOutlined';
 import ClearIcon from '@mui/icons-material/Clear';
+import LowPriorityIcon from '@mui/icons-material/LowPriority';
+import ReplayIcon from '@mui/icons-material/Replay';
 
 const Task = props => {
+  const state = props.task.state;
 
   const getStatusIcon = () => {
-    const state = props.state;
     switch (state) {
       case "paused": return <PauseIcon />;
-      case "queueing": return <WatchLaterOutlinedIcon />;
+      case "waiting": return <WatchLaterOutlinedIcon />;
       default: return <DirectionsRunOutlinedIcon />;
     }
   }
 
   const getActionButton = () => {
-    const state = props.state;
     switch (state) {
-      case "paused": return <PlayArrowIcon />;
-      default: return <PauseIcon />;
+      case "paused": return <PlayArrowIcon className={styles.button} />;
+      case "waiting": return <PauseIcon className={styles.button} />
+      case "finished": case "error": return <ReplayIcon className={styles.button} />;
+      default: return <LowPriorityIcon className={styles.button} />;
     }
   }
 
-  const progressBarStyle = {
-    backgroundColor: "rgb(0, 60, 0)",
-    // backgroundColor: "rgb(150, 150, 0)",
-    // backgroundColor: "rgb(100, 0, 0)"
+  const getProgressBarStyle = () => {
+    const progress = props.task.progress;
+    switch (state) {
+      case "waiting": return {backgroundColor: "rgb(120, 120, 0)"};
+      case "paused": return {
+        backgroundColor: "rgb(70, 70, 70)",
+        width: `${progress}%`
+      };
+      case "error": return {backgroundColor: "rgb(100, 0, 0)"};
+      case "finished": return {backgroundColor: "rgb(0, 50, 120)"};
+      default: return {
+        backgroundColor: "rgb(0, 80, 0)",
+        width: `${progress}%`
+      };
+    }
   }
 
   return (
     <div className={styles.container}>
       <div className={styles.topBar}>
-        <Typography className={styles.title} align="center">{props.task.name}</Typography>
-        <div className={styles.progressBar} style={progressBarStyle} />
+        {/* <Typography className={styles.title} align="center">{props.task.name}</Typography> */}
+        <div className={`${styles.progressBar} ${styles[state]}`} style={getProgressBarStyle()} />
       </div>
       <div className={styles.details}>
-        {getStatusIcon()}
-        <Typography>{props.task.asset.name}</Typography>
-        <Typography>{props.task.component.name}</Typography>
-        <div className={styles.spacer} />
+        {/* {getStatusIcon()} */}
+        <div className={styles.detailsText}>
+          <Typography>{props.task.name}</Typography>
+          <Typography noWrap>{props.task.asset.name} - {props.task.asset.context}</Typography>
+          <Typography>{props.task.component.name}</Typography>
+        </div>
+        {/* <div className={styles.spacer} /> */}
         {getActionButton()}
-        <ClearIcon />
+        <ClearIcon className={styles.button} />
       </div>
     </div>
   )

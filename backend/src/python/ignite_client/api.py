@@ -9,8 +9,9 @@ from fnmatch import fnmatch
 from pathlib import PurePath, Path
 from pprint import pprint
 import huey
+from huey.signals import *
 from ignite_client import utils
-# from ignite_client.task_manager import TaskManager
+from ignite_client.utils import TASK_MANAGER, PROCESSES_MANAGER
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -298,7 +299,15 @@ def _run_action(action, entity):
     return result
 
 
-def run_action(manager, entity, kind, action):
+@HUEY.signal()
+def _push_task_updates(signal, task, exc=None):
+    print(PROCESSES_MANAGER.connections)
+    # websocket = PROCESSES_MANAGER.get(task.data[0][0]["session_id"])
+    # websocket.send_json({"data": TASK_MANAGER.report()})
+
+
+def run_action(task_manager, entity, kind, action, session_id):
+    print(PROCESSES_MANAGER.connections)
     actions = utils.discover_actions().get(kind)
     if not actions:
         logging.error(f"Couldn't find action {kind} {action}")
@@ -308,13 +317,27 @@ def run_action(manager, entity, kind, action):
     for _action in actions:
         if _action["label"] != action:
             continue
+        _action["session_id"] = session_id
         task = _run_action.s(_action, entity)
         task.ignite_action = _action
         task.ignite_entity = entity
-        manager.add(task)
+        task_manager.add(task)
         break
     else:
         logging.error(f"Couldn't find action {kind} {action}")
         print("Available are:")
         pprint(actions)
         return
+
+def edit_task(manager, task_id, edit):
+    task = manager.get(task_id)
+    if edit == "pause":
+        task.revoke()
+    elif edit == "unpause":
+        task.restore()
+    elif edit == "retry":
+        task.reset()
+    elif edit == "clear":
+        manager.remove(task)
+    elif edit == "kill":
+        task.revoke()
