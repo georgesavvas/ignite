@@ -13,7 +13,7 @@ class Scene(Directory):
     def __init__(self, path="") -> None:
         self.dict_attrs = ["path", "project", "name", "group" ,"dcc", "extension",
             "version", "dir_kind", "scene", "context", "task", "version", "vsn", "tags",
-            "attributes"]
+            "attributes", "creation_time", "modification_time"]
         self.nr_attrs = ["path", "task", "scene"]
         self.project = ""
         self.group = ""

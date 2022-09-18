@@ -2,6 +2,7 @@ import os
 import yaml
 import logging
 import shutil
+import datetime
 from pathlib import Path, PurePath
 from ignite_server import utils
 from ignite_server import api
@@ -76,7 +77,10 @@ class Directory():
 
     def as_dict(self):
         d = {}
+        attrs = dir(self)
         for s in self.dict_attrs:
+            if not s in attrs:
+                continue
             value = getattr(self, s)
             d[s] = value
             if s in self.nr_attrs:
@@ -128,8 +132,11 @@ class Directory():
         return children
 
     def update_config(self, data):
+        data["modification_time"] = datetime.datetime.utcnow()
         with open(self.anchor, "w+") as f:
             config = yaml.safe_load(f) or {}
+            if not config.get("creation_time"):
+                config["creation_time"] = data["modification_time"]
             config.update(data)
             yaml.safe_dump(config, f)
         return config

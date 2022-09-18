@@ -10,7 +10,6 @@ import {ConfigProvider} from "./contexts/ConfigContext";
 import {EntityProvider} from "./contexts/EntityContext";
 import { SnackbarProvider } from 'notistack';
 import BuildFileURL from './services/BuildFileURL';
-// import { useState, useEffect } from 'react';
 
 const darkTheme = createTheme({
   palette: {
@@ -25,7 +24,7 @@ const darkTheme = createTheme({
   typography: {
     allVariants: {
       color: "lightgrey",
-      fontSize: "12px"
+      fontSize: "0.75rem"
     }
   },
 });

@@ -12,6 +12,7 @@ import serverRequest from "../../services/serverRequest";
 import { ConfigContext } from "../../contexts/ConfigContext";
 import Modal from "../../components/Modal";
 import ProjectTile from "./ProjectTile";
+import ProjectCreator from "./ProjectCreator";
 
 const tileContainerStyle = {
   flexGrow: 1,
@@ -60,14 +61,15 @@ const Browser = props => {
 
   return (
     <div className={styles.container}>
-      <div style={tileContainerStyle}>
-        {Object.keys(tiles).map((k) => tiles[k])}
-      </div>
-      <ReflexContainer orientation="vertical">
-        <ReflexElement flex={0.2}>
+      <ReflexContainer orientation="vertical" style={{height: "90vh"}}>
+        <ReflexElement flex={0.7}>
+          <div style={tileContainerStyle}>
+            {Object.keys(tiles).map((k) => tiles[k])}
+          </div>
         </ReflexElement>
         <ReflexSplitter style={splitterStyle} />
-        <ReflexElement flex={0.7}>
+        <ReflexElement flex={0.3}>
+          <ProjectCreator />
         </ReflexElement>
       </ReflexContainer>
     </div>
@@ -76,7 +78,7 @@ const Browser = props => {
 
 export default function ProjectBrowser(props) {
   return (
-    <Modal open={props.open} onClose={props.onClose} title="Project Browser" fullWidth maxWidth="xl"
+    <Modal open={props.open} onClose={props.onClose} title="Project Browser" fullWidth
     closeButton>
       {Browser(props)}
     </Modal>

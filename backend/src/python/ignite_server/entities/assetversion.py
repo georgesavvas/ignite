@@ -23,7 +23,7 @@ class AssetVersion(Directory):
         super().__init__(path, dir_kind="assetversion")
         self.dict_attrs = ["path", "dir_kind", "anchor", "project", "name", "version",
             "components", "asset", "task", "uri", "tags", "context",
-            "thumbnail"]
+            "thumbnail", "creation_time", "modification_time"]
         self.nr_attrs = ["path", "asset", "task"]
         self.version = self.name
         self.version_int = 0

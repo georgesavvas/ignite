@@ -95,12 +95,8 @@
         "to": "."
       },
       {
-        "from": "../dcc/",
-        "to": "dcc"
-      },
-      {
-        "from": "../common/",
-        "to": "common"
+        "from": "../config/",
+        "to": "config"
       },
       {
         "from": "../tools/",

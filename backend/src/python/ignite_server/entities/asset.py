@@ -13,7 +13,7 @@ class Asset(Directory):
     def __init__(self, path="") -> None:
         super().__init__(path, dir_kind="asset")
         self.dict_attrs = ["path", "dir_kind", "anchor", "project", "name", "versions",
-            "latest_v", "uri", "context", "next_path"]
+            "latest_v", "uri", "context", "next_path", "creation_time", "modification_time"]
         self.nr_attrs = ["path"]
         self.uri = utils.get_uri(path)
         self._versions = []
