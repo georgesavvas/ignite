@@ -22,6 +22,8 @@ class SocketManager:
     async def broadcast(self, data):
         for connection in self.connections:
             await connection[0].send_json(data)
-
-
-manager = SocketManager()
+    
+    def get(self, session_id):
+        for ws, id in self.connections:
+            if session_id == id:
+                return ws

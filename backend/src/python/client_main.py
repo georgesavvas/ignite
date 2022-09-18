@@ -9,16 +9,11 @@ from fastapi import FastAPI, Request, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from ignite_server.socket_manager import SocketManager
-from ignite_client.task_manager import TaskManager
 from ignite_client import utils, api
-
+from ignite_client.utils import TASK_MANAGER, PROCESSES_MANAGER
 
 ENV = os.environ
 CONFIG = utils.get_config()
-
-PROCESSES_MANAGER = SocketManager()
-TASK_MANAGER = TaskManager()
 
 
 app = FastAPI()
@@ -194,7 +189,18 @@ async def run_action(request: Request):
     action = result.get("action")
     if not entity or not action:
         return {"ok": False}
-    api.run_action(TASK_MANAGER, entity, kind, action)
+    session_id = result.get("session_id")
+    api.run_action(TASK_MANAGER, entity, kind, action, session_id)
+    return {"ok": True}
+
+
+@app.post("/api/v1/edit_task")
+async def edit_task(request: Request):
+    result = await request.json()
+    log_request(result)
+    task_id = result.get("task_id")
+    edit = result.get("edit")
+    api.edit_task(TASK_MANAGER, task_id, edit)
     return {"ok": True}
 
 

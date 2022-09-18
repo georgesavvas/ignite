@@ -11,10 +11,11 @@
 
 .title {
     position: absolute;
-    /* top: 1px; */
     width: 100%;
     height: 100%;
     z-index: 10;
+    padding-left: 5px;
+    padding-right: 5px;
 }
 
 .spacer {
@@ -23,19 +24,30 @@
 
 .details {
     display: flex;
-    height: 30px;
+    /* height: 30px; */
     /* justify-content: space-around; */
     align-items: center;
     gap: 5px;
-    padding-left: 5px;
-    padding-right: 5px;
-    border-top: 1px solid rgb(70, 70, 70);
+    padding: 5px;
+    /* border-top: 1px solid rgb(70, 70, 70); */
     box-sizing: border-box;
 }
 
+.detailsText {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.button {
+    cursor: pointer;
+}
+
 .topBar {
-    /* background-color: rgb(100, 100, 100); */
-    height: 20px;
+    /* background-color: rgb(30, 30, 30); */
+    height: 10px;
     width: 100%;
     position: relative;
 }
@@ -47,13 +59,14 @@
 
 .progressBar {
     position: absolute;
-    width: 75%;
+    width: 100%;
     height: 100%;
     left: 0;
     top: 0;
     background-color: rgb(0, 40, 0);
     box-sizing: border-box;
     border-radius: 3px;
+    animation: width 0.25s;
 }
 
 .progressBar:after {
@@ -64,22 +77,22 @@
     bottom: 0;
     right: 0;
     background-image: -webkit-gradient(linear, 0 0, 100% 100%, color-stop(.25, rgba(255, 255, 255, .2)), color-stop(.25, transparent), color-stop(.5, transparent), color-stop(.5, rgba(255, 255, 255, .2)), color-stop(.75, rgba(255, 255, 255, .2)), color-stop(.75, transparent), to(transparent));
-    /* z-index: 1; */
-    -webkit-background-size: 50px 50px;
-    -moz-background-size: 50px 50px;
     background-size: 50px 50px;
-    -webkit-animation: move 2s linear infinite;
     overflow: hidden;
 }
 
-@-webkit-keyframes move {
-    0% {
-        background-position: 0 0;
-    }
-    100% {
-        background-position: 50px 50px;
-    }
+.running:after {
+    animation: move 2s linear infinite;
 }
+
+.waiting:after {
+    animation: move 6s linear infinite;
+}
+
+.finished:after {
+    animation: move 6s linear infinite;
+}
+
 @keyframes move {
     0% {
         background-position: 0 0;

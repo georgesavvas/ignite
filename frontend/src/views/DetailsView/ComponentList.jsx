@@ -51,10 +51,20 @@ function Component({comp, onSelect, selectedComp, actions}) {
     entity: comp
   };
 
+  const handleAction = action => {
+    window.services.get_env("IGNITE_SESSION_ID").then(resp => {
+      clientRequest("run_action", {
+        ...data,
+        action: action.label,
+        session_id: resp
+      })
+    })
+  }
+
   contextItems = contextItems.concat(actions.map(action => (
     {
       label: action.label,
-      fn: () => clientRequest("run_action", {...data, action: action.label})
+      fn: () => handleAction(action)
     }
   )));
 

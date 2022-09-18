@@ -11,20 +11,56 @@ const createProcessesSocket = (config, sessionID, websocketConfig) => {
 
 const destroySocket = socket => {
   if (!socket) return;
-  // if (socket.interval) clearInterval(socket.interval);
+  if (socket.interval) clearInterval(socket.interval);
   socket.close();
 }
 
-const defaultTask = {
-  name: "Create MP4",
-  asset: {name: "beauty", context: "build/campfire/model/coal"},
-  component: {name: "render_acescg.####.exr"}
-}
+const defaultTasks = [
+  {
+    state: "running",
+    progress: 40,
+    name: "Create JPEGs",
+    asset: {name: "beauty", context: "build/campfire/model/coal"},
+    component: {name: "render_acescg.####.exr"}
+  },
+  {
+    state: "waiting",
+    name: "Create MP4",
+    asset: {name: "beauty", context: "build/campfire/model/coal"},
+    component: {name: "render_acescg.####.exr"}
+  },
+  {
+    state: "paused",
+    progress: 68,
+    name: "Upload to frameio",
+    asset: {name: "beauty", context: "build/campfire/model/coal"},
+    component: {name: "render_acescg.####.exr"}
+  },
+  {
+    state: "error",
+    name: "Convert to USD in houdini",
+    asset: {name: "beauty", context: "build/campfire/model/coal"},
+    component: {name: "render_acescg.####.exr"}
+  },
+  {
+    state: "finished",
+    name: "Convert to USD in houdini",
+    asset: {name: "beauty", context: "build/campfire/model/coal"},
+    component: {name: "render_acescg.####.exr"}
+  }
+]
+
+const taskStateOrder = ["running", "error", "paused", "waiting", "finished"]
+defaultTasks.sort((a, b) => {
+  const indexA = taskStateOrder.indexOf(a.state);
+  const indexB = taskStateOrder.indexOf(b.state);
+  return indexA - indexB;
+})
 
 export default function TaskManager(props) {
   const [socket, setSocket] = useState();
   const [config, setConfig] = useContext(ConfigContext);
-  const [tasks, setTasks] = useState([defaultTask, defaultTask, defaultTask, defaultTask]);
+  const [tasks, setTasks] = useState(defaultTasks);
 
   useEffect(() => {
     if (!config.serverDetails.address) return;
@@ -35,9 +71,9 @@ export default function TaskManager(props) {
       };
       const ws = createProcessesSocket(config, resp, websocketConfig);
       if (!ws) return;
-      // ws.interval = setInterval(() => {
-      //   ws.send("ping");
-      // }, 2000)
+      ws.interval = setInterval(() => {
+        ws.send("ping");
+      }, 1000)
       setSocket(ws);
     })
     return (() => {
@@ -51,7 +87,7 @@ export default function TaskManager(props) {
       {/* <SystemResources /> */}
       <div className={styles.container}>
         {tasks.map((task, index) =>
-          <Task key={index} state="running" progress={0.4} task={task} />
+          <Task key={index} progress={0.4} task={task} />
         )}
       </div>
     </div>
