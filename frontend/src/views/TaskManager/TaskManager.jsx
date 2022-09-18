@@ -24,7 +24,7 @@ const defaultTask = {
 export default function TaskManager(props) {
   const [socket, setSocket] = useState();
   const [config, setConfig] = useContext(ConfigContext);
-  const [tasks, setTasks] = useState([defaultTask]);
+  const [tasks, setTasks] = useState([defaultTask, defaultTask, defaultTask, defaultTask]);
 
   useEffect(() => {
     if (!config.serverDetails.address) return;
