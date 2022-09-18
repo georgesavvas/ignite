@@ -28,11 +28,17 @@ const Task = props => {
     }
   }
 
+  const progressBarStyle = {
+    backgroundColor: "rgb(0, 60, 0)",
+    // backgroundColor: "rgb(150, 150, 0)",
+    // backgroundColor: "rgb(100, 0, 0)"
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.topBar}>
         <Typography className={styles.title} align="center">{props.task.name}</Typography>
-        <div className={styles.progressBar} />
+        <div className={styles.progressBar} style={progressBarStyle} />
       </div>
       <div className={styles.details}>
         {getStatusIcon()}
