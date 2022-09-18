@@ -4,6 +4,7 @@ import yaml
 import logging
 import re
 import parse
+import datetime
 from pathlib import Path, PurePath
 from huey import SqliteHuey
 from ignite_server.constants import ANCHORS
@@ -71,7 +72,10 @@ def create_anchor(path, name):
         raise Exception(f"Invalid anchor name: {name}")
     full_path = Path(path) / anchor
     if not full_path.exists():
-        full_path.touch()
+        data = {"creation_time": datetime.datetime.utcnow()}
+        with open(full_path, "w+") as f:
+            yaml.safe_dump(data, f)
+        # full_path.touch()
     return full_path
 
 

@@ -6,12 +6,12 @@
     border: solid 1px;
     border-color: rgb(40, 40, 40);
     border-radius: 5px;
-    margin: 10px;
+    margin: 5px;
 }
 
 .tag {
     border-radius: 5px;
-    padding: 5px;
+    /* padding: 5px; */
     padding-left: 8px;
     padding-right: 8px;
     background-color: whitesmoke;
@@ -19,7 +19,7 @@
     justify-content: center;
     align-items: center;
     gap: 5px;
-    min-height: 25px;
+    min-height: 10px;
 }
 
 .tagEdit {
