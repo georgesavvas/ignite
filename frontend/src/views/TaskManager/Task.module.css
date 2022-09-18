@@ -26,9 +26,11 @@
     height: 30px;
     /* justify-content: space-around; */
     align-items: center;
-    /* gap: 5px; */
+    gap: 5px;
     padding-left: 5px;
     padding-right: 5px;
+    border-top: 1px solid rgb(70, 70, 70);
+    box-sizing: border-box;
 }
 
 .topBar {
@@ -45,12 +47,13 @@
 
 .progressBar {
     position: absolute;
-    width: 100%;
+    width: 75%;
     height: 100%;
     left: 0;
     top: 0;
     background-color: rgb(0, 40, 0);
     box-sizing: border-box;
+    border-radius: 3px;
 }
 
 .progressBar:after {
