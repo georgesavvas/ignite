@@ -190,7 +190,7 @@ async def run_action(request: Request):
     if not entity or not action:
         return {"ok": False}
     session_id = result.get("session_id")
-    api.run_action(TASK_MANAGER, entity, kind, action, session_id)
+    api.run_action(entity, kind, action, session_id)
     return {"ok": True}
 
 

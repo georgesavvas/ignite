@@ -8,6 +8,7 @@ from string import Formatter
 from fnmatch import fnmatch
 from pathlib import PurePath, Path
 from pprint import pprint
+from uuid import uuid4
 import huey
 from huey.signals import *
 from ignite_client import utils
@@ -289,7 +290,9 @@ def get_actions():
 
 
 @HUEY.task()
-def _run_action(action, entity):
+def _run_action(action, entity, queue):
+    def progress_fn(progress):
+        queue.put(())
     module_path = PurePath(action["module_path"])
     module = importlib.machinery.SourceFileLoader(
         module_path.name, str(module_path)
@@ -306,8 +309,7 @@ def _push_task_updates(signal, task, exc=None):
     # websocket.send_json({"data": TASK_MANAGER.report()})
 
 
-def run_action(task_manager, entity, kind, action, session_id):
-    print(PROCESSES_MANAGER.connections)
+def run_action(entity, kind, action, session_id):
     actions = utils.discover_actions().get(kind)
     if not actions:
         logging.error(f"Couldn't find action {kind} {action}")
@@ -318,10 +320,11 @@ def run_action(task_manager, entity, kind, action, session_id):
         if _action["label"] != action:
             continue
         _action["session_id"] = session_id
-        task = _run_action.s(_action, entity)
+        task_id = uuid4()
+        task = _run_action.s(_action, entity, TASK_MANAGER.queue, task_id)
         task.ignite_action = _action
         task.ignite_entity = entity
-        task_manager.add(task)
+        TASK_MANAGER.add(task, task_id)
         break
     else:
         logging.error(f"Couldn't find action {kind} {action}")
