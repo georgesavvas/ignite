@@ -17,6 +17,7 @@
         "platformdirs",
         "PLUGINPATH",
         "Popen",
+        "popleft",
         "repr",
         "RULETEMPLATE",
         "USDZ",

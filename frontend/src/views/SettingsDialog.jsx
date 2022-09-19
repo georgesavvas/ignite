@@ -180,8 +180,7 @@ export default function SettingsDialog(props) {
   }
 
   return (
-    <Modal open={props.open} onClose={props.onClose} title="Settings" maxWidth="lg"
-      closeButton>
+    <Modal open={props.open} onClose={props.onClose} title="Settings" maxWidth="lg">
       <div className={styles.container}>
         <DialogContentText style={{alignSelf: "flex-start"}}>
           Server Details

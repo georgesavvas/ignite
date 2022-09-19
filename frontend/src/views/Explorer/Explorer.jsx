@@ -245,16 +245,16 @@ function Explorer() {
   
   function getSpecificContextItems(data) {
     if (!(data.kind in DIRCONTEXTOPTIONS)) return [];
-    return DIRCONTEXTOPTIONS[data.kind].map(contextOption => (
-      {
-        label: contextOption.label,
-        value: contextOption.name,
-        dir_path: data.path,
-        fn: () => data.handleClick(
-          "create", {...data, method: contextOption.name, kind: contextOption.dir_kind}
-        )
-      }
-    ))
+    const kindOptions = DIRCONTEXTOPTIONS[data.kind];
+    const namedOptions = kindOptions[data.name] || kindOptions.default;
+    return namedOptions.map(contextOption => ({
+      label: contextOption.label,
+      value: contextOption.name,
+      dir_path: data.path,
+      fn: () => data.handleClick(
+        "create", {...data, method: contextOption.name, kind: contextOption.dir_kind}
+      )
+    }))
   }
 
   const itemData = {

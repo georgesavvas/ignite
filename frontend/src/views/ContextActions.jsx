@@ -4,6 +4,7 @@ import CreateDirModal from "./CreateDirModal";
 import serverRequest from "../services/serverRequest";
 import clientRequest from "../services/clientRequest";
 import TextField from '@mui/material/TextField';
+import { Button } from '@mui/material';
 
 export function CopyToClipboard(text, enqueueSnackbar) {
   navigator.clipboard.writeText(text);
@@ -28,10 +29,13 @@ export function DeleteDir({data, open=false, onClose, enqueueSnackbar, fn}) {
   }
 
   return (
-    <Modal open={open} buttonLabel="Confirm" onButtonClicked={handleDeleteEntity}
+    <Modal open={open} title="Are you sure?"
       maxWidth="sm" closeButton onClose={onClose}
       text={`This will permanently delete this ${data.kind}!`}
-      title="Are you sure?"
+      buttons={[
+        <Button key="confirm" onClick={handleDeleteEntity}>Confirm</Button>,
+        <Button key="cancel" onClick={onClose}>Cancel</Button>
+      ]}
     />
   )
 }
@@ -44,11 +48,12 @@ export function RenameDir({data, open=false, onClose, enqueueSnackbar, fn}) {
   }, [data.name])
 
   function handleRenameDir() {
+    console.log("hello")
     serverRequest("rename_entity", {...data, name: nameValue}).then(resp => {
       if (resp.ok) enqueueSnackbar("Renamed!", {variant: "success"});
       else {
         let reason = "";
-        if (resp.text) reason = ` - ${resp.text}`;
+        if (resp.error) reason = ` - ${resp.error}`;
         enqueueSnackbar(`Couldn't rename ${data.kind}${reason}.`, {variant: "error"});
       }
     });
@@ -57,8 +62,9 @@ export function RenameDir({data, open=false, onClose, enqueueSnackbar, fn}) {
   }
 
   return (
-    <Modal open={open} buttonLabel="Confirm" onButtonClicked={handleRenameDir}
+    <Modal open={open}
       maxWidth="sm" closeButton onClose={onClose} title={`Renaming ${data.kind}`}
+      buttons={[<Button key="confirm" onClick={handleRenameDir}>Confirm</Button>]}
     >
       <TextField
         id="name"

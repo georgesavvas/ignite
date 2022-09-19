@@ -10,9 +10,18 @@ import PendingOutlinedIcon from '@mui/icons-material/PendingOutlined';
 import ClearIcon from '@mui/icons-material/Clear';
 import LowPriorityIcon from '@mui/icons-material/LowPriority';
 import ReplayIcon from '@mui/icons-material/Replay';
+import clientRequest from "../../services/clientRequest";
 
 const Task = props => {
   const state = props.task.state;
+
+  const handleAction = action => {
+    const data = {
+      task_id: props.task.id,
+      edit: action
+    }
+    clientRequest("edit_task", data)
+  }
 
   const getStatusIcon = () => {
     switch (state) {
@@ -24,10 +33,10 @@ const Task = props => {
 
   const getActionButton = () => {
     switch (state) {
-      case "paused": return <PlayArrowIcon className={styles.button} />;
-      case "waiting": return <PauseIcon className={styles.button} />
-      case "finished": case "error": return <ReplayIcon className={styles.button} />;
-      default: return <LowPriorityIcon className={styles.button} />;
+      case "paused": return <PlayArrowIcon className={styles.button} onClick={() => handleAction("unpause")} />;
+      // case "waiting": return <PauseIcon className={styles.button} onClick={() => handleAction("pause")} />
+      case "finished": case "error": return <ReplayIcon className={styles.button} onClick={() => handleAction("retry")} />;
+      default: return <LowPriorityIcon className={styles.button} onClick={() => handleAction("retry")} />;
     }
   }
 
@@ -57,13 +66,14 @@ const Task = props => {
       <div className={styles.details}>
         {/* {getStatusIcon()} */}
         <div className={styles.detailsText}>
-          <Typography>{props.task.name}</Typography>
+          <Typography noWrap>{props.task.name}</Typography>
+          {/* <Typography noWrap>{props.task.entity.path}</Typography> */}
           <Typography noWrap>{props.task.asset.name} - {props.task.asset.context}</Typography>
           <Typography>{props.task.component.name}</Typography>
         </div>
         {/* <div className={styles.spacer} /> */}
         {getActionButton()}
-        <ClearIcon className={styles.button} />
+        <ClearIcon className={styles.button} onClick={() => handleAction("clear")} />
       </div>
     </div>
   )

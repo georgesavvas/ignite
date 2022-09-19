@@ -48,16 +48,16 @@ function DirectoryTile(props) {
 
   function getSpecificContextItems(entity) {
     if (!DIRCONTEXTOPTIONS.hasOwnProperty(entity.dir_kind)) return [];
-    return DIRCONTEXTOPTIONS[entity.dir_kind].map(contextOption => (
-      {
-        label: contextOption.label,
-        value: contextOption.name,
-        dir_path: entity.path,
-        fn: () => props.onContextMenu(
-          "create", {...entity, method: contextOption.name, kind: contextOption.dir_kind}
-        )
-      }
-    ))
+    const kindOptions = DIRCONTEXTOPTIONS[entity.dir_kind];
+    const namedOptions = kindOptions[entity.name] || kindOptions.default;
+    return namedOptions.map(contextOption => ({
+      label: contextOption.label,
+      value: contextOption.name,
+      dir_path: entity.path,
+      fn: () => props.onContextMenu(
+        "create", {...entity, method: contextOption.name, kind: contextOption.dir_kind}
+      )
+    }))
   }
 
   const handleClick = e => {

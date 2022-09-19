@@ -11,7 +11,10 @@ const createProcessesSocket = (config, sessionID, websocketConfig) => {
 
 const destroySocket = socket => {
   if (!socket) return;
-  if (socket.interval) clearInterval(socket.interval);
+  // if (socket.interval) {
+  //   clearInterval(socket.interval);
+  //   socket.interval = null;
+  // }
   socket.close();
 }
 
@@ -51,11 +54,15 @@ const defaultTasks = [
 ]
 
 const taskStateOrder = ["running", "error", "paused", "waiting", "finished"]
-defaultTasks.sort((a, b) => {
-  const indexA = taskStateOrder.indexOf(a.state);
-  const indexB = taskStateOrder.indexOf(b.state);
-  return indexA - indexB;
-})
+const sortTasks = tasks => {
+  const _tasks = [...tasks];
+  _tasks.sort((a, b) => {
+    const indexA = taskStateOrder.indexOf(a.state);
+    const indexB = taskStateOrder.indexOf(b.state);
+    return indexA - indexB;
+  })
+  return _tasks;
+}
 
 export default function TaskManager(props) {
   const [socket, setSocket] = useState();
@@ -67,13 +74,17 @@ export default function TaskManager(props) {
     if (socket) return;
     window.services.get_env("IGNITE_SESSION_ID").then(resp => {
       const websocketConfig = {
-        onmessage: e => console.log(JSON.parse(e.data))
+        onmessage: e => {
+          const data = JSON.parse(e.data);
+          console.log(data.data);
+          setTasks(sortTasks(data.data) || []);
+        }
       };
       const ws = createProcessesSocket(config, resp, websocketConfig);
-      if (!ws) return;
-      ws.interval = setInterval(() => {
-        ws.send("ping");
-      }, 1000)
+      if (!ws || ws.interval) return;
+      // ws.interval = setInterval(() => {
+      //   ws.send("ping");
+      // }, 1000)
       setSocket(ws);
     })
     return (() => {
@@ -83,11 +94,10 @@ export default function TaskManager(props) {
   }, [config.serverDetails])
 
   return (
-    <div>
-      {/* <SystemResources /> */}
-      <div className={styles.container}>
+    <div className={styles.container}>
+      <div className={styles.tasksContainer}>
         {tasks.map((task, index) =>
-          <Task key={index} progress={0.4} task={task} />
+          <Task key={index} task={task} />
         )}
       </div>
     </div>

@@ -24,15 +24,17 @@ IGNITE_DCC = Path(ENV["IGNITE_DCC"])
 
 def create_project(name: str):
     if not utils.validate_dirname(name): 
-        raise Exception(
-            f"Invalid project name, only alphanumeric and underscores allowed: {name}"
-        )
+        return False, "invalid project name"
     if list(Path(ROOT).glob(name)):
-        raise Exception(f"Project already exists: {name}")
+        return False, "already exists"
     path = ROOT / name
-    utils.ensure_directory(path)
+    utils.create_anchor(path, "project")
+    utils.create_anchor(path / "global", "group")
+    utils.create_anchor(path / "build", "group")
+    utils.create_anchor(path / "shots", "group")
+    utils.ensure_directory(path / "common")
     project = get_project(path)
-    return project
+    return project != None, ""
 
 
 def get_projects_root() -> str:
@@ -607,13 +609,13 @@ def rename_entity(path, entity_type, new_name):
             "Attempted to rename", entity.dir_kind,
             "but the entity was supposed to be", entity_type
         )
-        return False
+        return False, "wrong entity type"
     contents = get_contents(path)
-    if contents:
-        return -1
+    if contents and entity_type != "project":
+        return False, f"{entity_type} not empty"
     path = Path(path)
     path.rename(path.parent / new_name)
-    return 1
+    return True, ""
 
 
 def add_tags(path, tags):

@@ -1,6 +1,6 @@
 import './App.css';
 import 'react-reflex/styles.css'
-import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 import darkScrollbar from '@mui/material/darkScrollbar';
 import GlobalStyles from '@mui/material/GlobalStyles';
 import Home from './views/Home';
@@ -11,7 +11,7 @@ import {EntityProvider} from "./contexts/EntityContext";
 import { SnackbarProvider } from 'notistack';
 import BuildFileURL from './services/BuildFileURL';
 
-const darkTheme = createTheme({
+let darkTheme = createTheme({
   palette: {
     mode: 'dark',
     ignite: {
@@ -22,9 +22,10 @@ const darkTheme = createTheme({
     },
   },
   typography: {
+    // htmlFontSize: 18,
+    fontSize: 12.5,
     allVariants: {
-      color: "lightgrey",
-      fontSize: "0.75rem"
+      color: "lightgrey"
     }
   },
 });

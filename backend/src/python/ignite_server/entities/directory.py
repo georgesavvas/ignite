@@ -202,7 +202,7 @@ class Directory():
         root = ROOT.as_posix()
         parent = Path(self.path.parent)
         iter = 1
-        parent_attribs = []
+        parent_attrib_list = []
         while root in parent.as_posix():
             contents = next(parent.glob(".ign_*.yaml"), None)
             if not contents:
@@ -213,29 +213,29 @@ class Directory():
                 config = yaml.safe_load(f) or {}
             dir_attribs = config.get("attributes")
             if dir_attribs:
-                parent_attribs.append(dir_attribs)
+                parent_attrib_list.append(dir_attribs)
             parent = parent.parent
             iter +=1
             if iter > 20:
                 raise Exception(f"Reached iteration limit when walking directory: {self.path}")
-        parent_attribs.reverse()
-        attributes = {}
-        for attribs in parent_attribs:
-            attributes.update(attribs)
-        parent_keys = list(attributes.keys())
+        parent_attrib_list.reverse()
+        parent_attribs = {}
+        for attribs in parent_attrib_list:
+            parent_attribs.update(attribs)
 
         with open(self.anchor, "r") as f:
             config = yaml.safe_load(f) or {}
         current_attribs = config.get("attributes", {})
-        current_keys = list(current_attribs.keys())
+
+        attributes = dict(parent_attribs)
         attributes.update(current_attribs)
 
         attributes_formatted = []
         for k, v in attributes.items():
             attributes_formatted.append({
                 "name": k,
-                "inherited": v if k in parent_keys else "",
-                "override": v if k in current_keys else ""
+                "inherited": parent_attribs.get(k, ""),
+                "override": current_attribs.get(k, "")
             })
 
         return attributes_formatted

@@ -290,9 +290,9 @@ def get_actions():
 
 
 @HUEY.task()
-def _run_action(action, entity, queue):
-    def progress_fn(progress):
-        queue.put(())
+def _run_action(action, entity, task_id):
+    # def progress_fn(progress):
+    #     TASK_MANAGER.task_progress[task_id] = progress
     module_path = PurePath(action["module_path"])
     module = importlib.machinery.SourceFileLoader(
         module_path.name, str(module_path)
@@ -300,13 +300,6 @@ def _run_action(action, entity, queue):
     result = module.main(entity)
     print("Action result:", result)
     return result
-
-
-@HUEY.signal()
-def _push_task_updates(signal, task, exc=None):
-    print(PROCESSES_MANAGER.connections)
-    # websocket = PROCESSES_MANAGER.get(task.data[0][0]["session_id"])
-    # websocket.send_json({"data": TASK_MANAGER.report()})
 
 
 def run_action(entity, kind, action, session_id):
@@ -320,10 +313,8 @@ def run_action(entity, kind, action, session_id):
         if _action["label"] != action:
             continue
         _action["session_id"] = session_id
-        task_id = uuid4()
-        task = _run_action.s(_action, entity, TASK_MANAGER.queue, task_id)
-        task.ignite_action = _action
-        task.ignite_entity = entity
+        task_id = str(uuid4())
+        task = _run_action.s(action=_action, entity=entity, task_id=task_id)
         TASK_MANAGER.add(task, task_id)
         break
     else:
@@ -340,7 +331,9 @@ def edit_task(manager, task_id, edit):
         task.restore()
     elif edit == "retry":
         task.reset()
+        task.reschedule()
+        task.restore()
     elif edit == "clear":
-        manager.remove(task)
+        manager.remove(task_id)
     elif edit == "kill":
         task.revoke()

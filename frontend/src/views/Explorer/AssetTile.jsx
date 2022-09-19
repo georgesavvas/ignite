@@ -63,6 +63,7 @@ function AssetTile(props) {
         <URI uri={props.entity.uri} />
         <Path path={props.entity.creation_time} />
         <Path path={props.entity.modification_time} />
+        <Path path={props.entity.size} />
         {/* <Typography align="left">{props.entity.context}</Typography> */}
       </>
     )
