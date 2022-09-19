@@ -4,7 +4,7 @@ import CreateDirModal from "./CreateDirModal";
 import serverRequest from "../services/serverRequest";
 import clientRequest from "../services/clientRequest";
 import TextField from '@mui/material/TextField';
-import { Button } from '@mui/material';
+import { Button, OutlinedInput, Typography } from '@mui/material';
 
 export function CopyToClipboard(text, enqueueSnackbar) {
   navigator.clipboard.writeText(text);
@@ -18,6 +18,20 @@ export function ShowInExplorer(filepath, enqueueSnackbar) {
 }
 
 export function DeleteDir({data, open=false, onClose, enqueueSnackbar, fn}) {
+  const [puzzle, setPuzzle] = useState([0, 0]);
+  const [solved, setSolved] = useState(false);
+  const [value, setValue] = useState("");
+
+  useEffect(() => {
+    const n1 = Math.floor(Math.random() * 49);
+    const n2 = Math.floor(Math.random() * 49);
+    if (open) setPuzzle([n1, n2]);
+  }, [open])
+
+  useEffect(() => {
+    setSolved(parseInt(value) === puzzle[0] + puzzle[1]);
+  }, [value, puzzle])
+
   const handleDeleteEntity = () => {
     serverRequest("delete_entity", data).then(resp => {
       if (resp.ok) enqueueSnackbar("Successfully deleted!", {variant: "success"});
@@ -26,6 +40,7 @@ export function DeleteDir({data, open=false, onClose, enqueueSnackbar, fn}) {
     });
     if (fn) fn();
     onClose();
+    setValue("")
   }
 
   return (
@@ -33,10 +48,21 @@ export function DeleteDir({data, open=false, onClose, enqueueSnackbar, fn}) {
       maxWidth="sm" closeButton onClose={onClose}
       text={`This will permanently delete this ${data.kind}!`}
       buttons={[
-        <Button key="confirm" onClick={handleDeleteEntity}>Confirm</Button>,
+        <Button disabled={!solved} key="confirm" onClick={handleDeleteEntity}>Confirm</Button>,
         <Button key="cancel" onClick={onClose}>Cancel</Button>
       ]}
-    />
+    >
+      <TextField
+        style={{marginTop: "20px"}}
+        label={`${puzzle[0]} + ${puzzle[1]} =`}
+        size="small"
+        autoFocus
+        value={value}
+        onChange={e => setValue(e.target.value)}
+        helperText={solved ? "Go for it" : "Solve the above to continue"}
+        color={solved ? "success" : "error"}
+      />
+    </Modal>
   )
 }
 

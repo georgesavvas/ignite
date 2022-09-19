@@ -3,6 +3,7 @@ import styles from "./DccSelector.module.css";
 import Typography from '@mui/material/Typography';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import { Button } from "@mui/material";
+import LoadingButton from '@mui/lab/LoadingButton';
 import {ConfigContext} from "../contexts/ConfigContext";
 import {ContextContext} from "../contexts/ContextContext";
 import { useSnackbar } from 'notistack';
@@ -21,6 +22,7 @@ function DccSelector(props) {
   const [config, setConfig] = useContext(ConfigContext);
   const [selectedDcc, setSelectedDcc] = useState("");
   const [showAll, setShowAll] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
@@ -77,6 +79,7 @@ function DccSelector(props) {
   }
 
   async function handleLaunchClick(e) {
+    setIsLoading(true);
     const dcc = getDcc();
     const dcc_name = getDccName(dcc.path);
     const data = {
@@ -95,6 +98,7 @@ function DccSelector(props) {
     else enqueueSnackbar("Failed launching scene.", {variant: "error"});
     refreshContext();
     if (props.onClose) props.onClose();
+    setIsLoading(false);
   }
 
   let dccConfigSorted = config.dccConfig;
@@ -119,7 +123,8 @@ function DccSelector(props) {
         {dccConfigSorted.map((dcc, index) => formatDcc(dcc, index))}
       </div>
       <div style={{width: "100%", display: "grid", justifyContent: "center", marginTop: "20px"}}>
-        <Button
+        <LoadingButton
+          loading={isLoading}
           size="large"
           variant="outlined"
           color="ignite"
@@ -129,7 +134,7 @@ function DccSelector(props) {
           disabled={!selectedDcc}
         >
           Launch
-        </Button>
+        </LoadingButton>
       </div>
     </div>
   )
