@@ -23,10 +23,12 @@ export function DeleteDir({data, open=false, onClose, enqueueSnackbar, fn}) {
   const [value, setValue] = useState("");
 
   useEffect(() => {
+    if (!open) return;
     const n1 = Math.floor(Math.random() * 49);
     const n2 = Math.floor(Math.random() * 49);
-    if (open) setPuzzle([n1, n2]);
-  }, [open])
+    setPuzzle([n1, n2])
+    setValue("")
+  }, [open, data])
 
   useEffect(() => {
     setSolved(parseInt(value) === puzzle[0] + puzzle[1]);
@@ -40,7 +42,6 @@ export function DeleteDir({data, open=false, onClose, enqueueSnackbar, fn}) {
     });
     if (fn) fn();
     onClose();
-    setValue("")
   }
 
   return (

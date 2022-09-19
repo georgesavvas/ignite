@@ -25,7 +25,7 @@ CONFIG_PATH = Path(ENV["IGNITE_CONFIG_PATH"])
 
 HUEY = SqliteHuey(filename=USER_CONFIG_PATH / "ignite.db")
 PROCESSES_MANAGER = SocketManager()
-TASK_MANAGER = TaskManager(HUEY)
+TASK_MANAGER = TaskManager(HUEY, PROCESSES_MANAGER)
 
 OS_NAME = OS_NAMES[platform.system()]
 
