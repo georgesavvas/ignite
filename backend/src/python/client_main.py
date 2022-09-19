@@ -5,6 +5,8 @@ from pprint import pprint
 from pathlib import Path
 import uvicorn
 import logging
+import asyncio
+import threading
 from fastapi import FastAPI, Request, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -25,6 +27,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.on_event("startup")
+async def startup_event():
+    loop = asyncio.get_event_loop()
+    TASK_MANAGER.loop = loop
+    loop.create_task(TASK_MANAGER.start_worker())
 
 
 @app.websocket("/ws/processes/{session_id}")

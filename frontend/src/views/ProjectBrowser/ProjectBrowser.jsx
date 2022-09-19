@@ -13,7 +13,6 @@ import serverRequest from "../../services/serverRequest";
 import { ConfigContext } from "../../contexts/ConfigContext";
 import Modal from "../../components/Modal";
 import ProjectTile, { NewProjectTile } from "./ProjectTile";
-import ProjectCreator from "./ProjectCreator";
 import { TextField } from "@mui/material";
 import { useSnackbar } from 'notistack';
 import { validateDirName } from "../../utils/validateDirName";
@@ -41,19 +40,14 @@ const Browser = props => {
       obj[entity.result_id] = <ProjectTile key={entity.result_id}
         viewType="grid"
         entity={entity}
-        onContextMenu={handleContextMenuSelection}
+        onContextMenu={props.handleContextMenuSelection}
         onSelected={props.onProjectSelect}
         selected={""}
       />;
       return obj;
     }, {});
     setTiles(_tiles);
-  }, [props.loadedData]);
-
-  const handleContextMenuSelection = (action, data) => {
-    data[`${action}Open`] = true;
-    props.setModalData(data);
-  };
+  }, [props]);
 
   return (
     <div className={styles.container}>
@@ -104,6 +98,11 @@ export default function ProjectBrowser(props) {
     })
   }
 
+  const handleContextMenuSelection = (action, data) => {
+    data[`${action}Open`] = true;
+    setModalData(data);
+  };
+
   const handleProjectSelect = entity => {
     setProject(entity.name, setCurrentContext);
     props.onClose();
@@ -142,6 +141,7 @@ export default function ProjectBrowser(props) {
           modalData={modalData}
           setModalData={setModalData}
           loadedData={loadedData}
+          handleContextMenuSelection={handleContextMenuSelection}
         />
       }
     </Modal>
