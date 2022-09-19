@@ -127,6 +127,8 @@ def get_task_env(path):
         "CACHE": task.get("cache", ""),
         "SCENES": task.get("scenes", "")
     }
+    for attrib in task.get("attributes", []):
+        env[f"IGNITE_ATTRIB_{attrib['name']}"] = attrib["override"] or attrib["inherited"]
     return env
 
 

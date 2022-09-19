@@ -132,8 +132,9 @@ function CreateDirModal(props) {
   }
 
   return (
-    <Modal open={props.open} maxWidth="xs" onClose={props.onClose} closeButton
-      title={`Create ${props.data.kind}`} buttonLabel="Create" onButtonClicked={handleCreate}
+    <Modal open={props.open} maxWidth="xs" onClose={props.onClose}
+      title={`Create ${props.data.kind}`}
+      buttons={[<Button key="create" onClick={handleCreate}>Create</Button>]}
       buttonProps={{color: "ignite"}}
     >
       <div style={{display: "flex", flexDirection: "column", height: "60vh"}}>

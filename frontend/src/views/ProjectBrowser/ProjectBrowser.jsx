@@ -3,6 +3,7 @@ import styles from "./ProjectBrowser.module.css";
 import Typography from '@mui/material/Typography';
 import {setProject, ContextContext} from "../../contexts/ContextContext";
 import Button from '@mui/material/Button';
+import { DeleteDir, RenameDir, CreateDir } from "../ContextActions";
 import {
   ReflexContainer,
   ReflexSplitter,
@@ -11,16 +12,20 @@ import {
 import serverRequest from "../../services/serverRequest";
 import { ConfigContext } from "../../contexts/ConfigContext";
 import Modal from "../../components/Modal";
-import ProjectTile from "./ProjectTile";
+import ProjectTile, { NewProjectTile } from "./ProjectTile";
 import ProjectCreator from "./ProjectCreator";
+import { TextField } from "@mui/material";
+import { useSnackbar } from 'notistack';
+import { validateDirName } from "../../utils/validateDirName";
+import DataPlaceholder from "../../components/DataPlaceholder";
 
 const tileContainerStyle = {
   flexGrow: 1,
   display: "grid",
   overflowY: "auto",
   gridTemplateColumns: `repeat(auto-fill, minmax(250px, 1fr))`,
-  gridGap: "10px",
-  padding: "10px"
+  gridGap: "5px",
+  padding: "5px"
 }
 
 const splitterStyle = {
@@ -29,15 +34,47 @@ const splitterStyle = {
 }
 
 const Browser = props => {
-  const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
-  const [isLoading, setIsLoading] = useState(false);
-  const [loadedData, setLoadedData] = useState([]);
   const [tiles, setTiles] = useState([]);
 
-  const handleSelection = entity => {
-    setProject(entity.name, setCurrentContext);
-    props.onClose();
-  }
+  useEffect(() => {
+    const _tiles = props.loadedData.reduce(function(obj, entity) {
+      obj[entity.result_id] = <ProjectTile key={entity.result_id}
+        viewType="grid"
+        entity={entity}
+        onContextMenu={handleContextMenuSelection}
+        onSelected={props.onProjectSelect}
+        selected={""}
+      />;
+      return obj;
+    }, {});
+    setTiles(_tiles);
+  }, [props.loadedData]);
+
+  const handleContextMenuSelection = (action, data) => {
+    data[`${action}Open`] = true;
+    props.setModalData(data);
+  };
+
+  return (
+    <div className={styles.container}>
+      <div style={tileContainerStyle}>
+        <NewProjectTile
+          onClick={props.onNewProjectClicked}
+        />
+        {Object.keys(tiles).map((k) => tiles[k])}
+      </div>
+    </div>
+  )
+}
+
+export default function ProjectBrowser(props) {
+  const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
+  const [newProjectOpen, setNewProjectOpen] = useState(false);
+  const [newProjectName, setNewProjectName] = useState("");
+  const [modalData, setModalData] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadedData, setLoadedData] = useState([]);
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
   useEffect(() => {
     if (!props.open) return;
@@ -46,41 +83,67 @@ const Browser = props => {
       setIsLoading(false);
       setLoadedData(resp.data);
     });
-  }, [props.open]);
+  }, [props.open, currentContext]);
 
-  useEffect(() => {
-    const _tiles = loadedData.reduce(function(obj, entity) {
-      obj[entity.result_id] = <ProjectTile key={entity.result_id} viewType="grid"
-                                entity={entity} onSelected={handleSelection}
-                                selected={""}
-                              />;
-      return obj;
-    }, {});
-    setTiles(_tiles);
-  }, [loadedData]);
+  const handleNewProject = () => {
+    const data = {
+      name: newProjectName
+    }
+    serverRequest("create_project", data).then(resp => {
+      if (resp.ok) {
+        setProject(newProjectName, setCurrentContext)
+        props.onClose()
+        setNewProjectName("")
+        setNewProjectOpen(false)
+        enqueueSnackbar("Project created!", {variant: "success"})
+        return;
+      }
+      enqueueSnackbar(
+        `Couldn't create project - ${resp.error}`, {variant: "error"}
+      )
+    })
+  }
+
+  const handleProjectSelect = entity => {
+    setProject(entity.name, setCurrentContext);
+    props.onClose();
+  }
+
+  const handleProjectNameChange = e => {
+    const value = validateDirName(e.target.value);
+    setNewProjectName(value)
+  }
 
   return (
-    <div className={styles.container}>
-      <ReflexContainer orientation="vertical" style={{height: "90vh"}}>
-        <ReflexElement flex={0.7}>
-          <div style={tileContainerStyle}>
-            {Object.keys(tiles).map((k) => tiles[k])}
-          </div>
-        </ReflexElement>
-        <ReflexSplitter style={splitterStyle} />
-        <ReflexElement flex={0.3}>
-          <ProjectCreator />
-        </ReflexElement>
-      </ReflexContainer>
-    </div>
-  )
-}
-
-export default function ProjectBrowser(props) {
-  return (
-    <Modal open={props.open} onClose={props.onClose} title="Project Browser" fullWidth
-    closeButton>
-      {Browser(props)}
+    <Modal open={props.open} onClose={props.onClose} title="Project Browser"
+      maxWidth="xl"
+    >
+      <Modal open={newProjectOpen} onClose={() => setNewProjectOpen(false)} maxWidth="sm"
+        buttons={[<Button key="create" onClick={handleNewProject}>Create</Button>]}
+        title="New project name" 
+      >
+        <TextField onChange={handleProjectNameChange} value={newProjectName} 
+          size="small" fullWidth autoFocus
+        />
+      </Modal>
+      <DeleteDir open={modalData.deleteOpen} enqueueSnackbar={enqueueSnackbar}
+        onClose={() => setModalData(prevState => ({...prevState, deleteOpen: false}))}
+        data={modalData} fn={refreshContext}
+      />
+      <RenameDir open={modalData.renameOpen} enqueueSnackbar={enqueueSnackbar}
+        onClose={() => setModalData(prevState => ({...prevState, renameOpen: false}))}
+        data={modalData} fn={refreshContext}
+      />
+      {isLoading && !loadedData ? <DataPlaceholder /> :
+        <Browser
+          {...props}
+          onNewProjectClicked={() => setNewProjectOpen(true)}
+          onProjectSelect={handleProjectSelect}
+          modalData={modalData}
+          setModalData={setModalData}
+          loadedData={loadedData}
+        />
+      }
     </Modal>
   )
 }

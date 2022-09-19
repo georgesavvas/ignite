@@ -48,9 +48,9 @@ def process_request(req):
     return req
 
 
-def error(s):
+def error(s, msg=""):
     logging.error(s)
-    return {"ok": False, "error": s}
+    return {"ok": False, "error": msg or s}
 
 
 def mount_root():
@@ -109,6 +109,17 @@ async def get_project_tree(request: Request):
         return error("entity_not_found")
     data = project.get_project_tree() if project else {}
     return {"ok": True, "data": data}
+
+
+@app.post("/api/v1/create_project")
+async def create_project(request: Request):
+    result = await request.json()
+    log_request(result)
+    name = result.get("name")
+    ok, msg = api.create_project(name)
+    if not ok:
+        return error("generic_error", msg)
+    return {"ok": True}
 
 
 @app.post("/api/v1/find")
@@ -423,13 +434,10 @@ async def rename_entity(request: Request):
     new_name = result.get("name")
     if not new_name:
         return error("invalid_data")
-    code = api.rename_entity(path, entity, new_name)
-    codes = {
-        -1: "directory not empty"
-    }
-    if code < 0:
-        return error(codes[code])
-    return {"ok": True, "text": codes.get(code, "")}
+    ok, msg = api.rename_entity(path, entity, new_name)
+    if not ok:
+        return error("invalid_data", msg)
+    return {"ok": True}
 
 
 @app.post("/api/v1/add_tags")

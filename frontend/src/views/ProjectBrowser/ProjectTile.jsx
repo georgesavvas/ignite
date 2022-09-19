@@ -1,8 +1,19 @@
 import React, { useContext } from "react";
+import styles from "./ProjectTile.module.css";
 import Tile from "../../components/Tile";
 import Typography from '@mui/material/Typography';
 import { useSnackbar } from 'notistack';
 import { CopyToClipboard, ShowInExplorer } from "../ContextActions";
+import AddIcon from '@mui/icons-material/Add';
+import { IconButton } from "@mui/material";
+
+export function NewProjectTile(props) {
+  return (
+    <div className={styles.newProjectTile} onClick={props.onClick}>
+      <AddIcon className={styles.button} style={{fontSize: "48px"}} />
+    </div>
+  )
+}
 
 function ProjectTile(props) {
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
@@ -33,25 +44,10 @@ function ProjectTile(props) {
       },
       {
         label: `Delete ${entity.dir_kind}`,
-        fn: () => props.onContextMenu("delete", dirData),
-        divider: true
+        fn: () => props.onContextMenu("delete", dirData)
       }
     ]
   }
-
-  // function getSpecificContextItems(entity) {
-  //   if (!DIRCONTEXTOPTIONS.hasOwnProperty(entity.dir_kind)) return [];
-  //   return DIRCONTEXTOPTIONS[entity.dir_kind].map(contextOption => (
-  //     {
-  //       label: contextOption.label,
-  //       value: contextOption.name,
-  //       dir_path: entity.path,
-  //       fn: () => props.onContextMenu(
-  //         "create", {...entity, method: contextOption.name, kind: contextOption.dir_kind}
-  //       )
-  //     }
-  //   ))
-  // }
 
   const handleClick = e => {
     props.onSelected(props.entity);
@@ -77,7 +73,6 @@ function ProjectTile(props) {
   }
 
   let contextItems = getGenericContextItems(props.entity);
-  // contextItems = contextItems.concat(getSpecificContextItems(props.entity));
 
   return (
     <>

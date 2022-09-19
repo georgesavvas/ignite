@@ -5,11 +5,10 @@ import styles from "./ProjectCreator.module.css";
 const ProjectCreator = props => {
   return (
     <div className={styles.container}>
-      <Typography align="center">New Project</Typography>
+      <Typography align="center" variant="h5">New Project</Typography>
       <TextField
         label="Project Name"
         size="small"
-        fullWidth
       />
     </div>
   )

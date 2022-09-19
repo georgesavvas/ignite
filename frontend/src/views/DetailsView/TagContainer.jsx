@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react'
 import styles from "./TagContainer.module.css";
 import ClearIcon from '@mui/icons-material/Clear';
 import AddIcon from '@mui/icons-material/Add';
-import { TextField, Typography } from '@mui/material';
+import { TextField, Typography, Button } from '@mui/material';
 import Modal from "../../components/Modal";
 import { useSnackbar } from 'notistack';
 import { CopyToClipboard, ShowInExplorer } from "../ContextActions";
@@ -78,7 +78,7 @@ export function TagContainer(props) {
       setContextMenu={setContextMenu}
     />
     <Modal open={newTagsOpen} onClose={() => setNewTagsOpen(false)} maxWidth="md"
-      closeButton onButtonClicked={handleAddTags} buttonLabel="Create"
+      buttons={[<Button key="create" onClick={handleAddTags}>Create</Button>]}
       title="Add Tags" 
     >
       <TextField onChange={e => setNewTagsName(e.target.value)} value={newTagsName} 

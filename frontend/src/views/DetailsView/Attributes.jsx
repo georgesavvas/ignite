@@ -1,11 +1,11 @@
-import React, { useState, useRef, useMemo, useEffect } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import styles from "./Attributes.module.css";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import CopyIcon from "../../icons/CopyIcon";
 import { useSnackbar } from "notistack";
 import { CopyToClipboard } from "../ContextActions";
-import ContextMenu, { handleContextMenu } from "../../components/ContextMenu";
+import {ContextContext} from "../../contexts/ContextContext";
 import clientRequest from "../../services/clientRequest";
 import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
 import InputLabel from '@mui/material/InputLabel';
@@ -18,10 +18,10 @@ import serverRequest from "../../services/serverRequest";
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 
 const shouldBeEditable = params => {
+  // console.log(params);
   const row = params.row;
   if (params.field !== "name" && !row.name) return;
-  if (row.inherited) return;
-  console.log(params);
+  if (row.inherited && params.field === "name") return;
   return true;
 }
 
@@ -36,20 +36,26 @@ const gridStyles = {
       backgroundColor: "red"
     },
     backgroundColor: "rgb(30,30,30)"
-  }
+  },
+  // "& .actions": {
+  //   backgroundColor: "rgb(30,30,30)"
+  // }
 }
 
 function Attributes(props) {
-  const [data, setData] = useState([]);
+  const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
+  const [data, setData] = useState({attribs: [], shouldWrite: false});
 
   useEffect(() => {
     let attribs = props.attributes || [];
     attribs.forEach((attrib, index) => attrib.id = index);
-    setData(attribs || []);
-  }, [props.attributes]);
+    setData({attribs: attribs || [], shouldWrite: false});
+  }, [props.entityPath, props.attributes]);
 
   useEffect(() => {
-    serverRequest("set_attributes", {path: props.entityPath, attributes: data})
+    if (!data.shouldWrite) return;
+    serverRequest("set_attributes", {path: props.entityPath, attributes: data.attribs})
+    refreshContext()
   }, [data]);
 
   const actions = {
@@ -73,7 +79,7 @@ function Attributes(props) {
   
   const columns = [
     { field: "name", headerName: "Name", flex: 1, editable: true, cellClassName: getRowStyle},
-    { field: "inherited", headerName: "Inherited", flex: 1, editable: true, cellClassName: getRowStyle },
+    { field: "inherited", headerName: "Inherited", flex: 1, editable: false, cellClassName: getRowStyle },
     { field: "override", headerName: "Override", flex: 1, editable: true, cellClassName: getRowStyle },
     actions
   ];
@@ -82,27 +88,31 @@ function Attributes(props) {
     let value = e.target.value;
     if (value === "custom") value = "";
     setData(prevState => {
-      let attribs = [...prevState];
-      attribs.push({id: attribs.length, name: value});
-      return attribs;
+      let attribs = [...prevState.attribs];
+      attribs.push({id: data.attribs.at(-1).id + 1, name: value});
+      return {attribs: attribs, shouldWrite: false};
     });
   }
 
   const handleEdit = (newValues, previousValues) => {
+    console.log(newValues, previousValues, newValues === previousValues)
     if (newValues === previousValues) return newValues;
-    let attribs = data;
+    let attribs = data.attribs;
     attribs.forEach(attrib => {
       if (attrib.id === newValues.id) {
         attrib.name = newValues.name;
         attrib.override = newValues.override;
       }
     })
-    setData(attribs);
+    setData({attribs: attribs, shouldWrite: true});
     return newValues;
   }
 
   const handleDelete = id => () => {
-    setData(prevState => prevState.filter(row => row.id !== id));
+    setData(prevState => ({
+      attribs: prevState.attribs.filter(row => row.id !== id),
+      shouldWrite: true
+    }));
   };
 
   const handleError = error => {
@@ -132,7 +142,7 @@ function Attributes(props) {
         <DataGrid
           sx={gridStyles}
           disableSelectionOnClick
-          rows={data}
+          rows={data.attribs}
           columns={columns}
           isCellEditable={shouldBeEditable}
           processRowUpdate={handleEdit}

@@ -28,9 +28,8 @@ function ReprAssetModal(props) {
       open={props.open}
       onClose={props.onClose}
       title="Set representative asset"
-      buttonLabel="OK"
-      onButtonClicked={handleSave}
       maxWidth="sm"
+      buttons={[<Button key="confirm" onClick={handleSave}>Confirm</Button>]}
     >
       <TextField style={{marginTop: "10px"}} inputRef={uriField} autoFocus fullWidth color="ignite" size="small" label="Asset" />
     </Modal>

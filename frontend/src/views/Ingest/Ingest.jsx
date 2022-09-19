@@ -19,6 +19,7 @@ import {
 import { useEffect, useState, useContext } from 'react';
 import debounce from 'lodash.debounce';
 import clientRequest from "../../services/clientRequest";
+import ClearIcon from '@mui/icons-material/Clear';
 
 const splitterStyle = {
   borderStyle: "solid",
@@ -233,6 +234,7 @@ function Ingest(props) {
 
   return (
     <Dialog open={props.open} onClose={props.onClose} sx={ingestDialogStyle}>
+      <ClearIcon onClick={props.onClose} className={styles.closeButtonStyle} />
       <DialogContent style={{overflow: "hidden"}}>
         <div className={styles.container}>
           <Xwrapper>
@@ -288,7 +290,6 @@ function Ingest(props) {
         <LinearProgress color="ignite" style={{width: "100%", marginTop: "10px", visibility: loading ? "visible" : "hidden"}} />
       </DialogContent>
       <DialogActions>
-        <Button onClick={props.onClose}>Close</Button>
         <Button onClick={handleCreate} color="ignite" variant="outlined">Create</Button>
       </DialogActions>
     </Dialog>

@@ -10,7 +10,8 @@ function GridTile(props) {
   const [config, setConfig] = useContext(ConfigContext);
   const [progress, setProgress] = useState(0);
   const hoverArea = createRef();
-  let isStatic = props.thumbnail !== undefined;
+  const ThumbComp = props.thumbnailComp;
+  let isStatic = props.thumbnail !== undefined || ThumbComp;
   if (!isStatic && !props.entity.thumbnail.path.includes("####")) isStatic = true;
 
   const tileStyle = {
@@ -50,13 +51,11 @@ function GridTile(props) {
     props.onSelected(props.entity);
   }
 
-  const ThumbComp = props.thumbnailComp;
-
   return (
     <>
-      <ContextMenu items={props.contextItems} contextMenu={contextMenu}
+      {props.contextItems ? <ContextMenu items={props.contextItems} contextMenu={contextMenu}
         setContextMenu={setContextMenu}
-      />
+      /> : null}
       <div className={styles.tile + " " + styles.gridTile} style={tileStyle} onClick={handleClick}
         onContextMenu={e => handleContextMenu(e, contextMenu, setContextMenu)}
       >
@@ -82,7 +81,8 @@ function RowTile(props) {
   const [config, setConfig] = useContext(ConfigContext);
   const [progress, setProgress] = useState(0.5);
   const hoverArea = createRef();
-  const isStatic = props.thumbnail !== undefined;
+  const ThumbComp = props.thumbnailComp;
+  const isStatic = props.thumbnail !== undefined || ThumbComp;
   const sizeMult = 0.25;
 
   const tileStyle = {
@@ -130,17 +130,15 @@ function RowTile(props) {
     props.onSelected(props.entity);
   }
 
-  const ThumbComp = props.thumbnailComp;
-
   const gridStyle = {
-    gridTemplateColumns: props.columnWidths.join(" ")
+    gridTemplateColumns: props.columnWidths ? props.columnWidths.join(" ") : "1px"
   }
 
   return (
     <>
-      <ContextMenu items={props.contextItems} contextMenu={contextMenu}
+      {props.contextItems ? <ContextMenu items={props.contextItems} contextMenu={contextMenu}
         setContextMenu={setContextMenu}
-      />
+      /> : null}
       <div className={styles.tile} style={tileStyle} onClick={handleClick}
         onContextMenu={e => handleContextMenu(e, contextMenu, setContextMenu)}
       >
