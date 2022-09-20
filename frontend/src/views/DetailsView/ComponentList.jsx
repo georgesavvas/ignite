@@ -8,6 +8,8 @@ import { CopyToClipboard } from "../ContextActions";
 import ContextMenu, { handleContextMenu } from "../../components/ContextMenu";
 import openExplorer from "../../utils/openExplorer";
 import clientRequest from "../../services/clientRequest";
+import FormControl from '@mui/material/FormControl';
+import OutlinedInput from '@mui/material/OutlinedInput';
 
 const dccNames = {
   houdini: ["hmaster", "hescape", "houdini", "houdinicore", "houdinifx"],
@@ -87,6 +89,7 @@ function Component({comp, onSelect, selectedComp, actions}) {
 
 function ComponentList(props) {
   const [actions, setActions] = useState([]);
+  const [filterValue, setFilterValue] = useState("");
 
   useEffect(() => {
     clientRequest("get_actions").then(resp => {
@@ -96,7 +99,19 @@ function ComponentList(props) {
 
   return (
     <div className={styles.container}>
-      <Typography variant="h5" style={{marginBottom: "10px"}}>Components</Typography>
+      {/* <Typography variant="h5" style={{marginBottom: "10px"}}>Components</Typography> */}
+      <div className={styles.filterBar}>
+        <FormControl fullWidth>
+          <OutlinedInput
+            id="outlined-basic"
+            size="small"
+            fullWidth
+            placeholder="Filter"
+            value={filterValue}
+            onChange={e => setFilterValue(e.target.value || "")}
+          />
+        </FormControl>
+      </div>
       <div className={styles.compList}>
         {props.components.map((comp, index) => <Component key={index} comp={comp}
             onSelect={props.onSelect} selectedComp={props.selectedComp} actions={actions}

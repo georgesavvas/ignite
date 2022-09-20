@@ -9,6 +9,8 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import { Divider } from "@mui/material";
+import FormControl from '@mui/material/FormControl';
+import OutlinedInput from '@mui/material/OutlinedInput';
 
 const createProcessesSocket = (config, sessionID, websocketConfig) => {
   return clientSocket("processes", config, sessionID, websocketConfig);
@@ -16,10 +18,6 @@ const createProcessesSocket = (config, sessionID, websocketConfig) => {
 
 const destroySocket = socket => {
   if (!socket) return;
-  // if (socket.interval) {
-  //   clearInterval(socket.interval);
-  //   socket.interval = null;
-  // }
   socket.close();
 }
 
@@ -69,6 +67,7 @@ export default function TaskManager(props) {
   const [config, setConfig] = useContext(ConfigContext);
   const [tasks, setTasks] = useState([]);
   const [autoClear, setAutoClear] = useState(false);
+  const [filterValue, setFilterValue] = useState("");
 
   useEffect(() => {
     if (!config.serverDetails.address) return;
@@ -77,21 +76,17 @@ export default function TaskManager(props) {
       const websocketConfig = {
         onmessage: e => {
           const data = JSON.parse(e.data).data;
-          // console.log(data);
           setTasks(prevState => {
             const existing = [...prevState];
             const index = existing.findIndex(task => task.id === data.id);
-            if (index >= 0) existing[index] = data;
-            else existing.push(data);
+            if (index >= 0) existing[index] = {...existing[index], ...data};
+            else if (data.name && data.entity) existing.push(data);
             return sortTasks(existing);
           });
         }
       };
       const ws = createProcessesSocket(config, resp, websocketConfig);
-      if (!ws || ws.interval) return;
-      // ws.interval = setInterval(() => {
-      //   ws.send("ping");
-      // }, 1000)
+      if (!ws) return;
       setSocket(ws);
     })
     return (() => {
@@ -100,24 +95,53 @@ export default function TaskManager(props) {
     })
   }, [config.serverDetails])
 
+  useEffect(() => {
+    if (!autoClear) return;
+    setTasks(prevState => prevState.filter(task => task.state !== "finished"))
+  }, [autoClear])
+
   const handleClear = taskID => {
     setTasks(prevState => prevState.filter(task => task.id !== taskID))
   }
 
+  const handleKill = taskID => {
+    setTasks(prevState => {
+      const existing = [...prevState];
+      const index = existing.findIndex(task => task.id === taskID);
+      if (index < 0) return prevState;
+      existing[index] = {...existing[index], state: "error"};
+      return sortTasks(existing);
+    });
+  }
+
   return (
     <div className={styles.container}>
-      <FormControlLabel 
-        control={
-          <Switch checked={autoClear} onChange={e => setAutoClear(e.target.checked)} />
-        }
-        label="Clear finished"
-        labelPlacement="start"
-      />
-      <div className={styles.tasksContainer}>
-        {!tasks.length ? <DataPlaceholder text="No Tasks" /> : tasks.map((task, index) =>
-          <Task key={index} task={task} onClear={handleClear} />
-        )}
+      <div className={styles.filterBar}>
+        <FormControl fullWidth>
+          <OutlinedInput
+            id="outlined-basic"
+            size="small"
+            fullWidth
+            placeholder="Filter"
+            value={filterValue}
+            onChange={e => setFilterValue(e.target.value || "")}
+          />
+        </FormControl>
+        <FormControlLabel 
+          control={
+            <Switch checked={autoClear} onChange={e => setAutoClear(e.target.checked)} />
+          }
+          label="Clear finished"
+          labelPlacement="start"
+        />
       </div>
+        {!tasks.length ? <DataPlaceholder text="No Tasks" /> :
+          <div className={styles.tasksContainer}>
+            {tasks.map(task =>
+              <Task key={task.id} task={task} onClear={handleClear} forceKill={handleKill} />
+            )}
+          </div>
+        }
     </div>
   )
 }

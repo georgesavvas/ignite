@@ -27,7 +27,7 @@ DCC = Path(ENV["IGNITE_DCC"])
 CONFIG_PATH = Path(ENV["IGNITE_CONFIG_PATH"])
 
 PROCESSES_MANAGER = SocketManager()
-TASK_MANAGER = TaskManager(PROCESSES_MANAGER)
+TASK_MANAGER = TaskManager(PROCESSES_MANAGER, USER_CONFIG_PATH / "tasks.json")
 
 
 def get_config() -> dict:

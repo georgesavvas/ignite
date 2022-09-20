@@ -1,5 +1,5 @@
 .container {
-    margin: 10px;
+    margin: 5px;
     overflow: hidden;
     height: 100%;
     display: flex;
@@ -17,6 +17,7 @@
 
 .dccList {
     overflow: auto;
+    padding-right: 5px;
     /* height: 100%; */
     /* display: flex;
     flex-direction: column; */
