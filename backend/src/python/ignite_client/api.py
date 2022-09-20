@@ -9,19 +9,15 @@ from fnmatch import fnmatch
 from pathlib import PurePath, Path
 from pprint import pprint
 from uuid import uuid4
-import huey
-from huey.signals import *
 from ignite_client import utils
 from ignite_client.utils import TASK_MANAGER, PROCESSES_MANAGER
 
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 
 ENV = os.environ
 DCC = Path(ENV["IGNITE_DCC"])
-
-HUEY = utils.get_huey()
 
 
 def ingest(data):
@@ -289,15 +285,22 @@ def get_actions():
     return actions
 
 
-@HUEY.task()
-def _run_action(action, entity, task_id):
-    # def progress_fn(progress):
-    #     TASK_MANAGER.task_progress[task_id] = progress
+async def IgniteTask(action, entity, task_id):
+    async def progress_fn(progress):
+        # TASK_MANAGER.task_progress[task_id] = progress
+        ws = PROCESSES_MANAGER.get(action["session_id"])
+        await ws.send_json({"data": {
+            "state": "running" if progress < 100 else "finished",
+            "progress": progress,
+            "name": action["label"],
+            "entity": entity,
+            "id": task_id
+        }})
     module_path = PurePath(action["module_path"])
     module = importlib.machinery.SourceFileLoader(
         module_path.name, str(module_path)
     ).load_module()
-    result = module.main(entity)
+    result = await module.main(entity, progress_fn)
     print("Action result:", result)
     return result
 
@@ -314,8 +317,8 @@ def run_action(entity, kind, action, session_id):
             continue
         _action["session_id"] = session_id
         task_id = str(uuid4())
-        task = _run_action.s(action=_action, entity=entity, task_id=task_id)
-        TASK_MANAGER.add(task, task_id)
+        task = IgniteTask(_action, entity, task_id)
+        TASK_MANAGER.add(task, _action, entity, task_id, session_id)
         break
     else:
         logging.error(f"Couldn't find action {kind} {action}")

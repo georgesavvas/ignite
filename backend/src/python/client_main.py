@@ -29,11 +29,9 @@ app.add_middleware(
 )
 
 
-@app.on_event("startup")
-async def startup_event():
-    loop = asyncio.get_event_loop()
-    TASK_MANAGER.loop = loop
-    loop.create_task(TASK_MANAGER.start_worker())
+# @app.on_event("startup")
+# async def startup_event():
+#     LOOP.create_task(TASK_MANAGER.start_worker())
 
 
 @app.websocket("/ws/processes/{session_id}")
@@ -236,7 +234,7 @@ if __name__ == "__main__":
         f"{__name__}:app",
         host=host,
         port=port,
-        log_level="info",
+        log_level="warning",
         reload=True,
         workers=2
     )

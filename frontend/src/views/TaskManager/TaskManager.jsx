@@ -67,7 +67,7 @@ const sortTasks = tasks => {
 export default function TaskManager(props) {
   const [socket, setSocket] = useState();
   const [config, setConfig] = useContext(ConfigContext);
-  const [tasks, setTasks] = useState(defaultTasks);
+  const [tasks, setTasks] = useState([]);
 
   useEffect(() => {
     if (!config.serverDetails.address) return;
@@ -75,9 +75,15 @@ export default function TaskManager(props) {
     window.services.get_env("IGNITE_SESSION_ID").then(resp => {
       const websocketConfig = {
         onmessage: e => {
-          const data = JSON.parse(e.data);
-          console.log(data.data);
-          setTasks(sortTasks(data.data) || []);
+          const data = JSON.parse(e.data).data;
+          // console.log(data);
+          setTasks(prevState => {
+            const existing = [...prevState];
+            const index = existing.findIndex(task => task.id === data.id);
+            if (index >= 0) existing[index] = data;
+            else existing.push(data);
+            return sortTasks(existing);
+          });
         }
       };
       const ws = createProcessesSocket(config, resp, websocketConfig);
@@ -93,11 +99,15 @@ export default function TaskManager(props) {
     })
   }, [config.serverDetails])
 
+  const handleClear = taskID => {
+    setTasks(prevState => prevState.filter(task => task.id !== taskID))
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.tasksContainer}>
         {tasks.map((task, index) =>
-          <Task key={index} task={task} />
+          <Task key={index} task={task} onClear={handleClear} />
         )}
       </div>
     </div>
