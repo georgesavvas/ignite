@@ -4,6 +4,11 @@ import Task from "./Task";
 import SystemResources from "./SystemResources";
 import { clientSocket } from "../../services/clientWebSocket";
 import { ConfigContext } from "../../contexts/ConfigContext";
+import DataPlaceholder from "../../components/DataPlaceholder";
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Switch from '@mui/material/Switch';
+import { Divider } from "@mui/material";
 
 const createProcessesSocket = (config, sessionID, websocketConfig) => {
   return clientSocket("processes", config, sessionID, websocketConfig);
@@ -23,33 +28,28 @@ const defaultTasks = [
     state: "running",
     progress: 40,
     name: "Create JPEGs",
-    asset: {name: "beauty", context: "build/campfire/model/coal"},
-    component: {name: "render_acescg.####.exr"}
+    entity: {path: "build/campfire/model/coal"}
   },
   {
     state: "waiting",
     name: "Create MP4",
-    asset: {name: "beauty", context: "build/campfire/model/coal"},
-    component: {name: "render_acescg.####.exr"}
+    entity: {path: "build/campfire/model/coal"}
   },
   {
     state: "paused",
     progress: 68,
     name: "Upload to frameio",
-    asset: {name: "beauty", context: "build/campfire/model/coal"},
-    component: {name: "render_acescg.####.exr"}
+    entity: {path: "build/campfire/model/coal"}
   },
   {
     state: "error",
     name: "Convert to USD in houdini",
-    asset: {name: "beauty", context: "build/campfire/model/coal"},
-    component: {name: "render_acescg.####.exr"}
+    entity: {path: "build/campfire/model/coal"}
   },
   {
     state: "finished",
     name: "Convert to USD in houdini",
-    asset: {name: "beauty", context: "build/campfire/model/coal"},
-    component: {name: "render_acescg.####.exr"}
+    entity: {path: "build/campfire/model/coal"}
   }
 ]
 
@@ -68,6 +68,7 @@ export default function TaskManager(props) {
   const [socket, setSocket] = useState();
   const [config, setConfig] = useContext(ConfigContext);
   const [tasks, setTasks] = useState([]);
+  const [autoClear, setAutoClear] = useState(false);
 
   useEffect(() => {
     if (!config.serverDetails.address) return;
@@ -105,8 +106,15 @@ export default function TaskManager(props) {
 
   return (
     <div className={styles.container}>
+      <FormControlLabel 
+        control={
+          <Switch checked={autoClear} onChange={e => setAutoClear(e.target.checked)} />
+        }
+        label="Clear finished"
+        labelPlacement="start"
+      />
       <div className={styles.tasksContainer}>
-        {tasks.map((task, index) =>
+        {!tasks.length ? <DataPlaceholder text="No Tasks" /> : tasks.map((task, index) =>
           <Task key={index} task={task} onClear={handleClear} />
         )}
       </div>

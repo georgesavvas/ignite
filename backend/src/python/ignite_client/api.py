@@ -285,12 +285,12 @@ def get_actions():
     return actions
 
 
-async def IgniteTask(action, entity, task_id):
-    async def progress_fn(progress):
+async def IgniteTask(action, entity, task_id, paused, killed, **kwargs):
+    async def progress_fn(progress, state=""):
         # TASK_MANAGER.task_progress[task_id] = progress
         ws = PROCESSES_MANAGER.get(action["session_id"])
         await ws.send_json({"data": {
-            "state": "running" if progress < 100 else "finished",
+            "state": state or "running" if progress < 100 else "finished",
             "progress": progress,
             "name": action["label"],
             "entity": entity,
@@ -300,8 +300,7 @@ async def IgniteTask(action, entity, task_id):
     module = importlib.machinery.SourceFileLoader(
         module_path.name, str(module_path)
     ).load_module()
-    result = await module.main(entity, progress_fn)
-    print("Action result:", result)
+    result = await module.main(entity=entity, progress_fn=progress_fn, paused=paused, killed=killed, task_id=task_id)
     return result
 
 
@@ -317,8 +316,8 @@ def run_action(entity, kind, action, session_id):
             continue
         _action["session_id"] = session_id
         task_id = str(uuid4())
-        task = IgniteTask(_action, entity, task_id)
-        TASK_MANAGER.add(task, _action, entity, task_id, session_id)
+        # task = IgniteTask(_action, entity, task_id)
+        TASK_MANAGER.add(IgniteTask, action=_action, entity=entity, task_id=task_id, session_id=session_id)
         break
     else:
         logging.error(f"Couldn't find action {kind} {action}")
@@ -329,14 +328,14 @@ def run_action(entity, kind, action, session_id):
 def edit_task(manager, task_id, edit):
     task = manager.get(task_id)
     if edit == "pause":
-        task.revoke()
+        TASK_MANAGER.pause(task_id)
     elif edit == "unpause":
-        task.restore()
+        TASK_MANAGER.unpause(task_id)
     elif edit == "retry":
         task.reset()
         task.reschedule()
         task.restore()
     elif edit == "clear":
-        manager.remove(task_id)
+        TASK_MANAGER.clear(task_id)
     elif edit == "kill":
-        task.revoke()
+        TASK_MANAGER.kill(task_id)
