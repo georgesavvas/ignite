@@ -13,18 +13,20 @@ def start_worker(loop):
 class TaskManager():
     def __init__(self, processes_manager):
         self.tasks = []
+        self.paused = []
+        self.killed = []
         self.processes_manager = processes_manager
 
         self.loop = asyncio.new_event_loop()
-        self.queue = asyncio.Queue(loop=self.loop)
         self.thread = threading.Thread(
             target=start_worker, args=(self.loop,), daemon=True
         )
         self.thread.start()
 
-    def add(self, task, action, entity, task_id, session_id):
-        future = asyncio.run_coroutine_threadsafe(task, self.loop)
-        asyncio.create_task(self.send(action, entity, task_id, session_id))
+    def add(self, task, **kwargs):
+        _task = task(**kwargs, paused=self.paused, killed=self.killed)
+        future = asyncio.run_coroutine_threadsafe(_task, self.loop)
+        asyncio.create_task(self.send(**kwargs))
 
     def remove(self, task_id):
         for i, (id, task) in enumerate(self.tasks):
@@ -67,6 +69,26 @@ class TaskManager():
             if task_id == id:
                 return task
     
+    def pause(self, task_id):
+        if task_id in self.paused:
+            return
+        self.paused.append(task_id)
+    
+    def unpause(self, task_id):
+        if task_id in self.paused:
+            self.paused.remove(task_id)
+    
+    def kill(self, task_id):
+        if task_id in self.paused:
+            return
+        self.killed.append(task_id)
+    
+    def clear(self, task_id):
+        if task_id in self.paused:
+            self.paused.remove(task_id)
+        if task_id in self.killed:
+            self.killed.remove(task_id)
+
     async def send(self, action, entity, task_id, session_id):
         ws = self.processes_manager.get(session_id)
         await ws.send_json({"data": {

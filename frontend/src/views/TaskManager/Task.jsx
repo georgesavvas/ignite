@@ -24,7 +24,12 @@ const Task = props => {
   }
 
   const handleClear = () => {
-    props.onClear(props.task.id)
+    const data = {
+      task_id: props.task.id,
+      edit: state === "running" ? "kill" : "clear"
+    }
+    clientRequest("edit_task", data)
+    if (state !== "running") props.onClear(props.task.id)
   }
 
   const getStatusIcon = () => {
@@ -38,7 +43,7 @@ const Task = props => {
   const getActionButton = () => {
     switch (state) {
       case "paused": return <PlayArrowIcon className={styles.button} onClick={() => handleAction("unpause")} />;
-      // case "waiting": return <PauseIcon className={styles.button} onClick={() => handleAction("pause")} />
+      case "running": return <PauseIcon className={styles.button} onClick={() => handleAction("pause")} />
       case "finished": case "error": return <ReplayIcon className={styles.button} onClick={() => handleAction("retry")} />;
       default: return <LowPriorityIcon className={styles.button} onClick={() => handleAction("retry")} />;
     }

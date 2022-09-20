@@ -78,19 +78,20 @@
     background-image: -webkit-gradient(linear, 0 0, 100% 100%, color-stop(.25, rgba(255, 255, 255, .2)), color-stop(.25, transparent), color-stop(.5, transparent), color-stop(.5, rgba(255, 255, 255, .2)), color-stop(.75, rgba(255, 255, 255, .2)), color-stop(.75, transparent), to(transparent));
     background-size: 50px 50px;
     overflow: hidden;
+    animation: move 6s linear infinite;
 }
 
 .running:after {
     animation: move 2s linear infinite;
 }
 
-.waiting:after {
+/* .waiting:after {
     animation: move 6s linear infinite;
 }
 
 .finished:after {
     animation: move 6s linear infinite;
-}
+} */
 
 @keyframes move {
     0% {
