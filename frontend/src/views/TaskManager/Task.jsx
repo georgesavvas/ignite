@@ -23,6 +23,10 @@ const Task = props => {
     clientRequest("edit_task", data)
   }
 
+  const handleClear = () => {
+    props.onClear(props.task.id)
+  }
+
   const getStatusIcon = () => {
     switch (state) {
       case "paused": return <PauseIcon />;
@@ -43,16 +47,23 @@ const Task = props => {
   const getProgressBarStyle = () => {
     const progress = props.task.progress;
     switch (state) {
-      case "waiting": return {backgroundColor: "rgb(120, 120, 0)"};
+      case "waiting": return {
+        backgroundColor: "rgb(120, 120, 0)",
+        transition: "background-color 1s"
+      };
       case "paused": return {
         backgroundColor: "rgb(70, 70, 70)",
         width: `${progress}%`
       };
       case "error": return {backgroundColor: "rgb(100, 0, 0)"};
-      case "finished": return {backgroundColor: "rgb(0, 50, 120)"};
+      case "finished": return {
+        backgroundColor: "rgb(0, 50, 120)",
+        transition: "background-color 1s"
+      };
       default: return {
         backgroundColor: "rgb(0, 80, 0)",
-        width: `${progress}%`
+        width: `${Math.max(1, progress)}%`,
+        transition: progress === 0 ? "width 0.1s, background-color 1s" : "width 2s, background-color 1s"
       };
     }
   }
@@ -67,13 +78,13 @@ const Task = props => {
         {/* {getStatusIcon()} */}
         <div className={styles.detailsText}>
           <Typography noWrap>{props.task.name}</Typography>
-          {/* <Typography noWrap>{props.task.entity.path}</Typography> */}
-          <Typography noWrap>{props.task.asset.name} - {props.task.asset.context}</Typography>
-          <Typography>{props.task.component.name}</Typography>
+          <Typography noWrap>{props.task.entity.path}</Typography>
+          {/* <Typography noWrap>{props.task.asset.name} - {props.task.asset.context}</Typography>
+          <Typography>{props.task.component.name}</Typography> */}
         </div>
         {/* <div className={styles.spacer} /> */}
         {getActionButton()}
-        <ClearIcon className={styles.button} onClick={() => handleAction("clear")} />
+        <ClearIcon className={styles.button} onClick={handleClear} />
       </div>
     </div>
   )

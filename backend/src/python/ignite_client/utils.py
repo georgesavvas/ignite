@@ -7,14 +7,17 @@ import subprocess
 import requests
 import importlib
 import shutil
+import asyncio
+import threading
 from copy import deepcopy
 from pprint import pprint
 from pathlib import PurePath, Path
-from huey import SqliteHuey
 from ignite_client.constants import GENERIC_ENV, DCC_ENVS, OS_NAMES, DCC_DISCOVERY
 from ignite_server.socket_manager import SocketManager
 from ignite_client.task_manager import TaskManager
 
+
+OS_NAME = OS_NAMES[platform.system()]
 ENV = os.environ
 API_VERSION = ENV["IGNITE_API_VERSION"]
 IGNITE_ROOT = Path(ENV["IGNITE_ROOT"])
@@ -23,18 +26,15 @@ CLIENT_CONFIG_PATH = Path(ENV["IGNITE_CLIENT_CONFIG_PATH"])
 DCC = Path(ENV["IGNITE_DCC"])
 CONFIG_PATH = Path(ENV["IGNITE_CONFIG_PATH"])
 
-HUEY = SqliteHuey(filename=USER_CONFIG_PATH / "ignite.db")
 PROCESSES_MANAGER = SocketManager()
-TASK_MANAGER = TaskManager(HUEY, PROCESSES_MANAGER)
-
-OS_NAME = OS_NAMES[platform.system()]
+TASK_MANAGER = TaskManager(PROCESSES_MANAGER)
 
 
 def get_config() -> dict:
     path = CLIENT_CONFIG_PATH
     if not os.path.isfile(path):
         raise Exception(f"Config file not found: {path}")
-    logging.info(f"Reading config from {path}")    
+    logging.debug(f"Reading config from {path}")    
     with open(path, "r") as f:
         config = yaml.safe_load(f)
     config["projects_root"] = config["access"].get("projects_root", "")
@@ -76,10 +76,6 @@ def set_config(data):
 
     root_changed = old_config["projects_root"] != config["projects_root"]
     return config, root_changed
-
-
-def get_huey():
-    return HUEY
 
 
 def replace_vars(d):
