@@ -5,7 +5,8 @@ const containerStyle = {
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  padding: "20px"
+  padding: "20px",
+  height: "100%"
 }
 
 const typeStyle = {

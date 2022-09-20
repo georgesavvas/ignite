@@ -285,23 +285,23 @@ def get_actions():
     return actions
 
 
-async def IgniteTask(action, entity, task_id, paused, killed, **kwargs):
-    async def progress_fn(progress, state=""):
-        # TASK_MANAGER.task_progress[task_id] = progress
-        ws = PROCESSES_MANAGER.get(action["session_id"])
-        await ws.send_json({"data": {
-            "state": state or "running" if progress < 100 else "finished",
-            "progress": progress,
-            "name": action["label"],
-            "entity": entity,
-            "id": task_id
-        }})
-    module_path = PurePath(action["module_path"])
-    module = importlib.machinery.SourceFileLoader(
-        module_path.name, str(module_path)
-    ).load_module()
-    result = await module.main(entity=entity, progress_fn=progress_fn, paused=paused, killed=killed, task_id=task_id)
-    return result
+# async def IgniteTask(action, entity, task_id, paused, killed, **kwargs):
+#     async def progress_fn(progress, state=""):
+#         # TASK_MANAGER.task_progress[task_id] = progress
+#         ws = PROCESSES_MANAGER.get(action["session_id"])
+#         await ws.send_json({"data": {
+#             "state": state or "running" if progress < 100 else "finished",
+#             "progress": progress,
+#             "name": action["label"],
+#             "entity": entity,
+#             "id": task_id
+#         }})
+#     module_path = PurePath(action["module_path"])
+#     module = importlib.machinery.SourceFileLoader(
+#         module_path.name, str(module_path)
+#     ).load_module()
+#     result = await module.main(entity=entity, progress_fn=progress_fn, paused=paused, killed=killed, task_id=task_id)
+#     return result
 
 
 def run_action(entity, kind, action, session_id):
@@ -317,7 +317,7 @@ def run_action(entity, kind, action, session_id):
         _action["session_id"] = session_id
         task_id = str(uuid4())
         # task = IgniteTask(_action, entity, task_id)
-        TASK_MANAGER.add(IgniteTask, action=_action, entity=entity, task_id=task_id, session_id=session_id)
+        TASK_MANAGER.add(action=_action, entity=entity, task_id=task_id, session_id=session_id)
         break
     else:
         logging.error(f"Couldn't find action {kind} {action}")
@@ -325,16 +325,16 @@ def run_action(entity, kind, action, session_id):
         pprint(actions)
         return
 
-def edit_task(manager, task_id, edit):
-    task = manager.get(task_id)
+def edit_task(task_id, edit):
+    print("-----", task_id, edit)
     if edit == "pause":
         TASK_MANAGER.pause(task_id)
     elif edit == "unpause":
         TASK_MANAGER.unpause(task_id)
-    elif edit == "retry":
-        task.reset()
-        task.reschedule()
-        task.restore()
+    # elif edit == "retry":
+    #     task.reset()
+    #     task.reschedule()
+    #     task.restore()
     elif edit == "clear":
         TASK_MANAGER.clear(task_id)
     elif edit == "kill":

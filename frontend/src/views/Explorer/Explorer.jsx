@@ -203,8 +203,7 @@ function Explorer() {
     overflowY: "auto",
     gridTemplateColumns: `repeat(auto-fill, minmax(${explorerSettings.currentTileSize * 40}px, 1fr))`,
     gridGap: "3px",
-    padding: "3px",
-    paddingTop: "0px"
+    padding: "0px 5px"
   }
 
   if (explorerSettings.currentViewType === "row") {

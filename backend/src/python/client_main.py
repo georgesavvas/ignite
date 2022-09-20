@@ -37,6 +37,7 @@ app.add_middleware(
 @app.websocket("/ws/processes/{session_id}")
 async def processes(websocket: WebSocket, session_id: str):
     if session_id:
+        logging.warning(f"Request to open socket from {session_id}")
         await PROCESSES_MANAGER.connect(websocket, session_id)
     while True:
         try:
@@ -207,7 +208,7 @@ async def edit_task(request: Request):
     log_request(result)
     task_id = result.get("task_id")
     edit = result.get("edit")
-    api.edit_task(TASK_MANAGER, task_id, edit)
+    api.edit_task(task_id, edit)
     return {"ok": True}
 
 
