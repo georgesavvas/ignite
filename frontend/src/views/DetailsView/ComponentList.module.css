@@ -1,7 +1,7 @@
 .container {
     /* height: 100%; */
-    margin: 5px;
     box-sizing: border-box;
+    padding: 0px;
 }
 
 .compContainer {
@@ -16,6 +16,12 @@
     overflow: clip;
 }
 
+.filterBar {
+    display: flex;
+    justify-content: center;
+    padding: 5px;
+}
+
 .textContainer {
     padding-left: 5px;
     overflow: clip;
@@ -23,6 +29,7 @@
 
 .compList {
     box-sizing: border-box;
+    padding: 5px;;
 }
 
 .compIcon {

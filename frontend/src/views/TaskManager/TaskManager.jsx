@@ -133,6 +133,7 @@ export default function TaskManager(props) {
           }
           label="Clear finished"
           labelPlacement="start"
+          style={{minWidth: "150px"}}
         />
       </div>
         {!tasks.length ? <DataPlaceholder text="No Tasks" /> :
