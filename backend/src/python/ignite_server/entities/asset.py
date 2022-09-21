@@ -3,9 +3,9 @@ import yaml
 from pathlib import Path, PurePath
 from ignite_server import utils
 from ignite_server.entities.directory import Directory
+from ignite_server.utils import CONFIG
 
 
-CONFIG = utils.get_config()
 ROOT = PurePath(CONFIG["projects_root"])
 
 

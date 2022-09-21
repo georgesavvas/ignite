@@ -13,8 +13,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from ignite_server import utils
 from ignite_server.socket_manager import SocketManager
+from ignite_server.utils import CONFIG
 
-CONFIG = utils.get_config()
+
 SERVER_HOST, SERVER_PORT = CONFIG["server_address"].split(":")
 ROOT = PurePath(CONFIG["projects_root"])
 ENV = os.environ

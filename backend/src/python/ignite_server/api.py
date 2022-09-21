@@ -6,10 +6,10 @@ import shutil
 from pathlib import Path, PurePath
 from ignite_server import utils
 from ignite_server.constants import ANCHORS
+from ignite_server.utils import CONFIG
 
 
 ENV = os.environ
-CONFIG = utils.get_config()
 PROJECT_ANCHOR = ANCHORS["project"]
 ROOT = PurePath(CONFIG["projects_root"])
 KINDS = {v: k for k, v in ANCHORS.items()}
@@ -137,7 +137,6 @@ def find(path):
             if not asset:
                 logging.error(f"Couldn't find path at {asset_path}")
                 return None
-            print("-----", asset._best_av)
             if version == "best":
                 return asset.best_av
             elif version == "latest":
@@ -575,6 +574,13 @@ def get_repr_comp(target):
     target_entity = find(target)
     if not target_entity:
         return {}
+    if target_entity.dir_kind == "assetversion":
+        return target_entity.get_thumbnail()
+    if target_entity.dir_kind == "asset":
+        best_av = target_entity.best_av
+        if not best_av:
+            return {}
+        return best_av.get_thumbnail()
     target_repr = target_entity.repr
     if utils.is_uri(target_repr):
         target_repr = utils.uri_to_path(target_repr)
@@ -588,10 +594,10 @@ def get_repr_comp(target):
     asset = find(repr_asset)
     if not asset:
         return {}
-    latest_av = asset.latest_av
-    if not latest_av:
+    best_av = asset.best_av
+    if not best_av:
         return {}
-    return latest_av.get_thumbnail()
+    return best_av.get_thumbnail()
 
 
 def delete_entity(path, entity_type):
