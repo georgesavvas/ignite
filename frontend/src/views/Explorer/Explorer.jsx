@@ -19,6 +19,7 @@ import { LinearProgress } from "@mui/material";
 import { useSnackbar } from 'notistack';
 import BuildFileURL from "../../services/BuildFileURL";
 import { ConfigContext } from "../../contexts/ConfigContext";
+import DataPlaceholder from "../../components/DataPlaceholder";
 
 
 const debounced = debounce(fn => fn(), 500);
@@ -294,12 +295,14 @@ function Explorer() {
       />
       <Divider />
       <LinearProgress color="ignite" style={{width: "100%", minHeight: "2px", visibility: isLoading ? "visible" : "hidden"}} />
-      <div
-        style={tileContainerStyle}
-        onContextMenu={e => handleContextMenu(e, contextMenu, setContextMenu)}
-      >
-        {Object.keys(tiles).map((k) => tiles[k])}
-      </div>
+      {!loadedData.length ? <DataPlaceholder text={isLoading ? "Fetching data..." : "No results"} /> :
+        <div
+          style={tileContainerStyle}
+          onContextMenu={e => handleContextMenu(e, contextMenu, setContextMenu)}
+        >
+          {Object.keys(tiles).map((k) => tiles[k])}
+        </div>
+      }
       <div
         className={classes.layoutHelper}
         onContextMenu={e => handleContextMenu(e, contextMenu, setContextMenu)}

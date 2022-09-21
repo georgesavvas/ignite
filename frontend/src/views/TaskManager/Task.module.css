@@ -24,12 +24,9 @@
 
 .details {
     display: flex;
-    /* height: 30px; */
-    /* justify-content: space-around; */
     align-items: center;
     gap: 5px;
     padding: 5px;
-    /* border-top: 1px solid rgb(70, 70, 70); */
     box-sizing: border-box;
 }
 
@@ -87,16 +84,10 @@
 }
 
 .topBar {
-    /* background-color: rgb(30, 30, 30); */
     height: 10px;
     width: 100%;
     position: relative;
 }
-
-/* .progressBar {
-    height: 20px;
-    position: absolute;
-} */
 
 .progressBar {
     position: absolute;

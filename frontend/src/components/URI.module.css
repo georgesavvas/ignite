@@ -1,7 +1,7 @@
 .container {
     padding: 2px;
     cursor: pointer;
-    /* background-color: rgb(50, 50, 50); */
     border-radius: 3px;
-    /* border-bottom: solid 1px rgb(252, 140, 3); */
+    white-space: nowrap;
+    overflow: hidden;
 }

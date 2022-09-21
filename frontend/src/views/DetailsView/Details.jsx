@@ -3,6 +3,7 @@ import {EntityContext} from "../../contexts/EntityContext";
 import DirectoryDetails from "./DirectoryDetails";
 import AssetDetails from "./AssetDetails";
 import SceneDetails from "./SceneDetails";
+import DataPlaceholder from "../../components/DataPlaceholder";
 
 const style = {
   width: "100%",
@@ -26,7 +27,7 @@ function Details() {
       case "scene":
         return <SceneDetails entity={selectedEntity} />;
       case undefined:
-        return null;
+        return <DataPlaceholder text="Nothing selected" />;
       default:
         return <DirectoryDetails entity={selectedEntity} />;
     }

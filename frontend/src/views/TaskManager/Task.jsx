@@ -34,11 +34,12 @@ const Task = props => {
   }
 
   const handleClear = () => {
-    if (state !== "running") props.onClear(props.task.id);
+    const shouldKill = ["running", "paused"].includes(state);
+    if (!shouldKill) props.onClear(props.task.id);
     else props.forceKill(props.task.id);
     const data = {
       task_id: props.task.id,
-      edit: state === "running" ? "kill" : "clear"
+      edit: shouldKill ? "kill" : "clear"
     }
     clientRequest("edit_task", data)
   }
@@ -80,9 +81,13 @@ const Task = props => {
       };
       case "paused": return {
         backgroundColor: "rgb(70, 70, 70)",
-        width: `${progress || 100}%`
+        width: `${progress || 100}%`,
+        transition: "background-color 1s"
       };
-      case "error": return {backgroundColor: "rgb(100, 0, 0)"};
+      case "error": return {
+        backgroundColor: "rgb(100, 0, 0)",
+        transition: "background-color 1s"
+      };
       case "finished": return {
         backgroundColor: "rgb(0, 80, 0)",
         transition: "background-color 1s"
@@ -90,7 +95,7 @@ const Task = props => {
       default: return {
         backgroundColor: "rgb(0, 50, 120)",
         width: `${Math.max(1, progress || 100)}%`,
-        transition: progress === 0 ? "width 0.1s, background-color 1s" : "width 2s, background-color 1s"
+        transition: progress === 0 ? "width 0.1s, background-color 1s" : "width 0.5s, background-color 1s"
       };
     }
   }
@@ -106,14 +111,14 @@ const Task = props => {
         <Divider orientation="vertical" flexItem />
         <div className={styles.detailsText}>
           <Typography noWrap>{props.task.name}</Typography>
-          <Typography noWrap>{props.task.entity.path}</Typography>
+          <Typography noWrap style={{direction: "rtl", textAlign: "left"}}>{props.task.entity.path}</Typography>
           {/* <Typography noWrap>{props.task.asset.name} - {props.task.asset.context}</Typography>
           <Typography>{props.task.component.name}</Typography> */}
         </div>
         {/* <div className={styles.spacer} /> */}
         {/* <Divider orientation="vertical" flexItem /> */}
         {getActionButton()}
-        <ClearIcon className={`${styles.button} ${state === "finished" ? styles.pauseButton : styles.killButton}`} onClick={handleClear} />
+        <ClearIcon className={`${styles.button} ${["finished", "error"].includes(state) ? styles.pauseButton : styles.killButton}`} onClick={handleClear} />
       </div>
     </div>
   )

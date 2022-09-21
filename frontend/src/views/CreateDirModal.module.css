@@ -1,0 +1,8 @@
+.removeIcon {
+    color: red;
+    cursor: pointer;
+}
+
+.removeIcon:hover {
+    background-color: rgb(50, 50, 50);
+}

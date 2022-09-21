@@ -16,6 +16,7 @@ import Select from '@mui/material/Select';
 import { rgbToHex } from "@mui/material";
 import serverRequest from "../../services/serverRequest";
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
+import DataPlaceholder from "../../components/DataPlaceholder";
 
 const shouldBeEditable = params => {
   // console.log(params);
@@ -157,6 +158,9 @@ function Attributes(props) {
           processRowUpdate={handleEdit}
           onProcessRowUpdateError={handleError}
           experimentalFeatures={{ newEditingApi: true }}
+          components={{
+            NoRowsOverlay: () => <DataPlaceholder text="No attributes" />,
+          }}
         />
       </div>
     </div>

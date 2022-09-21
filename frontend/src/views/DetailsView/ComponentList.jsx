@@ -10,6 +10,7 @@ import openExplorer from "../../utils/openExplorer";
 import clientRequest from "../../services/clientRequest";
 import FormControl from '@mui/material/FormControl';
 import OutlinedInput from '@mui/material/OutlinedInput';
+import FilterField from "../../components/FilterField";
 
 const dccNames = {
   houdini: ["hmaster", "hescape", "houdini", "houdinicore", "houdinifx"],
@@ -99,20 +100,7 @@ function ComponentList(props) {
 
   return (
     <div className={styles.container}>
-      {/* <Typography variant="h5" style={{marginBottom: "10px"}}>Components</Typography> */}
-      <div className={styles.filterBar}>
-        <FormControl fullWidth focused={filterValue ? true : false}>
-          <OutlinedInput
-            id="outlined-basic"
-            size="small"
-            fullWidth
-            placeholder="Filter"
-            value={filterValue}
-            onChange={e => setFilterValue(e.target.value || "")}
-            color={filterValue ? "error" : ""}
-          />
-        </FormControl>
-      </div>
+      <FilterField filterValue={filterValue} setFilterValue={setFilterValue} />
       <div className={styles.compList}>
         {props.components.map((comp, index) => {
           const filterString = `${comp.name}${comp.file}`;

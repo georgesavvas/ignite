@@ -26,7 +26,7 @@ function Path(props) {
     <>
       <ContextMenu items={contextItems} contextMenu={contextMenu} setContextMenu={setContextMenu} />
       <div className={styles.container} onClick={e => handleContextMenu(e, contextMenu, setContextMenu)}>
-        <Typography style={{color: "cadetblue"}}>{props.path}</Typography>
+        <Typography style={{color: "cadetblue", direction: "rtl", textAlign: "left"}} noWrap>{props.path}</Typography>
       </div>
     </>
   )
