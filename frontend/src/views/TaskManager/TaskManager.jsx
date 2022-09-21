@@ -12,6 +12,7 @@ import { Divider } from "@mui/material";
 import FormControl from '@mui/material/FormControl';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import clientRequest from "../../services/clientRequest";
+import FilterField from "../../components/FilterField";
 
 const createProcessesSocket = (config, sessionID, websocketConfig) => {
   return clientSocket("processes", config, sessionID, websocketConfig);
@@ -120,18 +121,7 @@ export default function TaskManager(props) {
 
   return (
     <div className={styles.container}>
-      <div className={styles.filterBar}>
-        <FormControl fullWidth focused={filterValue ? true : false}>
-          <OutlinedInput
-            id="outlined-basic"
-            size="small"
-            fullWidth
-            placeholder="Filter"
-            value={filterValue}
-            onChange={e => setFilterValue(e.target.value || "")}
-            color={filterValue ? "error" : ""}
-          />
-        </FormControl>
+      <FilterField filterValue={filterValue} setFilterValue={setFilterValue}>
         <FormControlLabel 
           control={
             <Switch checked={autoClear} onChange={e => setAutoClear(e.target.checked)} />
@@ -140,24 +130,24 @@ export default function TaskManager(props) {
           labelPlacement="start"
           style={{minWidth: "150px"}}
         />
-      </div>
-        {!tasks.length ? <DataPlaceholder text="No Tasks" /> :
-          <div className={styles.tasksContainer}>
-            {tasks.map(task => {
-              const filterString = `
-                ${task.name}
-                ${task.entity.name}
-                ${task.entity.path}
-                ${task.entity.dir_kind}
-                ${task.entity.tags}
-              `;
-              const hide = filterValue && !filterString.includes(filterValue);
-              return <Task key={task.id} task={task} onClear={handleClear}
-                forceKill={handleKill} style={hide ? {display: "none"} : null}
-              />
-            })}
-          </div>
-        }
+      </FilterField>
+      {!tasks.length ? <DataPlaceholder text="No Tasks" /> :
+        <div className={styles.tasksContainer}>
+          {tasks.map(task => {
+            const filterString = `
+              ${task.name}
+              ${task.entity.name}
+              ${task.entity.path}
+              ${task.entity.dir_kind}
+              ${task.entity.tags}
+            `;
+            const hide = filterValue && !filterString.includes(filterValue);
+            return <Task key={task.id} task={task} onClear={handleClear}
+              forceKill={handleKill} style={hide ? {display: "none"} : null}
+            />
+          })}
+        </div>
+      }
     </div>
   )
 }

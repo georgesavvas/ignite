@@ -21,6 +21,7 @@ import { IconButton, Typography } from "@mui/material";
 import IgnTextField from "../../components/IgnTextField";
 import IgnButton from "../../components/IgnButton";
 import ContextMenu, { handleContextMenu } from "../../components/ContextMenu";
+import FilterField from "../../components/FilterField";
 
 const style = { 
   display: "flex",
@@ -49,8 +50,7 @@ function ExplorerBar(props) {
     setCurrentContext(currentContext.parent);
   }
 
-  const handleFilterChange = e => {
-    const value = e.target.value;
+  const handleFilterChange = value => {
     setFilterValue(value);
     props.onFilterChange(value);
   }
@@ -136,15 +136,7 @@ function ExplorerBar(props) {
             </ToggleButton>
           </ToggleButtonGroup>
         </Stack>
-        <IgnTextField
-          id="filterField"
-          placeholder="Filter"
-          fullWidth
-          variant="outlined"
-          value={filterValue}
-          error={filterValue !== ""}
-          onChange={handleFilterChange}
-        />
+        <FilterField filterValue={filterValue} setFilterValue={handleFilterChange} />
         <IconButton onClick={handleSortClicked} style={{height: "34.25px"}}>
           <SortIcon />
         </IconButton>

@@ -20,8 +20,8 @@ async def main(entity, state, progress_fn=None):
         if state["killed"]:
             await progress_fn(state="error")
             return
-        # if progress_fn:
-        #     await progress_fn(i / 10 * 100)
+        if progress_fn:
+            await progress_fn(i / 10 * 100)
         # print(f"Progress - {i / 10 * 100}%")
     print("Finished very heavy task!")
     return "yep!"

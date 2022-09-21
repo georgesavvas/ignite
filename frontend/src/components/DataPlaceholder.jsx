@@ -20,8 +20,8 @@ const typeStyle = {
 
 const DataPlaceholder = props => {
   return (
-    <div style={containerStyle}>
-      <Typography variant="h3" style={typeStyle}>{props.text || "Fetching data..."}</Typography>
+    <div style={{...containerStyle, ...props.style}}>
+      <Typography variant="h4" style={typeStyle}>{props.text || "Fetching data..."}</Typography>
     </div>
   )
 }

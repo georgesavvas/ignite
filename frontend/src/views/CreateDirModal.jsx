@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import styles from "./CreateDirModal.module.css";
 import DynamicList from "../components/DynamicList";
 import Modal from "../components/Modal";
 import Box from '@mui/material/Box';
@@ -16,7 +17,8 @@ import Typography from '@mui/material/Typography';
 import InputLabel from '@mui/material/InputLabel';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
-import CancelIcon from '@mui/icons-material/Cancel';
+import ClearIcon from '@mui/icons-material/Clear';
+import RemoveIcon from '@mui/icons-material/Remove';
 import { DIRECTORYICONS } from "../constants";
 
 const KINDTYPES = {
@@ -40,9 +42,7 @@ function Dir(props) {
 
   return (
     <Stack direction="row" gap={1} style={{width: "100%"}}>
-      <IconButton onClick={e => props.onRemove(props.index)}
-        color="error" size="small" variant="outlined"
-      ><CancelIcon /></IconButton>
+      <Box component={ClearIcon} onClick={e => props.onRemove(props.index)} sx={{width: "30px", height: "30px", m: "auto"}} className={styles.removeIcon} />
       {hasTypes ?
         <FormControl sx={{ minWidth: 120 }} size="small">
           <InputLabel id="type">Type</InputLabel>
@@ -74,8 +74,68 @@ function Dir(props) {
 }
 
 const dirTemplate = {
-  "type": "",
-  "name": ""
+  type: "",
+  name: ""
+}
+
+const ShotRange = props => {
+  const [start, setStart] = useState("");
+  const [end, setEnd] = useState("");
+  const [inc, setInc] = useState("");
+
+  const handlePopulate = () => {
+    const padding = start.length;
+    const startInt = parseInt(start);
+    const endInt = parseInt(end);
+    const incInt = inc ? parseInt(inc) : 10;
+    const amount = Math.floor((endInt - startInt) / incInt + 1);
+    const range = [...Array(amount).keys()].map(index => {
+      return (index * incInt + startInt).toString().padStart(padding, "0");
+    });
+    if (range.at(-1) !== end) range.push(end);
+    props.setDirList(range.map(n => ({type: "", name: n})));
+  }
+
+  const handleClear = () => {
+    props.setDirList([{...dirTemplate}])
+  }
+
+  return (
+    <Stack gap="5px" direction="row" style={{margin: "10px 0px"}}>
+      <TextField
+        id="rangex"
+        label="First shot"
+        value={start}
+        onChange={e => setStart(e.target.value)}
+        placeholder="0010"
+        size="small"
+      />
+      <TextField
+        id="rangey"
+        label="Last shot"
+        value={end}
+        onChange={e => setEnd(e.target.value)}
+        placeholder="0050"
+        size="small"
+      />
+      <TextField
+        id="step"
+        label="Increment"
+        value={inc}
+        onChange={e => setInc(e.target.value)}
+        placeholder="10"
+        size="small"
+      />
+      <Button variant="outlined" color="ignite" onClick={handlePopulate}
+        disabled={!start || !end}
+      >
+        Populate
+      </Button>
+      <Button variant="outlined" color="ignite" onClick={handleClear}>
+        Clear
+      </Button>
+    </Stack>
+  )
 }
 
 function CreateDirModal(props) {
@@ -132,11 +192,14 @@ function CreateDirModal(props) {
   }
 
   return (
-    <Modal open={props.open} maxWidth="xs" onClose={props.onClose}
+    <Modal open={props.open} maxWidth="sm" onClose={props.onClose}
       title={`Create ${props.data.kind}`}
       buttons={[<Button key="create" onClick={handleCreate}>Create</Button>]}
       buttonProps={{color: "ignite"}}
     >
+      {props.data.kind === "shot" ?
+        <ShotRange setDirList={setDirList} /> :
+      null}
       <div style={{display: "flex", flexDirection: "column", height: "60vh"}}>
         <DynamicList onAdd={handleAdd} onRemove={() => handleRemove(-1)}>
           {getDirList(dirList)}

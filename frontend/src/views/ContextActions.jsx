@@ -5,6 +5,7 @@ import serverRequest from "../services/serverRequest";
 import clientRequest from "../services/clientRequest";
 import TextField from '@mui/material/TextField';
 import { Button, OutlinedInput, Typography } from '@mui/material';
+import { Stack } from '@mui/system';
 
 export function CopyToClipboard(text, enqueueSnackbar) {
   navigator.clipboard.writeText(text);
@@ -117,11 +118,13 @@ export function CreateDir({data, open=false, onClose, enqueueSnackbar, fn}) {
   }
 
   return (
-    <CreateDirModal
-      open={open}
-      data={data}
-      onCreate={data => handleOnCreate(data)}
-      onClose={onClose}
-    />
+    <>
+      <CreateDirModal
+        open={open}
+        data={data}
+        onCreate={data => handleOnCreate(data)}
+        onClose={onClose}
+      />
+    </>
   )
 }

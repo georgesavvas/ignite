@@ -20,6 +20,7 @@ import { DeleteDir, RenameDir, CreateDir } from "../ContextActions";
 import { useSnackbar } from 'notistack';
 import { ConfigContext } from "../../contexts/ConfigContext";
 import BuildFileURL from "../../services/BuildFileURL";
+import DataPlaceholder from "../../components/DataPlaceholder";
 
 const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
   color: theme.palette.text.secondary,
@@ -232,6 +233,7 @@ function ProjectTreeView(props) {
     const filterString = nodes.filter_strings.join(" ")
     const hide = props.filter && !filterString.includes(props.filter);
     const path = BuildFileURL(nodes.path, config, {pathOnly: true});
+    if (nodes.id === "root" && hide) return;
     return (
       <StyledTreeItem
         key={nodes.id}
@@ -276,7 +278,7 @@ function ProjectTreeView(props) {
           selected={selectedItems}
           sx={{ flexGrow: 1, maxWidth: 800, overflowX: "hidden", overflowY: 'auto' }}
         >
-          {renderTree(props.data)}
+          {renderTree(props.data) || <DataPlaceholder text="No results" style={{height: "90%", width: "90%"}} />}
         </TreeView>
       </div>
     </div>

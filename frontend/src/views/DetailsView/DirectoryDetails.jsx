@@ -2,7 +2,7 @@ import React, { useState, useRef } from "react";
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import TagContainer from "./TagContainer";
-import { TextField } from "@mui/material";
+import { OutlinedInput, TextField } from "@mui/material";
 import Modal from "../../components/Modal";
 import serverRequest from "../../services/serverRequest";
 import Attributes from "./Attributes";
@@ -44,33 +44,52 @@ const rowStyle = {
 }
 
 function DirectoryDetails(props) {
-  const [reprModalOpen, setReptModalOpen] = useState(false);
+  const [reprValue, setReprValue] = useState("");
+  const [reptEdit, setReptEdit] = useState(false);
   const dir_kind = props.entity.dir_kind;
   const dir_kind_formatted = dir_kind.charAt(0).toUpperCase() + dir_kind.slice(1)
 
-  const handleReptChange = uri => {
+  const handleReptChange = () => {
     const data = {
       target: props.entity.path,
-      repr: uri
+      repr: reprValue
     }
     serverRequest("set_repr_asset", data)
-    setReptModalOpen(false);
+    setReprValue("");
+    setReptEdit(false);
   }
 
   return (
     <div style={style}>
-      <ReprAssetModal
-        open={reprModalOpen}
-        onSave={uri => handleReptChange(uri)}
-        onClose={() => setReptModalOpen(false)}
-      />
       <div style={{margin: "10px", overflow: "hidden"}}>
         <Typography variant="h5" style={{marginBottom: "10px"}}>{props.entity.name}</Typography>
         <Path path={props.entity.path} />
         <div style={rowStyle}>
-          <Typography>Repr Asset:</Typography>
-          <URI uri={props.entity.repr} />
-          <Button variant="outlined" size="small" onClick={() => setReptModalOpen(true)} color="ignite">Choose</Button>
+          <Typography>Thumbnail from:</Typography>
+          {reptEdit ?
+            <TextField
+              size="small"
+              label="Repr Asset"
+              fullWidth
+              value={reprValue}
+              onChange={e => setReprValue(e.target.value)}
+              onBlur={handleReptChange}
+            /> :
+            <>
+              <URI uri={props.entity.repr} />
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => {
+                  setReprValue(props.entity.repr || "")
+                  setReptEdit(true)
+                }}
+                color="ignite"
+              >
+                Edit
+              </Button>
+            </>
+          }
         </div>
       </div>
       <TagContainer entityPath={props.entity.path} tags={props.entity.tags} />
