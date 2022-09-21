@@ -116,9 +116,12 @@ def find(path):
     path = str(path).strip()
 
     if utils.is_uri(path):
-        if path.count("@") > 1:
+        at_amount = path.count("@")
+        if at_amount > 1:
             logging.error(f"URI has more than 1 '@': {path}")
             return None
+        elif not at_amount:
+            path += "@best"
         asset_uri, version = path.split("@")
         if version.isnumeric():
             path = utils.uri_to_path(path)
@@ -127,13 +130,14 @@ def find(path):
             if version not in ("best", "latest"):
                 logging.error(f"URI version '{version}' not recognised: {path}")
                 return None
-            asset_path = utils.uri_to_path(asset_uri)
+            asset_path = Path(utils.uri_to_path(asset_uri))
             if not asset_path or not asset_path.exists():
                 return None
             asset = Asset(asset_path)
             if not asset:
                 logging.error(f"Couldn't find path at {asset_path}")
                 return None
+            print("-----", asset._best_av)
             if version == "best":
                 return asset.best_av
             elif version == "latest":
@@ -569,6 +573,8 @@ def get_repr_comp(target):
                     return search(Path(their_repr))
 
     target_entity = find(target)
+    if not target_entity:
+        return {}
     target_repr = target_entity.repr
     if utils.is_uri(target_repr):
         target_repr = utils.uri_to_path(target_repr)

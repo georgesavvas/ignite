@@ -81,11 +81,12 @@ class Asset(Directory):
         self._avs_fetched = True
 
     def _get_best_version(self):
-        assetversions = self.assetversions.reverse()
-        best_score = 0
+        assetversions = sorted(self.assetversions, reverse=True)
+        if not assetversions:
+            return
+        best_score = -1
         best_av = None
         for av in assetversions:
-            print(av)
             score = av.score
             if score > best_score:
                 best_score = score
