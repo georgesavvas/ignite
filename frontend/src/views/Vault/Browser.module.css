@@ -1,0 +1,55 @@
+.container {
+    margin: 0px;
+    padding: 0px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
+
+.tileContainer {
+    /* padding: 10px; */
+    /* display: grid; */
+    overflow: auto;
+    flex-grow: 1;
+    box-sizing: border-box;
+    /* align-items: center;
+    justify-content: center; */
+}
+
+.helperTextContainer {
+    width: 100%;
+    display: flex;
+    padding-left: 10px;
+    padding-top: 5px;
+}
+
+.collectionsBrowserContainer {
+    display: flex;
+    flex-direction: row;
+    overflow: auto;
+    flex-grow: 1;
+}
+
+.browserContainer {
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    flex-grow: 1;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.collectionContainer {
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    flex-grow: 1;
+    box-sizing: border-box;
+    max-width: 300px;
+}
+
+.layoutHelper {
+    flex-grow: 100;
+}

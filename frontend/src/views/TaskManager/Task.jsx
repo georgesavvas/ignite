@@ -23,7 +23,7 @@ const COLOURS = {
 }
 
 const Task = props => {
-  const state = props.task.state;
+  const state = props.task.state || "waiting";
 
   const handleAction = action => {
     const data = {
@@ -58,7 +58,8 @@ const Task = props => {
       case "paused": return <PlayArrowIcon className={`${styles.button} ${styles.unpauseButton}`} onClick={() => handleAction("unpause")} />;
       case "running": return <PauseIcon className={`${styles.button} ${styles.pauseButton}`} onClick={() => handleAction("pause")} />
       case "finished": case "error": return <ReplayIcon className={`${styles.button} ${styles.retryButton}`} onClick={() => handleAction("retry")} />;
-      default: return <LowPriorityIcon className={`${styles.button} ${styles.retryButton}`} onClick={() => handleAction("retry")} />;
+      // default: return <LowPriorityIcon className={`${styles.button} ${styles.retryButton}`} onClick={() => handleAction("retry")} />;
+      default: return null;
     }
   }
 
@@ -95,7 +96,7 @@ const Task = props => {
   }
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} style={props.style}>
       <div className={styles.topBar}>
         {/* <Typography className={styles.title} align="center">{props.task.name}</Typography> */}
         <div className={`${styles.progressBar} ${styles[state]}`} style={{...getProgressBarStyle(), backgroundColor: COLOURS[state]}} />
@@ -112,7 +113,7 @@ const Task = props => {
         {/* <div className={styles.spacer} /> */}
         {/* <Divider orientation="vertical" flexItem /> */}
         {getActionButton()}
-        <ClearIcon className={`${styles.button} ${styles.killButton}`} onClick={handleClear} />
+        <ClearIcon className={`${styles.button} ${state === "finished" ? styles.pauseButton : styles.killButton}`} onClick={handleClear} />
       </div>
     </div>
   )

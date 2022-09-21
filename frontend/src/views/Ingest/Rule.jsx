@@ -62,67 +62,65 @@ export const Rule = memo(function Rule(props) {
   drag(drop(ref));
 
   return (
-    <div ref={ref}>
-      <div className={styles.expand}>
-        <div className={styles.ruleContainer} style={style}>
-          <div className={styles.topBar}>
-            <Typography variant="h6" style={{margin: "auto"}}>{"Rule " + (origIndex + 1)}</Typography>
-            <Button className={styles.button}
-              onClick={e => props.onRulesChange(e, "remove", origIndex)} color="lightgrey"
-            >Remove</Button>
-          </div>
-          <div className={styles.ruleRow}>
-          <FormControl sx={{ m: "5px", minWidth: 120 }} size="small">
-            <InputLabel id="label-file_target_type">Target type</InputLabel>
-            <Select
-              labelId="label-file_target_type"
-              id="select-file_target_type"
-              label="Target type"
-              value={rule.file_target_type || "filename"}
-              name={"file_target_type-" + origIndex}
-              onChange={handleChanged}
-            >
-              <MenuItem value="entire_path">Entire path</MenuItem>
-              <MenuItem value="directory">Directory</MenuItem>
-              <MenuItem value="filename">Filename</MenuItem>
-            </Select>
-          </FormControl>
-          <TextField sx={{ m: "5px", minWidth: 120 }} label="Target"
-            value={rule.file_target || ""} size="small" style={{flexGrow: 1}}
-            name={"file_target-" + origIndex} onChange={handleChanged}
-          />
-          </div>
-          <Divider />
-          <TextField sx={{ m: "5px", minWidth: 120 }} label="Filepath structure"
-            style={{flexGrow: 1}} size="small" value={rule.rule || ""}
-            name={"rule-" + origIndex} onChange={handleChanged}
-          />
-          <TextField sx={{ m: "5px", minWidth: 120 }} label="Task"
-            value={rule.task || ""} size="small" style={{flexGrow: 1}}
-            name={"task-" + origIndex} onChange={handleChanged}
-          />
-          <div className={styles.ruleRow}>
-            <TextField sx={{ m: "5px", minWidth: 120 }} label="Asset name"
-              value={rule.name || ""} size="small" style={{flexGrow: 1}}
-              name={"name-" + origIndex} onChange={handleChanged}
-            />
-            <TextField sx={{ m: "5px", minWidth: 120 }} label="Component name"
-              value={rule.comp || ""} size="small" style={{flexGrow: 1}}
-              name={"comp-" + origIndex} onChange={handleChanged}
-            />
-          </div>
-          <div className={styles.ruleRow}>
-            <TextField sx={{ m: "5px", minWidth: 120 }} label="Replace text"
-              value={rule.replace_target || ""} size="small" style={{flexGrow: 1}}
-              name={"replace_target-" + origIndex} onChange={handleChanged}
-            />
-            <TextField sx={{ m: "5px", minWidth: 120 }} label="With"
-              value={rule.replace_value || ""} size="small" style={{flexGrow: 1}}
-              name={"replace_value-" + origIndex} onChange={handleChanged}
-            />
-          </div>
-          <div className={styles.connector} id={id} />
+    <div ref={ref} className={styles.expand}>
+      <div className={styles.ruleContainer} style={style}>
+        <div className={styles.topBar}>
+          <Typography variant="h6" style={{margin: "auto"}}>{"Rule " + (origIndex + 1)}</Typography>
+          <Button className={styles.button}
+            onClick={e => props.onRulesChange(e, "remove", origIndex)} color="lightgrey"
+          >Remove</Button>
         </div>
+        <div className={styles.ruleRow}>
+        <FormControl sx={{ m: "5px", minWidth: 120 }} size="small">
+          <InputLabel id="label-file_target_type">Target type</InputLabel>
+          <Select
+            labelId="label-file_target_type"
+            id="select-file_target_type"
+            label="Target type"
+            value={rule.file_target_type || "filename"}
+            name={"file_target_type-" + origIndex}
+            onChange={handleChanged}
+          >
+            <MenuItem value="entire_path">Entire path</MenuItem>
+            <MenuItem value="directory">Directory</MenuItem>
+            <MenuItem value="filename">Filename</MenuItem>
+          </Select>
+        </FormControl>
+        <TextField sx={{ m: "5px", minWidth: 120 }} label="Target"
+          value={rule.file_target || ""} size="small" style={{flexGrow: 1}}
+          name={"file_target-" + origIndex} onChange={handleChanged}
+        />
+        </div>
+        <Divider />
+        <TextField sx={{ m: "5px", minWidth: 120 }} label="Filepath structure"
+          style={{flexGrow: 1}} size="small" value={rule.rule || ""}
+          name={"rule-" + origIndex} onChange={handleChanged}
+        />
+        <TextField sx={{ m: "5px", minWidth: 120 }} label="Task"
+          value={rule.task || ""} size="small" style={{flexGrow: 1}}
+          name={"task-" + origIndex} onChange={handleChanged}
+        />
+        <div className={styles.ruleRow}>
+          <TextField sx={{ m: "5px", minWidth: 120 }} label="Asset name"
+            value={rule.name || ""} size="small" style={{flexGrow: 1}}
+            name={"name-" + origIndex} onChange={handleChanged}
+          />
+          <TextField sx={{ m: "5px", minWidth: 120 }} label="Component name"
+            value={rule.comp || ""} size="small" style={{flexGrow: 1}}
+            name={"comp-" + origIndex} onChange={handleChanged}
+          />
+        </div>
+        <div className={styles.ruleRow}>
+          <TextField sx={{ m: "5px", minWidth: 120 }} label="Replace text"
+            value={rule.replace_target || ""} size="small" style={{flexGrow: 1}}
+            name={"replace_target-" + origIndex} onChange={handleChanged}
+          />
+          <TextField sx={{ m: "5px", minWidth: 120 }} label="With"
+            value={rule.replace_value || ""} size="small" style={{flexGrow: 1}}
+            name={"replace_value-" + origIndex} onChange={handleChanged}
+          />
+        </div>
+        <div className={styles.connector} id={id} />
       </div>
     </div>
   )

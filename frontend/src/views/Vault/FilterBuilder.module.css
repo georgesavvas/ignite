@@ -1,0 +1,98 @@
+.container {
+    padding: 10px;
+}
+
+.filtersCloseButton {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+}
+
+.manageTemplatesContainer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.filtersContainer {
+    box-sizing: border-box;
+    display: flex;
+    margin-top: 10px;
+    gap: 5px;
+    align-items: center;
+}
+
+.groupContainer {
+    border: 1px grey solid;
+    position: relative;
+    border-radius: 5px;
+    padding: 10px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+}
+
+.groupButtonContainer {
+    display: flex;
+    /* flex-direction: column; */
+    align-items: stretch;
+    justify-content: center;
+    gap: 5px;
+}
+
+.placeholderContainer {
+    border: 1px grey dashed;
+    border-radius: 5px;
+    box-sizing: border-box;
+    padding: 5px;
+    min-height: 76.5px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 5px;
+}
+
+.filterContainer {
+    border: 1px rgb(100, 100, 100) solid;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    padding: 5px;
+    background-color: rgb(20, 20, 20);
+}
+
+.fieldsContainer {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: center;
+}
+
+.icon {
+    color: rgb(100, 100, 100);
+}
+
+.topBar {
+    box-sizing: border-box;
+    display: flex;
+    height: 40px;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.placeholderOption {
+    box-sizing: border-box;
+    height: 100%;
+    width: 100%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.placeholderOption:hover {
+    background-color: rgb(50,50,50);
+}

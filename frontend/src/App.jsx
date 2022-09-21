@@ -10,6 +10,8 @@ import {ConfigProvider} from "./contexts/ConfigContext";
 import {EntityProvider} from "./contexts/EntityContext";
 import { SnackbarProvider } from 'notistack';
 import BuildFileURL from './services/BuildFileURL';
+import {ErrorBoundary} from 'react-error-boundary'
+import { Button, Typography } from "@mui/material";
 
 let darkTheme = createTheme({
   palette: {
@@ -32,29 +34,33 @@ let darkTheme = createTheme({
 
 BuildFileURL("");
 
+const ErrorFallback = ({error, resetErrorBoundary}) => {
+  return (
+    <div className="errorFallback" role="alert">
+      {/* <ErrorIcon /> */}
+      <Typography variant="h4">{"Ignite has crashed :("}</Typography>
+      <Button color="ignite" variant="outlined" size="large" onClick={resetErrorBoundary}>Reload</Button>
+      <pre className="errorContainer">{error.message}</pre>
+    </div>
+  )
+}
+
 function App() {
-  // const [isLoading, setIsLoading] = useState(true);
-
-  // useEffect(() => {
-  //   setTimeout(() => {
-  //     setIsLoading(false);
-  //   }, 3000);
-  // }, []);
-
   return (
     <ThemeProvider theme={darkTheme}>
       <GlobalStyles styles={{ ...darkScrollbar() }} />
-      {/* { isLoading ? <Splash onFinished={() => setIsLoading(false)} /> : null } */}
       <div className="App">
-        <ConfigProvider>
-          <ContextProvider>
-            <EntityProvider>
-              <SnackbarProvider maxSnack={3} autoHideDuration={2500}>
-                <Home />
-              </SnackbarProvider>
-            </EntityProvider>
-          </ContextProvider>
-        </ConfigProvider>
+        <ErrorBoundary FallbackComponent={ErrorFallback}>
+          <ConfigProvider>
+            <ContextProvider>
+              <EntityProvider>
+                <SnackbarProvider maxSnack={3} autoHideDuration={2500}>
+                  <Home />
+                </SnackbarProvider>
+              </EntityProvider>
+            </ContextProvider>
+          </ConfigProvider>
+        </ErrorBoundary>
       </div>
     </ThemeProvider>
   );

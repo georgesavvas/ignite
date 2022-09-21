@@ -29,9 +29,9 @@ app.add_middleware(
 )
 
 
-# @app.on_event("startup")
-# async def startup_event():
-#     LOOP.create_task(TASK_MANAGER.start_worker())
+@app.on_event("startup")
+async def startup_event():
+    TASK_MANAGER.restore_tasks()
 
 
 @app.websocket("/ws/processes/{session_id}")
@@ -210,6 +210,15 @@ async def edit_task(request: Request):
     edit = result.get("edit")
     api.edit_task(task_id, edit)
     return {"ok": True}
+
+
+@app.post("/api/v1/get_tasks")
+async def get_tasks(request: Request):
+    result = await request.json()
+    log_request(result)
+    session_id = result.get("session_id")
+    data = api.get_tasks(session_id)
+    return {"ok": True, "data": data}
 
 
 @app.get("/api/v1/quit")

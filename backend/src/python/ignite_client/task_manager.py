@@ -2,6 +2,7 @@ import logging
 import asyncio
 import threading
 import importlib
+from uuid import uuid4
 from pathlib import PurePath
 from tinydb import TinyDB, Query
 
@@ -20,19 +21,33 @@ class Task():
         self.id = task_id
         self.session_id = session_id
         self.processes_manager = processes_manager
-        self.state = {"paused": False, "killed": False}
+        self.state = {"paused": False, "killed": False, "active": "waiting"}
         self.on_finish = on_finish
+        self.progress = 0
 
     async def run(self):
         async def progress_fn(progress=-1, state=""):
-            ws = self.processes_manager.get(self.action["session_id"])
-            data = {"id": self.id}
+            ws = self.processes_manager.get(self.session_id)
+            if not ws and self.processes_manager.connections:
+                ws, ws_id = self.processes_manager.connections[0]
+                logging.error(f"Websocket was not found for {self} {self.session_id} but ended up using {ws_id}")
+            elif not ws:
+                logging.error(f"Websocket was not found for {self} {self.session_id}")
+                return
+            data = {
+                "id": self.id,
+                "name": self.action["label"],
+                "entity": self.entity
+            }
             if progress >= 0:
                 data["progress"] = progress
+                self.progress = progress
             if state:
                 data["state"] = state
+                self.state["active"] = state
             elif progress >= 0:
                 data["state"] = "running" if progress < 100 else "finished"
+                self.state["active"] = state
             await ws.send_json({"data": data})
         module_path = PurePath(self.action["module_path"])
         module = importlib.machinery.SourceFileLoader(
@@ -42,6 +57,14 @@ class Task():
         self.on_finish(self.id, result)
         return result
     
+    def as_dict(self):
+        return {
+            "action": self.action,
+            "entity": self.entity,
+            "task_id": self.id,
+            "session_id": self.session_id
+        }
+
     def pause(self):
         self.state["paused"] = True
     
@@ -63,30 +86,46 @@ class TaskManager():
             target=start_worker, args=(self.loop,), daemon=True
         )
         self.thread.start()
-        self.restore_items()
 
-    def add(self, **kwargs):
-        task = Task(**kwargs, processes_manager=self.processes_manager, on_finish=self.handle_task_finished)
-        asyncio.create_task(self.send(task, state="waiting"))
-        self.db.insert({**kwargs})
+    def create_task(self, action, entity, session_id, task_id=None):
+        task_id = task_id or str(uuid4())
+        task = Task(
+            action=action,
+            entity=entity,
+            task_id=task_id,
+            session_id=session_id,
+            processes_manager=self.processes_manager,
+            on_finish=self.handle_task_finished
+        )
+        self.run_task(task)
+    
+    def run_task(self, task):
+        asyncio.create_task(self.send(task))
         future = asyncio.run_coroutine_threadsafe(task.run(), self.loop)
+        self.remove(task.id)
+        self.db.insert(task.as_dict())
         self.tasks.append({
-            "id": kwargs["task_id"],
+            "id": task.id,
             "task": task,
             "future": future,
         })
 
     def remove(self, task_id):
-        for i, (id, task) in enumerate(self.tasks):
-            if task_id == id:
-                task.revoke()
+        for i, task_data in enumerate(self.tasks):
+            if task_data["id"] == task_id:
                 self.tasks.pop(i)
                 break
+        self.db.remove(Query().task_id == task_id)
     
-    def restore_items(self):
-        for item in self.db:
-            print(item)
-            logging.warning(f"Restoring task from db {item['task_id']}")
+    def restore_tasks(self):
+        for kwargs in self.db:
+            logging.warning(f"Restoring task from db {kwargs['task_id']}")
+            self.create_task(
+                action=kwargs["action"],
+                entity=kwargs["entity"],
+                task_id=kwargs["task_id"],
+                session_id=kwargs["session_id"]
+            )
 
     def tasks(self):
         return self.tasks
@@ -97,36 +136,30 @@ class TaskManager():
     def handle_task_finished(self, task_id, result):
         task = self.get_task(task_id)
         asyncio.create_task(self.send(task, state="finished" if not task.state["killed"] else "error"))
+        print(f"Removing {task_id} from db...")
         self.db.remove(Query().id == task_id)
-    
-    # def report(self):
-    #     data = []
-    #     # waiting = [task.kwargs["task_id"] for task in self.huey.pending()]
-    #     for task_id, task in self.tasks:
-    #         kwargs = task.ignite_data
-    #         state = "running"
-    #         if task.is_revoked():
-    #             state = "paused"
-    #         elif task_id in waiting:
-    #             state = "waiting"
-    #         else:
-    #             result = task()
-    #             if result:
-    #                 state = "finished"
-    #         data.append({
-    #             "state": state,
-    #             "progress": 100,
-    #             "name": kwargs["action"]["label"],
-    #             "entity": kwargs["entity"],
-    #             "id": task_id
-    #         })
-    #     return data
+        print("Done.")
     
     def get_task(self, task_id):
         for task_data in self.tasks:
             if task_data["id"] == task_id:
                 return task_data["task"]
     
+    def report(self, session_id=""):
+        data = []
+        for task_data in self.tasks:
+            task = task_data["task"]
+            if session_id and session_id != task.session_id:
+                continue
+            data.append({
+                "state": task.state["active"],
+                "progress": task.progress,
+                "name": task.action["label"],
+                "entity": task.entity,
+                "id": task.id
+            })
+        return data
+
     def get_future(self, task_id):
         for task_data in self.tasks:
             if task_data["id"] == task_id:
@@ -143,6 +176,12 @@ class TaskManager():
         print(f"Unpausing {task}")
         if task:
             task.unpause()
+    
+    def retry(self, task_id):
+        task = self.get_task(task_id)
+        print(f"Retrying {task}")
+        if task:
+            self.run_task(task)
     
     def kill(self, task_id):
         task = self.get_task(task_id)
@@ -162,8 +201,13 @@ class TaskManager():
 
     async def send(self, task, progress=-1, state=""):
         ws = self.processes_manager.get(task.session_id)
+        if not ws and self.processes_manager.connections:
+            ws, ws_id = self.processes_manager.connections[0]
+            logging.error(f"Websocket was not found for {task} {task.session_id} but ended up using {ws_id}")
+        elif not ws:
+            logging.error(f"Websocket was not found for {task} {task.session_id}")
+            return
         data = {
-            "state": "waiting",
             "name": task.action["label"],
             "entity": task.entity,
             "id": task.id

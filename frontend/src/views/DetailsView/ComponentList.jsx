@@ -18,16 +18,16 @@ const dccNames = {
   nuke: ["nuke"]
 }
 
-function Component({comp, onSelect, selectedComp, actions}) {
+function Component(props) {
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const [contextMenu, setContextMenu] = useState(null);
 
   const containerStyle = {
-    borderColor: comp.filename === selectedComp.filename ? "rgb(252, 140, 3)" : "rgb(70,70,70)"
+    borderColor: props.comp.filename === props.selectedComp.filename ? "rgb(252, 140, 3)" : "rgb(70,70,70)"
   }
 
   const handleClick = e => {
-    onSelect(e.currentTarget.id);
+    props.onSelect(e.currentTarget.id);
   }
 
   const handleCopy = (e, path) => {
@@ -38,19 +38,19 @@ function Component({comp, onSelect, selectedComp, actions}) {
   let contextItems = [
     {
       label: "Copy path",
-      fn: () => handleCopy(undefined, comp.path),
+      fn: () => handleCopy(undefined, props.comp.path),
       divider: true
     },
     {
       label: "Open in file explorer",
-      fn: () => openExplorer(comp.path, enqueueSnackbar),
+      fn: () => openExplorer(props.comp.path, enqueueSnackbar),
       divider: true
     },
   ]
 
   const data = {
     kind: "component",
-    entity: comp
+    entity: props.comp
   };
 
   const handleAction = action => {
@@ -63,7 +63,7 @@ function Component({comp, onSelect, selectedComp, actions}) {
     })
   }
 
-  contextItems = contextItems.concat(actions.map(action => (
+  contextItems = contextItems.concat(props.actions.map(action => (
     {
       label: action.label,
       fn: () => handleAction(action)
@@ -71,15 +71,15 @@ function Component({comp, onSelect, selectedComp, actions}) {
   )));
 
   return (
-    <div onContextMenu={e => handleContextMenu(e, contextMenu, setContextMenu)}>
+    <div onContextMenu={e => handleContextMenu(e, contextMenu, setContextMenu)} style={props.style}>
       <ContextMenu items={contextItems} contextMenu={contextMenu} setContextMenu={setContextMenu} />
-      <div className={styles.compContainer} id={comp.filename} onClick={handleClick} style={containerStyle}>
+      <div className={styles.compContainer} id={props.comp.filename} onClick={handleClick} style={containerStyle}>
         <div className={styles.compIcon} />
         <div className={styles.textContainer}>
-          <Typography variant="subtitle1" className={styles.label}>{comp.filename}</Typography>
+          <Typography variant="subtitle1" className={styles.label}>{props.comp.filename}</Typography>
         </div>
         <div className={styles.spacer} />
-        <IconButton onClick={e => handleCopy(e, comp.path)}>
+        <IconButton onClick={e => handleCopy(e, props.comp.path)}>
           <CopyIcon style={{fontSize: "20px"}} />
         </IconButton>
       </div>
@@ -101,7 +101,7 @@ function ComponentList(props) {
     <div className={styles.container}>
       {/* <Typography variant="h5" style={{marginBottom: "10px"}}>Components</Typography> */}
       <div className={styles.filterBar}>
-        <FormControl fullWidth>
+        <FormControl fullWidth focused={filterValue ? true : false}>
           <OutlinedInput
             id="outlined-basic"
             size="small"
@@ -109,14 +109,19 @@ function ComponentList(props) {
             placeholder="Filter"
             value={filterValue}
             onChange={e => setFilterValue(e.target.value || "")}
+            color={filterValue ? "error" : ""}
           />
         </FormControl>
       </div>
       <div className={styles.compList}>
-        {props.components.map((comp, index) => <Component key={index} comp={comp}
-            onSelect={props.onSelect} selectedComp={props.selectedComp} actions={actions}
+        {props.components.map((comp, index) => {
+          const filterString = `${comp.name}${comp.file}`;
+          const hide = filterValue && !filterString.includes(filterValue);
+          return <Component key={index} comp={comp}
+            onSelect={props.onSelect} selectedComp={props.selectedComp}
+            actions={actions} style={hide ? {display: "none"} : null}
           />
-        )}
+        })}
       </div>
     </div>
   )

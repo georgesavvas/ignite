@@ -229,8 +229,8 @@ function ProjectTreeView(props) {
   };
 
   const renderTree = (nodes) => {
-    const filter_string = nodes.filter_strings.join(" ")
-    const hide = props.filter && !filter_string.includes(props.filter);
+    const filterString = nodes.filter_strings.join(" ")
+    const hide = props.filter && !filterString.includes(props.filter);
     const path = BuildFileURL(nodes.path, config, {pathOnly: true});
     return (
       <StyledTreeItem

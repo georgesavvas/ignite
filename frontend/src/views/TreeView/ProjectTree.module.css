@@ -11,5 +11,5 @@
     display: flex;
     justify-content: center;
     padding: 5px;
-    padding-bottom: 0px;
+    background-color: rgb(30, 30, 30);
 }
