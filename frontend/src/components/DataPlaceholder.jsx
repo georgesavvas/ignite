@@ -6,7 +6,12 @@ const containerStyle = {
   alignItems: "center",
   justifyContent: "center",
   padding: "20px",
-  height: "100%"
+  height: "100%",
+  flexGrow: "100",
+  position: "absolute",
+  width: "100%",
+  boxSizing: "border-box",
+  pointerEvents: "none"
 }
 
 const typeStyle = {

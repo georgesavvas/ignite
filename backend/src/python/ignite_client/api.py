@@ -8,7 +8,6 @@ from string import Formatter
 from fnmatch import fnmatch
 from pathlib import PurePath, Path
 from pprint import pprint
-from uuid import uuid4
 from ignite_client import utils
 from ignite_client.utils import TASK_MANAGER, PROCESSES_MANAGER
 
@@ -278,30 +277,7 @@ def ingest_asset(data):
 
 
 def get_actions():
-    actions = utils.discover_actions()
-    # for entity in actions.keys():
-    #     for action in actions[entity]:
-    #         del action["fn"]
-    return actions
-
-
-# async def IgniteTask(action, entity, task_id, paused, killed, **kwargs):
-#     async def progress_fn(progress, state=""):
-#         # TASK_MANAGER.task_progress[task_id] = progress
-#         ws = PROCESSES_MANAGER.get(action["session_id"])
-#         await ws.send_json({"data": {
-#             "state": state or "running" if progress < 100 else "finished",
-#             "progress": progress,
-#             "name": action["label"],
-#             "entity": entity,
-#             "id": task_id
-#         }})
-#     module_path = PurePath(action["module_path"])
-#     module = importlib.machinery.SourceFileLoader(
-#         module_path.name, str(module_path)
-#     ).load_module()
-#     result = await module.main(entity=entity, progress_fn=progress_fn, paused=paused, killed=killed, task_id=task_id)
-#     return result
+    return utils.discover_actions()
 
 
 def run_action(entity, kind, action, session_id):
@@ -314,10 +290,11 @@ def run_action(entity, kind, action, session_id):
     for _action in actions:
         if _action["label"] != action:
             continue
-        _action["session_id"] = session_id
-        task_id = str(uuid4())
-        # task = IgniteTask(_action, entity, task_id)
-        TASK_MANAGER.add(action=_action, entity=entity, task_id=task_id, session_id=session_id)
+        TASK_MANAGER.create_task(
+            action=_action,
+            entity=entity,
+            session_id=session_id
+        )
         break
     else:
         logging.error(f"Couldn't find action {kind} {action}")
@@ -325,17 +302,20 @@ def run_action(entity, kind, action, session_id):
         pprint(actions)
         return
 
+
 def edit_task(task_id, edit):
-    print("-----", task_id, edit)
     if edit == "pause":
         TASK_MANAGER.pause(task_id)
     elif edit == "unpause":
         TASK_MANAGER.unpause(task_id)
-    # elif edit == "retry":
-    #     task.reset()
-    #     task.reschedule()
-    #     task.restore()
+    elif edit == "retry":
+        TASK_MANAGER.retry(task_id)
     elif edit == "clear":
         TASK_MANAGER.clear(task_id)
     elif edit == "kill":
         TASK_MANAGER.kill(task_id)
+
+
+def get_tasks(session_id):
+    data = TASK_MANAGER.report(session_id)
+    return data

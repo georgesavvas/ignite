@@ -13,6 +13,7 @@
         "hypercorn",
         "KINDTYPES",
         "Mult",
+        "notistack",
         "onmaximum",
         "onreconnect",
         "platformdirs",

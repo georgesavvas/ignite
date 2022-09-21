@@ -1,0 +1,19 @@
+.ratio169 .ratio11 .ratio916 {
+    border: solid lightgrey 2px;
+    background-color: red;
+}
+
+.ratio169 {
+    height: 50px;
+    aspect-ratio: 16 / 9;
+}
+
+.ratio11 {
+    height: 50px;
+    width: 50px;
+}
+
+.ratio916 {
+    height: 50 * (9 / 16);
+    aspect-ratio: 9 / 16;
+}

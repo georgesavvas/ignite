@@ -4,7 +4,7 @@ import AssetTile from "./AssetTile";
 import DirectoryTile from "./DirectoryTile";
 import Divider from '@mui/material/Divider';
 import ExplorerBar from "./ExplorerBar";
-import PageBar from "./PageBar";
+import PageBar from "../../components/PageBar";
 import {EntityContext} from "../../contexts/EntityContext";
 import {ContextContext} from "../../contexts/ContextContext";
 import { DeleteDir, RenameDir, CreateDir } from "../ContextActions";

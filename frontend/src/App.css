@@ -1,5 +1,4 @@
 .App {
-  /* text-align: center; */
   background-color: rgb(20, 20, 20);
   color: lightgrey;
   height: 100vh;
@@ -8,29 +7,24 @@
   margin: 0px;
   padding: 0px;
   font-size: 10px;
-  /* overflow-y: auto; */
 }
 
-/* .MuiButtonBase-root {
-  max-height: 35px;
-} */
-
-/* .MuiInputBase-root {
-  max-height: 35px;
+.errorFallback {
+  height: 100vh;
+  display: flex;
+  gap: 20px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: whitesmoke;
 }
 
-.MuiFormControl-root label {
-  top: -11px;
+.errorContainer {
+  margin-top: 30px;
+  padding: 10px;
+  background-color: rgb(30, 30, 30);
 }
 
-.MuiFormControl-root label[data-shrink='true'] {
-  top: 0;
+pre {
+  font-size: 16px;
 }
-
-.MuiTextField-root label {
-  top: -11px;
-}
-
-.MuiTextField-root label[data-shrink='true'] {
-  top: 0;
-} */

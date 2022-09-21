@@ -3,7 +3,7 @@ import Container from '@mui/material/Container';
 import Pagination from '@mui/material/Pagination';
 import Slider from '@mui/material/Slider';
 import Typography from '@mui/material/Typography';
-import IgnTextField from "../../components/IgnTextField";
+import IgnTextField from "./IgnTextField";
 
 const style = {
   margin: "0px",

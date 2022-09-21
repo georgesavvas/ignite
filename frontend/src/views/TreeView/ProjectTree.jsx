@@ -40,7 +40,7 @@ export default function ProjectTree() {
   return (
     <div className={styles.container}>
       <div className={styles.filterBar}>
-        <FormControl fullWidth>
+        <FormControl fullWidth focused={filterValue ? true : false}>
           <OutlinedInput
             id="outlined-basic"
             size="small"
@@ -48,6 +48,7 @@ export default function ProjectTree() {
             placeholder="Filter"
             value={filterValue}
             onChange={e => setFilterValue(e.target.value || "")}
+            color={filterValue ? "error" : ""}
           />
         </FormControl>
       </div>

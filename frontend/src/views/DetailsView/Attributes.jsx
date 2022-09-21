@@ -65,12 +65,11 @@ function Attributes(props) {
     width: 80,
     cellClassName: "actions",
     getActions: params => {
-      if (!shouldBeEditable(params)) return [];
       return [
         <GridActionsCellItem
           icon={<DeleteIcon />}
           label="Delete"
-          onClick={handleDelete(params.id)}
+          onClick={handleDelete(params.id, params.row)}
           color="inherit"
         />,
       ];
@@ -108,11 +107,21 @@ function Attributes(props) {
     return newValues;
   }
 
-  const handleDelete = id => () => {
-    setData(prevState => ({
-      attribs: prevState.attribs.filter(row => row.id !== id),
-      shouldWrite: true
-    }));
+  const handleDelete = (id, row) => () => {
+    if (row.inherited) {
+      setData(prevState => ({
+        attribs: prevState.attribs.map(row => {
+          if (row.id === id) row.override = "";
+          return row;
+        }),
+        shouldWrite: true
+      }));
+    } else {
+      setData(prevState => ({
+        attribs: prevState.attribs.filter(row => row.id !== id),
+        shouldWrite: true
+      }));
+    }
   };
 
   const handleError = error => {

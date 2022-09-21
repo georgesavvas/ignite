@@ -1,0 +1,13 @@
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    /* padding: 10px; */
+}
+
+.tag {
+    border-radius: 20px;
+    padding: 5px 10px 5px 10px;
+    background-color: whitesmoke;
+    height: 20px;
+}
