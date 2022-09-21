@@ -17,14 +17,16 @@ const FilterField = ({filterValue, setFilterValue, children}) => {
           onChange={e => setFilterValue(e.target.value || "")}
           color={filterValue ? "error" : ""}
         />
-        <Typography
-          variant="subtitle1"
-          align="center"
-          className={styles.clearButton}
-          onClick={() => setFilterValue("")}
-        >
-          Clear
-        </Typography>
+        {!filterValue ? null :
+          <Typography
+            variant="subtitle1"
+            align="center"
+            className={styles.clearButton}
+            onClick={() => setFilterValue("")}
+          >
+            Clear
+          </Typography>
+        }
       </FormControl>
       {children}
     </div>

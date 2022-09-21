@@ -4,8 +4,9 @@ from ignite_server.constants import DCC_EXTENSIONS
 from ignite_server import utils
 from ignite_server.entities.directory import Directory
 from ignite_server.constants import ANCHORS
+from ignite_server.utils import CONFIG
 
-CONFIG = utils.get_config()
+
 ROOT = PurePath(CONFIG["projects_root"])
 
 
