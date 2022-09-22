@@ -16,11 +16,12 @@ ROOT = PurePath(CONFIG["projects_root"])
 class Directory():
     def __init__(self, path="", dir_kind="directory") -> None:
         self.dict_attrs = ["path", "dir_kind", "anchor", "project", "name", "context",
-            "repr", "tags", "attributes"]
+            "repr", "tags", "attributes", "uri"]
         self.nr_attrs = ["path"]
         self.project = ""
         self.group = ""
         self.name = ""
+        self.uri = utils.get_uri(path)
         self.tags = []
         self._attributes = []
         self.dir_kind = dir_kind
@@ -75,6 +76,12 @@ class Directory():
         for k, v in config.items():
             setattr(self, k, v)
 
+    def get_parent(self):
+        if self.path.parent in ("exports", "scenes"):
+            return self.path.parent.parent
+        else:
+            return self.path.parent
+
     def as_dict(self):
         d = {}
         attrs = dir(self)
@@ -88,7 +95,7 @@ class Directory():
         d["icon"] = self.dir_kind
         if hasattr(self, "task_type"):
             d["icon"] += "_" + self.task_type
-        if hasattr(self, "repr"):
+        if self.repr:
             d["thumbnail"] = api.get_repr_comp(self.repr)
         return d
 
@@ -151,10 +158,11 @@ class Directory():
 
     @property
     def repr(self):
-        if not self._repr:
-            r = api.get_repr(self.path)
-            return r
         return self._repr
+        # if not self._repr:
+        #     r = api.get_repr(self.path)
+        #     return r
+        # return self._repr
 
     @repr.setter
     def repr(self, value):

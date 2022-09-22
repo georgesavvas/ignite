@@ -20,6 +20,7 @@ class Project(Directory):
             path = ROOT / name
         super().__init__(path, dir_kind="project")
         self.project = self.name
+        self.short_name = ""
 
     def create_dir(self, name, recursive=False):
         raise NotImplemented("create_dir not allowed for projects.")
@@ -55,6 +56,7 @@ class Project(Directory):
         for d in dirs:
             dir_path = path / d
             setattr(self, f"{d}_path", dir_path)
+        self.load_from_config()
     
     def set_short_name(self, name):
         if not utils.validate_dirname(name): 
@@ -63,18 +65,12 @@ class Project(Directory):
             )
         self.short_name = name
     
-    def update_config(self):
-        config_path = self.config_path / PROJECT_CONFIG_FILE
-        with open(config_path, "r") as f:
-            existing = yaml.safe_load(f)
-        existing = existing or {}
+    def update_config(self, data):
         config = {
-            "status": self.status,
             "short_name": self.short_name
         }
-        new_config = existing.update(config)
-        with open(config_path, "w") as f:
-            yaml.safe_dump(new_config, f)
+        config.update(data)
+        super().update_config(config)
 
     def get_project_tree(self):
         kinds = {v: k for k, v in ANCHORS.items()}

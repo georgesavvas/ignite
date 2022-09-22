@@ -6,6 +6,7 @@ import clientRequest from "../services/clientRequest";
 import TextField from '@mui/material/TextField';
 import { Button, OutlinedInput, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
+import { useRef } from 'react';
 
 export function CopyToClipboard(text, enqueueSnackbar) {
   navigator.clipboard.writeText(text);
@@ -18,7 +19,28 @@ export function ShowInExplorer(filepath, enqueueSnackbar) {
   })
 }
 
+export function setReprForProject(repr, enqueueSnackbar) {
+  const data = {
+    repr: repr
+  }
+  serverRequest("set_repr_for_project", data).then(resp => {
+    if (resp.ok) enqueueSnackbar(`Repr set for ${resp.data}`, {variant: "success"});
+    else enqueueSnackbar(`Couldn't set repr for ${resp.data}`, {variant: "error"});
+  })
+}
+
+export function setReprForParent(repr, enqueueSnackbar) {
+  const data = {
+    repr: repr
+  }
+  serverRequest("set_repr_for_parent", data).then(resp => {
+    if (resp.ok) enqueueSnackbar(`Repr set for ${resp.data}`, {variant: "success"});
+    else enqueueSnackbar(`Couldn't set repr for ${resp.data}`, {variant: "error"});
+  })
+}
+
 export function DeleteDir({data, open=false, onClose, enqueueSnackbar, fn}) {
+  const textFieldRef = useRef();
   const [puzzle, setPuzzle] = useState([0, 0]);
   const [solved, setSolved] = useState(false);
   const [value, setValue] = useState("");
@@ -46,11 +68,11 @@ export function DeleteDir({data, open=false, onClose, enqueueSnackbar, fn}) {
   }
 
   return (
-    <Modal open={open} title="Are you sure?"
-      maxWidth="sm" closeButton onClose={onClose}
+    <Modal open={open} title="Are you sure?" onFormSubmit={handleDeleteEntity}
+      maxWidth="sm" closeButton onClose={onClose} focusRef={textFieldRef}
       text={`This will permanently delete this ${data.kind}!`}
       buttons={[
-        <Button disabled={!solved} key="confirm" onClick={handleDeleteEntity}>Confirm</Button>,
+        <Button disabled={!solved} type="submit" key="confirm">Confirm</Button>,
         <Button key="cancel" onClick={onClose}>Cancel</Button>
       ]}
     >
@@ -59,6 +81,7 @@ export function DeleteDir({data, open=false, onClose, enqueueSnackbar, fn}) {
         label={`${puzzle[0]} + ${puzzle[1]} =`}
         size="small"
         autoFocus
+        inputRef={textFieldRef}
         value={value}
         onChange={e => setValue(e.target.value)}
         helperText={solved ? "Go for it" : "Solve the above to continue"}
@@ -70,6 +93,7 @@ export function DeleteDir({data, open=false, onClose, enqueueSnackbar, fn}) {
 
 export function RenameDir({data, open=false, onClose, enqueueSnackbar, fn}) {
   const [nameValue, setNameValue] = useState("");
+  const textFieldRef = useRef();
 
   useEffect(() => {
     setNameValue(data.name);
@@ -90,9 +114,9 @@ export function RenameDir({data, open=false, onClose, enqueueSnackbar, fn}) {
   }
 
   return (
-    <Modal open={open}
+    <Modal open={open} onFormSubmit={handleRenameDir} focusRef={textFieldRef}
       maxWidth="sm" closeButton onClose={onClose} title={`Renaming ${data.kind}`}
-      buttons={[<Button key="confirm" onClick={handleRenameDir}>Confirm</Button>]}
+      buttons={[<Button key="confirm" type="submit">Confirm</Button>]}
     >
       <TextField
         id="name"
@@ -103,6 +127,7 @@ export function RenameDir({data, open=false, onClose, enqueueSnackbar, fn}) {
         size="small"
         fullWidth
         autoFocus
+        inputRef={textFieldRef}
         style={{marginTop: "10px"}}
       />
     </Modal>

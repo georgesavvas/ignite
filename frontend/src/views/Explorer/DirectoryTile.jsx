@@ -3,7 +3,7 @@ import Tile from "../../components/Tile";
 import Typography from '@mui/material/Typography';
 import { ContextContext } from "../../contexts/ContextContext";
 import { useSnackbar } from 'notistack';
-import { CopyToClipboard, ShowInExplorer } from "../ContextActions";
+import { CopyToClipboard, ShowInExplorer, setReprForProject, setReprForParent } from "../ContextActions";
 import { DIRECTORYICONS, DIRCONTEXTOPTIONS } from "../../constants";
 
 function DirectoryTile(props) {
@@ -32,6 +32,15 @@ function DirectoryTile(props) {
       {
         label: "Open in file explorer",
         fn: () => ShowInExplorer(entity.path, enqueueSnackbar),
+        divider: true
+      },
+      {
+        label: "Set representative for project",
+        fn: () => setReprForProject(entity.path, enqueueSnackbar)
+      },
+      {
+        label: "Set representative for parent",
+        fn: () => setReprForParent(entity.path, enqueueSnackbar),
         divider: true
       },
       {
@@ -103,8 +112,11 @@ function DirectoryTile(props) {
   let contextItems = getGenericContextItems(props.entity);
   contextItems = contextItems.concat(getSpecificContextItems(props.entity));
 
-  const icon = props.entity.icon && props.entity.icon in DIRECTORYICONS ?
-    DIRECTORYICONS[props.entity.icon] : undefined;
+  let icon = undefined;
+  if (!props.entity.thumbnail) {
+    icon = props.entity.icon && props.entity.icon in DIRECTORYICONS ?
+      DIRECTORYICONS[props.entity.icon] : undefined;
+  }
 
   return (
     <>

@@ -3,7 +3,7 @@ import Tile from "../../components/Tile";
 import Typography from '@mui/material/Typography';
 import { ContextContext } from "../../contexts/ContextContext";
 import { useSnackbar } from 'notistack';
-import { CopyToClipboard, ShowInExplorer } from "../ContextActions";
+import { CopyToClipboard, ShowInExplorer, setReprForProject, setReprForParent } from "../ContextActions";
 import URI from "../../components/URI";
 import Path from "../../components/Path";
 import { Divider } from "@mui/material";
@@ -31,6 +31,15 @@ function AssetTile(props) {
     {
       label: "Copy path",
       fn: () =>  CopyToClipboard(props.entity.path, enqueueSnackbar),
+      divider: true
+    },
+    {
+      label: "Set representative for project",
+      fn: () => setReprForProject(props.entity.path, enqueueSnackbar)
+    },
+    {
+      label: "Set representative for parent",
+      fn: () => setReprForParent(props.entity.path, enqueueSnackbar),
       divider: true
     },
     {

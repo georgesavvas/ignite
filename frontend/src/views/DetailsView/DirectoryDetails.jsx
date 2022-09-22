@@ -16,26 +16,6 @@ const style = {
   flexDirection: "column"
 }
 
-function ReprAssetModal(props) {
-  const uriField = useRef();
-  const handleSave = e => {
-    const field = uriField.current;
-    const uri = field.value;
-    props.onSave(uri);
-  }
-  return(
-    <Modal
-      open={props.open}
-      onClose={props.onClose}
-      title="Set representative asset"
-      maxWidth="sm"
-      buttons={[<Button key="confirm" onClick={handleSave}>Confirm</Button>]}
-    >
-      <TextField style={{marginTop: "10px"}} inputRef={uriField} autoFocus fullWidth color="ignite" size="small" label="Asset" />
-    </Modal>
-  )
-}
-
 const rowStyle = {
   display: "flex",
   alignItems: "center",
@@ -65,12 +45,14 @@ function DirectoryDetails(props) {
         <Typography variant="h5" style={{marginBottom: "10px"}}>{props.entity.name}</Typography>
         <Path path={props.entity.path} />
         <div style={rowStyle}>
-          <Typography>Thumbnail from:</Typography>
-          {reptEdit ?
+          <Typography style={{minWidth: "110px"}}>Thumbnail from:</Typography>
+          {reptEdit || !props.entity.repr ?
             <TextField
               size="small"
-              label="Repr Asset"
+              label="Set Representative Asset"
+              placeholder="Path or URI"
               fullWidth
+              autoFocus
               value={reprValue}
               onChange={e => setReprValue(e.target.value)}
               onBlur={handleReptChange}

@@ -75,14 +75,20 @@ def get_uri(path, version=None):
     if not path:
         return ""
     splt = PurePath(path).as_posix().split(ROOT.as_posix(), 1)[1].replace("/exports", "").split("/")[1:]
+    i = len(splt)
     project = splt[0]
-    group = splt[1]
-    context = "/".join(splt[2:-2])
-    task = splt[-2]
-    name = splt[-1]
-    uri = f"ign:{project}:{group}:{context}:{task}:{name}"
+    group = splt[1] if i > 1 else None
+    context = "/".join(splt[2:-2]) if i > 3 else None
+    task = splt[-2] if i > 3 else None
+    name = splt[-1] if i > 4 else None
+    bits = [project, group, context, task, name]
+    uri = "ign"
+    for bit in bits:
+        if bit:
+            uri += f":{bit}"
+    # uri = f"ign:{project}:{group}:{context}:{task}:{name}"
     if version:
-        uri += "@" + str(version)
+        uri += f"@{version}"
     return uri
 
 
@@ -123,10 +129,16 @@ def uri_to_path(uri):
     if not result:
         result = URI_TEMPLATE_UNVERSIONED.parse(uri)
     if not result:
+        amount = uri.count(":")
+        pattern_split = "ign:{project}:{group}:{context}:{task}".split(":")
+        pattern = ":".join(pattern_split[:amount + 1])
+        result = parse.parse(pattern, uri)
+    if not result:
         logging.error(f"Failed to parse {uri}")
         return ""
     data = result.named
-    data["task"] += "/exports"
+    if data.get("task"):
+        data["task"] += "/exports"
     if data.get("version"):
         version = data.get("version")
         if version.startswith("v"):

@@ -21,6 +21,7 @@ class Scene(Directory):
         self.context = ""
         self.name = ""
         self.extension = ""
+        self._repr = None
         self.tags = []
         self.dir_kind = "scene"
         self.dcc = ""

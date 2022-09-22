@@ -11,6 +11,7 @@ function GridTile(props) {
   const [progress, setProgress] = useState(0);
   const hoverArea = createRef();
   const ThumbComp = props.thumbnailComp;
+
   let isStatic = props.thumbnail !== undefined || ThumbComp;
   if (!isStatic && !props.entity.thumbnail.path.includes("####")) isStatic = true;
 
@@ -34,7 +35,7 @@ function GridTile(props) {
 
   function getSeqThumbnail() {
     const thumbnail = props.entity.thumbnail
-    const hasThumbnail = thumbnail && thumbnail !== {} || thumbnail.path === "";
+    const hasThumbnail = thumbnail && (thumbnail !== {} || thumbnail.path === "");
     let thumbnailPath = thumbnail.path
     if (hasThumbnail && !thumbnail.static) {
       let frame = thumbnail.first_frame + (thumbnail.last_frame - thumbnail.first_frame) * progress;
@@ -62,7 +63,8 @@ function GridTile(props) {
         {ThumbComp ? <ThumbComp sx={{ fontSize: props.size * 0.25 }} className={styles.thumbnail} /> : null}
         {!ThumbComp && thumbnailURL ?
           <img src={thumbnailURL} className={styles.thumbnail} style={thumbnailStyle} />
-          : null}
+          : null
+        }
         <div className={styles.hoverArea} onMouseMove={isStatic ? null : handleMouseMove} ref={hoverArea}>
           <div className={styles.overlay}>
             <div className={styles.topGrad} />
