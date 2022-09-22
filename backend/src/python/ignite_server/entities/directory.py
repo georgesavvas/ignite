@@ -77,8 +77,8 @@ class Directory():
             setattr(self, k, v)
 
     def get_parent(self):
-        if self.path.parent in ("exports", "scenes"):
-            return self.path.parent.parent
+        if self.dir_kind == "assetversion":
+            return self.task
         else:
             return self.path.parent
 

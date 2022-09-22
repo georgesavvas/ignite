@@ -3,7 +3,7 @@ import Tile from "../../components/Tile";
 import Typography from '@mui/material/Typography';
 import { ContextContext } from "../../contexts/ContextContext";
 import { useSnackbar } from 'notistack';
-import { CopyToClipboard, ShowInExplorer, setReprForProject, setReprForParent } from "../ContextActions";
+import { CopyToClipboard, ShowInExplorer, setReprForProject, setReprForParent, clearRepr } from "../ContextActions";
 import { DIRECTORYICONS, DIRCONTEXTOPTIONS } from "../../constants";
 
 function DirectoryTile(props) {
@@ -33,6 +33,10 @@ function DirectoryTile(props) {
         label: "Open in file explorer",
         fn: () => ShowInExplorer(entity.path, enqueueSnackbar),
         divider: true
+      },
+      {
+        label: "Clear representative",
+        fn: () => clearRepr(entity.path, enqueueSnackbar)
       },
       {
         label: "Set representative for project",

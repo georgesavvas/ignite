@@ -82,7 +82,7 @@ def get_context_info(path):
         if i <= ignore:
             continue
         part_path = ROOT / PurePath(*parts[:i])
-        kind = get_dir_kind(part_path, append_task=True)
+        kind = utils.get_dir_kind(part_path)
         ancestor_kinds[part_path.as_posix()] = kind
     for x in path.iterdir():
         name = x.name
@@ -201,23 +201,6 @@ def _find_from_path(path):
     except Exception as e:
         logging.error(e)
     return obj
-
-
-def get_dir_kind(path, append_task=False):
-    anchors = KINDS.keys()
-    for x in Path(path).iterdir():
-        name = x.name
-        if name not in anchors:
-            continue
-        kind = KINDS[name]
-        if kind != "task":
-            return kind
-        with open(x, "r") as f:
-            config = yaml.safe_load(f)
-        if not config:
-            return "task_generic"
-        kind = "task_" + config.get("task_type", "generic")
-        return kind
 
 
 def create_dirs(path, method, dirs):
@@ -529,7 +512,7 @@ def register_assetversion(path):
     return True
 
 
-def set_repr_asset(target, repr):
+def set_repr(target, repr):
     target_entity = find(target)
     repr_entity = find(repr)
     if not target_entity:
@@ -605,6 +588,9 @@ def get_repr_comp(target):
     path =  Path(utils.uri_to_path(target_repr))
     if not path.is_dir():
         logging.error(f"Couldn't resolve {path}")
+        return {}
+    if path == target_entity.path:
+        logging.error(f"Infinite loop while fetching repr comp of {target_entity.path} - {target_entity.repr}")
         return {}
     repr_asset = search(path)
     if not repr_asset:
