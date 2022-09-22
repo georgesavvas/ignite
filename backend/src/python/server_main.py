@@ -402,6 +402,24 @@ async def set_repr_asset(request: Request):
     return {"ok": True}
 
 
+@app.post("/api/v1/set_repr_for_project")
+async def set_repr_for_project(request: Request):
+    result = await request.json()
+    log_request(result)
+    repr = result.get("repr", "")
+    ok, target = api.set_repr_for_project(repr)
+    return {"ok": ok, "data": target}
+
+
+@app.post("/api/v1/set_repr_for_parent")
+async def set_repr_for_parent(request: Request):
+    result = await request.json()
+    log_request(result)
+    repr = result.get("repr", "")
+    ok, target = api.set_repr_for_parent(repr)
+    return {"ok": ok, "data": target}
+
+
 @app.post("/api/v1/register_assetversion")
 async def register_assetversion(request: Request):
     result = await request.json()

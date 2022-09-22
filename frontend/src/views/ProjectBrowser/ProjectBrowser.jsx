@@ -1,4 +1,4 @@
-import { createRef, useState, useContext, useEffect } from "react";
+import { useRef, useState, useContext, useEffect } from "react";
 import styles from "./ProjectBrowser.module.css";
 import Typography from '@mui/material/Typography';
 import {setProject, ContextContext} from "../../contexts/ContextContext";
@@ -68,6 +68,7 @@ export default function ProjectBrowser(props) {
   const [modalData, setModalData] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [loadedData, setLoadedData] = useState([]);
+  const newProjectNameRef = useRef();
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
   useEffect(() => {
@@ -108,7 +109,7 @@ export default function ProjectBrowser(props) {
     props.onClose();
   }
 
-  const handleProjectNameChange = e => {
+  const handleProjectNameChange = (e, submit=false) => {
     const value = validateDirName(e.target.value);
     setNewProjectName(value)
   }
@@ -117,12 +118,13 @@ export default function ProjectBrowser(props) {
     <Modal open={props.open} onClose={props.onClose} title="Project Browser"
       maxWidth="xl"
     >
-      <Modal open={newProjectOpen} onClose={() => setNewProjectOpen(false)} maxWidth="sm"
-        buttons={[<Button key="create" onClick={handleNewProject}>Create</Button>]}
-        title="New project name" 
+      <Modal focusRef={newProjectNameRef} open={newProjectOpen} onClose={() => setNewProjectOpen(false)} maxWidth="sm"
+        buttons={[<Button key="create" type="submit">Create</Button>]}
+        title="New project name" autoFocus={false} onFormSubmit={handleNewProject}
       >
         <TextField onChange={handleProjectNameChange} value={newProjectName} 
-          size="small" fullWidth autoFocus
+          size="small" fullWidth autoFocus label="New project name" inputRef={newProjectNameRef}
+          style={{marginTop: "15px"}}
         />
       </Modal>
       <DeleteDir open={modalData.deleteOpen} enqueueSnackbar={enqueueSnackbar}

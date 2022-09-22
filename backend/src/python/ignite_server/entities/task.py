@@ -16,7 +16,7 @@ class Task(Directory):
         super().__init__(path, dir_kind="task")
         self.dict_attrs = ["path", "dir_kind", "anchor", "project", "name", "task_type",
         "repr", "exports", "scenes", "cache", "build", "sequence", "shot",
-        "context", "tags", "attributes"]
+        "context", "tags", "attributes", "uri"]
         self.nr_attrs = ["path", "exports"]
         self.scenes = self.path / "scenes"
         self.exports = self.path / "exports"

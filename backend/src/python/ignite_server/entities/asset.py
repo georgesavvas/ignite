@@ -15,7 +15,6 @@ class Asset(Directory):
         self.dict_attrs = ["path", "dir_kind", "anchor", "project", "name", "versions",
             "latest_v", "uri", "context", "next_path", "creation_time", "modification_time"]
         self.nr_attrs = ["path"]
-        self.uri = utils.get_uri(path)
         self._versions = []
         self._assetversions = []
         self._latest_v = None

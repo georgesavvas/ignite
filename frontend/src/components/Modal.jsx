@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styles from "./Modal.module.css";
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -10,6 +10,16 @@ import ClearIcon from '@mui/icons-material/Clear';
 
 function Modal(props) {
 
+  useEffect(() => {
+    if (!props.open || !props.focusRef) return;
+    const timeout = setTimeout(() => {
+      if (props.focusRef.current) props.focusRef.current.focus()
+    }, 1000);
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [props.open])
+
   const dialogStyle = {
     "& .MuiDialog-container": {
       "& .MuiPaper-root": {
@@ -20,19 +30,26 @@ function Modal(props) {
     },
   }
 
+  const handleSubmit = e => {
+    e.preventDefault()
+    props.onFormSubmit()
+  }
+
   return (
     <Dialog open={props.open} onClose={props.onClose} fullWidth={props.fullWidth !== undefined ? props.fullWidth : true}
-      maxWidth={props.maxWidth || "sx"} sx={dialogStyle}
+      maxWidth={props.maxWidth || "sx"} sx={dialogStyle} 
     >
-      <ClearIcon onClick={props.onClose} className={styles.closeButtonStyle} />
-      {props.title ? <DialogTitle>{props.title}</DialogTitle> : null}
-      <DialogContent {...props.dialogContentProps}>
-        {props.text ? <DialogContentText>{props.text}</DialogContentText> : null}
-        {props.children}
-      </DialogContent>
-      <DialogActions>
-        {props.buttons || null}
-      </DialogActions>
+      <form onSubmit={handleSubmit}>
+        <ClearIcon onClick={props.onClose} className={styles.closeButtonStyle} />
+        {props.title ? <DialogTitle>{props.title}</DialogTitle> : null}
+        <DialogContent {...props.dialogContentProps}>
+          {props.text ? <DialogContentText>{props.text}</DialogContentText> : null}
+          {props.children}
+        </DialogContent>
+        <DialogActions>
+          {props.buttons || null}
+        </DialogActions>
+      </form>
     </Dialog>
   );
 }

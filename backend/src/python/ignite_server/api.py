@@ -116,12 +116,9 @@ def find(path):
     path = str(path).strip()
 
     if utils.is_uri(path):
-        at_amount = path.count("@")
-        if at_amount > 1:
-            logging.error(f"URI has more than 1 '@': {path}")
-            return None
-        elif not at_amount:
-            path += "@best"
+        if not "@" in path:
+            path = utils.uri_to_path(path)
+            return _find_from_path(path)
         asset_uri, version = path.split("@")
         if version.isnumeric():
             path = utils.uri_to_path(path)
@@ -546,6 +543,28 @@ def set_repr_asset(target, repr):
     return True
 
 
+def set_repr_for_project(repr):
+    repr_entity = find(repr)
+    if not repr_entity:
+        return False, None
+    target_entity = find(ROOT / repr_entity.project)
+    if repr_entity.dir_kind == "assetversion":
+        repr_entity = find(repr_entity.asset)
+    target_entity.set_repr(repr_entity.uri)
+    return True, target_entity.name
+
+
+def set_repr_for_parent(repr):
+    repr_entity = find(repr)
+    if not repr_entity:
+        return False, None
+    target_entity = find(repr_entity.get_parent())
+    if repr_entity.dir_kind == "assetversion":
+        repr_entity = find(repr_entity.asset)
+    target_entity.set_repr(repr_entity.uri)
+    return True, target_entity.name
+
+
 def get_repr(target):
     assets = discover_assets(target, single=True)
     if not assets:
@@ -569,7 +588,8 @@ def get_repr_comp(target):
                     config = yaml.safe_load(f) or {}
                 their_repr = config.get("repr", "")
                 if their_repr:
-                    return search(Path(their_repr))
+                    their_repr_path = Path(utils.uri_to_path(their_repr))
+                    return search(their_repr_path)
 
     target_entity = find(target)
     if not target_entity:
@@ -582,9 +602,7 @@ def get_repr_comp(target):
             return {}
         return best_av.get_thumbnail()
     target_repr = target_entity.repr
-    if utils.is_uri(target_repr):
-        target_repr = utils.uri_to_path(target_repr)
-    path =  Path(target_repr)
+    path =  Path(utils.uri_to_path(target_repr))
     if not path.is_dir():
         logging.error(f"Couldn't resolve {path}")
         return {}
