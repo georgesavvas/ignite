@@ -13,6 +13,7 @@ import { ConfigContext } from "../../contexts/ConfigContext";
 import {ContextContext} from "../../contexts/ContextContext";
 import serverRequest from "../../services/serverRequest";
 import BuildFileURL from "../../services/BuildFileURL";
+import { useRef } from 'react';
 const stc = require("string-to-color");
 
 const namedStyles = {
@@ -30,6 +31,7 @@ const namedStyles = {
 export function TagContainer(props) {
   const [newTagsOpen, setNewTagsOpen] = useState(false);
   const [newTagsName, setNewTagsName] = useState("");
+  const newTagsRef = useRef();
   const [contextMenu, setContextMenu] = useState(null);
   const [config, setConfig] = useContext(ConfigContext);
   const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
@@ -78,11 +80,11 @@ export function TagContainer(props) {
       setContextMenu={setContextMenu}
     />
     <Modal open={newTagsOpen} onClose={() => setNewTagsOpen(false)} maxWidth="md"
-      buttons={[<Button key="create" onClick={handleAddTags}>Create</Button>]}
-      title="Add Tags" 
+      buttons={[<Button key="create" type="submit">Create</Button>]}
+      title="Add Tags" onFormSubmit={handleAddTags} focusRef={newTagsRef}
     >
       <TextField onChange={e => setNewTagsName(e.target.value)} value={newTagsName} 
-        size="small" fullWidth autoFocus
+        size="small" fullWidth autoFocus inputRef={newTagsRef}
       />
       <Typography variant="caption">
         Multiple tags can be separated by commas

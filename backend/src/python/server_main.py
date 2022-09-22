@@ -11,6 +11,17 @@ from fastapi import FastAPI, Request, WebSocket
 from fastapi.responses import PlainTextResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+
+import sentry_sdk
+sentry_sdk.init(
+    dsn="https://9930a18d142b45af9d27e35276e3de54@o1421552.ingest.sentry.io/6767422",
+
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for performance monitoring.
+    # We recommend adjusting this value in production.
+    traces_sample_rate=1.0
+)
+
 from ignite_server import utils
 from ignite_server.socket_manager import SocketManager
 from ignite_server.utils import CONFIG
@@ -390,13 +401,13 @@ async def register_asset(request: Request):
     return {"ok": True}
 
 
-@app.post("/api/v1/set_repr_asset")
-async def set_repr_asset(request: Request):
+@app.post("/api/v1/set_repr")
+async def set_repr(request: Request):
     result = await request.json()
     log_request(result)
     target = result.get("target", "")
     repr = result.get("repr", "")
-    ok = api.set_repr_asset(target, repr)
+    ok = api.set_repr(target, repr)
     if not ok:
         return error("generic_error")
     return {"ok": True}

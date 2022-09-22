@@ -11,6 +11,16 @@ from fastapi import FastAPI, Request, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
+import sentry_sdk
+sentry_sdk.init(
+    dsn="https://9930a18d142b45af9d27e35276e3de54@o1421552.ingest.sentry.io/6767422",
+
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for performance monitoring.
+    # We recommend adjusting this value in production.
+    traces_sample_rate=1.0
+)
+
 from ignite_client import utils, api
 from ignite_client.utils import TASK_MANAGER, PROCESSES_MANAGER
 

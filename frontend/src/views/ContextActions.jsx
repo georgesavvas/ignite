@@ -19,6 +19,20 @@ export function ShowInExplorer(filepath, enqueueSnackbar) {
   })
 }
 
+export function clearRepr(target, enqueueSnackbar, refresh) {
+  const data = {
+    target: target,
+    repr: ""
+  }
+  serverRequest("set_repr", data).then(resp => {
+    if (resp.ok) {
+      enqueueSnackbar("Done", {variant: "success"})
+      refresh()
+    }
+    else enqueueSnackbar("Couldn't clear repr", {variant: "error"});
+  })
+}
+
 export function setReprForProject(repr, enqueueSnackbar) {
   const data = {
     repr: repr

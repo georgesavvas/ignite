@@ -7,7 +7,10 @@ const getPort = require("get-port");
 const axios = require("axios");
 require("v8-compile-cache");
 const uuid4 = require("uuid4");
-const osu = require('node-os-utils')
+const osu = require('node-os-utils');
+const Sentry = require("@sentry/electron");
+
+Sentry.init({ dsn: "https://3037f050f6194c0dbc82183b252475fa@o1421552.ingest.sentry.io/6767421" });
 
 const sessionID = uuid4();
 const appPath = app.getAppPath();

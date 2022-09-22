@@ -41,6 +41,7 @@ const Browser = props => {
         viewType="grid"
         entity={entity}
         onContextMenu={props.handleContextMenuSelection}
+        onRefresh={props.onRefresh}
         onSelected={props.onProjectSelect}
         selected={""}
       />;
@@ -140,6 +141,7 @@ export default function ProjectBrowser(props) {
           {...props}
           onNewProjectClicked={() => setNewProjectOpen(true)}
           onProjectSelect={handleProjectSelect}
+          onRefresh={refreshContext}
           modalData={modalData}
           setModalData={setModalData}
           loadedData={loadedData}

@@ -12,6 +12,7 @@ from ignite_server.constants import ANCHORS
 ENV = os.environ
 IGNITE_ROOT = Path(ENV["IGNITE_ROOT"])
 
+KINDS = {v: k for k, v in ANCHORS.items()}
 URI_TEMPLATE = parse.compile("ign:{project}:{group}:{context}:{task}:{name}@{version}")
 URI_TEMPLATE_UNVERSIONED = parse.compile("ign:{project}:{group}:{context}:{task}:{name}")
 
@@ -74,14 +75,28 @@ def create_anchor(path, name):
 def get_uri(path, version=None):
     if not path:
         return ""
+    dir_kind = get_dir_kind(path)
     splt = PurePath(path).as_posix().split(ROOT.as_posix(), 1)[1].replace("/exports", "").split("/")[1:]
     i = len(splt)
     project = splt[0]
     group = splt[1] if i > 1 else None
-    context = "/".join(splt[2:-2]) if i > 3 else None
-    task = splt[-2] if i > 3 else None
-    name = splt[-1] if i > 4 else None
-    bits = [project, group, context, task, name]
+    context = task = name = version = None
+    if dir_kind == "assetversion":
+        context = "/".join(splt[2:-3])
+        task = splt[-3]
+        name = splt[-2]
+        version = splt[-1]
+    elif dir_kind == "asset":
+        context = "/".join(splt[2:-2])
+        task = splt[-2]
+        name = splt[-1]
+    elif dir_kind.startswith("task"):
+        context = "/".join(splt[2:-1])
+        task = splt[-1]
+    else:
+        context = "/".join(splt[2:])
+
+    bits = [project, group, context, task, name, version]
     uri = "ign"
     for bit in bits:
         if bit:
@@ -123,6 +138,23 @@ def get_dir_type(path, dir_type):
     return ""
 
 
+def get_dir_kind(path):
+    anchors = KINDS.keys()
+    for x in Path(path).iterdir():
+        name = x.name
+        if name not in anchors:
+            continue
+        kind = KINDS[name]
+        if kind != "task":
+            return kind
+        with open(x, "r") as f:
+            config = yaml.safe_load(f)
+        if not config:
+            return "task_generic"
+        kind = "task_" + config.get("task_type", "generic")
+        return kind
+
+
 def uri_to_path(uri):
     uri = str(uri)
     result = URI_TEMPLATE.parse(uri)
@@ -137,7 +169,7 @@ def uri_to_path(uri):
         logging.error(f"Failed to parse {uri}")
         return ""
     data = result.named
-    if data.get("task"):
+    if data.get("name"):
         data["task"] += "/exports"
     if data.get("version"):
         version = data.get("version")

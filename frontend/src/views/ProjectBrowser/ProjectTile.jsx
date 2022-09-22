@@ -3,7 +3,7 @@ import styles from "./ProjectTile.module.css";
 import Tile from "../../components/Tile";
 import Typography from '@mui/material/Typography';
 import { useSnackbar } from 'notistack';
-import { CopyToClipboard, ShowInExplorer } from "../ContextActions";
+import { CopyToClipboard, ShowInExplorer, clearRepr } from "../ContextActions";
 import AddIcon from '@mui/icons-material/Add';
 import { IconButton } from "@mui/material";
 
@@ -36,6 +36,11 @@ function ProjectTile(props) {
       {
         label: "Open in file explorer",
         fn: () => ShowInExplorer(entity.path, enqueueSnackbar),
+        divider: true
+      },
+      {
+        label: "Clear representative",
+        fn: () => clearRepr(entity.path, enqueueSnackbar, props.onRefresh),
         divider: true
       },
       {
