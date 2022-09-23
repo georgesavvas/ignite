@@ -32,7 +32,11 @@ function Vault(props) {
   const [refreshValue, setRefreshValue] = useState(0);
   const [selectedCollection, setSelectedCollection] = useState("");
   const [query, setQuery] = useState({filter_string: ""});
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadedAssets, setLoadedAssets] = useState([]);
   const [pages, setPages] = useState({total: 1, current: 1});
+  const [tilesPerPage, setTilesPerPage] = useState(50);
+  const [selectedAsset, setSelectedAsset] = useState({});
 
   useEffect(() => {
     const data = loadReflexLayout()
@@ -68,6 +72,29 @@ function Vault(props) {
     })
   }, [refreshValue])
 
+  useEffect(() => {
+    const data = {
+      page: pages.current,
+      limit: tilesPerPage,
+      query: query
+    }
+    setIsLoading(true)
+    serverRequest("vault/get_assets", data).then(resp => {
+      setIsLoading(false)
+      setLoadedAssets(resp.data)
+      setPages(prevState => ({...prevState, total: resp.pages.total, results: resp.pages.results}))
+    })
+  }, [pages, refreshValue, query, tilesPerPage, selectedCollection])
+
+  const handleAssetSelected = (asset) => {
+    setSelectedAsset(asset)
+    props.setCurrentAsset(asset)
+  }
+
+  const handleRefresh = () => {
+    props.setRefreshValue(prevState => (prevState + 1))
+  }
+
   const handleResized = data => {
     saveReflexLayout(data)
   }
@@ -97,7 +124,7 @@ function Vault(props) {
             <DndProvider backend={HTML5Backend}>
               <CollectionTree collectionData={collectionData}
                 refreshValue={refreshValue} setRefreshValue={setRefreshValue}
-                selectedCollection={selectedCollection}
+                selectedCollection={selectedCollection} onRefresh={handleRefresh}
                 setSelectedCollection={handleCollectionChange}
               />
             </DndProvider>
@@ -111,8 +138,11 @@ function Vault(props) {
         >
           <Browser
             refreshValue={refreshValue} setRefreshValue={setRefreshValue}
-            selectedCollection={selectedCollection} setPages={setPages}
+            selectedCollection={selectedCollection} loadedAssets={loadedAssets}
             pages={pages} handleQueryChange={handleQueryChange} query={query}
+            isLoading={isLoading} setTilesPerPage={setTilesPerPage}
+            handleAssetSelected={handleAssetSelected} setPages={setPages}
+            setIsLoading={setIsLoading}
           />
         </ReflexElement>
         <ReflexSplitter style={splitterStyle} />
