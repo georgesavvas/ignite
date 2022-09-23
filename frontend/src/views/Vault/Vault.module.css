@@ -18,3 +18,12 @@
     width: 100%;
     height: 100%;
 }
+
+.collectionContainer {
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    flex-grow: 1;
+    box-sizing: border-box;
+    max-width: 300px;
+}

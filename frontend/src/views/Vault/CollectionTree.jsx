@@ -1,25 +1,21 @@
-import TreeView from "@mui/lab/TreeView"
-import TreeItem, {treeItemClasses} from "@mui/lab/TreeItem"
-import {styled} from "@mui/material/styles"
-import Box from "@mui/material/Box"
-import PropTypes from "prop-types"
-import Typography from "@mui/material/Typography"
-import React, { useEffect, useState, memo, useMemo, useRef } from "react"
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
-import ChevronRightIcon from "@mui/icons-material/ChevronRight"
-import styles from "./CollectionTree.module.css"
-import ContextMenu, { handleContextMenu } from "../../components/ContextMenu"
-import { useSnackbar } from "notistack"
-import { CopyToClipboard, ShowInExplorer } from "../ContextActions"
-import { CreateColl, RenameColl, DeleteColl, EditColl } from "./Modals"
-import FormControl from "@mui/material/FormControl"
-import OutlinedInput from "@mui/material/OutlinedInput"
-import { useDrag, useDrop } from "react-dnd"
-import serverRequest from "../../services/serverRequest"
-
-const ICONS = {
-
-}
+import TreeView from "@mui/lab/TreeView";
+import TreeItem, {treeItemClasses} from "@mui/lab/TreeItem";
+import {styled} from "@mui/material/styles";
+import Box from "@mui/material/Box";
+import PropTypes from "prop-types";
+import Typography from "@mui/material/Typography";
+import React, { useEffect, useState, memo, useMemo, useRef } from "react";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import styles from "./CollectionTree.module.css";
+import ContextMenu, { handleContextMenu } from "../../components/ContextMenu";
+import { useSnackbar } from "notistack";
+import { CopyToClipboard, ShowInExplorer } from "../ContextActions";
+import { CreateColl, RenameColl, DeleteColl, EditColl } from "./Modals";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import { useDrag, useDrop } from "react-dnd";
+import serverRequest from "../../services/serverRequest";
+import FilterField from "../../components/FilterField";
 
 function findNodeByPath(object, result, value, parents) {
   if(object.hasOwnProperty("path") && object.path === value) {
@@ -34,19 +30,6 @@ function findNodeByPath(object, result, value, parents) {
       }
   }
 }
-
-// function findNodeById(object, result, value) {
-//   if(object.hasOwnProperty('id') && object.path === value) {
-//     result.push(object);
-//     return;
-//   }
-//   for(var i=0; i<Object.keys(object).length; i++){
-//     const child = object[Object.keys(object)[i]]
-//       if(child !== null && typeof child === "object"){
-//           findNodeById(object[Object.keys(object)[i]], result, value);
-//       }
-//   }
-// }
 
 const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
   color: theme.palette.text.secondary,
@@ -77,7 +60,7 @@ const shouldBeDisabled = (scope, path) => {
   if (path.startsWith("/all/2d/elements") || path.startsWith("/all/projects")) {
     return true
   }
-  if (path == "/all") return true
+  if (path === "/all") return true
 }
 
 function getContextItems(data, enqueueSnackbar) {
@@ -124,19 +107,9 @@ function getContextItems(data, enqueueSnackbar) {
 }
 
 const StyledTreeItem = memo(function StyledTreeItem(props) {
-  const [contextMenu, setContextMenu] = useState(null)
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar()
-  const ref = useRef(null)
-  // const [{ isOver, canDrop }, drop] = useDrop(() => ({
-  //     accept: "collection",
-  //     drop: item => console.log(item.path, "was just dropped on", props.path),
-  //     canDrop: item => item.path !== props.path,
-  //     collect: monitor => ({
-  //       isOver: !!monitor.isOver(),
-  //       canDrop: !!monitor.canDrop()
-  //     })
-  //   })
-  // )
+  const [contextMenu, setContextMenu] = useState(null);
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const ref = useRef(null);
 
   const [{ handlerId }, drop] = useDrop({
     accept: "collection",
@@ -253,13 +226,13 @@ StyledTreeItem.propTypes = {
 }
 
 function CollectionTree({collectionData, selectedCollection, setSelectedCollection, onRefresh, user}) {
-  const [expandedItems, setExpandedItems] = useState(["/all", "/all/2d", "/add/3d"])
-  const [selectedItems, setSelectedItems] = useState("")
-  const [contextMenu, setContextMenu] = useState(null)
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar()
-  const [filterValue, setFilterValue] = useState("")
-  const [modalData, setModalData] = useState({})
-  const [dropPreviewData, setDropPreviewData] = useState({opacity: 0, top: 0, height: 20})
+  const [expandedItems, setExpandedItems] = useState(["/all", "/all/2d", "/add/3d"]);
+  const [selectedItems, setSelectedItems] = useState("");
+  const [contextMenu, setContextMenu] = useState(null);
+  const {enqueueSnackbar, closeSnackbar} = useSnackbar();
+  const [filterValue, setFilterValue] = useState("");
+  const [modalData, setModalData] = useState({});
+  const [dropPreviewData, setDropPreviewData] = useState({opacity: 0, top: 0, height: 20});
 
   const scope = user ? "user" : "studio"
 
@@ -337,7 +310,6 @@ function CollectionTree({collectionData, selectedCollection, setSelectedCollecti
         key={nodes.path}
         nodeId={nodes.path}
         name={nodes.name}
-        labelIcon={ICONS[nodes.icon]}
         labelInfo={nodes.dir_kind}
         dynamic={nodes.dynamic || true}
         path={nodes.path}
@@ -365,7 +337,9 @@ function CollectionTree({collectionData, selectedCollection, setSelectedCollecti
   }
 
   return (
-    <div className={styles.container} onContextMenu={e => handleContextMenu(e, contextMenu, setContextMenu)}>
+    <div className={styles.container}
+      onContextMenu={e => handleContextMenu(e, contextMenu, setContextMenu)}
+    >
       <div className={styles.dropPreview} style={dropPreviewStyle} />
       <ContextMenu items={treeContextItems} contextMenu={contextMenu}
         setContextMenu={setContextMenu}
@@ -386,16 +360,7 @@ function CollectionTree({collectionData, selectedCollection, setSelectedCollecti
         onClose={() => setModalData(prevState => ({...prevState, renameOpen: false}))}
         data={modalData} fn={onRefresh}
       />
-      <div className={styles.filterBar}>
-        <OutlinedInput
-          id="outlined-basic"
-          size="small"
-          fullWidth
-          placeholder="Filter"
-          value={filterValue}
-          onChange={e => setFilterValue(e.target.value.toLowerCase() || "")}
-        />
-      </div>
+      <FilterField filterValue={filterValue} setFilterValue={setFilterValue} />
       <div className={styles.treeContainer}>
         <TreeView
           defaultCollapseIcon={<ExpandMoreIcon />}

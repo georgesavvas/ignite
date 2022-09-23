@@ -14,7 +14,7 @@ function Modal(props) {
     if (!props.open || !props.focusRef) return;
     const timeout = setTimeout(() => {
       if (props.focusRef.current) props.focusRef.current.focus()
-    }, 1000);
+    }, props.focusDelay || 250);
     return () => {
       clearTimeout(timeout);
     };
@@ -35,21 +35,32 @@ function Modal(props) {
     props.onFormSubmit()
   }
 
+  const formWrapper = (onFormSubmit, children) => {
+    if (onFormSubmit) return (
+      <form onSubmit={handleSubmit}>
+        {children}
+      </form>
+    )
+    else return children;
+  }
+
   return (
     <Dialog open={props.open} onClose={props.onClose} fullWidth={props.fullWidth !== undefined ? props.fullWidth : true}
       maxWidth={props.maxWidth || "sx"} sx={dialogStyle} 
     >
-      <form onSubmit={handleSubmit}>
-        <ClearIcon onClick={props.onClose} className={styles.closeButtonStyle} />
-        {props.title ? <DialogTitle>{props.title}</DialogTitle> : null}
-        <DialogContent {...props.dialogContentProps}>
-          {props.text ? <DialogContentText>{props.text}</DialogContentText> : null}
-          {props.children}
-        </DialogContent>
-        <DialogActions>
-          {props.buttons || null}
-        </DialogActions>
-      </form>
+      {formWrapper(props.onFormSubmit, 
+        <>
+          <ClearIcon onClick={props.onClose} className={styles.closeButtonStyle} />
+          {props.title ? <DialogTitle>{props.title}</DialogTitle> : null}
+          <DialogContent {...props.dialogContentProps}>
+            {props.text ? <DialogContentText>{props.text}</DialogContentText> : null}
+            {props.children}
+          </DialogContent>
+          <DialogActions>
+            {props.buttons || null}
+          </DialogActions>
+        </>
+      )}
     </Dialog>
   );
 }

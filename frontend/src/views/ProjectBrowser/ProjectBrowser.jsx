@@ -100,17 +100,20 @@ export default function ProjectBrowser(props) {
     })
   }
 
-  const handleContextMenuSelection = (action, data) => {
+  const handleContextMenuSelection = (action, _data) => {
+    const data = {..._data};
     data[`${action}Open`] = true;
     setModalData(data);
   };
 
   const handleProjectSelect = entity => {
-    setProject(entity.name, setCurrentContext);
+    if (entity.name !== currentContext.project) {
+      setProject(entity.name, setCurrentContext);
+    }
     props.onClose();
   }
 
-  const handleProjectNameChange = (e, submit=false) => {
+  const handleProjectNameChange = e => {
     const value = validateDirName(e.target.value);
     setNewProjectName(value)
   }
@@ -143,7 +146,6 @@ export default function ProjectBrowser(props) {
           onProjectSelect={handleProjectSelect}
           onRefresh={refreshContext}
           modalData={modalData}
-          setModalData={setModalData}
           loadedData={loadedData}
           handleContextMenuSelection={handleContextMenuSelection}
         />

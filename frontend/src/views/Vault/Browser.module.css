@@ -19,7 +19,6 @@
 }
 
 .helperTextContainer {
-    width: 100%;
     display: flex;
     padding-left: 10px;
     padding-top: 5px;
@@ -39,15 +38,6 @@
     flex-grow: 1;
     box-sizing: border-box;
     position: relative;
-}
-
-.collectionContainer {
-    display: flex;
-    flex-direction: column;
-    overflow: auto;
-    flex-grow: 1;
-    box-sizing: border-box;
-    max-width: 300px;
 }
 
 .layoutHelper {

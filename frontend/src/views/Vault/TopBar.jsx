@@ -17,25 +17,29 @@ import FilterAltIcon from "@mui/icons-material/FilterAlt"
 import SortIcon from "@mui/icons-material/Sort"
 import ContextMenu, { handleContextMenu } from "../../components/ContextMenu"
 import SyncIcon from '@mui/icons-material/Sync';
+import FilterField from "../../components/FilterField"
 
 const style = {
   display: "flex",
   justifyContent: "space-between",
-  padding: "10px",
-  paddingLeft: "20px",
-  paddingRight: "20px",
+  padding: "0px 10px",
   alignItems: "center"
 }
 
 function TopBar(props) {
-  const [ingestOpen, setIngestOpen] = useState(false)
-  const [sortMenu, setSortMenu] = useState(null)
+  const [ingestOpen, setIngestOpen] = useState(false);
+  const [sortMenu, setSortMenu] = useState(null);
+  const [filterValue, setFilterValue] = useState("");
 
   useEffect(() => {
     const sortData = localStorage.getItem("sortData")
     if (!sortData) return
     props.setQuery({sort: JSON.parse(sortData)})
   }, [])
+
+  useEffect(() => {
+    props.onFilterChange(filterValue)
+  }, [filterValue])
 
   const handleSortClicked = e => {
     handleContextMenu(e, sortMenu, setSortMenu)
@@ -83,8 +87,8 @@ function TopBar(props) {
         <SyncIcon style={{fontSize: "24px"}} />
       </IconButton>
       <Stack direction="row" spacing={1} style={{width: "100%", marginLeft: "100px", marginRight: "100px"}}>
-        <FormControlLabel control={<Switch checked={props.autoPlay} onChange={props.onAutoPlayChange} />} label="Autoplay" />
-        <TextField id="filterField" size="small" label="Search" variant="outlined" fullWidth onChange={props.onFilterChange} />
+        {/* <FormControlLabel control={<Switch checked={props.autoPlay} onChange={props.onAutoPlayChange} />} label="Autoplay" /> */}
+        <FilterField filterValue={filterValue} setFilterValue={setFilterValue} />
         <IconButton onClick={handleSortClicked}>
           <SortIcon />
         </IconButton>
@@ -92,17 +96,6 @@ function TopBar(props) {
           <FilterAltIcon />
         </IconButton>
       </Stack>
-      <ButtonGroup variant="text">
-        <IconButton aria-label="docs">
-          <HelpIcon />
-        </IconButton>
-        <IconButton aria-label="bug">
-          <BugReportIcon />
-        </IconButton>
-        <IconButton aria-label="feedback">
-          <ThumbsUpDownIcon />
-        </IconButton>
-      </ButtonGroup>
     </div>
   )
 }

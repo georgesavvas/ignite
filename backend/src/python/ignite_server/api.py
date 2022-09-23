@@ -13,11 +13,6 @@ ENV = os.environ
 PROJECT_ANCHOR = ANCHORS["project"]
 ROOT = PurePath(CONFIG["projects_root"])
 KINDS = {v: k for k, v in ANCHORS.items()}
-if not Path(ROOT).is_dir():
-    try:
-        os.makedirs(ROOT)
-    except Exception as e:
-        logging.error(e)
 IGNITE_SERVER_ROOT = Path(ENV["IGNITE_SERVER_ROOT"])
 IGNITE_DCC = Path(ENV["IGNITE_DCC"])
 
