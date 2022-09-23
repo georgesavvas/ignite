@@ -22,6 +22,7 @@ sentry_sdk.init(
     traces_sample_rate=1.0
 )
 
+from utils import log_request, process_request, error
 from ignite_server import utils
 from ignite_server.socket_manager import SocketManager
 from ignite_server.utils import CONFIG
@@ -44,25 +45,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-def log_request(request):
-    print("Request data:")
-    pprint(request)
-
-
-def process_request(req):
-    # remap paths if needed
-    client_root = req.get("client_root")
-    if client_root:
-        if req.get("path"):
-            req["path"] = utils.remap_path(req["path"], client_root)
-    return req
-
-
-def error(s, msg=""):
-    logging.error(s)
-    return {"ok": False, "error": msg or s}
 
 
 def mount_root():

@@ -62,7 +62,9 @@ export default function Home() {
       </div>
       <div className={styles.contents}>
         <ReflexContainer orientation="vertical">
-          <ReflexElement flex={flexRatios["home.tree"]} name="home.tree" onStopResize={handleResized}>
+          <ReflexElement flex={flexRatios["home.tree"]} name="home.tree"
+            onStopResize={handleResized}
+          >
             <ReflexContainer>
               <ReflexElement flex={0.75}>
                 <ProjectTree />
@@ -74,11 +76,15 @@ export default function Home() {
             </ReflexContainer>
           </ReflexElement>
           <ReflexSplitter style={splitterStyle} />
-          <ReflexElement flex={flexRatios["home.explorer"]} name="home.explorer" onStopResize={handleResized}>
+          <ReflexElement flex={flexRatios["home.explorer"]} name="home.explorer"
+           onStopResize={handleResized}
+          >
             <Explorer />
           </ReflexElement>
           <ReflexSplitter style={splitterStyle} />
-          <ReflexElement flex={flexRatios["home.details"]} name="home.details" onStopResize={handleResized}>
+          <ReflexElement flex={flexRatios["home.details"]} name="home.details"
+            onStopResize={handleResized}
+          >
             <Details />
           </ReflexElement>
         </ReflexContainer>

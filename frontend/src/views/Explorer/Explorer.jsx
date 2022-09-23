@@ -72,7 +72,8 @@ function Explorer() {
     setSelectedEntity(entity);
   }
 
-  const handleContextMenuSelection = (action, data) => {
+  const handleContextMenuSelection = (action, _data) => {
+    const data = {..._data};
     data[`${action}Open`] = true;
     setModalData(data);
   };

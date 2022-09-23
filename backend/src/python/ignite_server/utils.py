@@ -6,6 +6,7 @@ import re
 import parse
 import datetime
 from pathlib import Path, PurePath
+
 from ignite_server.constants import ANCHORS
 
 
@@ -34,6 +35,17 @@ CONFIG = get_config()
 IGNITE_SERVER_ADDRESS = CONFIG.get("server_address")
 ENV["IGNITE_SERVER_ADDRESS"] = IGNITE_SERVER_ADDRESS
 ROOT = PurePath(CONFIG["projects_root"])
+
+
+def ensure_root(root=ROOT):
+    if not Path(root).is_dir():
+        try:
+            os.makedirs(root)
+        except Exception as e:
+            logging.error(e)
+
+
+ensure_root(ROOT)
 
 
 def ensure_directory(path: Path) -> int:
@@ -199,21 +211,3 @@ def query_filter(entities, query):
         return entities
 
     return filtered
-
-
-def build_path(path):
-    path = PurePath(path)
-    root = ROOT.as_posix()
-    if path.as_posix().startswith(root):
-        return path
-    else:
-        return ROOT / path
-
-
-def remap_path(path, client_root):
-    path = PurePath(path)
-    client_root = PurePath(client_root)
-    if ROOT == client_root:
-        return str(path)
-    rel = path.relative_to(client_root)
-    return ROOT / rel

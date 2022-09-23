@@ -84,7 +84,7 @@ export function DeleteDir({data, open=false, onClose, enqueueSnackbar, fn}) {
   return (
     <Modal open={open} title="Are you sure?" onFormSubmit={handleDeleteEntity}
       maxWidth="sm" closeButton onClose={onClose} focusRef={textFieldRef}
-      text={`This will permanently delete this ${data.kind}!`}
+      text={`This will permanently delete this ${data.kind}!`} focusDelay={1500}
       buttons={[
         <Button disabled={!solved} type="submit" key="confirm">Confirm</Button>,
         <Button key="cancel" onClick={onClose}>Cancel</Button>
@@ -114,7 +114,10 @@ export function RenameDir({data, open=false, onClose, enqueueSnackbar, fn}) {
   }, [data.name])
 
   function handleRenameDir() {
-    console.log("hello")
+    if (nameValue === data.name) {
+      onClose();
+      return;
+    }
     serverRequest("rename_entity", {...data, name: nameValue}).then(resp => {
       if (resp.ok) enqueueSnackbar("Renamed!", {variant: "success"});
       else {
