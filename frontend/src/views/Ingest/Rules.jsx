@@ -15,49 +15,119 @@ import { HTML5Backend } from 'react-dnd-html5-backend'
 import { useDrag, useDrop } from 'react-dnd'
 import IconButton from '@mui/material/IconButton';
 import RemoveIcon from '@mui/icons-material/Remove';
+import Modal from '../../components/Modal';
+import ClearIcon from '@mui/icons-material/Clear';
+import serverRequest from '../../services/serverRequest';
+import DataPlaceholder from "../../components/DataPlaceholder";
 
-function getRuleTypeField(ruleType, index, onModify, template) {
-  switch (ruleType) {
-    case "extract_info":
-      return (
-        <FormControl sx={{ m: "5px" }} size="small" style={{flexGrow: 1}} key="extract_target">
-          <InputLabel id="label-extract_target">Extract from</InputLabel>
-          <Select
-            labelId="label-extract_target"
-            id="select-extract_target"
-            label="Extract from"
-            defaultValue={template.extract_target || ""}
-            name={"extract_target-" + index}
-            onChange={onModify}
-          >
-            <MenuItem value="entire_path">Entire path</MenuItem>
-            <MenuItem value="directory">Directory</MenuItem>
-            <MenuItem value="filename">Filename</MenuItem>
-          </Select>
-        </FormControl>
-      )
-    case "replace_value":
-      return (
-        <TextField sx={{ m: "5px" }} key="replace_target" label="Value to replace" style={{flexGrow: 1}} size="small" defaultValue={template.replace_target} name={"replace_target-" + index} onChange={onModify} />
-      )
-    case "set_value":
-      return (
-        <FormControl sx={{ m: "5px" }} size="small" style={{flexGrow: 1}} key="set_target">
-          <InputLabel id="label-set_target">Field to set</InputLabel>
-          <Select
-            labelId="label-set_target"
-            id="select-set_target"
-            label="Field to set"
-            defaultValue={template.set_target || ""}
-            name={"set_target-" + index}
-            onChange={onModify}
-          >
-            <MenuItem value="name">Asset name</MenuItem>
-            <MenuItem value="comp">Component name</MenuItem>
-          </Select>
-        </FormControl>
-      )
+const RuleNameInputModal = ({onSubmit, open, onClose}) => {
+  const [name, setName] = useState("")
+
+  const handleSubmit = () => {
+    onSubmit(name)
+    onClose()
+    setName("")
   }
+
+  return (
+    <Modal
+      maxWidth="sm"
+      title="Rule template name"
+      onSubmit={handleSubmit}
+      open={open}
+      onClose={onClose}
+      buttons={[<Button key="Confirm" type="submit">Create</Button>]}
+    >
+      <TextField fullWidth value={name} onChange={e => setName(e.target.value)} />
+    </Modal>
+  )
+}
+
+const RuleTemplates = props => {
+  const [templates, setTemplates] = useState([])
+  const [managerOpen, setManagerOpen] = useState(false)
+  const [ruleNameInputModalOpen, setRuleNameInputModalOpen] = useState(false)
+  const [ruleTemplateSelectOpen, setRuleTemplateSelectOpen] = useState(false)
+
+  const getRuleTemplates = (fn=undefined) => {
+    serverRequest("get_rule_templates").then(resp => {
+      setTemplates(resp.data || [])
+      if (fn) fn()
+    })
+  }
+
+  const handleChange = e => {
+    const value = e.target.value
+    const template = templates.filter(template => template.name === value)[0]
+    props.onTemplateSelect(template.data);
+  }
+
+  const handleSaveCurrent = ruleTemplateName => {
+    props.onSaveCurrent(ruleTemplateName)
+  }
+
+  const handleRuleTemplateSelectOpen = () => {
+    getRuleTemplates(setRuleTemplateSelectOpen(true))
+  }
+
+  const handleRemoveRule = name => {
+    serverRequest("remove_rule_template", {data: name}).then(resp => {
+      setTemplates(resp.data)
+    })
+  }
+
+  return (
+    <>
+      <RuleNameInputModal
+        open={ruleNameInputModalOpen}
+        onClose={() => setRuleNameInputModalOpen(false)}
+        onSubmit={handleSaveCurrent}
+      />
+      <Modal
+        maxWidth="xs"
+        open={managerOpen}
+        onClose={() => setManagerOpen(false)}
+        title="Manage rule templates"
+      >
+        {templates ? templates.map((template, index) => 
+          <div className={styles.manageRuleContainer} key={index}>
+            <Typography>{template.name}</Typography>
+            <IconButton onClick={() => handleRemoveRule(template.name)}>
+              <ClearIcon style={{color: "red"}} />
+            </IconButton>
+          </div>
+        ) : <DataPlaceholder text="No templates saved yet" style={{position: "relative"}} />}
+      </Modal>
+      <div className={styles.ruleTemplatesBar}>
+        <FormControl sx={{ m: 1, minWidth: 250 }} size="small">
+          <InputLabel id="rules-select-label">Templates...</InputLabel>
+          <Select
+            labelId="rules-label"
+            id="rules-select"
+            value={""}
+            open={ruleTemplateSelectOpen}
+            onClose={() => setRuleTemplateSelectOpen(false)}
+            label="Templates..."
+            placeholder="Templates..."
+            onOpen={handleRuleTemplateSelectOpen}
+            onChange={handleChange}
+          >
+            {templates ? templates.map((template, index) => 
+              <MenuItem
+                value={template.name}
+                data={template.data}
+                key={index}
+              >
+                {template.name}
+              </MenuItem>
+            ) : null}
+          </Select>
+        </FormControl>
+        <Button variant="outlined" onClick={() => setManagerOpen(true)}>Manage</Button>
+        <Button variant="outlined" onClick={() => setRuleNameInputModalOpen(true)}>Save current</Button>
+      </div>
+    </>
+  )
 }
 
 function RuleList(props) {
@@ -111,9 +181,22 @@ function RuleList(props) {
 }
 
 function Rules(props) {
+
+  const handleTemplateSelect = data => {
+    props.onAddRules(data)
+  }
+
+  const handleSaveCurrent = name => {
+    serverRequest("add_rule_template", {data: props.rules, name: name})
+  }
+
   return (
     <div className={styles.container}>
       <Typography variant="h6">Ingest Rules</Typography>
+      <RuleTemplates
+        onTemplateSelect={handleTemplateSelect}
+        onSaveCurrent={handleSaveCurrent}
+      />
       <DndProvider backend={HTML5Backend}>
         <RuleList {...props} />
       </DndProvider>
