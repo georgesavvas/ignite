@@ -123,6 +123,13 @@ class Asset(Directory):
     def as_dict(self):
         d = super().as_dict()
         d["latest_av"] = self.latest_av.as_dict() if self.latest_av else {}
+        attribs = ("name", "description", "path", "dir_kind", "project")
+        filter_string = "".join([getattr(self, a) for a in attribs])
+        filter_string += "".join(self.versions)
+        latest_av = self.get("latest_av", {})
+        filter_string += "".join(latest_av.get("tags", []))
+        filter_string += "".join([c.name for c in latest_av.get("components")])
+        d["filter_string"] = filter_string
         return d
     
     def get_tags(self):

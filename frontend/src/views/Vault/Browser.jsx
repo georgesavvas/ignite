@@ -132,7 +132,7 @@ function Browser(props) {
   const getBrowserHelperText = () => {
     let s = `${props.pages.results} results | `
     s += props.query.sort ? `Sorted by: ${props.query.sort.label}` : ""
-    s += ` | Collection: ${props.selectedCollection}`
+    s += ` | Collection: ${props.selectedCollection.path}`
     return s
   }
 
@@ -175,7 +175,7 @@ function Browser(props) {
       <PageBar pages={props.pages.total} currentPage={props.pages.current}
         onChange={handlePageChange} onAspectRatioChange={setAspectRatio}
         onTilesPerPageChange={handleTilesPerPageChange}
-        onTileSizeChange={handleTileSizeChange}
+        onTileSizeChange={handleTileSizeChange} tileSize={explorerSettings.currentTileSize}
       />
     </div>
   )
