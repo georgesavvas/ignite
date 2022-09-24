@@ -51,8 +51,8 @@ function Modal(props) {
       {formWrapper(props.onFormSubmit, 
         <>
           <ClearIcon onClick={props.onClose} className={styles.closeButtonStyle} />
-          {props.title ? <DialogTitle style={{padding: "10px 20px"}}>{props.title}</DialogTitle> : null}
-          <DialogContent style={{padding: "5px 20px"}} {...props.dialogContentProps}>
+          {props.title ? <DialogTitle style={{padding: "10px 20px 0px 20px"}}>{props.title}</DialogTitle> : null}
+          <DialogContent style={{padding: "15px 20px"}} {...props.dialogContentProps}>
             {props.text ? <DialogContentText>{props.text}</DialogContentText> : null}
             {props.children}
           </DialogContent>

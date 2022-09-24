@@ -5,7 +5,6 @@ import Divider from "@mui/material/Divider";
 import TopBar from "./TopBar";
 import PageBar from "../../components/PageBar";
 import { LinearProgress } from "@mui/material";
-import debounce from "lodash.debounce";
 import { useSnackbar } from "notistack";
 import serverRequest from "../../services/serverRequest";
 import FilterBar from "./FilterBar";
@@ -17,7 +16,6 @@ import AssetTile from "../Explorer/AssetTile";
 import DirectoryTile from "../Explorer/DirectoryTile";
 import { ConfigContext } from "../../contexts/ConfigContext";
 
-const debounced = debounce(fn => fn(), 500)
 
 const defaultExplorerSettings = {
   currentTileSize: 5,
@@ -83,15 +81,9 @@ function Browser(props) {
   // }
 
   const handleFilterChange = data => {
-    props.setIsLoading(true);
-    const filter_string = data === undefined ? "" : data;
-    debounced(() => {
+    props.onFilterChange(data)
       // const palette = getColoursFromString(filter_string);
       // const palette = [];
-      // props.handleQueryChange({filter_string: filter_string})
-      props.onFilterChange(data)
-    }
-    )
   }
 
   const handlePageChange = (event, value) => {

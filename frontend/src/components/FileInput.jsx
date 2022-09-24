@@ -3,12 +3,6 @@ import React, { useRef } from "react";
 import IgnButton from "../components/IgnButton";
 import { TextField } from "@mui/material";
 
-const style = { 
-  display: "flex",
-  alignItems: "center",
-  gap: "5px"
-}
-
 export default function FileInput(props) {
   const hiddenFileInput = useRef(null)
 
@@ -30,6 +24,12 @@ export default function FileInput(props) {
     props.onChange(props.value ? `${props.value}\n${paths}` : paths)
   }
 
+  const style = { 
+    display: "flex",
+    alignItems: !props.multiline ? "center" : "flex-start",
+    gap: "5px"
+  }
+
   return (
     <div style={{...style, ...props.style}}>
       <TextField
@@ -41,7 +41,7 @@ export default function FileInput(props) {
       <IgnButton
         variant="outlined"
         onClick={() => hiddenFileInput.current.click()}
-        style={{height: 37.5, marginTop: "4px"}}
+        style={{height: 37.5, ...props.buttonStyle}}
       >
         ...
       </IgnButton>

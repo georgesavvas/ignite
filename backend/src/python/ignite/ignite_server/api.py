@@ -453,7 +453,7 @@ def discover_assetversions(path, asset_kinds=[], latest=False, sort=None, filter
         assetversions += avs
     if as_dict:
         assetversions = [av.as_dict() for av in assetversions]
-        assetversions = sort_results(filtered, sort)
+        assetversions = sort_results(assetversions, sort)
     return assetversions
 
 

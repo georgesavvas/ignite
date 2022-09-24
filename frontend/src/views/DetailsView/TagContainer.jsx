@@ -10,7 +10,6 @@ import ContextMenu, { handleContextMenu } from "../../components/ContextMenu";
 import Tooltip from '@mui/material/Tooltip';
 import { hexToHsl } from '../../utils/hexToHsl';
 import { ConfigContext } from "../../contexts/ConfigContext";
-import {ContextContext} from "../../contexts/ContextContext";
 import serverRequest from "../../services/serverRequest";
 import BuildFileURL from "../../services/BuildFileURL";
 import { useRef } from 'react';
@@ -34,7 +33,6 @@ export function TagContainer(props) {
   const newTagsRef = useRef();
   const [contextMenu, setContextMenu] = useState(null);
   const [config, setConfig] = useContext(ConfigContext);
-  const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
   const contextItems = [
@@ -56,7 +54,7 @@ export function TagContainer(props) {
     serverRequest("add_tags", data).then(resp => {
       if (resp.ok) console.log("done");
       else console.log("failed");
-      refreshContext();
+      props.onRefresh();
     })
     setNewTagsOpen(false);
   }
@@ -69,7 +67,7 @@ export function TagContainer(props) {
     serverRequest("remove_tags", data).then(resp => {
       if (resp.ok) console.log("done");
       else console.log("failed");
-      refreshContext();
+      props.onRefresh();
     })
     setNewTagsOpen(false);
   }
@@ -132,7 +130,7 @@ function Tag(props) {
 function NewTags(props) {
   return (
     <Tooltip title="Add Tags">
-      <div className={styles.tagEdit} onClick={props.onClick} >
+      <div onContextMenu={e => {e.preventDefault(); e.stopPropagation()}} className={styles.tagEdit} onClick={props.onClick} >
         <AddIcon />
       </div>
     </Tooltip>

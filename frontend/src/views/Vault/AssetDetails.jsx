@@ -6,7 +6,7 @@ import TagContainer from "../DetailsView/TagContainer";
 import saveReflexLayout from "../../utils/saveReflexLayout";
 import loadReflexLayout from "../../utils/loadReflexLayout";
 import { ConfigContext } from "../../contexts/ConfigContext";
-import {ContextContext} from "../../contexts/ContextContext";
+import {VaultContext} from "../../contexts/VaultContext";
 import {
   ReflexContainer,
   ReflexSplitter,
@@ -70,12 +70,12 @@ function AssetDetails(props) {
   const [flexRatios, setFlexRatios] = useState(defaultFlexRations);
   const [selectedCompName, setSelectedCompName] = useState("");
   const [config, setConfig] = useContext(ConfigContext);
-  const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
   const {enqueueSnackbar, closeSnackbar} = useSnackbar();
   const [contextMenu, setContextMenu] = useState(null);
   const [selectedVersion, setSelectedVersion] = useState("");
   const [assetVersion, setAssetVersion] = useState();
   const [selectedComp, setSelectedComp] = useState();
+  const [vaultContext, setVaultContext, refreshVault] = useContext(VaultContext);
 
   useEffect(() => {
     const data = loadReflexLayout();
@@ -151,7 +151,7 @@ function AssetDetails(props) {
     serverRequest("add_tags", data).then(resp => {
       if (resp.ok) console.log("done");
       else console.log("failed");
-      refreshContext();
+      props.onRefresh();
     })
   }
 
@@ -163,7 +163,7 @@ function AssetDetails(props) {
     serverRequest("remove_tags", data).then(resp => {
       if (resp.ok) console.log("done");
       else console.log("failed");
-      refreshContext();
+      props.onRefresh();
     })
   }
 
@@ -208,7 +208,7 @@ function AssetDetails(props) {
             {/* <URI uri={assetVersion.uri} /> */}
             <Path path={assetVersion.path} />
           </div>
-          <TagContainer entityPath={assetVersion.path} tags={assetVersion.tags || []} />
+          <TagContainer entityPath={assetVersion.path} tags={assetVersion.tags || []} onRefresh={refreshVault} />
         </ReflexElement>
         <ReflexSplitter style={splitterStyle} />
         <ReflexElement flex={flexRatios["vault.details.comps"]} name={"vault.details.comps"} onStopResize={handleResized}>

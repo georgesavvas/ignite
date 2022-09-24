@@ -13,9 +13,13 @@ import Details from "./Details";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import CollectionTree from "./CollectionTree";
+import debounce from "lodash.debounce";
 import serverRequest from "../../services/serverRequest";
 import {ConfigContext} from "../../contexts/ConfigContext";
 import BuildFileURL from "../../services/BuildFileURL";
+import {VaultContext} from "../../contexts/VaultContext";
+
+const debounced = debounce(fn => fn(), 500)
 
 const splitterStyle = {
   borderColor: "rgb(40,40,40)",
@@ -40,6 +44,7 @@ function Vault(props) {
   const [tilesPerPage, setTilesPerPage] = useState(50);
   const [selectedEntity, setSelectedEntity] = useState({});
   const [config, setConfig] = useContext(ConfigContext);
+  const [vaultContext, setVaultContext, refreshVault] = useContext(VaultContext);
 
   useEffect(() => {
     const data = loadReflexLayout()
@@ -73,7 +78,7 @@ function Vault(props) {
       const data = resp.data
       setCollectionData(data && data.studio ? data.studio : [])
     })
-  }, [refreshValue])
+  }, [vaultContext])
 
   useEffect(() => {
     const data = {
@@ -88,7 +93,7 @@ function Vault(props) {
       setLoadedData(resp.data)
       setPages(prevState => ({...prevState, total: resp.pages.total, results: resp.pages.results}))
     })
-  }, [pages.current, refreshValue, query, tilesPerPage, selectedCollection])
+  }, [pages.current, vaultContext, query, tilesPerPage, selectedCollection])
 
   const handleEntitySelected = entity => {
     setSelectedEntity(entity)
@@ -103,13 +108,19 @@ function Vault(props) {
   }
 
   const handleQueryChange = newQuery => {
-    setQuery(prevState => ({...prevState, ...newQuery}))
-    setPages(prevState => ({...prevState, current: 1}))
+    setIsLoading(true)
+    debounced(() => {
+      setQuery(prevState => ({...prevState, ...newQuery}))
+      setPages(prevState => ({...prevState, current: 1}))
+    })
   }
 
   const handleFilterChange = data => {
-    setQuery(prevState => ({...prevState, filters: {...prevState.filters, ...data}}))
-    setPages(prevState => ({...prevState, current: 1}))
+    setIsLoading(true)
+    debounced(() => {
+      setQuery(prevState => ({...prevState, filters: {...prevState.filters, ...data}}))
+      setPages(prevState => ({...prevState, current: 1}))
+    })
   }
 
   const handleCollectionChange = coll => {
@@ -150,8 +161,7 @@ function Vault(props) {
             pages={pages} handleQueryChange={handleQueryChange} query={query}
             isLoading={isLoading} setTilesPerPage={setTilesPerPage}
             handleEntitySelected={handleEntitySelected} setPages={setPages}
-            setIsLoading={setIsLoading} selectedEntity={selectedEntity}
-            onFilterChange={handleFilterChange}
+            selectedEntity={selectedEntity} onFilterChange={handleFilterChange}
           />
         </ReflexElement>
         <ReflexSplitter style={splitterStyle} />
@@ -160,7 +170,7 @@ function Vault(props) {
           name="vault.details"
           onStopResize={handleResized}
         >
-          <Details selectedEntity={selectedEntity} />
+          <Details selectedEntity={selectedEntity} onRefresh={handleRefresh} />
         </ReflexElement>
       </ReflexContainer>
     </Modal>

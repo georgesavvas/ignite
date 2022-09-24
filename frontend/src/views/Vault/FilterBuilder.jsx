@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import styles from "./FilterBuilder.module.css"
 import { Divider, IconButton, TextField, Typography, Button } from "@mui/material"
 import GroupWorkIcon from '@mui/icons-material/GroupWork'
@@ -17,17 +17,18 @@ import Tooltip from '@mui/material/Tooltip'
 import serverRequest from '../../services/serverRequest'
 import Modal from '../../components/Modal'
 import ClearIcon from '@mui/icons-material/Clear'
+import IgnButton from '../../components/IgnButton'
+import DataPlaceholder from '../../components/DataPlaceholder'
 
 const fields = [
   {label: "", value: "filter_string"},
-  {label: "ID", value: "id"},
   {label: "Name", value: "name"},
-  {label: "Description", value: "description"},
+  // {label: "Description", value: "description"},
   {label: "Tags", value: "tags.ARRAY."},
   {label: "Project", value: "project"},
   {label: "Component name", value: "components.ARRAY.name"},
-  {label: "Component source", value: "components.ARRAY.source"},
-  {label: "Component filepath", value: "components.ARRAY.file"}
+  // {label: "Component source", value: "components.ARRAY.source"},
+  // {label: "Component filepath", value: "components.ARRAY.file"}
 ]
 
 const getFieldFromValue = value => {
@@ -171,7 +172,8 @@ const validateExpression = expr => {
 }
 
 const TemplateNameInputModal = ({onSubmit, open, onClose}) => {
-  const [name, setName] = useState("")
+  const [name, setName] = useState("");
+  const textfieldRef = useRef();
 
   const handleSubmit = () => {
     onSubmit(name)
@@ -181,14 +183,17 @@ const TemplateNameInputModal = ({onSubmit, open, onClose}) => {
 
   return (
     <Modal
-      maxWidth="sm"
+      maxWidth="xs"
       title="Filter template name"
-      buttonLabel="Submit"
-      onButtonClicked={handleSubmit}
+      onSubmit={handleSubmit}
       open={open}
       onClose={onClose}
+      buttons={[<IgnButton key="create" type="submit">Confirm</IgnButton>]}
+      focusRef={textfieldRef}
     >
-      <TextField fullWidth value={name} onChange={e => setName(e.target.value)} />
+      <TextField fullWidth value={name} onChange={e => setName(e.target.value)}
+        size="small" autoFocus label="Filter name" inputRef={textfieldRef}
+      />
     </Modal>
   )
 }
@@ -348,22 +353,22 @@ export default function FilterBuilder(props) {
         open={templateNameInputModalOpen}
         onClose={() => setTemplateNameInputModalOpen(false)}
         onSubmit={handleSaveCurrent}
+        buttons={[<IgnButton key="create" type="submit">Confirm</IgnButton>]}
       />
       <Modal
         maxWidth="xs"
         open={managerOpen}
         onClose={() => setManagerOpen(false)}
         title="Manage filter templates"
-        closeButton
       >
-        {templates ? templates.map((template, index) => 
+        {templates.length ? templates.map((template, index) => 
           <div className={styles.manageTemplatesContainer} key={index}>
             <Typography>{template.name}</Typography>
             <IconButton onClick={() => handleRemoveTemplate(template.name)}>
               <ClearIcon style={{color: "red"}} />
             </IconButton>
           </div>
-        ) : null}
+        ) : <DataPlaceholder text="No filters saved yet" style={{position: "relative"}} />}
       </Modal>
       <div className={styles.topBar}>
         <Button variant="outlined" onClick={() => setExpression(defaultExpr)}>Reset Filters</Button>
