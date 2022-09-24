@@ -5,6 +5,7 @@ import Typography from '@mui/material/Typography';
 import { TextField } from '@mui/material';
 import {useXarrow} from "react-xarrows";
 import Button from '@mui/material/Button';
+import FileInput from '../../components/FileInput';
 
 function File({filepath, id}) {
   return (
@@ -39,10 +40,9 @@ function Files(props) {
   return (
     <div className={styles.container}>
       <Typography variant="h6">Incoming files</Typography>
-      {/* <div className={styles.inputBar}> */}
-      <TextField size="small" fullWidth multiline maxRows={5} placeholder="Paste files or directories..." onBlur={props.onDirsChange} />
-        {/* <Button id={"file-browser"} variant="outlined" className={styles.browse} onClick={handleFileInput}>...</Button>
-      </div> */}
+      <FileInput size="small" fullWidth multiline maxRows={5} placeholder="Paste files or directories..."
+        onChange={props.onDirsChange} style={{alignSelf: "stretch"}}
+      />
       <DynamicList dense noButtons onScroll={updateXarrow}>
       {
         props.files ?

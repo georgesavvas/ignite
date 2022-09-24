@@ -56,7 +56,7 @@ const General = () => {
     setCanSave(changed)
   }
 
-  const isServerLocal = config.serverDetails.address.startsWith("localhost");
+  const isServerLocal = settings.serverDetails.address && settings.serverDetails.address.startsWith("localhost");
 
   return (
     <div className={styles.container}>
@@ -98,6 +98,7 @@ const General = () => {
           disabled={settings.access.remote}
           value={settings.access.projectsDir}
           onChange={e => handleAccessChange("projectsDir", e.target.value)}
+          buttonStyle={{marginTop: "4px"}}
         />
         <FileInput
           margin="dense"
@@ -109,6 +110,7 @@ const General = () => {
           value={settings.access.serverProjectsDir}
           onChange={e => handleAccessChange("serverProjectsDir", e.target.value)}
           style={{alignSelf: "stretch"}}
+          buttonStyle={{marginTop: "4px"}}
         />
       </div>
       <div className={styles.centered} style={{marginTop: "20px"}}>

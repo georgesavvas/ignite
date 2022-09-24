@@ -3,7 +3,7 @@ import React, { Suspense, useEffect, useContext, useState } from "react";
 import Slider from '@mui/material/Slider';
 import * as THREE from "three";
 import { Canvas, useFrame, useLoader, useThree, extend } from '@react-three/fiber';
-import { OrbitControls   } from "@react-three/drei";
+import { OrbitControls, Center } from "@react-three/drei";
 import { TextureLoader } from 'three/src/loaders/TextureLoader';
 import { USDZLoader } from "../../utils/threejsDev/USDLoader";
 import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js';
@@ -48,6 +48,7 @@ function Scene({path}) {
   const isExr = path.includes(".exr");
   const loader = isExr ? EXRLoader : TextureLoader
   const colorMap = useLoader(loader, path);
+  const viewport = useThree((state) => state.viewport)
 
   if (!isExr) {
     colorMap.encoding = THREE.sRGBEncoding;
@@ -58,10 +59,12 @@ function Scene({path}) {
   const ratio = width / height;
 
   return(
-    <mesh>
-      <planeGeometry attach="geometry" args={[ratio, 1]} />
-      <meshBasicMaterial map={colorMap} />
-    </mesh>
+    <Center onCentered={({container, width, height}) => container.scale.setScalar(Math.min(viewport.width / width, viewport.height / height))}>
+      <mesh>
+        <planeGeometry attach="geometry" args={[ratio, 1]} />
+        <meshBasicMaterial map={colorMap} />
+      </mesh>
+    </Center>
   )
 }
 

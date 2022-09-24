@@ -7,6 +7,7 @@ import Home from './views/Home';
 // import Splash from "./views/Splash";
 import {ContextProvider} from "./contexts/ContextContext";
 import {ConfigProvider} from "./contexts/ConfigContext";
+import {VaultProvider} from "./contexts/VaultContext";
 import {EntityProvider} from "./contexts/EntityContext";
 import { SnackbarProvider } from 'notistack';
 import BuildFileURL from './services/BuildFileURL';
@@ -54,9 +55,11 @@ function App() {
           <ConfigProvider>
             <ContextProvider>
               <EntityProvider>
-                <SnackbarProvider maxSnack={3} autoHideDuration={2500}>
-                  <Home />
-                </SnackbarProvider>
+                <VaultProvider>
+                  <SnackbarProvider maxSnack={3} autoHideDuration={2500}>
+                    <Home />
+                  </SnackbarProvider>
+                </VaultProvider>
               </EntityProvider>
             </ContextProvider>
           </ConfigProvider>

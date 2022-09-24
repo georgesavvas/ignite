@@ -22,7 +22,7 @@ function Details(props) {
     <div style={style}>
       {
         selectedEntity && Object.keys(selectedEntity).length ?
-        <AssetDetails entity={selectedEntity} /> :
+        <AssetDetails entity={selectedEntity} onRefresh={props.onRefresh} /> :
         <DataPlaceholder text="Nothing selected" />
       }
     </div>

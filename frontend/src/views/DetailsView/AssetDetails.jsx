@@ -161,7 +161,7 @@ function AssetDetails(props) {
             <URI uri={props.entity.uri} />
             <Path path={props.entity.path} />
           </div>
-          <TagContainer entityPath={props.entity.path} tags={props.entity.tags} />
+          <TagContainer entityPath={props.entity.path} tags={props.entity.tags} onRefresh={refreshContext} />
         </ReflexElement>
         <ReflexSplitter style={splitterStyle} />
         <ReflexElement flex={flexRatios["asset.comps"]} name={"asset.comps"} onStopResize={handleResized}>

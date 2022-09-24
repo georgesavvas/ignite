@@ -20,8 +20,8 @@ class AssetVersion(Directory):
         self.score = 0
         self.tags = set()
         super().__init__(path, dir_kind="assetversion")
-        self.dict_attrs = ["path", "dir_kind", "anchor", "project", "name", "version",
-            "components", "asset", "task", "uri", "tags", "context",
+        self.dict_attrs = ["path", "dir_kind", "anchor", "project", "name", 
+            "components", "asset", "task", "uri", "tags", "context", "version",
             "thumbnail", "creation_time", "modification_time"]
         self.nr_attrs = ["path", "asset", "task"]
         self.version = self.name
@@ -91,6 +91,11 @@ class AssetVersion(Directory):
             d["default_type"] = ""
             if ext in COMP_EXT_TYPES.keys():
                 d["default_type"] = COMP_EXT_TYPES[ext]
+        attribs = ("name", "path", "dir_kind", "project")
+        filter_string = "".join([str(getattr(self, a)) for a in attribs])
+        filter_string += "".join(self.tags)
+        filter_string += "".join([c["name"] for c in self.components])
+        d["filter_string"] = filter_string
         return d
 
     def get_thumbnail(self):

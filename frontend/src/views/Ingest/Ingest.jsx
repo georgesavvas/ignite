@@ -165,9 +165,8 @@ function Ingest(props) {
     }
   )}
 
-  const handleDirsChange = e => {
-    const dirs = e.target.value;
-    setIngestDirs(dirs);
+  const handleDirsChange = value => {
+    setIngestDirs(value);
   }
 
   const handleRulesChange = (e, action, index=-1, index2=-1) => {
