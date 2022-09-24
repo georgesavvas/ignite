@@ -10,14 +10,13 @@ from ignite_server.constants import ANCHORS
 from ignite_server.utils import CONFIG
 
 
-ROOT = PurePath(CONFIG["projects_root"])
 GROUP_ANCHOR = ANCHORS["group"]
 
 
 class Project(Directory):
     def __init__(self, name="", path="") -> None:
         if not path and name:
-            path = ROOT / name
+            path = CONFIG["root"] / name
         super().__init__(path, dir_kind="project")
         self.project = self.name
         self.short_name = ""
@@ -46,7 +45,7 @@ class Project(Directory):
 
     def load_from_path(self):
         path = self.path.as_posix()
-        root = ROOT.as_posix()
+        root = CONFIG["root"].as_posix()
         split = path.split(root)
         if not path.startswith(root) or re.match("^[\/]+$", split[1]):
             raise Exception(f"Invalid project path: {path}")

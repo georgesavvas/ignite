@@ -7,10 +7,8 @@ from ignite_server.entities.directory import Directory
 from ignite_server.entities.asset import Asset
 from ignite_server.entities.component import Component
 from ignite_server.constants import TAG_WEIGHTS
-from ignite_server.utils import CONFIG
 
 
-ROOT = PurePath(CONFIG["projects_root"])
 COMP_EXT_TYPES = {}
 for name, exts in COMP_TYPES.items():
     for ext in exts:

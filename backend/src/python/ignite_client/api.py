@@ -9,7 +9,7 @@ from fnmatch import fnmatch
 from pathlib import PurePath, Path
 from pprint import pprint
 from ignite_client import utils
-from ignite_client.utils import TASK_MANAGER, PROCESSES_MANAGER
+from ignite_client.utils import TASK_MANAGER
 
 
 logging.basicConfig(level=logging.INFO)

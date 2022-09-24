@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import styles from "./Vault.module.css";
 import Modal from "../../components/Modal";
 import {
@@ -14,6 +14,7 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import CollectionTree from "./CollectionTree";
 import serverRequest from "../../services/serverRequest";
+import {ConfigContext} from "../../contexts/ConfigContext";
 
 const splitterStyle = {
   borderColor: "rgb(40,40,40)",
@@ -37,6 +38,7 @@ function Vault(props) {
   const [pages, setPages] = useState({total: 1, current: 1});
   const [tilesPerPage, setTilesPerPage] = useState(50);
   const [selectedAsset, setSelectedAsset] = useState({});
+  const [config, setConfig] = useContext(ConfigContext);
 
   useEffect(() => {
     const data = loadReflexLayout()
@@ -74,17 +76,18 @@ function Vault(props) {
 
   useEffect(() => {
     const data = {
+      path: `${config.access.serverProjectsRoot}/__vault__`,
       page: pages.current,
       limit: tilesPerPage,
       query: query
     }
     setIsLoading(true)
-    serverRequest("vault/get_assets", data).then(resp => {
+    serverRequest("get_assets", data).then(resp => {
       setIsLoading(false)
       setLoadedAssets(resp.data)
       setPages(prevState => ({...prevState, total: resp.pages.total, results: resp.pages.results}))
     })
-  }, [pages, refreshValue, query, tilesPerPage, selectedCollection])
+  }, [pages.current, refreshValue, query, tilesPerPage, selectedCollection])
 
   const handleAssetSelected = (asset) => {
     setSelectedAsset(asset)

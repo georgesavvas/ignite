@@ -26,16 +26,17 @@ export const ConfigProvider = props => {
   const [writeIncr, setWriteIncr] = useState(0);
 
   useEffect(() => {
-    clientRequest("get_config").then(resp => {
-      const data = resp.data;
-      console.log("Config received:", data);
-      const savedServerDetails = data.server_details;
+    const clientData = clientRequest("get_config");
+    Promise.all([clientData]).then(resp => {
+      const clientDataResults = resp[0].data;
+      console.log("Config received:", clientDataResults);
+      const savedServerDetails = clientDataResults.server_details;
       const savedAccess = {
-        projectsDir: data.access.projects_root,
-        serverProjectsDir: data.access.server_projects_root,
-        remote: data.access.remote
+        projectsDir: clientDataResults.access.projects_root,
+        serverProjectsDir: clientDataResults.access.server_projects_root,
+        remote: clientDataResults.access.remote
       }
-      const savedDccConfig = data.dcc_config;
+      const savedDccConfig = clientDataResults.dcc_config;
       window.services.set_envs({
         IGNITE_SERVER_ADDRESS: savedServerDetails.address,
         IGNITE_SERVER_PASSWORD: savedServerDetails.password
@@ -43,7 +44,10 @@ export const ConfigProvider = props => {
       window.services.get_env("IGNITE_CLIENT_ADDRESS").then(resp => {
         setConfig({
           serverDetails: {...serverDetailsDefault, ...savedServerDetails},
-          access: {...accessDefault, ...savedAccess},
+          access: {
+            ...accessDefault,
+            ...savedAccess
+          },
           dccConfig: savedDccConfig,
           clientAddress: resp
         })

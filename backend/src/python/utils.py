@@ -7,7 +7,6 @@ from ignite_server.utils import CONFIG
 
 
 ENV = os.environ
-ROOT = PurePath(CONFIG["projects_root"])
 
 
 class LogFormatter(logging.Formatter):
@@ -69,17 +68,17 @@ def error(s, msg=""):
 
 def build_path(path):
     path = PurePath(path)
-    root = ROOT.as_posix()
+    root = CONFIG["root"].as_posix()
     if path.as_posix().startswith(root):
         return path
     else:
-        return ROOT / path
+        return CONFIG["root"] / path
 
 
 def remap_path(path, client_root):
     path = PurePath(path)
     client_root = PurePath(client_root)
-    if ROOT == client_root:
+    if CONFIG["root"] == client_root:
         return str(path)
     rel = path.relative_to(client_root)
-    return ROOT / rel
+    return CONFIG["root"] / rel

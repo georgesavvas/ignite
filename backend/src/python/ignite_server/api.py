@@ -11,7 +11,6 @@ from ignite_server.utils import CONFIG
 
 ENV = os.environ
 PROJECT_ANCHOR = ANCHORS["project"]
-ROOT = PurePath(CONFIG["projects_root"])
 KINDS = {v: k for k, v in ANCHORS.items()}
 IGNITE_SERVER_ROOT = Path(ENV["IGNITE_SERVER_ROOT"])
 IGNITE_DCC = Path(ENV["IGNITE_DCC"])
@@ -20,9 +19,9 @@ IGNITE_DCC = Path(ENV["IGNITE_DCC"])
 def create_project(name: str):
     if not utils.validate_dirname(name): 
         return False, "invalid project name"
-    if list(Path(ROOT).glob(name)):
+    if list(Path(CONFIG["root"]).glob(name)):
         return False, "already exists"
-    path = ROOT / name
+    path = CONFIG["root"] / name
     utils.create_anchor(path, "project")
     utils.create_anchor(path / "global", "group")
     utils.create_anchor(path / "build", "group")
@@ -33,19 +32,23 @@ def create_project(name: str):
 
 
 def get_projects_root() -> str:
-    return str(ROOT)
+    return str(CONFIG["root"])
+
+
+def get_vault_path() -> str:
+    return str(CONFIG["vault"])
 
 
 def get_projects() -> list:
     from ignite_server.entities.project import Project
-    projects = Path(ROOT).iterdir()
+    projects = Path(CONFIG["root"]).iterdir()
     projects = [p for p in projects if not p.name.startswith(".")]
     projects = [Project(path=p).as_dict() for p in projects if (Path(p) / PROJECT_ANCHOR).exists()]
     return projects
 
 
 def get_project_names() -> list:
-    projects = Path(ROOT).iterdir()
+    projects = Path(CONFIG["root"]).iterdir()
     projects = [p for p in projects if not p.name.startswith(".")]
     projects = [p.name for p in projects if (Path(p) / PROJECT_ANCHOR).exists()]
     return projects
@@ -55,8 +58,8 @@ def get_project(name):
     if not name:
         return None
     from ignite_server.entities.project import Project
-    path = ROOT / name
-    if not Path(ROOT).is_dir():
+    path = CONFIG["root"] / name
+    if not Path(CONFIG["root"]).is_dir():
         return None
     return Project(path=path)
 
@@ -72,11 +75,11 @@ def get_context_info(path):
         path = path.parent
     parts = path.parts
     ancestor_kinds = {}
-    ignore = len(ROOT.parts)
+    ignore = len(CONFIG["root"].parts)
     for i in range(len(parts)):
         if i <= ignore:
             continue
-        part_path = ROOT / PurePath(*parts[:i])
+        part_path = CONFIG["root"] / PurePath(*parts[:i])
         kind = utils.get_dir_kind(part_path)
         ancestor_kinds[part_path.as_posix()] = kind
     for x in path.iterdir():
@@ -85,9 +88,11 @@ def get_context_info(path):
             continue
         kind = KINDS[name]
         ancestor_kinds[path.as_posix()] = kind
-        project = path.as_posix().split(ROOT.as_posix(), 1)[1].lstrip("/").split("/")[0]
+        project = path.as_posix().split(
+            CONFIG["root"].as_posix(), 1
+        )[1].lstrip("/").split("/")[0]
         data = {
-            "root": ROOT.as_posix(),
+            "root": CONFIG["root"].as_posix(),
             "name": name,
             "path": str(path),
             "path_nr": utils.get_nr(path),
@@ -95,7 +100,7 @@ def get_context_info(path):
             "parent": str(path.parent),
             "parent_nr": utils.get_nr(path.parent),
             "project": project.strip(),
-            "project_path": (ROOT / project).as_posix(),
+            "project_path": (CONFIG["root"] / project).as_posix(),
             "dir_kind": kind,
             "ancestor_kinds": ancestor_kinds
         }
@@ -525,7 +530,7 @@ def set_repr_for_project(repr):
     repr_entity = find(repr)
     if not repr_entity:
         return False, None
-    target_entity = find(ROOT / repr_entity.project)
+    target_entity = find(CONFIG["root"] / repr_entity.project)
     if repr_entity.dir_kind == "assetversion":
         repr_entity = find(repr_entity.asset)
     target_entity.set_repr(repr_entity.uri)
