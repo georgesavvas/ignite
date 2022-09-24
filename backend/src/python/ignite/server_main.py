@@ -274,6 +274,7 @@ async def get_assets(request: Request):
         "pages": {
             "total": pages,
             "current": page,
+            "results": total
         },
         "result_amount": total,
         "data": to_return
@@ -317,6 +318,7 @@ async def get_assetversions(request: Request):
         "pages": {
             "total": pages,
             "current": page,
+            "results": total
         },
         "result_amount": total,
         "data": to_return
@@ -349,6 +351,7 @@ async def get_scenes(request: Request):
         "pages": {
             "total": pages,
             "current": page,
+            "results": total
         },
         "result_amount": total,
         "data": to_return
