@@ -71,7 +71,7 @@ function getGenericContextItems(data, enqueueSnackbar) {
 
 function getSpecificContextItems(data) {
   const kindOptions = DIRCONTEXTOPTIONS[data.kind];
-  const namedOptions = kindOptions[data.name] || kindOptions.default;
+  const namedOptions = (kindOptions && kindOptions[data.name]) || kindOptions.default;
   return namedOptions.map(contextOption => ({
     label: contextOption.label,
     value: contextOption.name,
