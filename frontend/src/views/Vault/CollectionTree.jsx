@@ -16,6 +16,7 @@ import OutlinedInput from "@mui/material/OutlinedInput";
 import { useDrag, useDrop } from "react-dnd";
 import serverRequest from "../../services/serverRequest";
 import FilterField from "../../components/FilterField";
+import { Button } from "@mui/material";
 
 function findNodeByPath(object, result, value, parents) {
   if(object.hasOwnProperty("path") && object.path === value) {
@@ -225,8 +226,8 @@ StyledTreeItem.propTypes = {
   name: PropTypes.string.isRequired
 }
 
-function CollectionTree({collectionData, selectedCollection, setSelectedCollection, onRefresh, user}) {
-  const [expandedItems, setExpandedItems] = useState(["/all", "/all/2d", "/add/3d"]);
+function CollectionTree(props) {
+  const [expandedItems, setExpandedItems] = useState(["/all"]);
   const [selectedItems, setSelectedItems] = useState("");
   const [contextMenu, setContextMenu] = useState(null);
   const {enqueueSnackbar, closeSnackbar} = useSnackbar();
@@ -234,25 +235,26 @@ function CollectionTree({collectionData, selectedCollection, setSelectedCollecti
   const [modalData, setModalData] = useState({});
   const [dropPreviewData, setDropPreviewData] = useState({opacity: 0, top: 0, height: 20});
 
-  const scope = user ? "user" : "studio"
+  const scope = props.user ? "user" : "studio"
 
   // useEffect(() => {
   //   setSelectedItems("/all");
   // }, [])
 
   useEffect(() => {
-    const [selectedScope, selectedPath] = selectedCollection.split(":")
+    if (!props.selectedCollection || !props.selectedCollection.path) return;
+    const [selectedScope, selectedPath] = props.selectedCollection.path.split(":")
     if (scope !== selectedScope) {
       setSelectedItems([])
       return
     }
     setSelectedItems(selectedPath)
-  }, [selectedCollection])
+  }, [props.selectedCollection])
 
   const collectionInfo = {
     name: "",
     path: "/",
-    user: user,
+    user: props.user,
     scope: scope
   }
 
@@ -269,10 +271,11 @@ function CollectionTree({collectionData, selectedCollection, setSelectedCollecti
 
     let result = []
     let parents = []
-    findNodeByPath(collectionData, result, nodeId, parents)
+    findNodeByPath(props.collectionData, result, nodeId, parents)
     result = result[0]
-    setSelectedCollection(`${scope}:${result.path}`)
+    props.setSelectedCollection(result)
     setSelectedItems(nodeId)
+    props.onFilterChange({collection: result.expression})
   }
 
   const handleNodeToggle = (event, nodeIds) => {
@@ -293,12 +296,12 @@ function CollectionTree({collectionData, selectedCollection, setSelectedCollecti
       target: target,
       offset: offset,
       scope: scope,
-      user: user
+      user: props.user
     }
     serverRequest("reorder_collection", {data: data}).then(resp => {
       if (resp.ok) enqueueSnackbar("Success!", {variant: "success"})
       else enqueueSnackbar("Error reordering collection.", {variant: "error"})
-      onRefresh()
+      props.onRefresh()
     })
   }
 
@@ -318,7 +321,7 @@ function CollectionTree({collectionData, selectedCollection, setSelectedCollecti
         style={hide ? {display: "none"} : null}
         onFocusCapture={e => e.stopPropagation()}
         custom={{setdroppreviewdata: setDropPreviewData, onreorder: handleReOrder}}
-        user={user}
+        user={props.user}
         scope={scope}
       >
         {Array.isArray(nodes.children)
@@ -346,19 +349,19 @@ function CollectionTree({collectionData, selectedCollection, setSelectedCollecti
       />
       <EditColl open={modalData.editOpen} enqueueSnackbar={enqueueSnackbar}
         onClose={() => setModalData(prevState => ({...prevState, editOpen: false}))}
-        data={modalData} fn={onRefresh}
+        data={modalData} fn={props.onRefresh}
       />
       <CreateColl open={modalData.createOpen} enqueueSnackbar={enqueueSnackbar}
         onClose={() => setModalData(prevState => ({...prevState, createOpen: false}))}
-        data={modalData} fn={onRefresh}
+        data={modalData} fn={props.onRefresh}
       />
       <DeleteColl open={modalData.deleteOpen} enqueueSnackbar={enqueueSnackbar}
         onClose={() => setModalData(prevState => ({...prevState, deleteOpen: false}))}
-        data={modalData} fn={onRefresh}
+        data={modalData} fn={props.onRefresh}
       />
       <RenameColl open={modalData.renameOpen} enqueueSnackbar={enqueueSnackbar}
         onClose={() => setModalData(prevState => ({...prevState, renameOpen: false}))}
-        data={modalData} fn={onRefresh}
+        data={modalData} fn={props.onRefresh}
       />
       <FilterField filterValue={filterValue} setFilterValue={setFilterValue} />
       <div className={styles.treeContainer}>
@@ -372,7 +375,7 @@ function CollectionTree({collectionData, selectedCollection, setSelectedCollecti
           sx={{ flexGrow: 1, overflowX: "hidden", overflowY: "auto" }}
         >
           {/* {renderTree(collectionData)} */}
-          {collectionData.map((node) => renderTree(node))}
+          {props.collectionData.map((node) => renderTree(node))}
         </TreeView>
       </div>
     </div>

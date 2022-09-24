@@ -3,8 +3,6 @@ import logging
 from pprint import pprint
 from pathlib import PurePath
 
-from ignite_server.utils import CONFIG
-
 
 ENV = os.environ
 
@@ -54,31 +52,31 @@ def log_request(request):
 
 def process_request(req):
     # remap paths if needed
-    client_root = req.get("client_root")
-    if client_root:
-        if req.get("path"):
-            req["path"] = remap_path(req["path"], client_root)
+    # client_root = req.get("client_root")
+    # if client_root:
+    #     if req.get("path"):
+    #         req["path"] = remap_path(req["path"], client_root)
     return req
 
 
 def error(s, msg=""):
-    logging.error(s)
+    LOGGER.error(s)
     return {"ok": False, "error": msg or s}
 
 
-def build_path(path):
+def build_path(path, server_root):
     path = PurePath(path)
-    root = CONFIG["root"].as_posix()
+    root = server_root.as_posix()
     if path.as_posix().startswith(root):
         return path
     else:
-        return CONFIG["root"] / path
+        return server_root / path
 
 
-def remap_path(path, client_root):
+def remap_path(path, server_root, client_root):
     path = PurePath(path)
     client_root = PurePath(client_root)
-    if CONFIG["root"] == client_root:
+    if server_root == client_root:
         return str(path)
     rel = path.relative_to(client_root)
-    return CONFIG["root"] / rel
+    return server_root / rel

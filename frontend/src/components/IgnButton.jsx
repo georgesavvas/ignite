@@ -3,6 +3,6 @@ import { Button } from "@mui/material";
 
 export default function IgnButton(props) {
   return (
-    <Button {...props} />
+    <Button variant="outlined" {...props} />
   )
 }

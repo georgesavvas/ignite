@@ -1,2 +1,2 @@
-pyinstaller src/python/server_main.py --noconfirm --onefile --name=IgniteServer --windowed --icon=../frontend/public/media/desktop_icon/mac/icon.icns
-pyinstaller src/python/client_main.py --noconfirm --onefile --name=IgniteClientBackend --windowed --icon=../frontend/public/media/desktop_icon/mac/icon.icns
+pyinstaller src/python/ignite/server_main.py --noconfirm --onefile --name=IgniteServer --windowed --icon=../frontend/public/media/desktop_icon/mac/icon.icns
+pyinstaller src/python/ignite/client_main.py --noconfirm --onefile --name=IgniteClientBackend --windowed --icon=../frontend/public/media/desktop_icon/mac/icon.icns

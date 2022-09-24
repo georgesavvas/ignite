@@ -13,10 +13,10 @@ import json
 from pathlib import Path, PurePath
 from pprint import pprint
 
-from asset_library.models.asset import Asset
-from asset_library.models.render import Render
-from asset_library.log_formatter import LogFormatter
-from asset_library.tools import load_assetlib_config, get_assets_collection, get_logger, hex_to_rgb
+# from asset_library.models.asset import Asset
+# from asset_library.models.render import Render
+# from asset_library.log_formatter import LogFormatter
+# from asset_library.tools import load_assetlib_config, get_assets_collection, get_logger, hex_to_rgb
 
 LOGGER = get_logger(__name__)
 
@@ -933,7 +933,7 @@ def ingest_asset(data):
             "find", {"query": asset.as_posix()}
         ).get("data")
         if not asset_entity:
-            logging.error(f"Tried to create an asset at {asset} but couldn't, possibly directory exists already.")
+            LOGGER.error(f"Tried to create an asset at {asset} but couldn't, possibly directory exists already.")
             return
     if asset_entity:
         print("Ingesting on top of existing asset.")

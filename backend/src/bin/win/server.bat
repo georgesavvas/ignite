@@ -1,4 +1,6 @@
 git pull --ff-only
 title "IGNITE SERVER"
-%0\..\..\..\..\env\Scripts\activate && python %0\..\..\..\python\server_main.py
+%0\..\..\..\..\env\Scripts\activate && ^
+cd %0\..\..\..\python && ^
+python -m ignite.server_main
 PAUSE

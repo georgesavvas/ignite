@@ -7,9 +7,11 @@ import parse
 import datetime
 from pathlib import Path, PurePath
 
-from ignite_server.constants import ANCHORS
+from ignite.utils import get_logger
+from ignite.server.constants import ANCHORS
 
 
+LOGGER = get_logger(__name__)
 ENV = os.environ
 IGNITE_ROOT = Path(ENV["IGNITE_ROOT"])
 SERVER_CONFIG_PATH = os.environ["IGNITE_SERVER_USER_CONFIG_PATH"]
@@ -22,7 +24,7 @@ URI_TEMPLATE_UNVERSIONED = parse.compile("ign:{project}:{group}:{context}:{task}
 def get_config(formatted=True) -> dict:
     if not os.path.isfile(SERVER_CONFIG_PATH):
         raise Exception(f"Config file not found: {SERVER_CONFIG_PATH}")
-    logging.info(f"Reading config from {SERVER_CONFIG_PATH}...")    
+    LOGGER.info(f"Reading config from {SERVER_CONFIG_PATH}...")    
     with open(SERVER_CONFIG_PATH, "r") as f:
         config = yaml.safe_load(f)
     paths = ("projects_root",)
@@ -50,7 +52,7 @@ def ensure_path(path):
             os.makedirs(path, exist_ok=True)
             return True
         except Exception as e:
-            logging.error(e)
+            LOGGER.error(e)
             return False
 
 
@@ -82,7 +84,7 @@ def set_projects_root(path):
 def ensure_directory(path: Path) -> int:
     path = Path(path)
     if path.is_file():
-        logging.warning(f"ensure_directory run but path was pointing to a file: {path}")
+        LOGGER.warning(f"ensure_directory run but path was pointing to a file: {path}")
         return 1
     elif path.is_dir():
         return 1
@@ -211,7 +213,7 @@ def uri_to_path(uri):
         pattern = ":".join(pattern_split[:amount + 1])
         result = parse.parse(pattern, uri)
     if not result:
-        logging.error(f"Failed to parse {uri}")
+        LOGGER.error(f"Failed to parse {uri}")
         return ""
     data = result.named
     if data.get("name"):

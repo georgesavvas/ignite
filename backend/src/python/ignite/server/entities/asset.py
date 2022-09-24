@@ -1,7 +1,7 @@
 import os
 import yaml
 from pathlib import Path
-from ignite_server.entities.directory import Directory
+from ignite.server.entities.directory import Directory
 
 class Asset(Directory):
     def __init__(self, path="") -> None:
@@ -31,14 +31,14 @@ class Asset(Directory):
 
     @property
     def latest_v(self):
-        if not self._avs_fetched:
-            self._fetch_versions()
+        if not self._latest_v:
+            self._get_latest_version()
         return self._latest_v
 
     @property
     def latest_av(self):
-        if not self._avs_fetched:
-            self._fetch_versions()
+        if not self._latest_av:
+            self._get_latest_version()
         return self._latest_av
     
     @property
@@ -54,7 +54,7 @@ class Asset(Directory):
         return self._best_av
 
     def _fetch_versions(self):
-        from ignite_server.entities.assetversion import AssetVersion
+        from ignite.server.entities.assetversion import AssetVersion
 
         path = Path(self.path)
         versions = []
@@ -72,6 +72,25 @@ class Asset(Directory):
             self._latest_v = versions[0]
             self._latest_av = assetversions[0]
         self._avs_fetched = True
+    
+    def _get_latest_version(self):
+        from ignite.server.entities.assetversion import AssetVersion
+
+        path = Path(self.path)
+        versions = []
+        for x in path.iterdir():
+            name = x.name
+            if not name.startswith("v"):
+                continue
+            versions.append(name)
+        versions = sorted(versions, reverse=True)
+        if not versions:
+            return
+        version = versions[0]
+        assetversion = AssetVersion(path / version)
+        if assetversion:
+            self._latest_v = version
+            self._latest_av = assetversion
 
     def _get_best_version(self):
         assetversions = sorted(self.assetversions, reverse=True)
@@ -103,8 +122,7 @@ class Asset(Directory):
 
     def as_dict(self):
         d = super().as_dict()
-        if self.latest_av:
-            d["latest_av"] = self.latest_av.as_dict()
+        d["latest_av"] = self.latest_av.as_dict() if self.latest_av else {}
         return d
     
     def get_tags(self):

@@ -1,7 +1,7 @@
 import os
 from pathlib import Path, PurePath
-from ignite_server import utils
-from ignite_server.entities.directory import Directory
+from ignite.server import utils
+from ignite.server.entities.directory import Directory
 
 
 class Sequence(Directory):

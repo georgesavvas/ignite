@@ -8,13 +8,13 @@ from string import Formatter
 from fnmatch import fnmatch
 from pathlib import PurePath, Path
 from pprint import pprint
-from ignite_client import utils
-from ignite_client.utils import TASK_MANAGER
+
+from ..utils import get_logger
+from ignite.client import utils
+from ignite.client.utils import TASK_MANAGER
 
 
-logging.basicConfig(level=logging.INFO)
-
-
+LOGGER = get_logger(__name__)
 ENV = os.environ
 DCC = Path(ENV["IGNITE_DCC"])
 
@@ -248,7 +248,7 @@ def ingest_asset(data):
             "find", {"path": asset.as_posix()}
         ).get("data")
         if not asset_dict:
-            logging.error(f"Tried to create an asset at {asset} but couldn't, possibly directory exists already.")
+            LOGGER.error(f"Tried to create an asset at {asset} but couldn't, possibly directory exists already.")
             return
     if asset_dict:
         print("Ingesting on top of existing asset.")
@@ -283,7 +283,7 @@ def get_actions():
 def run_action(entity, kind, action, session_id):
     actions = utils.discover_actions().get(kind)
     if not actions:
-        logging.error(f"Couldn't find action {kind} {action}")
+        LOGGER.error(f"Couldn't find action {kind} {action}")
         print("Available are:")
         pprint(actions)
         return
@@ -297,7 +297,7 @@ def run_action(entity, kind, action, session_id):
         )
         break
     else:
-        logging.error(f"Couldn't find action {kind} {action}")
+        LOGGER.error(f"Couldn't find action {kind} {action}")
         print("Available are:")
         pprint(actions)
         return

@@ -6,6 +6,11 @@ from uuid import uuid4
 from pathlib import PurePath
 from tinydb import TinyDB, Query
 
+from ..utils import get_logger
+
+
+LOGGER = get_logger(__name__)
+
 
 def start_worker(loop):
     print("WORKER INIT")
@@ -30,9 +35,9 @@ class Task():
             ws = self.processes_manager.get(self.session_id)
             if not ws and self.processes_manager.connections:
                 ws, ws_id = self.processes_manager.connections[0]
-                logging.error(f"Websocket was not found for {self} {self.session_id} but ended up using {ws_id}")
+                LOGGER.error(f"Websocket was not found for {self} {self.session_id} but ended up using {ws_id}")
             elif not ws:
-                logging.error(f"Websocket was not found for {self} {self.session_id}")
+                LOGGER.error(f"Websocket was not found for {self} {self.session_id}")
                 return
             data = {
                 "id": self.id,
@@ -119,7 +124,7 @@ class TaskManager():
     
     def restore_tasks(self):
         for kwargs in self.db:
-            logging.warning(f"Restoring task from db {kwargs['task_id']}")
+            LOGGER.warning(f"Restoring task from db {kwargs['task_id']}")
             self.create_task(
                 action=kwargs["action"],
                 entity=kwargs["entity"],
@@ -203,9 +208,9 @@ class TaskManager():
         ws = self.processes_manager.get(task.session_id)
         if not ws and self.processes_manager.connections:
             ws, ws_id = self.processes_manager.connections[0]
-            logging.error(f"Websocket was not found for {task} {task.session_id} but ended up using {ws_id}")
+            LOGGER.error(f"Websocket was not found for {task} {task.session_id} but ended up using {ws_id}")
         elif not ws:
-            logging.error(f"Websocket was not found for {task} {task.session_id}")
+            LOGGER.error(f"Websocket was not found for {task} {task.session_id}")
             return
         data = {
             "name": task.action["label"],

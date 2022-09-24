@@ -105,13 +105,6 @@ function Explorer() {
     });
   }, [pages.current, explorerSettings.currentResultType, explorerSettings.tilesPerPage, currentContext, config.access, query]);
 
-  // useEffect(() => {
-  //   if (!selectedEntity) return;
-  //   loadedData.forEach(entity => {
-  //     if (entity.path === selectedEntity.path) setSelectedEntity(entity);
-  //   })
-  // }, [loadedData]);
-
   useEffect(() => {
     const _tiles = loadedData.reduce(function(obj, entity) {
       if (entity.path === selectedEntity.path) setSelectedEntity(entity);

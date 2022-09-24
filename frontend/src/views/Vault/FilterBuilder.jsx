@@ -23,7 +23,7 @@ const fields = [
   {label: "ID", value: "id"},
   {label: "Name", value: "name"},
   {label: "Description", value: "description"},
-  {label: "Tags", value: "tags"},
+  {label: "Tags", value: "tags.ARRAY."},
   {label: "Project", value: "project"},
   {label: "Component name", value: "components.ARRAY.name"},
   {label: "Component source", value: "components.ARRAY.source"},

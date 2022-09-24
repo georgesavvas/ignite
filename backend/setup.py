@@ -3,5 +3,5 @@ from setuptools import setup, find_packages
 setup(
     name="ignite",
     version='0.1.0',
-    packages=find_packages(include=["src/ignite_server", "src/ignite_client"])
+    packages=find_packages(include=["src/python/ignite"])
 )

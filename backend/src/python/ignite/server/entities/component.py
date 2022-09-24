@@ -1,7 +1,7 @@
 import os
 from pathlib import PurePath
 import clique
-from ignite_server import utils
+from ignite.server import utils
 
 
 class Component():

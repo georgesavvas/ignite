@@ -3,10 +3,13 @@ import glob
 import clique
 import platform
 import subprocess
-from ignite_server.constants import TOOLS, OS_NAMES
+
+from ignite.utils import get_logger
+from ignite.server.constants import TOOLS, OS_NAMES
 
 
-os_name = OS_NAMES[platform.system()]
+LOGGER = get_logger(__name__)
+OS_NAME = OS_NAMES[platform.system()]
 
 
 def convert_img(input, output):
@@ -21,7 +24,7 @@ def convert_img(input, output):
     # padding = output.count("#")
     # output = output.replace("#" * padding, f"%0{padding}d")
 
-    tool = TOOLS.get("oiiotool").get(os_name)
+    tool = TOOLS.get("oiiotool").get(OS_NAME)
     cmd = f"{tool} --frames {range} --framepadding {padding} {input} "
     # cmd += f"--colorconvert \"ACES - ACEScg\" \"Output - sRGB\" -o {output}"
     cmd += f"--autocc -o {output}"
@@ -40,7 +43,7 @@ def convert_img(input, output):
 
 
 def encode(input, output, fps=25):
-    tool = TOOLS.get("ffmpeg").get(os_name)
+    tool = TOOLS.get("ffmpeg").get(OS_NAME)
 
     cmd_frame = ""
     cmd_fps = ""

@@ -193,7 +193,7 @@ async def add_rule_template(request: Request):
     name = result.get("name")
     data = result.get("data")
     if not name or not data:
-        logging.error(f"name {name} data {data}")
+        LOGGER.error(f"name {name} data {data}")
         return {"ok": False}
     data = api.add_rule_template(data, name)
     return {

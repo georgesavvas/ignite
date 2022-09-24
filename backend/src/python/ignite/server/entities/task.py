@@ -1,9 +1,9 @@
 import os
 from pathlib import Path, PurePath
-from ignite_server.constants import DCC_EXTENSIONS
-from ignite_server import utils
-from ignite_server.entities.directory import Directory
-from ignite_server.constants import ANCHORS
+from ignite.server.constants import DCC_EXTENSIONS
+from ignite.server import utils
+from ignite.server.entities.directory import Directory
+from ignite.server.constants import ANCHORS
 
 
 class Task(Directory):
@@ -40,7 +40,7 @@ class Task(Directory):
         return d
 
     def discover_scenes(self, dcc=[], latest=True, as_dict=False):
-        from ignite_server.entities.scene import Scene
+        from ignite.server.entities.scene import Scene
 
         kinds = {v: k for k, v in ANCHORS.items()}
         anchors = kinds.keys()
