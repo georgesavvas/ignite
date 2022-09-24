@@ -26,7 +26,7 @@ function TopBar(props) {
   }, [])
 
   useEffect(() => {
-    props.onFilterChange(filterValue)
+    props.onFilterStringChange(filterValue)
   }, [filterValue])
 
   const handleSortClicked = e => {

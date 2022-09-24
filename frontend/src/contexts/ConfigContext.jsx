@@ -64,8 +64,11 @@ export const ConfigProvider = props => {
       IGNITE_SERVER_ADDRESS: config.serverDetails.address,
       IGNITE_SERVER_PASSWORD: config.serverDetails.password
     })
+    const isServerLocal = config.serverDetails.address.startsWith("localhost");
     const accessFormatted = {
       projects_root: config.access.projectsDir,
+      server_projects_root: isServerLocal ? config.access.projectsDir :
+        config.access.serverProjectsDir,
       remote: config.access.remote
     }
     const data = {
@@ -112,17 +115,17 @@ export const ConfigProvider = props => {
     setConfig(prevState => ({...prevState, access: {...prevState.access, ...data}}));
   }
 
-  const handleSetDccConfig = (data, operation) => {
+  const handleSetDccConfig = (data, operation="modify") => {
     switch (operation) {
-      case "add": {
+      default: {
         setConfig(prevState => (
-          {...prevState, dccConfig: addToDCCConfig(prevState.dccConfig, data)}
+          {...prevState, dccConfig: modifyDCCConfig(prevState.dccConfig, data)}
         ));
         break;
       }
-      case "modify": {
+      case "add": {
         setConfig(prevState => (
-          {...prevState, dccConfig: modifyDCCConfig(prevState.dccConfig, data)}
+          {...prevState, dccConfig: addToDCCConfig(prevState.dccConfig, data)}
         ));
         break;
       }
@@ -135,7 +138,7 @@ export const ConfigProvider = props => {
     }
   }
 
-  const handleSetConfig = (setting, data, operation="") => {
+  const handleSetConfig = (setting, data, operation) => {
     switch(setting) {
       case "serverDetails": {
         handleSetServerDetails(data); break;
@@ -146,6 +149,7 @@ export const ConfigProvider = props => {
       case "dccConfig": {
         handleSetDccConfig(data, operation); break;
       }
+      default: return;
     }
   }
 

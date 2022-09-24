@@ -81,3 +81,4 @@ websockets==10.3
 wrapt==1.13.3
 colorthief
 tinydb
+mongoquery

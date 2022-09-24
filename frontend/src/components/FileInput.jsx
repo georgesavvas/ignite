@@ -40,7 +40,6 @@ export default function FileInput(props) {
       />
       <IgnButton
         variant="outlined"
-        color="ignite"
         onClick={() => hiddenFileInput.current.click()}
         style={{height: 37.5, marginTop: "4px"}}
       >

@@ -1,4 +1,4 @@
-from ignite_server.entities.directory import Directory
+from ignite.server.entities.directory import Directory
 
 
 class Group(Directory):

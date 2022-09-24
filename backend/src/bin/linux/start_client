@@ -3,4 +3,5 @@
 git pull --ff-only;
 fuser -k -n tcp 3000;
 source backend/env/bin/activate;
-python3 backend/src/python/client_main.py;
+cd src/python
+python3 -m ignite.client_main;

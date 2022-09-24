@@ -1,12 +1,12 @@
 import os
-from ignite_server.constants import COMP_TYPES
+from ignite.server.constants import COMP_TYPES
 import clique
 from pathlib import Path, PurePath
-from ignite_server import utils
-from ignite_server.entities.directory import Directory
-from ignite_server.entities.asset import Asset
-from ignite_server.entities.component import Component
-from ignite_server.constants import TAG_WEIGHTS
+from ignite.server import utils
+from ignite.server.entities.directory import Directory
+from ignite.server.entities.asset import Asset
+from ignite.server.entities.component import Component
+from ignite.server.constants import TAG_WEIGHTS
 
 
 COMP_EXT_TYPES = {}
@@ -33,7 +33,7 @@ class AssetVersion(Directory):
         self.components = []
         self.asset = self.path.parent
         self.uri = utils.get_uri(self.asset, self.version_int)
-        self.task = self.asset.parent.parent
+        self.task = self.asset.parent.parent if "/exports/" in self.path.as_posix() else None
         self.context = self.get_context()
         self.fetch_components()
         self._get_score()

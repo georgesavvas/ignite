@@ -1,3 +1,5 @@
 title "IGNITE CLIENT"
-%0\..\..\..\..\env\Scripts\activate && python %0\..\..\..\python\client_main.py
+%0\..\..\..\..\env\Scripts\activate && ^
+cd %0\..\..\..\python && ^
+python -m ignite.client_main
 PAUSE

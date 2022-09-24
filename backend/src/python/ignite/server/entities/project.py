@@ -4,12 +4,15 @@ import yaml
 import time
 import logging
 from pathlib import Path, PurePath
-from ignite_server import utils
-from ignite_server.entities.directory import Directory
-from ignite_server.constants import ANCHORS
-from ignite_server.utils import CONFIG
+
+from ignite.utils import get_logger
+from ignite.server import utils
+from ignite.server.entities.directory import Directory
+from ignite.server.constants import ANCHORS
+from ignite.server.utils import CONFIG
 
 
+LOGGER = get_logger(__name__)
 GROUP_ANCHOR = ANCHORS["group"]
 
 
@@ -40,7 +43,7 @@ class Project(Directory):
             with open(self.anchor, "w") as f:
                 yaml.safe_dump(config, f)
         else:
-            logging.warning("Initialising an existing project!?")
+            LOGGER.warning("Initialising an existing project!?")
         self.load_from_path()
 
     def load_from_path(self):
@@ -91,7 +94,10 @@ class Project(Directory):
                     if name in (".config", "common"):
                         continue
                     if name in anchors:
-                        d["dir_kind"] = kinds[name]
+                        kind = kinds[name]
+                        if kind in ("asset", "assetversion"):
+                            continue
+                        d["dir_kind"] = kind
                         d["anchor"] = x
                         continue
                     if name.startswith("."):

@@ -12,37 +12,61 @@ import FilterBar from "./FilterBar";
 import { Typography } from "@mui/material";
 import Modal from "../../components/Modal";
 import DataPlaceholder from "../../components/DataPlaceholder";
-import AssetTile from "./AssetTile";
+import BuildFileURL from "../../services/BuildFileURL";
+import AssetTile from "../Explorer/AssetTile";
+import DirectoryTile from "../Explorer/DirectoryTile";
+import { ConfigContext } from "../../contexts/ConfigContext";
 
 const debounced = debounce(fn => fn(), 500)
 
+const defaultExplorerSettings = {
+  currentTileSize: 5,
+  tilesPerPage: 50
+}
+
 function Browser(props) {
   const [filtersOpen, setFiltersOpen] = useState(false);
-  // const {enqueueSnackbar, closeSnackbar} = useSnackbar();
   const [aspectRatio, setAspectRatio] = useState(1);
+  const [explorerSettings, setExplorerSettings] = useState(defaultExplorerSettings);
   const [tileSize, setTileSize] = useState(200);
   const [tiles, setTiles] = useState([]);
+  const [config, setConfig] = useContext(ConfigContext);
 
   useEffect(() => {
-    const _tiles = props.loadedAssets.reduce(function(obj, asset) {
-      if (asset.id === props.selectedAsset.id) props.handleAssetSelected(asset)
-      obj[asset.id] = 
-        <AssetTile
-          key={asset.id}
-          // onAssetDelete={() => setAssetDeleteModal({
-          //   open: true,
-          //   assetID: asset.id
-          // })}
-          // onAssetEdit={props.onAssetEdit}
-          asset={asset}
-          aspectRatio={aspectRatio} onSelected={props.handleAssetSelected}
-          selected={asset.id === props.selectedAsset.id}
-          size={tileSize}
-        />
-      return obj
-    }, {})
-    setTiles(_tiles)
-  }, [props.loadedAssets, props.selectedAsset, aspectRatio, tileSize])
+    const _tiles = props.loadedData.reduce(function(obj, entity) {
+      if (entity.path === props.selectedEntity.path) props.handleEntitySelected(entity);
+      entity.path = BuildFileURL(entity.path, config, {pathOnly: true});
+      if (entity.components) {
+        entity.components.forEach(comp => {
+          comp.path = BuildFileURL(comp.path, config, {pathOnly: true});
+        })
+      }
+      if (entity.task) entity.task = BuildFileURL(entity.task, config, {pathOnly: true});
+      if (entity.dir_kind === "assetversion") {
+        obj[entity.result_id] = <AssetTile key={entity.result_id}
+          entity={entity}
+          onSelected={props.handleEntitySelected}
+          size={explorerSettings.currentTileSize * 40}
+          viewType="grid"
+          selected={props.selectedEntity.path === entity.path}
+          refreshContext={props.onRefresh}
+          // onContextMenu={handleContextMenuSelection}
+        />;
+      } else {
+        obj[entity.result_id] = <DirectoryTile key={entity.result_id}
+          entity={entity}
+          onSelected={props.handleEntitySelected}
+          size={explorerSettings.currentTileSize * 40}
+          viewType="grid"
+          selected={props.selectedEntity.path === entity.path}
+          refreshContext={props.onRefresh}
+          // onContextMenu={handleContextMenuSelection}
+        />;
+      }
+      return obj;
+    }, {});
+    setTiles(_tiles);
+  }, [props.loadedData, props.selectedEntity.path, explorerSettings.currentViewType, explorerSettings.currentTileSize])
 
   // const getColourNameCluster = (word, words) => {
   //   const index = words.indexOf(word)
@@ -58,13 +82,14 @@ function Browser(props) {
   //   return colours
   // }
 
-  const handleFilterChange = value => {
+  const handleFilterChange = data => {
     props.setIsLoading(true);
-    const filter_string = value === undefined ? "" : value;
+    const filter_string = data === undefined ? "" : data;
     debounced(() => {
       // const palette = getColoursFromString(filter_string);
-      const palette = [];
-      props.handleQueryChange({filter_string: filter_string, palette: palette})
+      // const palette = [];
+      // props.handleQueryChange({filter_string: filter_string})
+      props.onFilterChange(data)
     }
     )
   }
@@ -91,8 +116,8 @@ function Browser(props) {
     paddingTop: "5px"
   }
 
-  const handleExpressionChange = expression => {
-    props.handleQueryChange({expression: expression})
+  const handleFilterStringChange = value => {
+    props.handleQueryChange({filter_string: value})
   }
 
   // const handleAssetDelete = assetID => {
@@ -114,7 +139,7 @@ function Browser(props) {
   return (
     <div className={styles.container}>
       <TopBar onRefresh={props.onRefresh}
-        onFilterChange={handleFilterChange} setQuery={props.handleQueryChange}
+        onFilterStringChange={handleFilterStringChange} setQuery={props.handleQueryChange}
         onFiltersToggle={() => setFiltersOpen(prevState => !prevState)}
       />
       <Divider />
@@ -128,14 +153,14 @@ function Browser(props) {
       <div className={styles.browserContainer}>
         <div style={{width: "100%"}}>
           <FilterBar open={filtersOpen} setOpen={setFiltersOpen}
-            onExpressionChanged={handleExpressionChange}
+            onFilterChange={handleFilterChange}
           />
           <div className={styles.helperTextContainer}>
             <Typography variant="caption" style={{color: "grey"}}>
               {getBrowserHelperText()}
             </Typography>
           </div>
-          {props.loadedAssets.length ?
+          {props.loadedData.length ?
             <Box className={styles.tileContainer} style={tileContainerStyle}>
               {Object.keys(tiles).map((k) => tiles[k])}
             </Box> :

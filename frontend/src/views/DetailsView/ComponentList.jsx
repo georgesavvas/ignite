@@ -24,7 +24,7 @@ function Component(props) {
   const [contextMenu, setContextMenu] = useState(null);
 
   const containerStyle = {
-    borderColor: props.comp.filename === props.selectedComp.filename ? "rgb(252, 140, 3)" : "rgb(70,70,70)"
+    borderColor: props.selectedComp && props.comp.filename === props.selectedComp.filename ? "rgb(252, 140, 3)" : "rgb(70,70,70)"
   }
 
   const handleClick = e => {

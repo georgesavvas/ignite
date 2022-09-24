@@ -11,6 +11,7 @@ import { Typography } from "@mui/material";
 import {ConfigContext} from "../../contexts/ConfigContext";
 import BuildFileURL from "../../services/BuildFileURL";
 import { clamp } from "../../utils/math";
+import DataPlaceholder from "../../components/DataPlaceholder";
 // import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 const style = {
@@ -180,6 +181,11 @@ function ComponentViewer(props) {
   const [progress, setProgress] = useState(0.5);
   
   const comp = props.comp;
+
+  if (!comp) return (
+    <DataPlaceholder text="No component selected" />
+  )
+
   let path = "media/no_icon.png";
   if (comp.path_nr) path = BuildFileURL(comp.path_nr, config, {forceRemote: true});
   if (!comp.static) {

@@ -22,21 +22,25 @@ sentry_sdk.init(
     traces_sample_rate=1.0
 )
 
-from utils import log_request, process_request, error
-from ignite_server import utils
-from ignite_server.socket_manager import SocketManager
-from ignite_server.utils import CONFIG
+# from ignite.vault import router as vault_router
+from ignite.utils import log_request, process_request, error, get_logger
+from ignite.server import utils
+from ignite.server.socket_manager import SocketManager
+from ignite.server.utils import CONFIG
+from ignite.vault import new_api as vault_api
 
 
+LOGGER = get_logger(__name__)
 SERVER_HOST, SERVER_PORT = CONFIG["server_address"].split(":")
 ENV = os.environ
 
 ASSET_UPDATES_MANAGER = SocketManager()
 
-from ignite_server import api
+from ignite.server import api
 
 
 app = FastAPI()
+# app.include_router(vault_router.router)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -48,9 +52,9 @@ app.add_middleware(
 
 def mount_root():
     if not CONFIG["root"] or not Path(CONFIG["root"]).is_dir():
-        logging.warning(f"Projects root {CONFIG['root']} does not exist, skipping mounting...")
+        LOGGER.warning(f"Projects root {CONFIG['root']} does not exist, skipping mounting...")
         return
-    logging.debug(f"Attempting to mount {CONFIG['root']}")
+    LOGGER.debug(f"Attempting to mount {CONFIG['root']}")
     app.mount(
         "/files", StaticFiles(directory=CONFIG['root']), name="projects_root"
     )
@@ -252,6 +256,7 @@ async def get_assets(request: Request):
         result.get("path"),
         # latest=query.get("latest", 0),
         sort=query.get("sort"),
+        filters=query.get("filters"),
         as_dict=True
     )
     data = utils.query_filter(data, query)
@@ -273,6 +278,17 @@ async def get_assets(request: Request):
         "result_amount": total,
         "data": to_return
     }
+
+
+@app.post("/api/v1/get_assetversion")
+async def get_assetversion(request: Request):
+    result = await request.json()
+    log_request(result)
+    path = result.get("path")
+    data = api.get_assetversion(path)
+    if not data:
+        return error("entity_not_found")
+    return {"ok": True, "data": data}
 
 
 @app.post("/api/v1/get_assetversions")
@@ -515,7 +531,7 @@ async def set_attributes(request: Request):
 
 @app.get("/api/v1/quit")
 async def rename_entity(request: Request):
-    logging.info("Asked to shut down, cya!")
+    LOGGER.info("Asked to shut down, cya!")
     sys.exit()
 
 
@@ -526,15 +542,169 @@ async def asset_updates(websocket: WebSocket, session_id: str):
     while True:
         try:
             received = await websocket.receive_json()
-            logging.info(f"Websocket asset_updates received {received}")
+            LOGGER.info(f"Websocket asset_updates received {received}")
         except Exception as e:
             print("error:", e)
             break
+
+
+@app.get("/api/v1/get_filter_templates")
+async def get_filters():
+    data = vault_api.get_filter_templates()
+    return {
+        "ok": True,
+        "data": data
+    }
+
+
+@app.post("/api/v1/add_filter_template")
+async def add_filter(request: Request):
+    result = await request.json()
+    log_request(result)
+    name = result.get("name")
+    data = result.get("data", {})
+    if not name or not data:
+        return {"ok": False}
+    data = vault_api.add_filter_template(data, name)
+    return {
+        "ok": True,
+        "data": data
+    }
+
+
+@app.post("/api/v1/remove_filter_template")
+async def remove_filter(request: Request):
+    result = await request.json()
+    log_request(result)
+    data = result.get("data", {})
+    data = vault_api.remove_filter_template(data)
+    return {
+        "ok": True,
+        "data": data
+    }
+
+
+@app.post("/api/v1/rename_collection")
+async def rename_collection(request: Request):
+    result = await request.json()
+    log_request(result)
+    data = result.get("data", {})
+    data = vault_api.rename_collection(data)
+    return {
+        "ok": True,
+        "data": data
+    }
+
+
+@app.post("/api/v1/edit_collection")
+async def edit_collection(request: Request):
+    result = await request.json()
+    log_request(result)
+    data = result.get("data", {})
+    data = vault_api.edit_collection(data)
+    return {
+        "ok": True,
+        "data": data
+    }
+
+
+@app.post("/api/v1/write_collections")
+async def write_collections(request: Request):
+    result = await request.json()
+    log_request(result)
+    data = result.get("data", {})
+    data = vault_api.write_collections(data)
+    return {
+        "ok": True,
+        "data": data
+    }
+
+
+@app.get("/api/v1/get_rule_templates")
+async def get_rule_templates():
+    data = vault_api.get_rule_templates()
+    return {
+        "ok": True,
+        "data": data
+    }
+
+
+@app.post("/api/v1/add_rule_template")
+async def add_rule_template(request: Request):
+    result = await request.json()
+    log_request(result)
+    name = result.get("name")
+    data = result.get("data")
+    if not name or not data:
+        LOGGER.error(f"name {name} data {data}")
+        return {"ok": False}
+    data = vault_api.add_rule_template(data, name)
+    return {
+        "ok": True,
+        "data": data
+    }
+
+
+@app.post("/api/v1/remove_rule_template")
+async def remove_rule_template(request: Request):
+    result = await request.json()
+    log_request(result)
+    data = result.get("data", {})
+    data = vault_api.remove_rule_template(data)
+    return {
+        "ok": True,
+        "data": data
+    }
+
+
+@app.post("/api/v1/get_collections")
+async def get_collections(request: Request):
+    result = await request.json()
+    log_request(result)
+    user = result.get("user")
+    data = vault_api.get_collections(user, "all")
+    return {
+        "ok": True,
+        "data": data
+    }
+
+
+@app.post("/api/v1/create_collection")
+async def create_collection(request: Request):
+    result = await request.json()
+    log_request(result)
+    data = result.get("data", {})
+    data = vault_api.create_collection(data)
+    return {
+        "ok": True,
+        "data": data
+    }
+
+
+@app.post("/api/v1/delete_collection")
+async def delete_collection(request: Request):
+    result = await request.json()
+    log_request(result)
+    data = result.get("data", {})
+    data = vault_api.delete_collection(data)
+    return {
+        "ok": True,
+        "data": data
+    }
+
+
+@app.post("/api/v1/reorder_collection")
+async def reorder_collection(request: Request):
+    result = await request.json()
+    log_request(result)
+    data = result.get("data")
+    ok = vault_api.reorder_collection(data)
+    return {"ok": ok}
 
 
 mount_root()
 
 
 if __name__ == "__main__":
-    logging.info(f"Launching server at {SERVER_HOST}:{SERVER_PORT}")
+    LOGGER.info(f"Launching server at {SERVER_HOST}:{SERVER_PORT}")
     uvicorn.run(f"{__name__}:app", host=SERVER_HOST, port=int(SERVER_PORT), log_level="info", reload=True, workers=4)

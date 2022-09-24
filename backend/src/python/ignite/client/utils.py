@@ -13,11 +13,12 @@ from copy import deepcopy
 from pprint import pprint
 from pathlib import PurePath, Path
 
-from ignite_client.constants import GENERIC_ENV, DCC_ENVS, OS_NAMES, DCC_DISCOVERY
-from ignite_server.socket_manager import SocketManager
-from ignite_client.task_manager import TaskManager
+from ..utils import get_logger
+from ignite.client.constants import GENERIC_ENV, DCC_ENVS, OS_NAMES, DCC_DISCOVERY
+from ignite.server.socket_manager import SocketManager
+from ignite.client.task_manager import TaskManager
 
-
+LOGGER = get_logger(__name__)
 OS_NAME = OS_NAMES[platform.system()]
 ENV = os.environ
 API_VERSION = ENV["IGNITE_API_VERSION"]
@@ -35,7 +36,7 @@ def get_config(formatted=True) -> dict:
     path = CLIENT_CONFIG_PATH
     if not os.path.isfile(path):
         raise Exception(f"Config file not found: {path}")
-    logging.debug(f"Reading config from {path}")    
+    LOGGER.debug(f"Reading config from {path}")    
     with open(path, "r") as f:
         config = yaml.safe_load(f)
     config["projects_root"] = config["access"].get("projects_root", "")
@@ -71,6 +72,11 @@ def set_config(data):
     IGNITE_SERVER_PASSWORD = config["server_details"].get("password", "")
     ENV["IGNITE_SERVER_ADDRESS"] = IGNITE_SERVER_ADDRESS
     ENV["IGNITE_SERVER_PASSWORD"] = IGNITE_SERVER_PASSWORD
+
+    new_projects_root = config["access"]["server_projects_root"]
+    if new_projects_root != old_config["access"]["server_projects_root"]:
+        LOGGER.warning(f"Asking server to mount root {new_projects_root}")
+        server_request("set_projects_root", {"path": new_projects_root})
 
     config["root"] = config["access"].get("projects_root", "")
     changed = old_config != config
@@ -173,21 +179,21 @@ def discover_dcc():
     for name, data in DCC_DISCOVERY.items():
         paths = data["paths"][OS_NAME]
         path = None
-        logging.info(f"Attempting to find {name}...")
+        LOGGER.info(f"Attempting to find {name}...")
         for p in paths:
-            logging.info(f"Searching at {p}")
+            LOGGER.info(f"Searching at {p}")
             available = glob.glob(p)
             if available:
                 path = available[0]
-                logging.info(f"Found {available}")
-                logging.info(f"Choosing {path}")
+                LOGGER.info(f"Found {available}")
+                LOGGER.info(f"Choosing {path}")
                 break
         else:
-            logging.info(f"Found nothing.")
+            LOGGER.info(f"Found nothing.")
             continue
         args = data.get("args")
         if args:
-            logging.info(f"Appending args {args}")
+            LOGGER.info(f"Appending args {args}")
             path += f" {args}"
         dcc = {
             "exts": data["exts"],
@@ -260,21 +266,21 @@ def get_launch_cmd(dcc, dcc_name, task, scene):
 def copy_default_scene(task, dcc):
     task = server_request("find", {"path": task}).get("data")
     if not task or not task["dir_kind"] == "task":
-        logging.error(f"Invalid task {task}")
+        LOGGER.error(f"Invalid task {task}")
         return
     filepath = DCC / "default_scenes/default_scenes.yaml"
     if not filepath.exists():
-        logging.error(f"Default scenes config {filepath} does not exist.")
+        LOGGER.error(f"Default scenes config {filepath} does not exist.")
         return
     with open(filepath, "r") as f:
         data = yaml.safe_load(f)
     if dcc not in data.keys():
-        logging.error(f"Default scenes config is empty {filepath}")
+        LOGGER.error(f"Default scenes config is empty {filepath}")
         return
     src = DCC / "default_scenes" / data[dcc]
     dest = Path(task.get("next_scene"))
     dest.mkdir(parents=True, exist_ok=True)
-    logging.info(f"Copying default scene {src} to {dest}")
+    LOGGER.info(f"Copying default scene {src} to {dest}")
     shutil.copy2(src, dest)
     data = {
         "client_root": str(CONFIG["root"]),

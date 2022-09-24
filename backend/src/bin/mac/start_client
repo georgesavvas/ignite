@@ -3,4 +3,5 @@
 # git pull --ff-only;
 lsof -P | grep ':9071' | awk '{print $2}' | xargs kill -9
 source env/bin/activate;
-python3 src/python/client_main.py;
+cd src/python
+python3 -m ignite.client_main;

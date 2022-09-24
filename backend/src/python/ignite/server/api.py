@@ -4,11 +4,16 @@ import yaml
 import logging
 import shutil
 from pathlib import Path, PurePath
-from ignite_server import utils
-from ignite_server.constants import ANCHORS
-from ignite_server.utils import CONFIG
+
+from mongoquery import Query
+
+from ignite.utils import get_logger
+from ignite.server import utils
+from ignite.server.constants import ANCHORS
+from ignite.server.utils import CONFIG
 
 
+LOGGER = get_logger(__name__)
 ENV = os.environ
 PROJECT_ANCHOR = ANCHORS["project"]
 KINDS = {v: k for k, v in ANCHORS.items()}
@@ -40,7 +45,7 @@ def get_vault_path() -> str:
 
 
 def get_projects() -> list:
-    from ignite_server.entities.project import Project
+    from ignite.server.entities.project import Project
     projects = Path(CONFIG["root"]).iterdir()
     projects = [p for p in projects if not p.name.startswith(".")]
     projects = [Project(path=p).as_dict() for p in projects if (Path(p) / PROJECT_ANCHOR).exists()]
@@ -57,7 +62,7 @@ def get_project_names() -> list:
 def get_project(name):
     if not name:
         return None
-    from ignite_server.entities.project import Project
+    from ignite.server.entities.project import Project
     path = CONFIG["root"] / name
     if not Path(CONFIG["root"]).is_dir():
         return None
@@ -109,7 +114,7 @@ def get_context_info(path):
 
 
 def find(path):
-    from ignite_server.entities.asset import Asset
+    from ignite.server.entities.asset import Asset
 
     if not path:
         return
@@ -125,14 +130,14 @@ def find(path):
             return _find_from_path(path)
         else:
             if version not in ("best", "latest"):
-                logging.error(f"URI version '{version}' not recognised: {path}")
+                LOGGER.error(f"URI version '{version}' not recognised: {path}")
                 return None
             asset_path = Path(utils.uri_to_path(asset_uri))
             if not asset_path or not asset_path.exists():
                 return None
             asset = Asset(asset_path)
             if not asset:
-                logging.error(f"Couldn't find path at {asset_path}")
+                LOGGER.error(f"Couldn't find path at {asset_path}")
                 return None
             if version == "best":
                 return asset.best_av
@@ -157,16 +162,16 @@ def resolve(uri):
 
 
 def _find_from_path(path):
-    from ignite_server.entities.project import Project
-    from ignite_server.entities.directory import Directory
-    from ignite_server.entities.group import Group
-    from ignite_server.entities.build import Build
-    from ignite_server.entities.sequence import Sequence
-    from ignite_server.entities.shot import Shot
-    from ignite_server.entities.task import Task
-    from ignite_server.entities.asset import Asset
-    from ignite_server.entities.assetversion import AssetVersion
-    from ignite_server.entities.scene import Scene
+    from ignite.server.entities.project import Project
+    from ignite.server.entities.directory import Directory
+    from ignite.server.entities.group import Group
+    from ignite.server.entities.build import Build
+    from ignite.server.entities.sequence import Sequence
+    from ignite.server.entities.shot import Shot
+    from ignite.server.entities.task import Task
+    from ignite.server.entities.asset import Asset
+    from ignite.server.entities.assetversion import AssetVersion
+    from ignite.server.entities.scene import Scene
 
     kinds = {v: k for k, v in ANCHORS.items()}
     anchors = kinds.keys()
@@ -186,7 +191,7 @@ def _find_from_path(path):
     if not path.is_dir():
         path = path.parent
     if not path.is_dir():
-        logging.error(f"Invalid path: {path}")
+        LOGGER.error(f"Invalid path: {path}")
         return
     for d in path.iterdir():
         name = d.name
@@ -199,7 +204,7 @@ def _find_from_path(path):
     try:
         obj = entity(path=path)
     except Exception as e:
-        logging.error(e)
+        LOGGER.error(e)
     return obj
 
 
@@ -233,6 +238,29 @@ def sort_results(results, sort):
         if field in keys:
             results.sort(key=lambda c: c[field], reverse=reverse)
     return results
+
+
+def format_filter(expr):
+    if not expr:
+        return {}
+    if isinstance(expr, list):
+        return [format_filter(e) for e in expr]
+    elif expr.get("condition"):
+        condition = "$and" if expr.get("condition", "") == "and" else "$or"
+        return {condition: format_filter(expr.get("filters", []))}
+    else:
+        field, value = list(expr.items())[0]
+        if not value:
+            return {}
+        if not field:
+            field = "filter_string"
+        if ".ARRAY." in field:
+            first, second = field.split(".ARRAY.")
+            if second:
+                return {first: {"$elemMatch": {second: {"$regex": value}}}}
+            else:
+                return {first: {"$elemMatch": {"$regex": value}}}
+        return {field: {"$regex": value}}
 
 
 def get_contents(path, latest=False, sort=None, as_dict=False):
@@ -294,7 +322,7 @@ def get_task(path):
 
 
 def discover_tasks(path, task_types=[], sort=None, as_dict=False):
-    from ignite_server.entities.task import Task
+    from ignite.server.entities.task import Task
 
     def discover(path, l=[]):
         name = path.name
@@ -336,8 +364,8 @@ def discover_tasks(path, task_types=[], sort=None, as_dict=False):
     return tasks
 
 
-def discover_assets(path, asset_kinds=[], sort=None, as_dict=False, single=False):
-    from ignite_server.entities.asset import Asset
+def discover_assets(path, asset_kinds=[], sort=None, as_dict=False, filters={}, single=False):
+    from ignite.server.entities.asset import Asset
 
     def discover(path, l=[]):
         name = path.name
@@ -352,7 +380,8 @@ def discover_assets(path, asset_kinds=[], sort=None, as_dict=False, single=False
                 if name in (".config", "common"):
                     continue
                 if name in KINDS:
-                    d["dir_kind"] = KINDS[name]
+                    kind = KINDS[name]
+                    d["dir_kind"] = kind
                     d["anchor"] = x
                     continue
                 if name.startswith("."):
@@ -374,15 +403,44 @@ def discover_assets(path, asset_kinds=[], sort=None, as_dict=False, single=False
 
         return l
 
+    def promote_av_attribs(assets):
+        attribs = ("tags", "components")
+        for asset in assets:
+            if not asset.get("latest_av"):
+                continue
+            for attrib in attribs:
+                asset[attrib] = asset["latest_av"][attrib]
+            del asset["latest_av"]
+        return assets
+
     data = discover(Path(path))
     assets = [Asset(path=asset["path"]) for asset in data]
     if as_dict:
         assets = [a.as_dict() for a in assets]
+        if filters:
+            from pprint import pprint
+            print("BEFORE FILTERS", len(assets))
+            assets = promote_av_attribs(assets)
+            pprint(assets[-1])
+        if filters.get("collection"):
+            pprint(filters["collection"])
+            query = Query(format_filter(filters["collection"]))
+            filtered = list(filter(query.match, assets))
+            assets = filtered
+            print("AFTER COLLECTION FILTER", len(assets))
+        if filters.get("search"):
+            pprint(filters["search"])
+            expr = format_filter(filters["search"])
+            pprint(expr)
+            query = Query(expr)
+            filtered = list(filter(query.match, assets))
+            assets = filtered
+            print("AFTER SEARCH FILTER", len(assets))
         assets = sort_results(assets, sort)
     return assets
 
 
-def discover_assetversions(path, asset_kinds=[], latest=False, sort=None, as_dict=False):
+def discover_assetversions(path, asset_kinds=[], latest=False, sort=None, filters=[], as_dict=False):
     assetversions = []
     assets = discover_assets(path, asset_kinds=asset_kinds)
     for asset in assets:
@@ -395,12 +453,12 @@ def discover_assetversions(path, asset_kinds=[], latest=False, sort=None, as_dic
         assetversions += avs
     if as_dict:
         assetversions = [av.as_dict() for av in assetversions]
-        assetversions = sort_results(assetversions, sort)
+        assetversions = sort_results(filtered, sort)
     return assetversions
 
 
 def discover_scenes(path, dcc=[], latest=False, sort=None, as_dict=False):
-    from ignite_server.entities.scene import Scene
+    from ignite.server.entities.scene import Scene
 
     path = Path(path)
     def discover(path, l=[]):
@@ -446,24 +504,31 @@ def discover_scenes(path, dcc=[], latest=False, sort=None, as_dict=False):
     return scenes
 
 
+def get_assetversion(path):
+    entity = find(path)
+    if not entity:
+        return
+    return entity.as_dict()
+
+
 def copy_default_scene(task, dcc):
     task = find(task)
     if not task or not task.dir_kind == "task":
-        logging.error(f"Invalid task {task}")
+        LOGGER.error(f"Invalid task {task}")
         return
     filepath = IGNITE_DCC / "default_scenes/default_scenes.yaml"
     if not filepath.exists():
-        logging.error(f"Default scenes config {filepath} does not exist.")
+        LOGGER.error(f"Default scenes config {filepath} does not exist.")
         return
     with open(filepath, "r") as f:
         data = yaml.safe_load(f)
     if dcc not in data.keys():
-        logging.error(f"Default scenes config is empty {filepath}")
+        LOGGER.error(f"Default scenes config is empty {filepath}")
         return
     src = IGNITE_DCC / "default_scenes" / data[dcc]
     dest = task.get_next_scene()
     os.makedirs(dest)
-    logging.info(f"Copying default scene {src} to {dest}")
+    LOGGER.info(f"Copying default scene {src} to {dest}")
     shutil.copy2(src, dest)
     utils.create_anchor(dest, "scene")
     return dest / PurePath(src).name
@@ -478,7 +543,7 @@ def register_task(path, task_type):
     utils.create_anchor(path, "task")
     task = find(path)
     if not task:
-        logging.error(f"Failed to register task at {path}")
+        LOGGER.error(f"Failed to register task at {path}")
         return
     task.set_task_type(task_type)
     return True
@@ -493,7 +558,7 @@ def register_asset(path):
     utils.create_anchor(path, "asset")
     av = find(path)
     if not av or not av.dir_kind == "asset":
-        logging.error(f"Failed to register asset at {path}")
+        LOGGER.error(f"Failed to register asset at {path}")
         return
     return True
 
@@ -502,12 +567,12 @@ def register_assetversion(path):
     asset_path = PurePath(path).parent
     asset = find(asset_path)
     if not asset:
-        logging.warning(f"Asset anchor was missing (but created) when registering assetversion {path}")
+        LOGGER.warning(f"Asset anchor was missing (but created) when registering assetversion {path}")
         utils.create_anchor(asset_path, "asset")
     utils.create_anchor(path, "assetversion")
     av = find(path)
     if not av or not av.dir_kind == "assetversion":
-        logging.error(f"Failed to register assetversion at {path}")
+        LOGGER.error(f"Failed to register assetversion at {path}")
         return
     return True
 
@@ -587,10 +652,10 @@ def get_repr_comp(target):
     target_repr = target_entity.repr
     path =  Path(utils.uri_to_path(target_repr))
     if not path.is_dir():
-        logging.error(f"Couldn't resolve {path}")
+        LOGGER.error(f"Couldn't resolve {path}")
         return {}
     if path == target_entity.path:
-        logging.error(f"Infinite loop while fetching repr comp of {target_entity.path} - {target_entity.repr}")
+        LOGGER.error(f"Infinite loop while fetching repr comp of {target_entity.path} - {target_entity.repr}")
         return {}
     repr_asset = search(path)
     if not repr_asset:
@@ -659,3 +724,39 @@ def set_attributes(path, attributes):
     entity = find(path)
     entity.set_attributes(attributes_processed)
     return True
+
+
+def get_rule_templates():
+    path = Path(LIB_RULE_TEMPLATES)
+    if not path.exists():
+        return []
+    with open(path, "r") as file:
+        rule_templates = yaml.safe_load(file)
+    return rule_templates or []
+
+
+def add_rule_template(data, name):
+    rule_templates = get_rule_templates()
+    template = {
+        "data": data,
+        "name": name
+    }
+    rule_templates.append(template)
+    return write_rule_templates(rule_templates)
+
+
+def remove_rule_template(name):
+    rule_templates = get_rule_templates()
+    for i, rt in enumerate(rule_templates):
+        if rt["name"] == name:
+            rule_templates.pop(i)
+            break
+    return write_rule_templates(rule_templates)
+
+
+def write_rule_templates(data):
+    path = Path(LIB_RULE_TEMPLATES)
+    with open(path, "w") as file:
+        rule_templates = yaml.safe_dump(data, file)
+    return rule_templates
+

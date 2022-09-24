@@ -9,14 +9,23 @@
     gap: 5px;
 }
 
+.row {
+    display: flex;
+    gap: 5px;
+}
+
+.centered {
+    display: flex;
+    justify-content: center;
+}
+
 .access {
     margin-top: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
 }
 
 .vault {
     margin-top: 10px;
-}
-
-.divider {
-    margin: 20px 0px;
 }

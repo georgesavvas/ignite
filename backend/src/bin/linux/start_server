@@ -4,4 +4,5 @@ git pull --ff-only;
 echo "Killing processes listening on 9070...";
 fuser -k -n tcp 9070;
 source env/bin/activate;
-python src/python/server_main.py;
+cd src/python
+python3 -m ignite.server_main;

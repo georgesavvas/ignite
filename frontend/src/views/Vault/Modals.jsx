@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Modal from "../../components/Modal"
 import serverRequest from "../../services/serverRequest"
 import TextField from '@mui/material/TextField'
 import FilterBuilder from './FilterBuilder'
+import IgnButton from '../../components/IgnButton'
 
 export function EditColl({data, open=false, onClose, enqueueSnackbar, fn}) {
-  const [filterData, setFilterData] = useState({})
+  const [filterData, setFilterData] = useState({});
 
   useEffect(() => {
     if (data.expression) setFilterData({...data["expression"]})
@@ -28,8 +29,9 @@ export function EditColl({data, open=false, onClose, enqueueSnackbar, fn}) {
   const defaultExpr = '{ "condition": "and", "filters": [{ "": "" }, { "": "" }]}'
 
   return (
-    <Modal open={open} buttonLabel="Confirm" onButtonClicked={handleConfirm}
-      maxWidth="xl" closeButton onClose={onClose} title={`Editing ${data.name}`}
+    <Modal open={open} onFormSubmit={handleConfirm} onClose={onClose}
+      maxWidth="xl" title={`Editing ${data.name}`}
+      buttons={[<IgnButton key="create" type="submit">Confirm</IgnButton>]}
     >
       <FilterBuilder
         default={JSON.stringify(data.expression) || defaultExpr}
@@ -40,7 +42,8 @@ export function EditColl({data, open=false, onClose, enqueueSnackbar, fn}) {
 }
 
 export function RenameColl({data, open=false, onClose, enqueueSnackbar, fn}) {
-  const [nameValue, setNameValue] = useState("")
+  const [nameValue, setNameValue] = useState("");
+  const textFieldRef = useRef();
 
   useEffect(() => {
     setNameValue(data.name)
@@ -60,8 +63,9 @@ export function RenameColl({data, open=false, onClose, enqueueSnackbar, fn}) {
   }
 
   return (
-    <Modal open={open} buttonLabel="Confirm" onButtonClicked={handleConfirm}
-      maxWidth="sm" closeButton onClose={onClose} title={`Renaming ${data.name}`}
+    <Modal open={open} focusRef={textFieldRef} maxWidth="sm" onClose={onClose}
+      onFormSubmit={handleConfirm} title={`Renaming ${data.name}`}
+      buttons={[<IgnButton key="create" type="submit">Confirm</IgnButton>]}
     >
       <TextField
         id="name"
@@ -72,6 +76,7 @@ export function RenameColl({data, open=false, onClose, enqueueSnackbar, fn}) {
         size="small"
         fullWidth
         autoFocus
+        inputRef={textFieldRef}
         style={{marginTop: "10px"}}
       />
     </Modal>
@@ -90,22 +95,22 @@ export function DeleteColl({data, open=false, onClose, enqueueSnackbar, fn}) {
   }
 
   return (
-    <Modal open={open} buttonLabel="Confirm" onButtonClicked={handleConfirm}
-      maxWidth="sm" closeButton onClose={onClose}
+    <Modal open={open} onButtonClicked={handleConfirm} onClose={onClose}
       text={`This will permanently delete the ${data.name} collection!`}
-      title="Are you sure?"
+      title="Are you sure?" maxWidth="sm"
     />
   )
 }
 
 export function CreateColl({data, open=false, onClose, enqueueSnackbar, fn}) {
-  const [nameValue, setNameValue] = useState("")
+  const [nameValue, setNameValue] = useState("");
+  const textFieldRef = useRef();
 
   useEffect(() => {
     setNameValue("")
   }, [data.name])
 
-  const handleConfirm = data => {
+  const handleConfirm = () => {
     data.name = nameValue
     serverRequest("create_collection", {data: data}).then((resp => {
       enqueueSnackbar(resp.text, {variant: resp.ok ? "success" : "error"})
@@ -115,9 +120,10 @@ export function CreateColl({data, open=false, onClose, enqueueSnackbar, fn}) {
   }
 
   return (
-    <Modal open={open} buttonLabel="Create" onButtonClicked={e => handleConfirm(data)}
+    <Modal open={open} buttonLabel="Create" focusRef={textFieldRef}
       maxWidth="sm" closeButton onClose={onClose}
-      title="Create"
+      onFormSubmit={handleConfirm} title="Create"
+      buttons={[<IgnButton key="create" type="submit">Confirm</IgnButton>]}
     >
       <TextField
         id="name"
@@ -128,6 +134,7 @@ export function CreateColl({data, open=false, onClose, enqueueSnackbar, fn}) {
         size="small"
         fullWidth
         autoFocus
+        inputRef={textFieldRef}
         style={{marginTop: "10px"}}
       />
     </Modal>

@@ -1,10 +1,10 @@
 import os
 from pathlib import Path, PurePath
-from ignite_server.constants import ANCHORS, DCC_EXTENSIONS
-from ignite_server import utils
-from ignite_server.entities.directory import Directory
-from ignite_server.entities.task import Task
-from ignite_server.utils import CONFIG
+from ignite.server.constants import ANCHORS, DCC_EXTENSIONS
+from ignite.server import utils
+from ignite.server.entities.directory import Directory
+from ignite.server.entities.task import Task
+from ignite.server.utils import CONFIG
 
 
 class Scene(Directory):

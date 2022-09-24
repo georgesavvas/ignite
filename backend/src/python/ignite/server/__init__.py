@@ -5,6 +5,7 @@ import logging
 from pathlib import Path
 from platformdirs import user_config_dir
 
+
 logging.basicConfig(level=logging.INFO)
 
 DIR = os.path.dirname(__file__)

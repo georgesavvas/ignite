@@ -4,11 +4,15 @@ import logging
 import shutil
 import datetime
 from pathlib import Path, PurePath
-from ignite_server import utils
-from ignite_server import api
-from ignite_server.constants import ANCHORS
-from ignite_server.utils import CONFIG
 
+from ignite.utils import get_logger
+from ignite.server import utils
+from ignite.server import api
+from ignite.server.constants import ANCHORS
+from ignite.server.utils import CONFIG
+
+
+LOGGER = get_logger(__name__)
 
 
 class Directory():
@@ -66,7 +70,7 @@ class Directory():
             context = self.task
         else:
             context = self.path.parent
-        return context.relative_to(project_path).as_posix()
+        return context.relative_to(project_path).as_posix() if context else ""
 
     def load_from_config(self):
         with open(self.anchor, "r") as f:
@@ -109,12 +113,12 @@ class Directory():
         return path
     
     def create_task(self, name, task_type="generic"):
-        from ignite_server.entities.task import Task
+        from ignite.server.entities.task import Task
 
         path = self.create_dir(name, "task")
         task = Task(path=path)
         if not task:
-            logging.error(f"Task creation failed: {path}")
+            LOGGER.error(f"Task creation failed: {path}")
             return
         task.set_task_type(task_type)
     

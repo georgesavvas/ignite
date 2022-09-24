@@ -22,7 +22,7 @@ export default function FilterBar(props) {
     >
       <FilterBuilder
         default={defaultExpr}
-        onChange={props.onExpressionChanged}
+        onChange={value => props.onFilterChange({"search": value})}
       />
     </div>
   )

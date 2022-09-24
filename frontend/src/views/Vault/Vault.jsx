@@ -15,6 +15,7 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import CollectionTree from "./CollectionTree";
 import serverRequest from "../../services/serverRequest";
 import {ConfigContext} from "../../contexts/ConfigContext";
+import BuildFileURL from "../../services/BuildFileURL";
 
 const splitterStyle = {
   borderColor: "rgb(40,40,40)",
@@ -31,13 +32,13 @@ function Vault(props) {
   const [flexRatios, setFlexRatios] = useState(defaultFlexRations);
   const [collectionData, setCollectionData] = useState([]);
   const [refreshValue, setRefreshValue] = useState(0);
-  const [selectedCollection, setSelectedCollection] = useState("");
+  const [selectedCollection, setSelectedCollection] = useState();
   const [query, setQuery] = useState({filter_string: ""});
   const [isLoading, setIsLoading] = useState(true);
-  const [loadedAssets, setLoadedAssets] = useState([]);
+  const [loadedData, setLoadedData] = useState([]);
   const [pages, setPages] = useState({total: 1, current: 1});
   const [tilesPerPage, setTilesPerPage] = useState(50);
-  const [selectedAsset, setSelectedAsset] = useState({});
+  const [selectedEntity, setSelectedEntity] = useState({});
   const [config, setConfig] = useContext(ConfigContext);
 
   useEffect(() => {
@@ -64,11 +65,11 @@ function Vault(props) {
 
   useEffect(() => {
     const selectedCollection = localStorage.getItem("selectedCollection")
-    handleCollectionChange(selectedCollection || "studio:/all")
+    handleCollectionChange(selectedCollection || undefined)
   }, [])
 
   useEffect(() => {
-    serverRequest("get_collections").then(resp => {
+    serverRequest("get_collections", {data: {user: undefined}}).then(resp => {
       const data = resp.data
       setCollectionData(data && data.studio ? data.studio : [])
     })
@@ -76,7 +77,7 @@ function Vault(props) {
 
   useEffect(() => {
     const data = {
-      path: `${config.access.serverProjectsRoot}/__vault__`,
+      path: BuildFileURL(`__vault__`, config, {reverse: true, pathOnly: true}),
       page: pages.current,
       limit: tilesPerPage,
       query: query
@@ -84,18 +85,17 @@ function Vault(props) {
     setIsLoading(true)
     serverRequest("get_assets", data).then(resp => {
       setIsLoading(false)
-      setLoadedAssets(resp.data)
+      setLoadedData(resp.data)
       setPages(prevState => ({...prevState, total: resp.pages.total, results: resp.pages.results}))
     })
   }, [pages.current, refreshValue, query, tilesPerPage, selectedCollection])
 
-  const handleAssetSelected = (asset) => {
-    setSelectedAsset(asset)
-    props.setCurrentAsset(asset)
+  const handleEntitySelected = entity => {
+    setSelectedEntity(entity)
   }
 
   const handleRefresh = () => {
-    props.setRefreshValue(prevState => (prevState + 1))
+    setRefreshValue(prevState => (prevState + 1))
   }
 
   const handleResized = data => {
@@ -107,9 +107,14 @@ function Vault(props) {
     setPages(prevState => ({...prevState, current: 1}))
   }
 
+  const handleFilterChange = data => {
+    setQuery(prevState => ({...prevState, filters: {...prevState.filters, ...data}}))
+    setPages(prevState => ({...prevState, current: 1}))
+  }
+
   const handleCollectionChange = coll => {
     setSelectedCollection(coll)
-    handleQueryChange({collection: coll})
+    // handleQueryChange({collection: coll})
     localStorage.setItem("selectedCollection", coll)
   }
 
@@ -117,7 +122,7 @@ function Vault(props) {
     <Modal open={props.open} onClose={props.onClose} title="Vault" fullWidth
       fullHeight
     >
-      <ReflexContainer orientation="vertical">
+      <ReflexContainer orientation="vertical" className={styles.container}>
         <ReflexElement
           flex={flexRatios["vault.collections"]}
           name="vault.collections"
@@ -126,9 +131,9 @@ function Vault(props) {
           <div className={styles.collectionContainer}>
             <DndProvider backend={HTML5Backend}>
               <CollectionTree collectionData={collectionData}
-                refreshValue={refreshValue} setRefreshValue={setRefreshValue}
+                refreshValue={refreshValue}
                 selectedCollection={selectedCollection} onRefresh={handleRefresh}
-                setSelectedCollection={handleCollectionChange}
+                setSelectedCollection={handleCollectionChange} onFilterChange={handleFilterChange}
               />
             </DndProvider>
           </div>
@@ -140,12 +145,13 @@ function Vault(props) {
           onStopResize={handleResized}
         >
           <Browser
-            refreshValue={refreshValue} setRefreshValue={setRefreshValue}
-            selectedCollection={selectedCollection} loadedAssets={loadedAssets}
+            refreshValue={refreshValue} onRefresh={handleRefresh}
+            selectedCollection={selectedCollection} loadedData={loadedData}
             pages={pages} handleQueryChange={handleQueryChange} query={query}
             isLoading={isLoading} setTilesPerPage={setTilesPerPage}
-            handleAssetSelected={handleAssetSelected} setPages={setPages}
-            setIsLoading={setIsLoading}
+            handleEntitySelected={handleEntitySelected} setPages={setPages}
+            setIsLoading={setIsLoading} selectedEntity={selectedEntity}
+            onFilterChange={handleFilterChange}
           />
         </ReflexElement>
         <ReflexSplitter style={splitterStyle} />
@@ -154,7 +160,7 @@ function Vault(props) {
           name="vault.details"
           onStopResize={handleResized}
         >
-          <Details />
+          <Details selectedEntity={selectedEntity} />
         </ReflexElement>
       </ReflexContainer>
     </Modal>

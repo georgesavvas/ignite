@@ -7,6 +7,7 @@ import uvicorn
 import logging
 import asyncio
 import threading
+
 from fastapi import FastAPI, Request, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -21,10 +22,12 @@ sentry_sdk.init(
     traces_sample_rate=1.0
 )
 
-from ignite_client import utils, api
-from ignite_client.utils import TASK_MANAGER, PROCESSES_MANAGER, CONFIG
+from ignite.utils import get_logger
+from ignite.client import utils, api
+from ignite.client.utils import TASK_MANAGER, PROCESSES_MANAGER, CONFIG
 
 
+LOGGER = get_logger(__name__)
 ENV = os.environ
 
 app = FastAPI()
@@ -46,7 +49,7 @@ async def startup_event():
 @app.websocket("/ws/processes/{session_id}")
 async def processes(websocket: WebSocket, session_id: str):
     if session_id:
-        logging.warning(f"Request to open socket from {session_id}")
+        LOGGER.warning(f"Request to open socket from {session_id}")
         await PROCESSES_MANAGER.connect(websocket, session_id)
     while True:
         try:
@@ -68,9 +71,9 @@ def error(s):
 def mount_root():
     projects_root = CONFIG["root"]
     if not projects_root or not Path(projects_root).is_dir():
-        logging.warning(f"Projects root {projects_root} does not exist, skipping mounting...")
+        LOGGER.warning(f"Projects root {projects_root} does not exist, skipping mounting...")
         return
-    logging.debug(f"Attempting to mount {projects_root}")
+    LOGGER.debug(f"Attempting to mount {projects_root}")
     app.mount("/files", StaticFiles(directory=projects_root), name="projects_root")
 
 
@@ -232,7 +235,7 @@ async def get_tasks(request: Request):
 
 @app.get("/api/v1/quit")
 async def rename_entity(request: Request):
-    logging.info("Asked to shut down, cya!")
+    LOGGER.info("Asked to shut down, cya!")
     sys.exit()
 
 
@@ -246,9 +249,9 @@ if __name__ == "__main__":
     if len(args) >= 2:
         port = int(args[1])
     IGNITE_CLIENT_ADDRESS = f"{host}:{port}"
-    logging.info(f"Setting IGNITE_CLIENT_ADDRESS to {IGNITE_CLIENT_ADDRESS}")
+    LOGGER.info(f"Setting IGNITE_CLIENT_ADDRESS to {IGNITE_CLIENT_ADDRESS}")
     ENV["IGNITE_CLIENT_ADDRESS"] = IGNITE_CLIENT_ADDRESS
-    logging.info(f"Launching server at {host}:{port}")
+    LOGGER.info(f"Launching server at {host}:{port}")
     uvicorn.run(
         f"{__name__}:app",
         host=host,

@@ -1,5 +1,10 @@
 import logging
 
+from ignite.utils import get_logger
+
+
+LOGGER = get_logger(__name__)
+
 
 class SocketManager:
     def __init__(self):
@@ -8,16 +13,16 @@ class SocketManager:
     async def connect(self, websocket, session_id):
         for i, (ws, id) in enumerate(self.connections):
             if session_id == id:
-                logging.warning(f"Closing websocket {session_id}")
+                LOGGER.warning(f"Closing websocket {session_id}")
                 self.connections.pop(i)
                 break
         await websocket.accept()
         self.connections.append((websocket, session_id))
-        logging.info(f"Total connections: {len(self.connections)}")
+        LOGGER.info(f"Total connections: {len(self.connections)}")
 
     def disconnect(self, websocket, session_id):
         self.connections.remove((websocket, session_id))
-        logging.info(f"Total connections: {len(self.connections)}")
+        LOGGER.info(f"Total connections: {len(self.connections)}")
 
     async def broadcast(self, data):
         for connection in self.connections:
