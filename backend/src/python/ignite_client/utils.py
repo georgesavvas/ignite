@@ -31,7 +31,7 @@ PROCESSES_MANAGER = SocketManager()
 TASK_MANAGER = TaskManager(PROCESSES_MANAGER, USER_CONFIG_PATH / "tasks.json")
 
 
-def get_config() -> dict:
+def get_config(formatted=True) -> dict:
     path = CLIENT_CONFIG_PATH
     if not os.path.isfile(path):
         raise Exception(f"Config file not found: {path}")
@@ -39,43 +39,51 @@ def get_config() -> dict:
     with open(path, "r") as f:
         config = yaml.safe_load(f)
     config["projects_root"] = config["access"].get("projects_root", "")
+    if formatted:
+        return {
+            "root": PurePath(config["projects_root"]),
+            "dcc_config": config["dcc_config"],
+            "server_details": config["server_details"],
+            "access": config["access"]
+        }
     return config
 
 
-CONFIG = get_config()
+CONFIG = {}
+CONFIG.update(get_config())
 IGNITE_SERVER_ADDRESS = CONFIG["server_details"].get("address", "")
 IGNITE_SERVER_PASSWORD = CONFIG["server_details"].get("password", "")
 ENV["IGNITE_SERVER_ADDRESS"] = IGNITE_SERVER_ADDRESS
 ENV["IGNITE_SERVER_PASSWORD"] = IGNITE_SERVER_PASSWORD
-ROOT = PurePath(CONFIG["projects_root"])
 
 
 def set_config(data):
-    global CONFIG, ROOT, IGNITE_SERVER_ADDRESS, IGNITE_SERVER_PASSWORD
+    global CONFIG, IGNITE_SERVER_ADDRESS, IGNITE_SERVER_PASSWORD
 
-    config = get_config()
+    config = get_config(False)
     old_config = deepcopy(config)
-    config.update(data)
+    for key in ("access", "server_details"):
+        if not data.get(key):
+            continue
+        config[key].update(data[key])
+    config["dcc_config"] = data["dcc_config"]
     IGNITE_SERVER_ADDRESS = config["server_details"].get("address", "")
     IGNITE_SERVER_PASSWORD = config["server_details"].get("password", "")
     ENV["IGNITE_SERVER_ADDRESS"] = IGNITE_SERVER_ADDRESS
     ENV["IGNITE_SERVER_PASSWORD"] = IGNITE_SERVER_PASSWORD
 
-    config["projects_root"] = config["access"].get("projects_root", "")
-    server_root = server_request("get_projects_root")["data"]
-    config["access"]["server_projects_root"] = server_root
+    config["root"] = config["access"].get("projects_root", "")
     changed = old_config != config
-
-    CONFIG = config
-    ROOT = PurePath(config["projects_root"])
 
     if not changed:
         return config, False
 
     with open(CLIENT_CONFIG_PATH, "w") as f:
         yaml.safe_dump(config, f)
+    
+    CONFIG.update(get_config())
 
-    root_changed = old_config["projects_root"] != config["projects_root"]
+    root_changed = old_config["root"] != config["root"]
     return config, root_changed
 
 
@@ -269,14 +277,14 @@ def copy_default_scene(task, dcc):
     logging.info(f"Copying default scene {src} to {dest}")
     shutil.copy2(src, dest)
     data = {
-        "client_root": str(ROOT),
+        "client_root": str(CONFIG["root"]),
         "path": str(dest),
         "dir_kind": "scene"
     }
     server_request("register_directory", data)
     scene_path = dest / PurePath(src).name
     data = {
-        "client_root": str(ROOT),
+        "client_root": str(CONFIG["root"]),
         "path": str(scene_path)
     }
     scene = server_request("find", data).get("data")

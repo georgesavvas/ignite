@@ -10,8 +10,6 @@ from ignite_server.constants import ANCHORS
 from ignite_server.utils import CONFIG
 
 
-ROOT = PurePath(CONFIG["projects_root"])
-
 
 class Directory():
     def __init__(self, path="", dir_kind="directory") -> None:
@@ -45,7 +43,7 @@ class Directory():
 
     def load_from_path(self):
         path = self.path.as_posix()
-        root = ROOT.as_posix()
+        root = CONFIG["root"].as_posix()
         if not path.startswith(root):
             raise Exception(f"Invalid project dir: {path}")
         if not Path(path).is_dir():
@@ -63,7 +61,7 @@ class Directory():
     def get_context(self):
         if self.dir_kind == "group":
             return ""
-        project_path = ROOT / self.project
+        project_path = CONFIG["root"] / self.project
         if hasattr(self, "task"):
             context = self.task
         else:
@@ -210,7 +208,7 @@ class Directory():
 
     @property
     def attributes(self):
-        root = ROOT.as_posix()
+        root = CONFIG["root"].as_posix()
         parent = Path(self.path.parent)
         iter = 1
         parent_attrib_list = []

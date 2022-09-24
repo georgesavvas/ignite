@@ -1,12 +1,7 @@
 import os
-from pathlib import Path, PurePath
+from pathlib import PurePath
 import clique
-from ignite_server.constants import ANCHORS
 from ignite_server import utils
-from ignite_server.utils import CONFIG
-
-
-ROOT = PurePath(CONFIG["projects_root"])
 
 
 class Component():

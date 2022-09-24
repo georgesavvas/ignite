@@ -12,40 +12,71 @@ from ignite_server.constants import ANCHORS
 
 ENV = os.environ
 IGNITE_ROOT = Path(ENV["IGNITE_ROOT"])
+SERVER_CONFIG_PATH = os.environ["IGNITE_SERVER_USER_CONFIG_PATH"]
 
 KINDS = {v: k for k, v in ANCHORS.items()}
 URI_TEMPLATE = parse.compile("ign:{project}:{group}:{context}:{task}:{name}@{version}")
 URI_TEMPLATE_UNVERSIONED = parse.compile("ign:{project}:{group}:{context}:{task}:{name}")
 
 
-def get_config() -> dict:
-    path = os.environ["IGNITE_SERVER_USER_CONFIG_PATH"]
-    if not os.path.isfile(path):
-        raise Exception(f"Config file not found: {path}")
-    logging.info(f"Reading config from {path}...")    
-    with open(path, "r") as f:
+def get_config(formatted=True) -> dict:
+    if not os.path.isfile(SERVER_CONFIG_PATH):
+        raise Exception(f"Config file not found: {SERVER_CONFIG_PATH}")
+    logging.info(f"Reading config from {SERVER_CONFIG_PATH}...")    
+    with open(SERVER_CONFIG_PATH, "r") as f:
         config = yaml.safe_load(f)
     paths = ("projects_root",)
     for p in paths:
         config[p] = os.path.abspath(config[p])
+    root = PurePath(config["projects_root"])
+    if formatted:
+        return {
+            "root": root,
+            "server_address": config.get("server_address"),
+            "vault": root / config["vault_name"]
+        }
     return config
 
 
-CONFIG = get_config()
+CONFIG = {}
+CONFIG.update(get_config())
 IGNITE_SERVER_ADDRESS = CONFIG.get("server_address")
 ENV["IGNITE_SERVER_ADDRESS"] = IGNITE_SERVER_ADDRESS
-ROOT = PurePath(CONFIG["projects_root"])
 
 
-def ensure_root(root=ROOT):
-    if not Path(root).is_dir():
+def ensure_path(path):
+    if not Path(path).is_dir():
         try:
-            os.makedirs(root)
+            os.makedirs(path, exist_ok=True)
+            return True
         except Exception as e:
             logging.error(e)
+            return False
 
 
-ensure_root(ROOT)
+ensure_path(CONFIG["root"])
+ensure_path(CONFIG["vault"])
+
+
+def set_projects_root(path):
+    global CONFIG
+
+    path = Path(path)
+    if path.as_posix() == CONFIG["root"].as_posix():
+        return True
+    if path.is_file():
+        return False
+    ok = ensure_path(path)
+    if not ok:
+        return False
+
+    config = get_config(False)
+    config["projects_root"] = path
+    with open(SERVER_CONFIG_PATH, "w") as f:
+        yaml.safe_dump(config, f)
+
+    CONFIG["projects_root"] = path
+    return True
 
 
 def ensure_directory(path: Path) -> int:
@@ -67,7 +98,7 @@ def validate_dirname(name, extra_chars=""):
 def get_nr(path):
     if not path:
         return PurePath()
-    return PurePath(path).relative_to(ROOT).as_posix()
+    return PurePath(path).relative_to(CONFIG["root"]).as_posix()
 
 
 def create_anchor(path, name):
@@ -88,7 +119,9 @@ def get_uri(path, version=None):
     if not path:
         return ""
     dir_kind = get_dir_kind(path)
-    splt = PurePath(path).as_posix().split(ROOT.as_posix(), 1)[1].replace("/exports", "").split("/")[1:]
+    splt = PurePath(path).as_posix().split(
+        CONFIG["root"].as_posix(), 1
+    )[1].replace("/exports", "").split("/")[1:]
     i = len(splt)
     project = splt[0]
     group = splt[1] if i > 1 else None
@@ -134,7 +167,7 @@ def format_int_version(s):
 
 
 def get_dir_type(path, dir_type):
-    root = ROOT.as_posix()
+    root = CONFIG["root"].as_posix()
     anchor = ANCHORS[dir_type]
     path = Path(path)
     parent = path
@@ -189,7 +222,7 @@ def uri_to_path(uri):
             data["version"] = format_int_version(data["version"])
         else:
             del data["version"]
-    path = ROOT
+    path = CONFIG["root"]
     for step in ("project", "group", "context", "task", "name", "version"):
         if not data.get(step):
             return path

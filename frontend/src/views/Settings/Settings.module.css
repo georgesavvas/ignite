@@ -1,0 +1,23 @@
+.container {
+    display: flex;
+    height: 60vh;
+}
+
+.menuContainer {
+    width: 150px;
+    padding-right: 10px;
+}
+
+.settingsContainer {
+    flex-grow: 1;
+    overflow: auto;
+}
+
+.option {
+    border-radius: 5px;
+    margin-bottom: 5px;
+}
+
+.selected {
+    background-color: rgb(70, 70, 70);
+}

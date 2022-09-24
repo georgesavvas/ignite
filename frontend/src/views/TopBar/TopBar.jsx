@@ -7,7 +7,7 @@ import HelpIcon from '@mui/icons-material/Help';
 import BugReportIcon from '@mui/icons-material/BugReport';
 import ThumbsUpDownIcon from '@mui/icons-material/ThumbsUpDown';
 import SettingsIcon from '@mui/icons-material/Settings';
-import SettingsDialog from "../SettingsDialog.jsx";
+import Settings from "../Settings/Settings.jsx";
 import ProjectBrowser from "../ProjectBrowser/ProjectBrowser";
 import Vault from "../Vault/Vault";
 
@@ -50,7 +50,7 @@ export default function TopBar() {
         open={projectBrowserOpen}
         onClose={() => setProjectBrowserOpen(false)}
       />
-      <SettingsDialog open={settingsOpen} onClose={() => setSettingsOpen(false)} />
+      <Settings open={settingsOpen} onClose={() => setSettingsOpen(false)} />
       <div className={styles.container}>
         <div className={styles.leftSide}>
           <IgnButton

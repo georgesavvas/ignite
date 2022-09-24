@@ -55,7 +55,8 @@ def ensure_config(filepath, default={}):
 SERVER_USER_CONFIG_PATH = USER_CONFIG_PATH / "server_config.yaml"
 ensure_config(SERVER_USER_CONFIG_PATH, {
     "server_address": "0.0.0.0:9070",
-    "projects_root": str(Path.home() / "projects")
+    "projects_root": str(Path.home() / "projects"),
+    "vault_name": "__vault__"
 })
 
 logging.debug(f"Setting IGNITE_SERVER_USER_CONFIG_PATH to {SERVER_USER_CONFIG_PATH}")

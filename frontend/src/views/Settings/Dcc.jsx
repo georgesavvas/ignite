@@ -1,23 +1,17 @@
-import React, {useEffect, useState, useContext} from 'react';
-import { styled } from '@mui/material/styles';
-import styles from "./SettingsDialog.module.css";
+import React, {useEffect, useState, useContext} from 'react'
+import styles from "./Dcc.module.css";
+import {ConfigContext} from "../../contexts/ConfigContext";
+import { Stack, Divider } from '@mui/material';
 import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import DialogContentText from '@mui/material/DialogContentText';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import IconButton from '@mui/material/IconButton';
-import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
-import { Stack, Divider } from '@mui/material';
-import Modal from "../components/Modal";
+import Clear from '@mui/icons-material/Clear';
+import TextField from '@mui/material/TextField';
+import clientRequest from '../../services/clientRequest';
 
-export default function SettingsDialog(props) {
-
-  useEffect(() => {
-    setServerAddress(config.serverDetails.address)
-  }, [config.serverDetails.address])
+const Dcc = () => {
+  const [config, setConfig] = useContext(ConfigContext);
 
   const handleDccConfigChange = (e) => {
     const s = e.currentTarget.id.split("-");
@@ -58,6 +52,28 @@ export default function SettingsDialog(props) {
     setConfig("dccConfig", data, "modify");
   }
 
+  const handleAddDcc = e => {
+    setConfig("dccConfig", [], "add");
+  }
+
+  const handleDiscoverDcc = e => {
+    clientRequest("discover_dcc").then(resp => {
+      const new_config = resp.data;
+      let existing_paths = [];
+      config.dccConfig.forEach(config => {
+        existing_paths.push(config.path);
+      })
+      const filtered = new_config.filter(
+        config => !existing_paths.includes(config.path)
+      );
+      console.log(
+        `Previously had ${existing_paths.length} configs,
+        discovered ${new_config.length}, adding ${filtered.length}`
+      );
+      setConfig("dccConfig", filtered, "add");
+    });
+  }
+
   function renderDcc(dcc, index) {
     if (dcc.valid === undefined) dcc.valid = false;
     return (
@@ -68,7 +84,7 @@ export default function SettingsDialog(props) {
           id={"remove-" + index}
           onClick={handleRemoveDcc}
         >
-          <RemoveCircleOutlineIcon style={{color: "red", fontSize: "2rem"}} />
+          <Clear style={{color: "red", fontSize: "2rem"}} />
         </IconButton>
         <Divider flexItem orientation="vertical" />
         <div className={styles.gridContainer}>
@@ -127,78 +143,19 @@ export default function SettingsDialog(props) {
     )
   }
 
-  const dialogStyle = {
-    "& .MuiDialog-container": {
-      "& .MuiPaper-root": {
-        width: "100%",
-        maxWidth: "80vw",
-        backgroundColor: "rgb(40,40,40)",
-        backgroundImage: "none"
-      },
-    },
-  }
-
-  const dccBar = {
-    display: "flex",
-    justifyContent: "space-between"
-  }
-
-  
-
-  
-
   return (
-    <Modal open={props.open} onClose={props.onClose} title="Settings" maxWidth="lg">
-      <div className={styles.container}>
-        <DialogContentText style={{alignSelf: "flex-start"}}>
-          Server Details
-        </DialogContentText>
-        <div className={styles.insideContainer}>
-          <TextField
-            margin="dense"
-            id="server-address"
-            label="Address"
-            fullWidth
-            variant="standard"
-            value={serverAddress}
-            onChange={handleServerAddressChange}
-          />
-          <TextField
-            margin="dense"
-            id="server-password"
-            label="Password"
-            fullWidth
-            variant="standard"
-            value={config.serverDetails.password}
-            onChange={e => setConfig("serverDetails", {password: e.target.value})}
-          />
-        </div>
-        <Divider flexItem style={{marginTop: "20px", marginBottom: "20px"}} />
-        <DialogContentText style={{alignSelf: "flex-start"}}>
-          Access
-        </DialogContentText>
-        <div className={styles.insideContainer}>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={config.access.remote}
-                  onChange={e => setConfig("access", {remote: e.target.checked})}
-                />}
-              label="Remote"
-              style={{alignSelf: "flex-start"}}
-            />
-            <TextField
-              margin="dense"
-              id="projects-dir"
-              label="Projects directory"
-              fullWidth
-              variant="standard"
-              disabled={config.access.remote}
-              value={config.access.projectsDir}
-              onChange={e => setConfig("access", {projectsDir: e.target.value})}
-            />
-        </div>
-      </div>
-    </Modal>
+    <div className={styles.container}>
+      <Stack direction="row" alignItems="center" spacing={2}
+        style={{alignSelf: "flex-end"}}
+      >
+        <Button variant="outlined" onClick={handleAddDcc}>Add</Button>
+        <Button variant="outlined" onClick={handleDiscoverDcc}>Discover</Button>
+      </Stack>
+      <List sx={{ width: '100%'}}>
+        {config.dccConfig.map((dcc, index) => renderDcc(dcc, index))}
+      </List>
+    </div>
   )
 }
+
+export default Dcc

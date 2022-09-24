@@ -1,19 +1,13 @@
 import os
 import yaml
-from pathlib import Path, PurePath
-from ignite_server import utils
+from pathlib import Path
 from ignite_server.entities.directory import Directory
-from ignite_server.utils import CONFIG
-
-
-ROOT = PurePath(CONFIG["projects_root"])
-
 
 class Asset(Directory):
     def __init__(self, path="") -> None:
         super().__init__(path, dir_kind="asset")
         self.dict_attrs = ["path", "dir_kind", "anchor", "project", "name", "versions",
-            "latest_v", "uri", "context", "next_path", "creation_time", "modification_time"]
+            "latest_v", "best_v", "uri", "context", "next_path", "creation_time", "modification_time"]
         self.nr_attrs = ["path"]
         self._versions = []
         self._assetversions = []

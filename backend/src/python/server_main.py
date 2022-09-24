@@ -29,7 +29,6 @@ from ignite_server.utils import CONFIG
 
 
 SERVER_HOST, SERVER_PORT = CONFIG["server_address"].split(":")
-ROOT = PurePath(CONFIG["projects_root"])
 ENV = os.environ
 
 ASSET_UPDATES_MANAGER = SocketManager()
@@ -48,11 +47,13 @@ app.add_middleware(
 
 
 def mount_root():
-    if not ROOT or not Path(ROOT).is_dir():
-        logging.warning(f"Projects root {ROOT} does not exist, skipping mounting...")
+    if not CONFIG["root"] or not Path(CONFIG["root"]).is_dir():
+        logging.warning(f"Projects root {CONFIG['root']} does not exist, skipping mounting...")
         return
-    logging.debug(f"Attempting to mount {ROOT}")
-    app.mount("/files", StaticFiles(directory=ROOT), name="projects_root")
+    logging.debug(f"Attempting to mount {CONFIG['root']}")
+    app.mount(
+        "/files", StaticFiles(directory=CONFIG['root']), name="projects_root"
+    )
 
 
 @app.get("/api/v1/get_projects_root")
@@ -60,6 +61,23 @@ async def get_projects_root():
     data = api.get_projects_root()
     if not data:
         return error("no_projects_root")
+    return {"ok": True, "data": data}
+
+
+@app.post("/api/v1/set_projects_root")
+async def set_projects_root(request: Request):
+    result = await request.json()
+    log_request(result)
+    path = result.get("path")
+    ok = utils.set_projects_root(path)
+    if ok:
+        mount_root()
+    return {"ok": ok}
+
+
+@app.get("/api/v1/get_vault_path")
+async def get_vault_path():
+    data = api.get_vault_path()
     return {"ok": True, "data": data}
 
 
@@ -232,7 +250,7 @@ async def get_assets(request: Request):
     query = result.get("query", {})
     data = api.discover_assets(
         result.get("path"),
-        latest=query.get("latest", 0),
+        # latest=query.get("latest", 0),
         sort=query.get("sort"),
         as_dict=True
     )

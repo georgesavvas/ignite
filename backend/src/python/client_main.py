@@ -22,11 +22,10 @@ sentry_sdk.init(
 )
 
 from ignite_client import utils, api
-from ignite_client.utils import TASK_MANAGER, PROCESSES_MANAGER
+from ignite_client.utils import TASK_MANAGER, PROCESSES_MANAGER, CONFIG
+
 
 ENV = os.environ
-CONFIG = utils.get_config()
-
 
 app = FastAPI()
 origins = ["*"]
@@ -67,7 +66,7 @@ def error(s):
 
 
 def mount_root():
-    projects_root = CONFIG["projects_root"]
+    projects_root = CONFIG["root"]
     if not projects_root or not Path(projects_root).is_dir():
         logging.warning(f"Projects root {projects_root} does not exist, skipping mounting...")
         return

@@ -1,7 +1,13 @@
 /* eslint-disable react/no-unknown-property */
-import React, { useRef } from "react"
-import Button from "@mui/material/Button"
-import { TextField } from "@mui/material"
+import React, { useRef } from "react";
+import IgnButton from "../components/IgnButton";
+import { TextField } from "@mui/material";
+
+const style = { 
+  display: "flex",
+  alignItems: "center",
+  gap: "5px"
+}
 
 export default function FileInput(props) {
   const hiddenFileInput = useRef(null)
@@ -25,20 +31,21 @@ export default function FileInput(props) {
   }
 
   return (
-    <div style={{display: "flex", gap: "10px", width: "100%"}}>
+    <div style={{...style, ...props.style}}>
       <TextField
         {...props}
         value={props.value}
         onChange={handleChange}
         onBlur={handleChange}
       />
-      <Button
+      <IgnButton
         variant="outlined"
-        // sx={{maxHeight: "40px"}}
+        color="ignite"
         onClick={() => hiddenFileInput.current.click()}
+        style={{height: 37.5, marginTop: "4px"}}
       >
         ...
-      </Button>
+      </IgnButton>
       <input
         ref={hiddenFileInput}
         type="file"

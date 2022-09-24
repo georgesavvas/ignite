@@ -7,9 +7,6 @@ from ignite_server.entities.task import Task
 from ignite_server.utils import CONFIG
 
 
-ROOT = PurePath(CONFIG["projects_root"])
-
-
 class Scene(Directory):
     def __init__(self, path="") -> None:
         self.dict_attrs = ["path", "project", "name", "group" ,"dcc", "extension",
@@ -47,7 +44,7 @@ class Scene(Directory):
     def load_from_path(self):
         path = self.path
         path_str = self.path.as_posix()
-        root = ROOT.as_posix()
+        root = CONFIG["root"].as_posix()
         if not path_str.startswith(root):
             raise Exception(f"Invalid project dir: {path}")
         if not Path(path).is_dir():
