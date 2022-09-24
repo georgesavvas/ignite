@@ -19,6 +19,8 @@ PROJECT_ANCHOR = ANCHORS["project"]
 KINDS = {v: k for k, v in ANCHORS.items()}
 IGNITE_SERVER_ROOT = Path(ENV["IGNITE_SERVER_ROOT"])
 IGNITE_DCC = Path(ENV["IGNITE_DCC"])
+USER_CONFIG_PATH = PurePath(ENV["IGNITE_USER_CONFIG_PATH"])
+RULE_TEMPLATES_PATH = USER_CONFIG_PATH / "rule_templates.yaml"
 
 
 def create_project(name: str):
@@ -727,7 +729,7 @@ def set_attributes(path, attributes):
 
 
 def get_rule_templates():
-    path = Path(LIB_RULE_TEMPLATES)
+    path = Path(RULE_TEMPLATES_PATH)
     if not path.exists():
         return []
     with open(path, "r") as file:
@@ -755,7 +757,7 @@ def remove_rule_template(name):
 
 
 def write_rule_templates(data):
-    path = Path(LIB_RULE_TEMPLATES)
+    path = Path(RULE_TEMPLATES_PATH)
     with open(path, "w") as file:
         rule_templates = yaml.safe_dump(data, file)
     return rule_templates
