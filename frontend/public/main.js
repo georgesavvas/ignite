@@ -1,4 +1,4 @@
-const { app, BrowserWindow, protocol, ipcMain, dialog, Tray, Menu } = require("electron");
+const {app, BrowserWindow, protocol, ipcMain, dialog, Tray, Menu, shell} = require("electron");
 const os = require("os");
 const fs = require("fs").promises;
 const path = require("path");
@@ -7,7 +7,7 @@ const getPort = require("get-port");
 const axios = require("axios");
 require("v8-compile-cache");
 const uuid4 = require("uuid4");
-const osu = require('node-os-utils');
+const osu = require("node-os-utils");
 const Sentry = require("@sentry/electron");
 
 Sentry.init({ dsn: "https://3037f050f6194c0dbc82183b252475fa@o1421552.ingest.sentry.io/6767421" });
@@ -30,9 +30,9 @@ const getResourceUsage = async () => {
   const usage = {
     cpu: cpu_data,
     mem: mem_data.usedMemPercentage,
-  }
+  };
   return usage;
-}
+};
 
 async function clientRequest(port, method, data=undefined) {
   console.log(`http://localhost:${port}/api/v1/${method}`);
@@ -40,11 +40,11 @@ async function clientRequest(port, method, data=undefined) {
     url: `http://localhost:${port}/api/v1/${method}`,
     method: !data ? "get" : "post",
     headers: {
-      'Accept': 'application/json, text/plain, */*',
-      'Content-Type': 'application/json'
+      "Accept": "application/json, text/plain, */*",
+      "Content-Type": "application/json"
     },
     data: JSON.stringify(data)
-  })
+  });
   return await resp.data;
 }
 
@@ -52,33 +52,33 @@ const iconPaths = {
   "win32": "media/desktop_icon/win/icon.ico",
   "darwin": "media/desktop_icon/mac/icon.icns",
   "linux": "media/desktop_icon/linux/icon.png"
-}
+};
 
 const serverPaths = {
   "win32": "IgniteServer.exe",
   "darwin": "IgniteServer",
   "linux": "IgniteServer"
-}
-const serverPathDev = "../backend/src/python/server_main.py"
+};
+const serverPathDev = "../backend/src/python/server_main.py";
 const serverPath = path.join(
   appPath,
   process.env.NODE_ENV === "dev" ?
     serverPathDev :
     serverPaths[platformName]
-)
+);
 
 const clientPaths = {
   "win32": "IgniteClientBackend.exe",
   "darwin": "IgniteClientBackend",
   "linux": "IgniteClientBackend"
-}
-const clientPathDev = "../backend/src/python/client_main.py"
+};
+const clientPathDev = "../backend/src/python/client_main.py";
 const clientPath = path.join(
   appPath,
   process.env.NODE_ENV === "dev" ?
     clientPathDev :
     clientPaths[platformName]
-)
+);
 
 function createWindow (port) {
   const win = new BrowserWindow({
@@ -93,7 +93,7 @@ function createWindow (port) {
       preload: path.join(__dirname, "preload.js"),
       enableBlinkFeatures: "CSSGridTemplatePropertyInterpolation"
     }
-  })
+  });
 
   if (isDev) {
     console.log("Loading development environment...");
@@ -121,7 +121,7 @@ function createWindow (port) {
       if (err) {
         throw err;
       }
-      else return true
+      else return true;
     });
   });
   
@@ -131,6 +131,10 @@ function createWindow (port) {
       if (err) throw err;
       return true;
     });
+  });
+
+  ipcMain.handle("open_url", async (e, url) => {
+    shell.openExternal(url);
   });
   
   ipcMain.handle("check_path", async (e, filepath) => {
@@ -184,7 +188,7 @@ function createSplash () {
     backgroundColor: "#141414",
     alwaysOnTop: true,
     icon: path.join(__dirname, iconPaths[platformName])
-  })
+  });
   win.loadFile("public/splash.html");
   return win;
 }
@@ -230,11 +234,11 @@ app.whenReady().then(async () => {
       app.quit();
     } },
   ]);
-  tray.setToolTip("Ignite")
-  tray.setContextMenu(contextMenu)
-  tray.on("click", () => window.show())
-  tray.on("double-click", () => window.show())
-})
+  tray.setToolTip("Ignite");
+  tray.setContextMenu(contextMenu);
+  tray.on("click", () => window.show());
+  tray.on("double-click", () => window.show());
+});
 app.on("ready", async () => {
   const protocolName = "ign";
   protocol.registerFileProtocol(protocolName, (request, callback) => {
@@ -245,8 +249,8 @@ app.on("ready", async () => {
     catch (error) {
       console.error(error);
     }
-  })
-})
+  });
+});
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
@@ -266,6 +270,6 @@ app.on("activate", e => {
   // dock icon is clicked and there are no other windows open.
   
   if (BrowserWindow.getAllWindows().length === 0) {
-    window = createWindow()
+    window = createWindow();
   }
-})
+});
