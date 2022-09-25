@@ -13,10 +13,10 @@ LOGGER = get_logger(__name__)
 
 
 def start_worker(loop):
-    print("WORKER INIT")
+    LOGGER.warning("WORKER INIT")
     asyncio.set_event_loop(loop)
     loop.run_forever()
-    print("WORKER END")
+    LOGGER.warning("WORKER END")
 
 
 class Task():
