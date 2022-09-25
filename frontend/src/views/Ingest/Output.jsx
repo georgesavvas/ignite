@@ -1,9 +1,12 @@
-import React from 'react';
+import React from "react";
+
+import Typography from "@mui/material/Typography";
+import {useXarrow} from "react-xarrows";
+import Divider from "@mui/material/Divider";
+
 import styles from "./Output.module.css";
 import DynamicList from "../../components/DynamicList";
-import Typography from '@mui/material/Typography';
-import {useXarrow} from "react-xarrows";
-import { Divider } from '@mui/material';
+
 
 function Asset({data, id}) {
   return (
@@ -19,7 +22,7 @@ function Asset({data, id}) {
       )}
       <div className={styles.connector} id={id} />
     </div>
-  )
+  );
 }
 
 function Output(props) {
@@ -31,12 +34,12 @@ function Output(props) {
       <DynamicList noButtons onScroll={updateXarrow} style={{marginTop: "34px"}}>
         {
           props.assets ?
-          props.assets.map((child, index) => <Asset data={child} key={index} id={"asset-" + index} />) :
-          null
+            props.assets.map((child, index) => <Asset data={child} key={index} id={"asset-" + index} />) :
+            null
         }
       </DynamicList>
     </div>
-  )
+  );
 }
 
 export default Output;

@@ -59,4 +59,4 @@ export const DCCINFO = [
     icon: "media/dcc/vscode.png",
     name: "code"
   }
-]
+];

@@ -1,47 +1,46 @@
 import React, {useEffect, useState, useContext} from "react";
-import PropTypes from 'prop-types';
-import {styled} from '@mui/material/styles';
-import Typography from '@mui/material/Typography';
-import FormControl from '@mui/material/FormControl';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import styles from "./ProjectTreeView.module.css";
-import TreeView from '@mui/lab/TreeView';
-import TreeItem, {treeItemClasses} from '@mui/lab/TreeItem';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import Box from '@mui/material/Box';
-import {ContextContext} from "../../contexts/ContextContext";
-import { DIRECTORYICONS, DIRCONTEXTOPTIONS } from "../../constants";
-import ContextMenu, { handleContextMenu } from "../../components/ContextMenu";
-import { CopyToClipboard, ShowInExplorer } from "../ContextActions";
-import { DeleteDir, RenameDir, CreateDir } from "../ContextActions";
-import { useSnackbar } from 'notistack';
-import { ConfigContext } from "../../contexts/ConfigContext";
+import PropTypes from "prop-types";
+
+import {styled} from "@mui/material/styles";
+import Typography from "@mui/material/Typography";
+import TreeView from "@mui/lab/TreeView";
+import TreeItem, {treeItemClasses} from "@mui/lab/TreeItem";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import Box from "@mui/material/Box";
+import {useSnackbar} from "notistack";
+
+import {ConfigContext} from "../../contexts/ConfigContext";
 import BuildFileURL from "../../services/BuildFileURL";
 import DataPlaceholder from "../../components/DataPlaceholder";
+import {ContextContext} from "../../contexts/ContextContext";
+import {DIRECTORYICONS, DIRCONTEXTOPTIONS} from "../../constants";
+import ContextMenu, {handleContextMenu} from "../../components/ContextMenu";
+import {CopyToClipboard, ShowInExplorer} from "../ContextActions";
+import {DeleteDir, RenameDir, CreateDir} from "../ContextActions";
+import styles from "./ProjectTreeView.module.css";
 
-const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
+
+const StyledTreeItemRoot = styled(TreeItem)(({theme}) => ({
   color: theme.palette.text.secondary,
   [`& .${treeItemClasses.content}`]: {
     color: theme.palette.text.secondary,
     paddingRight: theme.spacing(0),
     paddingLeft: theme.spacing(0),
     fontWeight: theme.typography.fontWeightMedium,
-    '&.Mui-expanded': {
+    "&.Mui-expanded": {
       fontWeight: theme.typography.fontWeightRegular,
     },
-    '&:hover': {
+    "&:hover": {
       backgroundColor: theme.palette.action.hover,
     },
-    '&.Mui-focused, &.Mui-selected, &.Mui-selected.Mui-focused': {
+    "&.Mui-focused, &.Mui-selected, &.Mui-selected.Mui-focused": {
       backgroundColor: `var(--tree-view-bg-color, ${theme.palette.action.selected})`,
-      color: 'var(--tree-view-color)'
+      color: "var(--tree-view-color)"
     },
     [`& .${treeItemClasses.label}`]: {
-      fontWeight: 'inherit',
-      color: 'inherit',
+      fontWeight: "inherit",
+      color: "inherit",
     },
   }
 }));
@@ -66,7 +65,7 @@ function getGenericContextItems(data, enqueueSnackbar) {
       fn: () => data.handleClick("delete", data),
       divider: true
     }
-  ]
+  ];
 }
 
 function getSpecificContextItems(data) {
@@ -79,22 +78,18 @@ function getSpecificContextItems(data) {
     fn: () => data.handleClick(
       "create", {...data, method: contextOption.name, kind: contextOption.dir_kind}
     )
-  }))
+  }));
 }
 
 function StyledTreeItem(props) {
   const [contextMenu, setContextMenu] = useState(null);
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const {enqueueSnackbar} = useSnackbar();
 
   const {
     bgColor,
     color,
-    depth = 2,
     labelIcon: LabelIcon,
     labelInfo,
-    dir_path,
-    dir_kind,
-    onContextOpen,
     labelText,
     ...other
   } = props;
@@ -102,7 +97,7 @@ function StyledTreeItem(props) {
   const handleClick = (action, data) => {
     props.onContextOpen(action, data);
     handleClose();
-  }
+  };
 
   const handleClose = () => {
     setContextMenu(null);
@@ -113,7 +108,7 @@ function StyledTreeItem(props) {
     kind: props.dir_kind,
     name: labelText,
     handleClick: handleClick
-  }
+  };
 
   let contextItems = getGenericContextItems(itemData, enqueueSnackbar);
   contextItems = contextItems.concat(getSpecificContextItems(itemData));
@@ -126,10 +121,10 @@ function StyledTreeItem(props) {
       <StyledTreeItemRoot
         label={
           <Box onContextMenu={e => handleContextMenu(e, contextMenu, setContextMenu)}
-            sx={{ display: 'flex', alignItems: 'center', p: 0.1, pr: 0.8 }}
+            sx={{display: "flex", alignItems: "center", p: 0.1, pr: 0.8}}
           >
-            <Box component={LabelIcon} color="inherit" sx={{ height: "20px", width: "20px", mr: 1 }} />
-            <Typography variant="body2" sx={{ textAlign: 'left', fontWeight: 'inherit', flexGrow: 1 }}>
+            <Box component={LabelIcon} color="inherit" sx={{height: "20px", width: "20px", mr: 1}} />
+            <Typography variant="body2" sx={{textAlign: "left", fontWeight: "inherit", flexGrow: 1}}>
               {labelText}
             </Typography>
             <Typography variant="caption" color="rgb(100,100,100)">
@@ -138,14 +133,14 @@ function StyledTreeItem(props) {
           </Box>
         }
         style={{
-          '--tree-view-color': color,
-          '--tree-view-bg-color': bgColor
+          "--tree-view-color": color,
+          "--tree-view-bg-color": bgColor
         }}
         {...other}
       />
     </div>
   );
-};
+}
 
 StyledTreeItem.propTypes = {
   bgColor: PropTypes.string,
@@ -156,25 +151,25 @@ StyledTreeItem.propTypes = {
 };
 
 function ProjectTreeView(props) {
-  const [config, setConfig] = useContext(ConfigContext);
+  const [config] = useContext(ConfigContext);
   const [expandedItems, setExpandedItems] = useState(["root"]);
   const [modalData, setModalData] = useState({});
   const [selectedItems, setSelectedItems] = useState("root");
   const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const {enqueueSnackbar} = useSnackbar();
 
   useEffect(() => {
-    function findNodeByPath(object, result, value, parents){
-      if(object.hasOwnProperty("path") && object.path === value) {
+    function findNodeByPath(object, result, value, parents) {
+      if (object.path && object.path === value) {
         result.push(object);
         return;
       }
-      for(var i=0; i<Object.keys(object).length; i++){
-        const child = object[Object.keys(object)[i]]
-          if(child !== null && typeof child === "object"){
-              if (value.includes(child.path)) parents.push(child.id);
-              findNodeByPath(object[Object.keys(object)[i]], result, value, parents);
-          }
+      for (var i=0; i<Object.keys(object).length; i++) {
+        const child = object[Object.keys(object)[i]];
+        if (child !== null && typeof child === "object") {
+          if (value.includes(child.path)) parents.push(child.id);
+          findNodeByPath(object[Object.keys(object)[i]], result, value, parents);
+        }
       }
     }
 
@@ -191,23 +186,23 @@ function ProjectTreeView(props) {
         setExpandedItems(prevState => [...prevState, ...parents, nodeId]);
       }
     }
-  }, [currentContext])
+  }, [currentContext]);
 
   const handleNodeSelect = (event, nodeId) => {
-    function findNodeById(object, result, value){
-      if(object.hasOwnProperty('id') && object.id === value) {
+    function findNodeById(object, result, value) {
+      if (object.id && object.id === value) {
         result.push(object);
         return;
       }
-      for(var i=0; i<Object.keys(object).length; i++){
-        const child = object[Object.keys(object)[i]]
-          if(child !== null && typeof child === "object"){
-              findNodeById(object[Object.keys(object)[i]], result, value);
-          }
+      for(var i=0; i<Object.keys(object).length; i++) {
+        const child = object[Object.keys(object)[i]];
+        if (child !== null && typeof child === "object"){
+          findNodeById(object[Object.keys(object)[i]], result, value);
+        }
       }
     }
 
-    let iconClicked = event.target.closest(".MuiTreeItem-iconContainer")
+    let iconClicked = event.target.closest(".MuiTreeItem-iconContainer");
     if(iconClicked) return;
 
     var result = [];
@@ -218,11 +213,11 @@ function ProjectTreeView(props) {
   };
 
   const handleNodeToggle = (event, nodeIds) => {
-    let iconClicked = event.target.closest(".MuiTreeItem-iconContainer")
+    let iconClicked = event.target.closest(".MuiTreeItem-iconContainer");
     if(iconClicked || nodeIds.length > expandedItems.length) {
       setExpandedItems(nodeIds);
     }
-  }
+  };
 
   const handleContextMenuSelection = (action, data) => {
     data[`${action}Open`] = true;
@@ -230,7 +225,7 @@ function ProjectTreeView(props) {
   };
 
   const renderTree = (nodes) => {
-    const filterString = nodes.filter_strings.join(" ")
+    const filterString = nodes.filter_strings.join(" ");
     const hide = props.filter && !filterString.includes(props.filter);
     const path = BuildFileURL(nodes.path, config, {pathOnly: true});
     if (nodes.id === "root" && hide) return;
@@ -250,7 +245,7 @@ function ProjectTreeView(props) {
           ? nodes.children.map((node) => renderTree(node))
           : null}
       </StyledTreeItem>
-    )
+    );
   };
 
   return (
@@ -276,7 +271,7 @@ function ProjectTreeView(props) {
           onNodeToggle={handleNodeToggle}
           expanded={expandedItems}
           selected={selectedItems}
-          sx={{ flexGrow: 1, maxWidth: 800, overflowX: "hidden", overflowY: 'auto' }}
+          sx={{flexGrow: 1, maxWidth: 800, overflowX: "hidden", overflowY: "auto"}}
         >
           {renderTree(props.data) || <DataPlaceholder text="No results" style={{height: "90%", width: "90%"}} />}
         </TreeView>

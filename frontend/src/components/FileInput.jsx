@@ -1,34 +1,36 @@
 /* eslint-disable react/no-unknown-property */
-import React, { useRef } from "react";
+import React, {useRef} from "react";
+
 import IgnButton from "../components/IgnButton";
-import { TextField } from "@mui/material";
+import TextField from "@mui/material/TextField";
+
 
 export default function FileInput(props) {
-  const hiddenFileInput = useRef(null)
+  const hiddenFileInput = useRef(null);
 
   const handleChange = e => {
-    if (!props.onChange) return
-    props.onChange(e.target.value)
-  }
+    if (!props.onChange) return;
+    props.onChange(e.target.value);
+  };
 
   const handleFileInput = e => {
     const paths = [...e.target.files].reduce((previous, current) => {
-      return previous ? `${previous}\n${current.path}` : current.path
-    }, "")
-    e.target.value = ""
-    if (!props.onChange) return
+      return previous ? `${previous}\n${current.path}` : current.path;
+    }, "");
+    e.target.value = "";
+    if (!props.onChange) return;
     if (!props.additive) {
-      props.onChange(paths)
-      return
+      props.onChange(paths);
+      return;
     }
-    props.onChange(props.value ? `${props.value}\n${paths}` : paths)
-  }
+    props.onChange(props.value ? `${props.value}\n${paths}` : paths);
+  };
 
   const style = { 
     display: "flex",
     alignItems: !props.multiline ? "center" : "flex-start",
     gap: "5px"
-  }
+  };
 
   return (
     <div style={{...style, ...props.style}}>
@@ -55,5 +57,5 @@ export default function FileInput(props) {
         onChange={handleFileInput}
       />
     </div>
-  )
+  );
 }

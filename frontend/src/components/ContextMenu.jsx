@@ -1,6 +1,8 @@
-import React, {useState} from 'react';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
+import React from "react";
+
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+
 
 export function handleContextMenu(event, contextMenu, setContextMenu) {
   event.preventDefault();
@@ -8,12 +10,12 @@ export function handleContextMenu(event, contextMenu, setContextMenu) {
   setContextMenu(
     contextMenu === null
       ? {
-          mouseX: event.clientX - 2,
-          mouseY: event.clientY - 4,
-        }
+        mouseX: event.clientX - 2,
+        mouseY: event.clientY - 4,
+      }
       : null,
   );
-};
+}
 
 function ContextMenu(props) {
   // const [contextMenu, setContextMenu] = useState(null);
@@ -43,7 +45,7 @@ function ContextMenu(props) {
       >
         {item.label}
       </MenuItem>
-    )
+    );
   }
 
   return (
@@ -60,7 +62,7 @@ function ContextMenu(props) {
     >
       {props.items.map((item, index) => formatItem(item, index))}
     </Menu>
-  )
+  );
 }
 
 export default ContextMenu;

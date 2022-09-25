@@ -1,14 +1,18 @@
-import React, {useEffect, useState, useContext} from 'react'
+import React, {useContext} from "react";
+
+import Divider from "@mui/material/Divider";
+import Stack from "@mui/material/Stack";
+import Button from "@mui/material/Button";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import IconButton from "@mui/material/IconButton";
+import Clear from "@mui/icons-material/Clear";
+import TextField from "@mui/material/TextField";
+
+import clientRequest from "../../services/clientRequest";
 import styles from "./Dcc.module.css";
 import {ConfigContext} from "../../contexts/ConfigContext";
-import { Stack, Divider } from '@mui/material';
-import Button from '@mui/material/Button';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import IconButton from '@mui/material/IconButton';
-import Clear from '@mui/icons-material/Clear';
-import TextField from '@mui/material/TextField';
-import clientRequest from '../../services/clientRequest';
+
 
 const Dcc = () => {
   const [config, setConfig] = useContext(ConfigContext);
@@ -21,25 +25,25 @@ const Dcc = () => {
       index: target_id,
       field: target_field,
       value: e.target.value
-    }
+    };
     window.api.checkPath(data.value).then(exists => {
       data.valid = exists;
       return setConfig("dccConfig", data, "modify");
-    })
-  }
+    });
+  };
 
   const handleRemoveDcc = (e) => {
     const target_id = e.currentTarget.id.split("-")[1];
     const data = {index: target_id};
     setConfig("dccConfig", data, "remove");
-  }
+  };
 
   const handleFileInput = e => {
     window.api.fileInput().then(resp => {
       if (resp.cancelled) return;
       onFileSelected(e, resp.filePaths[0]);
-    })
-  }
+    });
+  };
 
   const onFileSelected = (e, filepath) => {
     const s = e.target.id.split("-");
@@ -48,21 +52,21 @@ const Dcc = () => {
       index: target_id,
       field: "path",
       value: filepath
-    }
+    };
     setConfig("dccConfig", data, "modify");
-  }
+  };
 
-  const handleAddDcc = e => {
+  const handleAddDcc = () => {
     setConfig("dccConfig", [], "add");
-  }
+  };
 
-  const handleDiscoverDcc = e => {
+  const handleDiscoverDcc = () => {
     clientRequest("discover_dcc").then(resp => {
       const new_config = resp.data;
       let existing_paths = [];
       config.dccConfig.forEach(config => {
         existing_paths.push(config.path);
-      })
+      });
       const filtered = new_config.filter(
         config => !existing_paths.includes(config.path)
       );
@@ -72,7 +76,7 @@ const Dcc = () => {
       );
       setConfig("dccConfig", filtered, "add");
     });
-  }
+  };
 
   function renderDcc(dcc, index) {
     if (dcc.valid === undefined) dcc.valid = false;
@@ -140,7 +144,7 @@ const Dcc = () => {
           </div>
         </div>
       </ListItem>
-    )
+    );
   }
 
   return (
@@ -151,11 +155,11 @@ const Dcc = () => {
         <Button variant="outlined" onClick={handleAddDcc}>Add</Button>
         <Button variant="outlined" onClick={handleDiscoverDcc}>Discover</Button>
       </Stack>
-      <List sx={{ width: '100%'}}>
+      <List sx={{width: "100%"}}>
         {config.dccConfig.map((dcc, index) => renderDcc(dcc, index))}
       </List>
     </div>
-  )
-}
+  );
+};
 
-export default Dcc
+export default Dcc;

@@ -1,13 +1,16 @@
-import { Typography } from '@mui/material';
+import React, {useState} from "react";
+
+import Typography from "@mui/material/Typography";
+import {useSnackbar} from "notistack";
+
 import styles from "./Path.module.css";
 import ContextMenu, { handleContextMenu } from "./ContextMenu";
-import { CopyToClipboard } from "../views/ContextActions";
-import { useSnackbar } from 'notistack';
-import React, {useState} from 'react';
+import {CopyToClipboard} from "../views/ContextActions";
+
 
 function Path(props) {
   const [contextMenu, setContextMenu] = useState(null);
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const {enqueueSnackbar} = useSnackbar();
 
   const contextItems = [
     {
@@ -18,7 +21,7 @@ function Path(props) {
     //   "label": "Go to asset",
     //   "fn": () => CopyToClipboard(props.path, enqueueSnackbar)
     // }
-  ]
+  ];
 
   if (!props.path) return null;
 
@@ -29,7 +32,7 @@ function Path(props) {
         <Typography style={{color: "cadetblue", direction: "rtl", textAlign: "left"}} noWrap>{props.path}</Typography>
       </div>
     </>
-  )
+  );
 }
 
 export default Path;

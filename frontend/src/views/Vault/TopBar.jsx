@@ -1,43 +1,45 @@
-import React, { useEffect, useState } from "react"
-import Stack from "@mui/material/Stack"
-import IconButton from "@mui/material/IconButton"
-import FilterAltIcon from "@mui/icons-material/FilterAlt"
-import SortIcon from "@mui/icons-material/Sort"
-import ContextMenu, { handleContextMenu } from "../../components/ContextMenu"
-import SyncIcon from '@mui/icons-material/Sync';
-import FilterField from "../../components/FilterField"
+import React, {useEffect, useState} from "react";
+
+import Stack from "@mui/material/Stack";
+import IconButton from "@mui/material/IconButton";
+import FilterAltIcon from "@mui/icons-material/FilterAlt";
+import SortIcon from "@mui/icons-material/Sort";
+import SyncIcon from "@mui/icons-material/Sync";
+
+import ContextMenu, {handleContextMenu} from "../../components/ContextMenu";
+import FilterField from "../../components/FilterField";
+
 
 const style = {
   display: "flex",
   justifyContent: "space-between",
   padding: "0px 10px",
   alignItems: "center"
-}
+};
 
 function TopBar(props) {
-  const [ingestOpen, setIngestOpen] = useState(false);
   const [sortMenu, setSortMenu] = useState(null);
   const [filterValue, setFilterValue] = useState("");
 
   useEffect(() => {
-    const sortData = localStorage.getItem("sortData")
-    if (!sortData) return
-    props.setQuery({sort: JSON.parse(sortData)})
-  }, [])
+    const sortData = localStorage.getItem("sortData");
+    if (!sortData) return;
+    props.setQuery({sort: JSON.parse(sortData)});
+  }, []);
 
   useEffect(() => {
-    props.onFilterStringChange(filterValue)
-  }, [filterValue])
+    props.onFilterStringChange(filterValue);
+  }, [filterValue]);
 
   const handleSortClicked = e => {
-    handleContextMenu(e, sortMenu, setSortMenu)
-  }
+    handleContextMenu(e, sortMenu, setSortMenu);
+  };
 
   const handleSortChange = (field, reverse, label) => {
-    const sortData = {field: field, reverse: reverse, label: label}
-    props.setQuery({sort: sortData})
-    localStorage.setItem("sortData", JSON.stringify(sortData))
-  }
+    const sortData = {field: field, reverse: reverse, label: label};
+    props.setQuery({sort: sortData});
+    localStorage.setItem("sortData", JSON.stringify(sortData));
+  };
 
   const sortOptions = [
     {
@@ -64,7 +66,7 @@ function TopBar(props) {
       label: "Date modified (Oldest first)",
       fn: () => handleSortChange("date_modified", false, "Date modified (Oldest first)"),
     }
-  ]
+  ];
 
   return (
     <div style={style}>
@@ -85,7 +87,7 @@ function TopBar(props) {
         </IconButton>
       </Stack>
     </div>
-  )
+  );
 }
 
-export default TopBar
+export default TopBar;

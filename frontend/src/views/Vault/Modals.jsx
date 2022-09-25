@@ -1,32 +1,31 @@
-import React, { useEffect, useRef, useState } from 'react'
-import Modal from "../../components/Modal"
-import serverRequest from "../../services/serverRequest"
-import TextField from '@mui/material/TextField'
-import FilterBuilder from './FilterBuilder'
-import IgnButton from '../../components/IgnButton'
+import React, {useEffect, useRef, useState} from "react";
+
+import TextField from "@mui/material/TextField";
+
+import FilterBuilder from "./FilterBuilder";
+import IgnButton from "../../components/IgnButton";
+import Modal from "../../components/Modal";
+import serverRequest from "../../services/serverRequest";
+
 
 export function EditColl({data, open=false, onClose, enqueueSnackbar, fn}) {
   const [filterData, setFilterData] = useState({});
 
   useEffect(() => {
-    if (data.expression) setFilterData({...data["expression"]})
-    else setFilterData({})
-  }, [data.path])
+    if (data.expression) setFilterData({...data["expression"]});
+    else setFilterData({});
+  }, [data.path]);
 
   function handleConfirm() {
     serverRequest("edit_collection", {data: {...data, expression: filterData.expression}}).then(resp => {
-      if (resp.ok) enqueueSnackbar("Success!", {variant: "success"})
-      else {
-        let reason = ""
-        if (resp.text) reason = ` - ${resp.text}`
-        enqueueSnackbar("Couldn't edit collection.", {variant: "error"})
-      }
-    })
-    if (fn) fn()
-    onClose()
+      if (resp.ok) enqueueSnackbar("Success!", {variant: "success"});
+      else enqueueSnackbar("Couldn't edit collection.", {variant: "error"});
+    });
+    if (fn) fn();
+    onClose();
   }
 
-  const defaultExpr = '{ "condition": "and", "filters": [{ "": "" }, { "": "" }]}'
+  const defaultExpr = "{ \"condition\": \"and\", \"filters\": [{ \"\": \"\" }, { \"\": \"\" }]}";
 
   return (
     <Modal open={open} onFormSubmit={handleConfirm} onClose={onClose}
@@ -38,7 +37,7 @@ export function EditColl({data, open=false, onClose, enqueueSnackbar, fn}) {
         onChange={value => setFilterData({expression: value})}
       />
     </Modal>
-  )
+  );
 }
 
 export function RenameColl({data, open=false, onClose, enqueueSnackbar, fn}) {
@@ -46,20 +45,16 @@ export function RenameColl({data, open=false, onClose, enqueueSnackbar, fn}) {
   const textFieldRef = useRef();
 
   useEffect(() => {
-    setNameValue(data.name)
-  }, [data.name])
+    setNameValue(data.name);
+  }, [data.name]);
 
   function handleConfirm() {
     serverRequest("rename_collection", {data: {...data, name: nameValue}}).then(resp => {
-      if (resp.ok) enqueueSnackbar("Renamed!", {variant: "success"})
-      else {
-        let reason = ""
-        if (resp.text) reason = ` - ${resp.text}`
-        enqueueSnackbar("Couldn't rename collection.", {variant: "error"})
-      }
-    })
-    if (fn) fn()
-    onClose()
+      if (resp.ok) enqueueSnackbar("Renamed!", {variant: "success"});
+      else enqueueSnackbar("Couldn't rename collection.", {variant: "error"});
+    });
+    if (fn) fn();
+    onClose();
   }
 
   return (
@@ -80,26 +75,26 @@ export function RenameColl({data, open=false, onClose, enqueueSnackbar, fn}) {
         style={{marginTop: "10px"}}
       />
     </Modal>
-  )
+  );
 }
   
 export function DeleteColl({data, open=false, onClose, enqueueSnackbar, fn}) {
   const handleConfirm = () => {
     serverRequest("delete_collection", {data: data}).then(resp => {
-      if (resp.ok) enqueueSnackbar("Successfully deleted!", {variant: "success"})
+      if (resp.ok) enqueueSnackbar("Successfully deleted!", {variant: "success"});
       else enqueueSnackbar("There was an issue with deleting this.", {variant: "error"}
-      )
-    })
-    if (fn) fn()
-    onClose()
-  }
+      );
+    });
+    if (fn) fn();
+    onClose();
+  };
 
   return (
     <Modal open={open} onButtonClicked={handleConfirm} onClose={onClose}
       text={`This will permanently delete the ${data.name} collection!`}
       title="Are you sure?" maxWidth="sm"
     />
-  )
+  );
 }
 
 export function CreateColl({data, open=false, onClose, enqueueSnackbar, fn}) {
@@ -107,17 +102,17 @@ export function CreateColl({data, open=false, onClose, enqueueSnackbar, fn}) {
   const textFieldRef = useRef();
 
   useEffect(() => {
-    setNameValue("")
-  }, [data.name])
+    setNameValue("");
+  }, [data.name]);
 
   const handleConfirm = () => {
-    data.name = nameValue
+    data.name = nameValue;
     serverRequest("create_collection", {data: data}).then((resp => {
-      enqueueSnackbar(resp.text, {variant: resp.ok ? "success" : "error"})
-      onClose()
-      if (fn) fn()
-    }))
-  }
+      enqueueSnackbar(resp.text, {variant: resp.ok ? "success" : "error"});
+      onClose();
+      if (fn) fn();
+    }));
+  };
 
   return (
     <Modal open={open} buttonLabel="Create" focusRef={textFieldRef}
@@ -138,5 +133,5 @@ export function CreateColl({data, open=false, onClose, enqueueSnackbar, fn}) {
         style={{marginTop: "10px"}}
       />
     </Modal>
-  )
+  );
 }

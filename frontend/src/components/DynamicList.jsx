@@ -1,11 +1,12 @@
-import React from 'react';
+import React from "react";
+
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
+
 import styles from "./DynamicList.module.css";
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import IconButton from '@mui/material/IconButton';
-import AddIcon from '@mui/icons-material/Add';
-import RemoveIcon from '@mui/icons-material/Remove';
-import Add from '@mui/icons-material/Add';
+
 
 const style = {
   width: "100%",
@@ -14,14 +15,14 @@ const style = {
   backgroundColor: "rgb(20,20,20)",
   overflowY: "scroll",
   flexGrow: 1
-}
+};
 
 function createListItem(child, index, dense) {
   return (
     <ListItem key={index} dense={dense}>
       {child}
     </ListItem>
-  )
+  );
 }
 
 function buttons(props) {
@@ -30,7 +31,7 @@ function buttons(props) {
       <AddIcon className={styles.button} onClick={props.onAdd || null}/>
       <RemoveIcon className={styles.button} onClick={props.onRemove || null}/>
     </div>
-  )
+  );
 }
 
 function DynamicList(props) {
@@ -40,12 +41,12 @@ function DynamicList(props) {
       <List sx={style} onScroll={props.onScroll} style={props.style} ref={props.innerRef}>
         {
           props.children ?
-          props.children.map((child, index) => createListItem(child, index, props.dense)) :
-          null
+            props.children.map((child, index) => createListItem(child, index, props.dense)) :
+            null
         }
       </List>
     </>
-  )
+  );
 }
 
 export default DynamicList;

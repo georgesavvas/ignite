@@ -1,14 +1,17 @@
-import React, { useContext, useState } from "react";
+import React, {useContext} from "react";
+
+import Typography from "@mui/material/Typography";
+import { useSnackbar } from "notistack";
+
+import {CopyToClipboard, ShowInExplorer, clearRepr} from "../ContextActions";
+import {setReprForProject, setReprForParent} from "../ContextActions";
+import {DIRECTORYICONS, DIRCONTEXTOPTIONS} from "../../constants";
 import Tile from "../../components/Tile";
-import Typography from '@mui/material/Typography';
-import { ContextContext } from "../../contexts/ContextContext";
-import { useSnackbar } from 'notistack';
-import { CopyToClipboard, ShowInExplorer, setReprForProject, setReprForParent, clearRepr } from "../ContextActions";
-import { DIRECTORYICONS, DIRCONTEXTOPTIONS } from "../../constants";
+import {ContextContext} from "../../contexts/ContextContext";
 
 function DirectoryTile(props) {
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
-  const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
+  const {enqueueSnackbar} = useSnackbar();
+  const [currentContext, setCurrentContext] = useContext(ContextContext);
 
   const hasThumbnail = props.entity.thumbnail && props.entity.thumbnail.filename;
   const isScene = props.entity.dir_kind === "scene";
@@ -21,7 +24,7 @@ function DirectoryTile(props) {
     path: props.entity.path,
     kind: props.entity.dir_kind,
     name: props.entity.name
-  }
+  };
 
   function getGenericContextItems(entity) {
     return [
@@ -56,7 +59,7 @@ function DirectoryTile(props) {
         fn: () => props.onContextMenu("delete", dirData),
         divider: true
       }
-    ]
+    ];
   }
 
   function getSpecificContextItems(entity) {
@@ -70,7 +73,7 @@ function DirectoryTile(props) {
       fn: () => props.onContextMenu(
         "create", {...entity, method: contextOption.name, kind: contextOption.dir_kind}
       )
-    }))
+    }));
   }
 
   const handleClick = e => {
@@ -80,8 +83,8 @@ function DirectoryTile(props) {
         path = props.entity.task.path;
       }
       setCurrentContext(path);
-    };
-  }
+    }
+  };
 
   function thumbnailPath() {
     let path = "media/folder_icon.png";
@@ -110,7 +113,7 @@ function DirectoryTile(props) {
         <Typography align="left">{props.entity.version}</Typography>
         <Typography align="left">{props.entity.full_context}</Typography>
       </>
-    )
+    );
   }
 
   let contextItems = getGenericContextItems(props.entity);

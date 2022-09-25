@@ -1,22 +1,26 @@
-import './App.css';
-import 'react-reflex/styles.css'
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import darkScrollbar from '@mui/material/darkScrollbar';
-import GlobalStyles from '@mui/material/GlobalStyles';
-import Home from './views/Home';
-// import Splash from "./views/Splash";
+import React from "react";
+
+import "react-reflex/styles.css";
+import {createTheme, ThemeProvider} from "@mui/material/styles";
+import darkScrollbar from "@mui/material/darkScrollbar";
+import GlobalStyles from "@mui/material/GlobalStyles";
+import {SnackbarProvider} from "notistack";
+import {ErrorBoundary} from "react-error-boundary";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+
+import "./App.css";
+import BuildFileURL from "./services/BuildFileURL";
 import {ContextProvider} from "./contexts/ContextContext";
 import {ConfigProvider} from "./contexts/ConfigContext";
 import {VaultProvider} from "./contexts/VaultContext";
 import {EntityProvider} from "./contexts/EntityContext";
-import { SnackbarProvider } from 'notistack';
-import BuildFileURL from './services/BuildFileURL';
-import {ErrorBoundary} from 'react-error-boundary'
-import { Button, Typography } from "@mui/material";
+import Home from "./views/Home";
+
 
 let darkTheme = createTheme({
   palette: {
-    mode: 'dark',
+    mode: "dark",
     ignite: {
       main: "rgb(252, 140, 3)",
     },
@@ -43,13 +47,13 @@ const ErrorFallback = ({error, resetErrorBoundary}) => {
       <Button color="ignite" variant="outlined" size="large" onClick={resetErrorBoundary}>Reload</Button>
       <pre className="errorContainer">{error.message}</pre>
     </div>
-  )
-}
+  );
+};
 
 function App() {
   return (
     <ThemeProvider theme={darkTheme}>
-      <GlobalStyles styles={{ ...darkScrollbar() }} />
+      <GlobalStyles styles={{...darkScrollbar()}} />
       <div className="App">
         <ErrorBoundary FallbackComponent={ErrorFallback}>
           <ConfigProvider>

@@ -1,24 +1,25 @@
-import React, { useEffect } from 'react';
+import React, { useEffect } from "react";
+
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
+import ClearIcon from "@mui/icons-material/Clear";
+
 import styles from "./Modal.module.css";
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
-import Button from '@mui/material/Button';
-import ClearIcon from '@mui/icons-material/Clear';
+
 
 function Modal(props) {
-
   useEffect(() => {
     if (!props.open || !props.focusRef) return;
     const timeout = setTimeout(() => {
-      if (props.focusRef.current) props.focusRef.current.focus()
+      if (props.focusRef.current) props.focusRef.current.focus();
     }, props.focusDelay || 250);
     return () => {
       clearTimeout(timeout);
     };
-  }, [props.open])
+  }, [props.open]);
 
   const dialogStyle = {
     "& .MuiDialog-container": {
@@ -28,21 +29,21 @@ function Modal(props) {
         height: props.fullHeight ? "100%" : "none"
       },
     },
-  }
+  };
 
   const handleSubmit = e => {
-    e.preventDefault()
-    props.onFormSubmit()
-  }
+    e.preventDefault();
+    props.onFormSubmit();
+  };
 
   const formWrapper = (onFormSubmit, children) => {
     if (onFormSubmit) return (
       <form onSubmit={handleSubmit}>
         {children}
       </form>
-    )
+    );
     else return children;
-  }
+  };
 
   return (
     <Dialog open={props.open} onClose={props.onClose} fullWidth={props.fullWidth !== undefined ? props.fullWidth : true}

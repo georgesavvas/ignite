@@ -1,41 +1,38 @@
-import React, { useState, useContext } from "react";
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
+import React, {useState, useContext, useEffect} from "react";
+
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
 import TagContainer from "./TagContainer";
-import { OutlinedInput, TextField } from "@mui/material";
-import Modal from "../../components/Modal";
+import TextField from "@mui/material/TextField";
+
 import serverRequest from "../../services/serverRequest";
 import Attributes from "./Attributes";
 import URI from "../../components/URI";
 import Path from "../../components/Path";
-import {setProject, ContextContext} from "../../contexts/ContextContext";
-import { useEffect } from "react";
+import {ContextContext} from "../../contexts/ContextContext";
 
 const style = {
   width: "100%",
   height: "100%",
   display: "flex",
   flexDirection: "column"
-}
+};
 
 const rowStyle = {
   display: "flex",
   alignItems: "center",
   gap: "10px",
   marginTop: "5px"
-}
+};
 
 function DirectoryDetails(props) {
   const [reprValue, setReprValue] = useState("");
   const [reptEdit, setReptEdit] = useState(false);
-  const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
-
-  const dir_kind = props.entity.dir_kind;
-  const dir_kind_formatted = dir_kind.charAt(0).toUpperCase() + dir_kind.slice(1)
+  const [,, refreshContext] = useContext(ContextContext);
 
   useEffect(() => {
-    setReprValue("")
-  }, [props.entity.path])
+    setReprValue("");
+  }, [props.entity.path]);
 
   const handleReptChange = () => {
     if (props.entity.repr === null && !reprValue) {setReptEdit(false); return;}
@@ -43,12 +40,12 @@ function DirectoryDetails(props) {
     const data = {
       target: props.entity.path,
       repr: reprValue
-    }
-    serverRequest("set_repr", data)
+    };
+    serverRequest("set_repr", data);
     setReprValue("");
     setReptEdit(false);
     refreshContext();
-  }
+  };
 
   return (
     <div style={style}>
@@ -68,7 +65,7 @@ function DirectoryDetails(props) {
               value={reprValue}
               onChange={e => setReprValue(e.target.value)}
               onBlur={handleReptChange}
-              onKeyPress={e => {if (e.key === "Enter") handleReptChange()}}
+              onKeyPress={e => {if (e.key === "Enter") handleReptChange();}}
             /> :
             <>
               <URI uri={props.entity.repr} />
@@ -76,8 +73,8 @@ function DirectoryDetails(props) {
                 variant="outlined"
                 size="small"
                 onClick={() => {
-                  setReprValue(props.entity.repr || "")
-                  setReptEdit(true)
+                  setReprValue(props.entity.repr || "");
+                  setReptEdit(true);
                 }}
                 color="ignite"
               >
@@ -90,7 +87,7 @@ function DirectoryDetails(props) {
       <TagContainer entityPath={props.entity.path} tags={props.entity.tags} />
       <Attributes entityPath={props.entity.path} attributes={props.entity.attributes} />
     </div>
-  )
+  );
 }
 
 export default DirectoryDetails;

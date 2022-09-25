@@ -1,16 +1,19 @@
-import React, { useState, memo, useRef } from 'react';
+import React, {memo, useRef} from "react";
+
+import Typography from "@mui/material/Typography";
+import Select from "@mui/material/Select";
+import TextField from "@mui/material/TextField";
+import { Button, Divider } from "@mui/material";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import {useDrag, useDrop} from "react-dnd";
+
 import styles from "./Rules.module.css";
-import Typography from '@mui/material/Typography';
-import Select from '@mui/material/Select';
-import TextField from '@mui/material/TextField';
-import { Button, Divider } from '@mui/material';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import { useDrag, useDrop } from 'react-dnd'
+
 
 export const Rule = memo(function Rule(props) {
-  const ref = useRef(null)
+  const ref = useRef(null);
   const index = props.index;
   const rule = props.rule;
   const id = props.id;
@@ -18,23 +21,23 @@ export const Rule = memo(function Rule(props) {
   const [{ isDragging }, drag] = useDrag({
     type: "rule",
     item: () => {
-      return { id, index, origIndex }
+      return { id, index, origIndex };
     },
     collect: monitor => ({
       isDragging: monitor.isDragging(),
     }),
-  })
-  const [{ handlerId }, drop] = useDrop(
+  });
+  const [, drop] = useDrop(
     () => ({
       accept: "rule",
       collect(monitor) {
         return {
           handlerId: monitor.getHandlerId(),
-        }
+        };
       },
-      hover(item, monitor) {
+      hover(item) {
         if (!ref.current) {
-          return
+          return;
         }
         const dragIndex = item.origIndex;
         const hoverIndex = props.index;
@@ -42,14 +45,14 @@ export const Rule = memo(function Rule(props) {
         props.moveRule(dragIndex, hoverIndex);
         // const hoverBoundingRect = ref.current?.getBoundingClientRect();
       },
-      drop(item, monitor) {
+      drop(item) {
         if (!ref.current) {
           return;
         }
         props.moveRule(item.origIndex, index, true);
       }
     })
-  )
+  );
   
   const handleChanged = e => props.onRulesChange(e, "modify");
 
@@ -57,7 +60,7 @@ export const Rule = memo(function Rule(props) {
     backgroundColor: rule.colour,
     opacity: isDragging ? 0 : 1,
     // border: isDragging ? "solid red 2px" : "none"
-  }
+  };
 
   drag(drop(ref));
 
@@ -71,25 +74,25 @@ export const Rule = memo(function Rule(props) {
           >Remove</Button>
         </div>
         <div className={styles.ruleRow}>
-        <FormControl sx={{ m: "5px", minWidth: 120 }} size="small">
-          <InputLabel id="label-file_target_type">Target type</InputLabel>
-          <Select
-            labelId="label-file_target_type"
-            id="select-file_target_type"
-            label="Target type"
-            value={rule.file_target_type || "filename"}
-            name={"file_target_type-" + origIndex}
-            onChange={handleChanged}
-          >
-            <MenuItem value="entire_path">Entire path</MenuItem>
-            <MenuItem value="directory">Directory</MenuItem>
-            <MenuItem value="filename">Filename</MenuItem>
-          </Select>
-        </FormControl>
-        <TextField sx={{ m: "5px", minWidth: 120 }} label="Target"
-          value={rule.file_target || ""} size="small" style={{flexGrow: 1}}
-          name={"file_target-" + origIndex} onChange={handleChanged}
-        />
+          <FormControl sx={{ m: "5px", minWidth: 120 }} size="small">
+            <InputLabel id="label-file_target_type">Target type</InputLabel>
+            <Select
+              labelId="label-file_target_type"
+              id="select-file_target_type"
+              label="Target type"
+              value={rule.file_target_type || "filename"}
+              name={"file_target_type-" + origIndex}
+              onChange={handleChanged}
+            >
+              <MenuItem value="entire_path">Entire path</MenuItem>
+              <MenuItem value="directory">Directory</MenuItem>
+              <MenuItem value="filename">Filename</MenuItem>
+            </Select>
+          </FormControl>
+          <TextField sx={{ m: "5px", minWidth: 120 }} label="Target"
+            value={rule.file_target || ""} size="small" style={{flexGrow: 1}}
+            name={"file_target-" + origIndex} onChange={handleChanged}
+          />
         </div>
         <Divider />
         <TextField sx={{ m: "5px", minWidth: 120 }} label="Filepath structure"
@@ -123,5 +126,5 @@ export const Rule = memo(function Rule(props) {
         <div className={styles.connector} id={id} />
       </div>
     </div>
-  )
-})
+  );
+});

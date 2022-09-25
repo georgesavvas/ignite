@@ -1,21 +1,21 @@
-import { Breadcrumbs } from '@mui/material';
-import { useSnackbar } from 'notistack';
-import React, {useEffect, useState, useContext, useRef} from "react";
+import React, {useEffect, useState, useContext} from "react";
+
+import Breadcrumbs from "@mui/material/Breadcrumbs";
+import {useSnackbar} from "notistack";
+
 import styles from "./ContextBar.module.css";
 import { ContextContext } from "../../contexts/ContextContext";
-import { CopyToClipboard } from "../ContextActions";
 import { DIRECTORYICONS } from "../../constants";
-import ContextBarLink from './ContextBarLink';
-import IgnTextField from '../../components/IgnTextField';
-import IgnButton from "../../components/IgnButton";
+import ContextBarLink from "./ContextBarLink";
+import IgnTextField from "../../components/IgnTextField";
+
 
 export default function ContextBar() {
-  const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
+  const [currentContext, setCurrentContext] = useContext(ContextContext);
   const [contextPath, setContextPath] = useState("");
   const [contextPathError, setContextPathError] = useState([false, ""]);
   const [isTextField, setIsTextField] = useState(false);
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
-  const textfieldRef = useRef(null);
+  const {enqueueSnackbar} = useSnackbar();
 
   useEffect(() => {
     if (currentContext.path !== undefined) {
@@ -31,29 +31,29 @@ export default function ContextBar() {
         enqueueSnackbar("Path not found", {variant: "error"});
         setContextPath(currentContext.path);
       }
-    }))
-  }
+    }));
+  };
 
-  const handleBreadCrumbClick = e => {
+  const handleBreadCrumbClick = () => {
     setIsTextField(true);
-  }
+  };
 
   const handleBlur = e => {
     const value = e.target.value;
     console.log(currentContext.path, value);
     if (currentContext.path !== value) handlePathChange(value);
     setIsTextField(false);
-  }
+  };
 
   const getSectionPaths = () => {
     if (!currentContext.posix) return {};
     let sectionPaths = {};
     const sections = currentContext.path_nr.replace("/scenes/", "/").replace("/exports/", "/").split("/");
     sections.map((section, index) => {
-      sectionPaths[section] = sections.slice(0, index + 1).join("/")
-    })
+      sectionPaths[section] = sections.slice(0, index + 1).join("/");
+    });
     return sectionPaths;
-  }
+  };
   const sectionPaths = getSectionPaths();
 
   return (
@@ -79,10 +79,10 @@ export default function ContextBar() {
             const Icon = DIRECTORYICONS[kind];
             return (
               <ContextBarLink setCurrentContext={setCurrentContext} icon={Icon} path={path} key={index}>{section}</ContextBarLink>
-            )
+            );
           })}     
         </Breadcrumbs>
       }
     </div>
-  )
+  );
 }

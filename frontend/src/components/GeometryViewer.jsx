@@ -1,8 +1,11 @@
-import React, { useRef, useState, Suspense, useEffect, useMemo } from "react";
-import * as THREE from 'three'
-import { Canvas, useFrame, useLoader } from '@react-three/fiber'
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
-import { useGLTF, OrbitControls, PerspectiveCamera, Environment } from '@react-three/drei'
+/* eslint-disable react/no-unknown-property */
+import React, {useState, Suspense, useEffect} from "react";
+
+import * as THREE from "three";
+import {Canvas} from "@react-three/fiber";
+// import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
+import {useGLTF, OrbitControls, Environment} from "@react-three/drei";
+
 
 const GLTF_PLACEHOLDER = "/asset_library/3d/asset_library/common/model_placeholder.gltf";
 
@@ -14,14 +17,14 @@ function Model(props) {
     window.api.checkPath(gltf_path).then(exists => {
       if (!exists) gltf_path = GLTF_PLACEHOLDER;
       setPath(gltf_path);
-    })
-  }, [props.asset])
+    });
+  }, [props.asset]);
 
   let gltf = useGLTF(`http://192.168.11.44:8084/files/${path.replace("/asset_library/3d/asset_library/", "")}`);
   console.log(path);
   // gltf.scene.children[0].material = <meshStandardMaterial attach="material" color="lightblue" />;
   const mat = new THREE.MeshStandardMaterial({color: "red"});
-  for (const [name, mesh] of Object.entries(gltf.nodes)) {
+  for (const [, mesh] of Object.entries(gltf.nodes)) {
     mesh.material = mat;
   }
   // const diffuseColor = new THREE.Color().setHSL( 1, 0.5, 0.25 );
@@ -46,17 +49,17 @@ function Model(props) {
       </mesh> */}
     </>
   );
-};
+}
 
 const mouseButtons = {
   LEFT: THREE.MOUSE.ROTATE,
   MIDDLE: THREE.MOUSE.PAN,
   RIGHT: THREE.MOUSE.PAN
-}
+};
 
-function ModelViewer({ asset }) {
+function ModelViewer({asset }) {
   return (
-    <Canvas camera={{ zoom: 1, position: [0, 0, 1] }}>
+    <Canvas camera={{zoom: 1, position: [0, 0, 1] }}>
       <OrbitControls enableRotate={true} enableDamping={false} zoomSpeed={3} mouseButtons={mouseButtons} />
       <Suspense fallback={null}>
         {/* <ambientLight intensity={50} /> */}
@@ -89,7 +92,7 @@ function ModelViewer({ asset }) {
     //     </PerspectiveCamera>
     //   </Suspense>
     // </Canvas>
-  )
+  );
 }
 
 export default ModelViewer;

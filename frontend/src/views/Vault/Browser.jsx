@@ -1,34 +1,32 @@
-import React, { useEffect, useState, useContext } from "react";
-import styles from "./Browser.module.css";
+import React, {useEffect, useState, useContext} from "react";
+
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
+import Typography from "@mui/material/Typography";
+import LinearProgress from "@mui/material/LinearProgress";
+
 import TopBar from "./TopBar";
 import PageBar from "../../components/PageBar";
-import { LinearProgress } from "@mui/material";
-import { useSnackbar } from "notistack";
-import serverRequest from "../../services/serverRequest";
-import FilterBar from "./FilterBar";
-import { Typography } from "@mui/material";
-import Modal from "../../components/Modal";
 import DataPlaceholder from "../../components/DataPlaceholder";
-import BuildFileURL from "../../services/BuildFileURL";
 import AssetTile from "../Explorer/AssetTile";
 import DirectoryTile from "../Explorer/DirectoryTile";
-import { ConfigContext } from "../../contexts/ConfigContext";
+import {ConfigContext} from "../../contexts/ConfigContext";
+import styles from "./Browser.module.css";
+import FilterBar from "./FilterBar";
+import BuildFileURL from "../../services/BuildFileURL";
 
 
 const defaultExplorerSettings = {
   currentTileSize: 5,
   tilesPerPage: 50
-}
+};
 
 function Browser(props) {
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [aspectRatio, setAspectRatio] = useState(1);
-  const [explorerSettings, setExplorerSettings] = useState(defaultExplorerSettings);
+  const [explorerSettings] = useState(defaultExplorerSettings);
   const [tileSize, setTileSize] = useState(200);
   const [tiles, setTiles] = useState([]);
-  const [config, setConfig] = useContext(ConfigContext);
+  const [config] = useContext(ConfigContext);
 
   useEffect(() => {
     const _tiles = props.loadedData.reduce(function(obj, entity) {
@@ -37,7 +35,7 @@ function Browser(props) {
       if (entity.components) {
         entity.components.forEach(comp => {
           comp.path = BuildFileURL(comp.path, config, {pathOnly: true});
-        })
+        });
       }
       if (entity.task) entity.task = BuildFileURL(entity.task, config, {pathOnly: true});
       if (entity.dir_kind === "assetversion") {
@@ -64,7 +62,7 @@ function Browser(props) {
       return obj;
     }, {});
     setTiles(_tiles);
-  }, [props.loadedData, props.selectedEntity.path, explorerSettings.currentViewType, explorerSettings.currentTileSize])
+  }, [props.loadedData, props.selectedEntity.path, explorerSettings.currentViewType, explorerSettings.currentTileSize]);
 
   // const getColourNameCluster = (word, words) => {
   //   const index = words.indexOf(word)
@@ -81,22 +79,22 @@ function Browser(props) {
   // }
 
   const handleFilterChange = data => {
-    props.onFilterChange(data)
-      // const palette = getColoursFromString(filter_string);
-      // const palette = [];
-  }
+    props.onFilterChange(data);
+    // const palette = getColoursFromString(filter_string);
+    // const palette = [];
+  };
 
   const handlePageChange = (event, value) => {
-    props.setPages(prevPages => ({...prevPages, current: value}))
-  }
+    props.setPages(prevPages => ({...prevPages, current: value}));
+  };
 
   const handleTilesPerPageChange = (event) => {
-    props.setTilesPerPage(parseInt(event.target.value))
-  }
+    props.setTilesPerPage(parseInt(event.target.value));
+  };
 
   const handleTileSizeChange = (event) => {
-    setTileSize(event.target.value * 40)
-  }
+    setTileSize(event.target.value * 40);
+  };
 
   const tileContainerStyle = {
     flexGrow: 1,
@@ -106,11 +104,11 @@ function Browser(props) {
     gridGap: "10px",
     padding: "10px",
     paddingTop: "5px"
-  }
+  };
 
   const handleFilterStringChange = value => {
-    props.handleQueryChange({filter_string: value})
-  }
+    props.handleQueryChange({filter_string: value});
+  };
 
   // const handleAssetDelete = assetID => {
   //   setAssetDeleteModal({open: false})
@@ -122,11 +120,11 @@ function Browser(props) {
   // }
 
   const getBrowserHelperText = () => {
-    let s = `${props.pages.results} results | `
-    s += props.query.sort ? `Sorted by: ${props.query.sort.label}` : ""
-    s += ` | Collection: ${props.selectedCollection.path}`
-    return s
-  }
+    let s = `${props.pages.results} results | `;
+    s += props.query.sort ? `Sorted by: ${props.query.sort.label}` : "";
+    s += ` | Collection: ${props.selectedCollection.path}`;
+    return s;
+  };
 
   return (
     <div className={styles.container}>
@@ -165,12 +163,12 @@ function Browser(props) {
       </div>
       <Divider />
       <PageBar pages={props.pages.total} currentPage={props.pages.current}
-        onChange={handlePageChange} onAspectRatioChange={setAspectRatio}
+        onChange={handlePageChange}
         onTilesPerPageChange={handleTilesPerPageChange}
         onTileSizeChange={handleTileSizeChange} tileSize={explorerSettings.currentTileSize}
       />
     </div>
-  )
+  );
 }
 
-export default Browser
+export default Browser;

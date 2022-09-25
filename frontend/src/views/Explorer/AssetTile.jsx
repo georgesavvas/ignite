@@ -1,16 +1,19 @@
-import React, { useState, useContext } from "react";
-import Tile from "../../components/Tile";
-import Typography from '@mui/material/Typography';
-import { ContextContext } from "../../contexts/ContextContext";
-import { useSnackbar } from 'notistack';
-import { CopyToClipboard, ShowInExplorer, setReprForProject, setReprForParent } from "../ContextActions";
+import React, {useContext} from "react";
+
+import Typography from "@mui/material/Typography";
+import { useSnackbar } from "notistack";
+
 import URI from "../../components/URI";
 import Path from "../../components/Path";
-import { Divider } from "@mui/material";
+import {CopyToClipboard, ShowInExplorer} from "../ContextActions";
+import {setReprForProject, setReprForParent} from "../ContextActions";
+import { ContextContext } from "../../contexts/ContextContext";
+import Tile from "../../components/Tile";
+
 
 function AssetTile(props) {
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
-  const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
+  const {enqueueSnackbar} = useSnackbar();
+  const [currentContext] = useContext(ContextContext);
 
   const hasThumbnail = props.entity.thumbnail && props.entity.thumbnail.filename;
   const thumbnailWidth = hasThumbnail ? "100%" : "50%";
@@ -21,7 +24,7 @@ function AssetTile(props) {
   const dirData = {
     kind: props.entity.dir_kind,
     path: props.entity.path
-  }
+  };
 
   const contextItems = [
     {
@@ -51,7 +54,7 @@ function AssetTile(props) {
       label: "Delete asset version",
       fn: () => props.onContextMenu("delete", dirData)
     }
-  ]
+  ];
 
   function details() {
     if (props.viewType === "grid") return(
@@ -75,7 +78,7 @@ function AssetTile(props) {
         <Path path={props.entity.size} />
         {/* <Typography align="left">{props.entity.context}</Typography> */}
       </>
-    )
+    );
   }
 
   return (

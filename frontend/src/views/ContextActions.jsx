@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState, useRef} from "react";
+
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
+
 import Modal from "../components/Modal";
 import CreateDirModal from "./CreateDirModal";
 import serverRequest from "../services/serverRequest";
 import clientRequest from "../services/clientRequest";
-import TextField from '@mui/material/TextField';
-import { Button, OutlinedInput, Typography } from '@mui/material';
-import { Stack } from '@mui/system';
-import { useRef } from 'react';
+
 
 export function CopyToClipboard(text, enqueueSnackbar) {
   navigator.clipboard.writeText(text);
@@ -16,41 +17,41 @@ export function CopyToClipboard(text, enqueueSnackbar) {
 export function ShowInExplorer(filepath, enqueueSnackbar) {
   clientRequest("show_in_explorer", {"filepath": filepath}).then((resp) => {
     if (!resp.ok) enqueueSnackbar("Failed launching scene.", {variant: "error"});
-  })
+  });
 }
 
 export function clearRepr(target, enqueueSnackbar, refresh) {
   const data = {
     target: target,
     repr: ""
-  }
+  };
   serverRequest("set_repr", data).then(resp => {
     if (resp.ok) {
-      enqueueSnackbar("Done", {variant: "success"})
-      refresh()
+      enqueueSnackbar("Done", {variant: "success"});
+      refresh();
     }
     else enqueueSnackbar("Couldn't clear repr", {variant: "error"});
-  })
+  });
 }
 
 export function setReprForProject(repr, enqueueSnackbar) {
   const data = {
     repr: repr
-  }
+  };
   serverRequest("set_repr_for_project", data).then(resp => {
     if (resp.ok) enqueueSnackbar(`Repr set for ${resp.data}`, {variant: "success"});
     else enqueueSnackbar(`Couldn't set repr for ${resp.data}`, {variant: "error"});
-  })
+  });
 }
 
 export function setReprForParent(repr, enqueueSnackbar) {
   const data = {
     repr: repr
-  }
+  };
   serverRequest("set_repr_for_parent", data).then(resp => {
     if (resp.ok) enqueueSnackbar(`Repr set for ${resp.data}`, {variant: "success"});
     else enqueueSnackbar(`Couldn't set repr for ${resp.data}`, {variant: "error"});
-  })
+  });
 }
 
 export function DeleteDir({data, open=false, onClose, enqueueSnackbar, fn}) {
@@ -63,13 +64,13 @@ export function DeleteDir({data, open=false, onClose, enqueueSnackbar, fn}) {
     if (!open) return;
     const n1 = Math.floor(Math.random() * 49);
     const n2 = Math.floor(Math.random() * 49);
-    setPuzzle([n1, n2])
-    setValue("")
-  }, [open, data])
+    setPuzzle([n1, n2]);
+    setValue("");
+  }, [open, data]);
 
   useEffect(() => {
     setSolved(parseInt(value) === puzzle[0] + puzzle[1]);
-  }, [value, puzzle])
+  }, [value, puzzle]);
 
   const handleDeleteEntity = () => {
     serverRequest("delete_entity", data).then(resp => {
@@ -79,7 +80,7 @@ export function DeleteDir({data, open=false, onClose, enqueueSnackbar, fn}) {
     });
     if (fn) fn();
     onClose();
-  }
+  };
 
   return (
     <Modal open={open} title="Are you sure?" onFormSubmit={handleDeleteEntity}
@@ -102,7 +103,7 @@ export function DeleteDir({data, open=false, onClose, enqueueSnackbar, fn}) {
         color={solved ? "success" : "error"}
       />
     </Modal>
-  )
+  );
 }
 
 export function RenameDir({data, open=false, onClose, enqueueSnackbar, fn}) {
@@ -111,7 +112,7 @@ export function RenameDir({data, open=false, onClose, enqueueSnackbar, fn}) {
 
   useEffect(() => {
     setNameValue(data.name);
-  }, [data.name])
+  }, [data.name]);
 
   function handleRenameDir() {
     if (nameValue === data.name) {
@@ -148,7 +149,7 @@ export function RenameDir({data, open=false, onClose, enqueueSnackbar, fn}) {
         style={{marginTop: "10px"}}
       />
     </Modal>
-  )
+  );
 }
 
 export function CreateDir({data, open=false, onClose, enqueueSnackbar, fn}) {
@@ -157,7 +158,7 @@ export function CreateDir({data, open=false, onClose, enqueueSnackbar, fn}) {
       enqueueSnackbar(resp.text, {variant: resp.ok ? "success" : "error"});
       if (fn) fn();
     }));
-  }
+  };
 
   return (
     <>
@@ -168,5 +169,5 @@ export function CreateDir({data, open=false, onClose, enqueueSnackbar, fn}) {
         onClose={onClose}
       />
     </>
-  )
+  );
 }

@@ -17,11 +17,11 @@ export const hexToHsl = (H, maxS=100, maxL=100) => {
   g /= 255;
   b /= 255;
   let cmin = Math.min(r,g,b),
-      cmax = Math.max(r,g,b),
-      delta = cmax - cmin,
-      h = 0,
-      s = 0,
-      l = 0;
+    cmax = Math.max(r,g,b),
+    delta = cmax - cmin,
+    h = 0,
+    s = 0,
+    l = 0;
 
   if (delta == 0)
     h = 0;
@@ -46,4 +46,4 @@ export const hexToHsl = (H, maxS=100, maxL=100) => {
   l = clamp(l, 0, maxL);
 
   return "hsl(" + h + "," + s + "%," + l + "%)";
-}
+};

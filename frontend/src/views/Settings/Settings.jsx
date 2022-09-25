@@ -1,10 +1,12 @@
+import React, {useState} from "react";
+
+import {ListItemText, Divider, MenuItem, MenuList} from "@mui/material";
+
 import styles from "./Settings.module.css";
-import { ListItemIcon, ListItemText, Typography, Divider, MenuItem, MenuList } from '@mui/material'
-import React from 'react';
-import Modal from '../../components/Modal';
-import { useState } from "react";
+import Modal from "../../components/Modal";
 import Dcc from "./Dcc";
 import General from "./General";
+
 
 const settingOptions = ["General", "DCC"];
 
@@ -13,12 +15,12 @@ const Settings = props => {
 
   const getSettings = () => {
     switch (selectedOption) {
-      default:
-        return <General />
-      case "DCC":
-        return <Dcc />
+    default:
+      return <General />;
+    case "DCC":
+      return <Dcc />;
     }
-  }
+  };
 
   return (
     <Modal open={props.open} onClose={props.onClose} title="Settings"
@@ -46,7 +48,7 @@ const Settings = props => {
         </div>
       </div>
     </Modal>
-  )
-}
+  );
+};
 
-export default Settings
+export default Settings;

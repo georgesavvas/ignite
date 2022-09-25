@@ -5,7 +5,7 @@ const cOpts = {
   create_sequence: {name: "create_sequence", label: "Create sequence", dir_kind: "sequence"},
   create_shot: {name: "create_shot", label: "Create shot", dir_kind: "shot"},
   create_task: {name: "create_task", label: "Create task", dir_kind: "task"}
-}
+};
 
 export const DIRCONTEXTOPTIONS = {
   project: {
@@ -31,4 +31,4 @@ export const DIRCONTEXTOPTIONS = {
   shot: {
     default: [cOpts.create_directory, cOpts.create_task]
   }
-}
+};

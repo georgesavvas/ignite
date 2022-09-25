@@ -16,7 +16,7 @@ async function serverRequest(method, data=undefined) {
       "Content-Type": "application/json"
     },
     body: JSON.stringify(data)
-  })
+  });
   const resp2 = await resp.json();
   console.log("Server response:", method, resp2);
   return resp2;

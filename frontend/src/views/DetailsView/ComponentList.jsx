@@ -1,40 +1,33 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, {useState, useEffect} from "react";
+import Typography from "@mui/material/Typography";
+import IconButton from "@mui/material/IconButton";
+import {useSnackbar} from "notistack";
+
 import styles from "./ComponentList.module.css";
-import Typography from '@mui/material/Typography';
-import IconButton from '@mui/material/IconButton';
-import CopyIcon from "../../icons/CopyIcon";
-import { useSnackbar } from 'notistack';
-import { CopyToClipboard } from "../ContextActions";
+import {CopyToClipboard} from "../ContextActions";
 import ContextMenu, { handleContextMenu } from "../../components/ContextMenu";
 import openExplorer from "../../utils/openExplorer";
 import clientRequest from "../../services/clientRequest";
-import FormControl from '@mui/material/FormControl';
-import OutlinedInput from '@mui/material/OutlinedInput';
 import FilterField from "../../components/FilterField";
+import CopyIcon from "../../icons/CopyIcon";
 
-const dccNames = {
-  houdini: ["hmaster", "hescape", "houdini", "houdinicore", "houdinifx"],
-  maya: ["maya"],
-  blender: ["blender"],
-  nuke: ["nuke"]
-}
 
 function Component(props) {
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const {enqueueSnackbar} = useSnackbar();
   const [contextMenu, setContextMenu] = useState(null);
 
   const containerStyle = {
     borderColor: props.selectedComp && props.comp.filename === props.selectedComp.filename ? "rgb(252, 140, 3)" : "rgb(70,70,70)"
-  }
+  };
 
   const handleClick = e => {
     props.onSelect(e.currentTarget.id);
-  }
+  };
 
   const handleCopy = (e, path) => {
     if (e) e.stopPropagation();
     CopyToClipboard(path, enqueueSnackbar);
-  }
+  };
 
   let contextItems = [
     {
@@ -47,7 +40,7 @@ function Component(props) {
       fn: () => openExplorer(props.comp.path, enqueueSnackbar),
       divider: true
     },
-  ]
+  ];
 
   const data = {
     kind: "component",
@@ -60,9 +53,9 @@ function Component(props) {
         ...data,
         action: action.label,
         session_id: resp
-      })
-    })
-  }
+      });
+    });
+  };
 
   contextItems = contextItems.concat(props.actions.map(action => (
     {
@@ -85,7 +78,7 @@ function Component(props) {
         </IconButton>
       </div>
     </div>
-  )
+  );
 }
 
 function ComponentList(props) {
@@ -95,8 +88,8 @@ function ComponentList(props) {
   useEffect(() => {
     clientRequest("get_actions").then(resp => {
       setActions(resp.data.component || []);
-    })
-  }, [])
+    });
+  }, []);
 
   return (
     <div className={styles.container}>
@@ -108,11 +101,11 @@ function ComponentList(props) {
           return <Component key={index} comp={comp}
             onSelect={props.onSelect} selectedComp={props.selectedComp}
             actions={actions} style={hide ? {display: "none"} : null}
-          />
+          />;
         })}
       </div>
     </div>
-  )
+  );
 }
 
 export default ComponentList;

@@ -1,20 +1,20 @@
 import React, { useState, useEffect, useContext } from "react";
+
 import Typography from "@mui/material/Typography";
+import {ReflexContainer, ReflexSplitter, ReflexElement} from "react-reflex";
+import {useSnackbar} from "notistack";
+
 import ComponentViewer from "./ComponentViewer";
 import ComponentList from "./ComponentList";
 import TagContainer from "./TagContainer";
 import saveReflexLayout from "../../utils/saveReflexLayout";
 import loadReflexLayout from "../../utils/loadReflexLayout";
-import { ConfigContext } from "../../contexts/ConfigContext";
 import {ContextContext} from "../../contexts/ContextContext";
-import {ReflexContainer, ReflexSplitter, ReflexElement} from "react-reflex";
-import serverRequest from "../../services/serverRequest";
-import BuildFileURL from "../../services/BuildFileURL";
-import { useSnackbar } from "notistack";
-import { CopyToClipboard, ShowInExplorer } from "../ContextActions";
-import ContextMenu, { handleContextMenu } from "../../components/ContextMenu";
+import {CopyToClipboard} from "../ContextActions";
+import ContextMenu from "../../components/ContextMenu";
 import URI from "../../components/URI";
 import Path from "../../components/Path";
+
 
 const splitterStyle = {
   borderColor: "rgb(80,80,80)",
@@ -46,9 +46,8 @@ const compExtensionPreviewPriority = [
 function AssetDetails(props) {
   const [flexRatios, setFlexRatios] = useState(defaultFlexRations);
   const [selectedCompName, setSelectedCompName] = useState("");
-  const [config, setConfig] = useContext(ConfigContext);
-  const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const [,, refreshContext] = useContext(ContextContext);
+  const {enqueueSnackbar} = useSnackbar();
   const [contextMenu, setContextMenu] = useState(null);
 
   useEffect(() => {
@@ -98,30 +97,6 @@ function AssetDetails(props) {
   };
 
   const selectedComp = getComp(selectedCompName);
-
-  const handleAddTags = tags => {
-    const data = {
-      path: BuildFileURL(props.entity.path, config, {pathOnly: true, reverse: true}),
-      tags: tags
-    };
-    serverRequest("add_tags", data).then(resp => {
-      if (resp.ok) console.log("done");
-      else console.log("failed");
-      refreshContext();
-    });
-  };
-
-  const handleOnDeleteTagClicked = name => {
-    const data = {
-      path: BuildFileURL(props.entity.path, config, {pathOnly: true, reverse: true}),
-      tags: name
-    };
-    serverRequest("remove_tags", data).then(resp => {
-      if (resp.ok) console.log("done");
-      else console.log("failed");
-      refreshContext();
-    });
-  };
 
   const contextItems = [
     {

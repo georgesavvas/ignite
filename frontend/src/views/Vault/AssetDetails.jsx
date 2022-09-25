@@ -1,55 +1,48 @@
-import React, { useState, useEffect, useContext } from "react";
-import Typography from '@mui/material/Typography';
+import React, {useState, useEffect, useContext} from "react";
+
+import Typography from "@mui/material/Typography";
+import {ReflexContainer, ReflexSplitter, ReflexElement} from "react-reflex";
+import {useSnackbar} from "notistack";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
+
+import DataPlaceholder from "../../components/DataPlaceholder";
+import {CopyToClipboard} from "../ContextActions";
+import ContextMenu from "../../components/ContextMenu";
+import Path from "../../components/Path";
+import serverRequest from "../../services/serverRequest";
 import ComponentViewer from "../DetailsView/ComponentViewer";
 import ComponentList from "../DetailsView/ComponentList";
 import TagContainer from "../DetailsView/TagContainer";
 import saveReflexLayout from "../../utils/saveReflexLayout";
 import loadReflexLayout from "../../utils/loadReflexLayout";
-import { ConfigContext } from "../../contexts/ConfigContext";
 import {VaultContext} from "../../contexts/VaultContext";
-import {ReflexContainer, ReflexSplitter, ReflexElement} from "react-reflex";
-import serverRequest from "../../services/serverRequest";
-import BuildFileURL from "../../services/BuildFileURL";
-import { useSnackbar } from 'notistack';
-import { CopyToClipboard, ShowInExplorer } from "../ContextActions";
-import ContextMenu, { handleContextMenu } from "../../components/ContextMenu";
-import URI from "../../components/URI";
-import Path from "../../components/Path";
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
-import DataPlaceholder from "../../components/DataPlaceholder";
+
 
 const splitterStyle = {
   borderColor: "rgb(80,80,80)",
   backgroundColor: "rgb(80,80,80)"
-}
+};
 
 const versionSelectStyle = {
   minWidth: "150px",
   position: "absolute",
   right: "10px",
   top: "15px"
-}
+};
 
 const style = {
   width: "100%",
   height: "100%"
-}
+};
 
 const defaultFlexRations = {
   "vault.details.viewer": 0.4,
   "vault.details.details": 0.25,
   "vault.details.comps": 0.35
-}
-
-const rowStyle = {
-  display: "flex",
-  alignItems: "center",
-  gap: "10px",
-  marginTop: "5px"
-}
+};
 
 const compExtensionPreviewPriority = [
   ".mp4",
@@ -60,31 +53,30 @@ const compExtensionPreviewPriority = [
   ".tif",
   ".tiff",
   ".exr"
-]
+];
 
 function AssetDetails(props) {
   const [flexRatios, setFlexRatios] = useState(defaultFlexRations);
   const [selectedCompName, setSelectedCompName] = useState("");
-  const [config, setConfig] = useContext(ConfigContext);
-  const {enqueueSnackbar, closeSnackbar} = useSnackbar();
+  const {enqueueSnackbar} = useSnackbar();
   const [contextMenu, setContextMenu] = useState(null);
   const [selectedVersion, setSelectedVersion] = useState("");
   const [assetVersion, setAssetVersion] = useState();
   const [selectedComp, setSelectedComp] = useState();
-  const [vaultContext, setVaultContext, refreshVault] = useContext(VaultContext);
+  const [,, refreshVault] = useContext(VaultContext);
 
   useEffect(() => {
     const data = loadReflexLayout();
     if (!data) {
       setFlexRatios(defaultFlexRations);
-      return
+      return;
     }
     const viewer = data["vault.details.viewer"];
     const details = data["vault.details.details"];
     const comps = data["vault.details.comps"];
     if (!viewer || !details || !comps) {
       setFlexRatios(defaultFlexRations);
-      return
+      return;
     }
     const fullWidth = viewer[1] + details[1] + comps[1];
     const ratios = {
@@ -97,16 +89,16 @@ function AssetDetails(props) {
 
   useEffect(() => {
     if (!props.entity || props.entity === null) return;
-    setSelectedVersion(props.entity.latest_v)
+    setSelectedVersion(props.entity.latest_v);
   }, [props.entity]);
 
   useEffect(() => {
     if (!props.entity || props.entity === null) return;
     if (!selectedVersion) return;
-    const path = `${props.entity.path}/${selectedVersion}`
+    const path = `${props.entity.path}/${selectedVersion}`;
     serverRequest("get_assetversion", {path: path}).then(resp => {
       const av = resp.data;
-      setAssetVersion(av)
+      setAssetVersion(av);
       if (!av.components) {
         setSelectedCompName("");
         return;
@@ -116,52 +108,28 @@ function AssetDetails(props) {
           setSelectedCompName(comp.filename);
           return;
         }
-      })
-    })
+      });
+    });
   }, [props.entity, selectedVersion]);
 
   useEffect(() => {
     if (!selectedCompName) {
-      setSelectedComp()
-      return
+      setSelectedComp();
+      return;
     }
     setSelectedComp(getComp(selectedCompName));
-  }, [selectedCompName])
+  }, [selectedCompName]);
 
   const handleResized = data => {
-    saveReflexLayout(data)
-  }
+    saveReflexLayout(data);
+  };
 
   const getComp = compName => {
     for(const comp of assetVersion.components) {
       if (comp.filename === compName) return comp;
     }
     return {};
-  }
-
-  const handleAddTags = tags => {
-    const data = {
-      path: BuildFileURL(props.entity.path, config, {pathOnly: true, reverse: true}),
-      tags: tags
-    };
-    serverRequest("add_tags", data).then(resp => {
-      if (resp.ok) console.log("done");
-      else console.log("failed");
-      props.onRefresh();
-    })
-  }
-
-  const handleOnDeleteTagClicked = name => {
-    const data = {
-      path: BuildFileURL(props.entity.path, config, {pathOnly: true, reverse: true}),
-      tags: name
-    };
-    serverRequest("remove_tags", data).then(resp => {
-      if (resp.ok) console.log("done");
-      else console.log("failed");
-      props.onRefresh();
-    })
-  }
+  };
 
   const contextItems = [
     {
@@ -172,7 +140,7 @@ function AssetDetails(props) {
     //   label: "Add tags",
     //   fn: () => ShowInExplorer(props.entity.path, enqueueSnackbar)
     // }
-  ]
+  ];
 
   if (!assetVersion) return <DataPlaceholder text="Fetching data..." />;
 
@@ -212,7 +180,7 @@ function AssetDetails(props) {
         </ReflexElement>
       </ReflexContainer>
     </div>
-  )
+  );
 }
 
 export default AssetDetails;

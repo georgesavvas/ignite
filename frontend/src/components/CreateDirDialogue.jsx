@@ -1,25 +1,20 @@
-import {useState} from "react";
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import MenuItem from '@mui/material/MenuItem';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemText from '@mui/material/ListItemText';
-import ListItemAvatar from '@mui/material/ListItemAvatar';
-import Checkbox from '@mui/material/Checkbox';
+import React, {useState} from "react";
+
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import MenuItem from "@mui/material/MenuItem";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
+
 
 const NewDirContent = (values, setValues) => {
   const handleChange = (e, field) => {
     const data = {};
     data[field] = e.target.value;
     setValues(prevState => ({...prevState, ...data}));
-  }
+  };
 
   return (
     <DialogContent>
@@ -37,8 +32,8 @@ const NewDirContent = (values, setValues) => {
         onChange={(e) => handleChange(e, "dir_name")}
       />
     </DialogContent>
-  )
-}
+  );
+};
 
 const NewBuildContent = (values, setValues) => {
   // const [checked, setChecked] = useState([1]);
@@ -47,7 +42,7 @@ const NewBuildContent = (values, setValues) => {
     const data = {};
     data[field] = e.target.value;
     setValues(prevState => ({...prevState, ...data}));
-  }
+  };
 
   return (
     <DialogContent>
@@ -85,8 +80,8 @@ const NewBuildContent = (values, setValues) => {
         onChange={(e) => handleChange(e, "dir_name")}
       />
     </DialogContent>
-  )
-}
+  );
+};
 
 const NewTaskContent = (values, setValues) => {
   // const [checked, setChecked] = useState([1]);
@@ -126,7 +121,7 @@ const NewTaskContent = (values, setValues) => {
     const data = {};
     data[field] = e.target.value;
     setValues(prevState => ({...prevState, ...data}));
-  }
+  };
 
   return (
     <DialogContent>
@@ -155,8 +150,8 @@ const NewTaskContent = (values, setValues) => {
         onChange={(e) => handleChange(e, "dir_name")}
       />
     </DialogContent>
-  )
-}
+  );
+};
 
 const dialogueContents = {
   "directory": NewDirContent,
@@ -164,7 +159,7 @@ const dialogueContents = {
   "sequence": NewDirContent,
   "shot": NewDirContent,
   "task": NewTaskContent
-}
+};
 
 export default function CreateDirDialogue(props) {
   const fields = {
@@ -177,9 +172,9 @@ export default function CreateDirDialogue(props) {
   const handleCreate = (e) => {
     e.preventDefault();
     props.onCreate(values, props.meta);
-    setValues("")
+    setValues("");
     props.onClose();
-  }
+  };
   return (
     <Dialog open={props.open} onClose={props.onClose}>
       <DialogTitle>{props.meta.modal_title}</DialogTitle>

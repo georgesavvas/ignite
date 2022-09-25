@@ -1,16 +1,15 @@
-import React, {useEffect, useState, useContext} from 'react';
+import React, {useEffect, useState, useContext} from "react";
+
+import TextField from "@mui/material/TextField";
+import {Divider, Typography} from "@mui/material";
+
 import styles from "./General.module.css";
 import {ConfigContext} from "../../contexts/ConfigContext";
-import TextField from '@mui/material/TextField';
-import DialogContentText from '@mui/material/DialogContentText';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import { Stack, Divider, Typography } from '@mui/material';
-import Checkbox from '@mui/material/Checkbox';
-import FileInput from '../../components/FileInput';
-import IgnButton from '../../components/IgnButton';
+import FileInput from "../../components/FileInput";
+import IgnButton from "../../components/IgnButton";
+
 
 const General = () => {
-  const [serverAddress, setServerAddress] = useState("");
   const [config, setConfig] = useContext(ConfigContext);
   const [settings, setSettings] = useState({serverDetails: {}, access: {}});
   const [canSave, setCanSave] = useState(false);
@@ -25,36 +24,36 @@ const General = () => {
         projectsDir: config.access.projectsDir,
         serverProjectsDir: config.access.serverProjectsDir
       }
-    })
-  }, [config.serverDetails, config.access])
+    });
+  }, [config.serverDetails, config.access]);
 
   const handleServerDetailsChange = (field, value) => {
     setSettings(prevState => ({
       ...prevState,
       serverDetails: {...prevState.serverDetails[field], value}
     }));
-  }
+  };
 
   const handleAccessChange = (field, value) => {
     setSettings(prevState => ({
       ...prevState,
       access: {...prevState.access[field], value}
-    }))
-    checkSave()
-  }
+    }));
+    checkSave();
+  };
 
   const handleSave = () => {
-    setConfig("serverDetails", {...settings.serverDetails})
-    setConfig("access", {...settings.access})
-    setCanSave(false)
-  }
+    setConfig("serverDetails", {...settings.serverDetails});
+    setConfig("access", {...settings.access});
+    setCanSave(false);
+  };
 
   const checkSave = () => {
     let changed = false;
     if (config.serverDetails !== settings.serverDetails) changed = true;
     if (config.access !== settings.access) changed = true;
-    setCanSave(changed)
-  }
+    setCanSave(changed);
+  };
 
   const isServerLocal = settings.serverDetails.address && settings.serverDetails.address.startsWith("localhost");
 
@@ -121,7 +120,7 @@ const General = () => {
         </IgnButton>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default General
+export default General;
