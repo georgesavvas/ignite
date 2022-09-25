@@ -8,6 +8,8 @@ import TextField from "@mui/material/TextField";
 export default function FileInput(props) {
   const hiddenFileInput = useRef(null);
 
+  const {buttonStyle, ...other} = props;
+
   const handleChange = e => {
     if (!props.onChange) return;
     props.onChange(e.target.value);
@@ -35,7 +37,7 @@ export default function FileInput(props) {
   return (
     <div style={{...style, ...props.style}}>
       <TextField
-        {...props}
+        {...other}
         value={props.value}
         onChange={handleChange}
         onBlur={handleChange}
@@ -43,7 +45,7 @@ export default function FileInput(props) {
       <IgnButton
         variant="outlined"
         onClick={() => hiddenFileInput.current.click()}
-        style={{height: 37.5, ...props.buttonStyle}}
+        style={{height: 37.5, ...buttonStyle}}
       >
         ...
       </IgnButton>

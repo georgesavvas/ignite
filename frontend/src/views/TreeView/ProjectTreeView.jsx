@@ -91,11 +91,12 @@ function StyledTreeItem(props) {
     labelIcon: LabelIcon,
     labelInfo,
     labelText,
+    onContextOpen,
     ...other
   } = props;
 
   const handleClick = (action, data) => {
-    props.onContextOpen(action, data);
+    onContextOpen(action, data);
     handleClose();
   };
 
@@ -104,8 +105,8 @@ function StyledTreeItem(props) {
   };
 
   const itemData = {
-    path: props.dir_path,
-    kind: props.dir_kind,
+    path: props.dirpath,
+    kind: props.dirkind,
     name: labelText,
     handleClick: handleClick
   };
@@ -147,7 +148,7 @@ StyledTreeItem.propTypes = {
   color: PropTypes.string,
   labelIcon: PropTypes.elementType.isRequired,
   labelInfo: PropTypes.string,
-  labelText: PropTypes.string.isRequired,
+  labelText: PropTypes.string.isRequired
 };
 
 function ProjectTreeView(props) {
@@ -236,8 +237,8 @@ function ProjectTreeView(props) {
         labelText={nodes.name}
         labelIcon={DIRECTORYICONS[nodes.icon]}
         labelInfo={nodes.dir_kind}
-        dir_kind={nodes.dir_kind}
-        dir_path={path}
+        dirkind={nodes.dir_kind}
+        dirpath={path}
         onContextOpen={handleContextMenuSelection}
         style={hide ? {display: "none"} : null}
       >

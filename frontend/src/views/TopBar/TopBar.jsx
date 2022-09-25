@@ -43,21 +43,18 @@ export default function TopBar() {
           <img src="media/ignite_logo.png" className={styles.logo} />
         </div>
         <div className={styles.rightSide}>
-          <ButtonGroup variant="text" >
-            <IconButton>
-              <HelpIcon />
-            </IconButton>
-            <IconButton>
-              <BugReportIcon />
-            </IconButton>
-            <IconButton>
-              <ThumbsUpDownIcon />
-              {/* <FeedbackIcon /> */}
-            </IconButton>
-            <IconButton style={{marginLeft: "10px"}} onClick={() => setSettingsOpen(true)}>
-              <SettingsIcon />
-            </IconButton>
-          </ButtonGroup>
+          <IconButton size="small" style={{padding: 0}}>
+            <div className={styles.feedbackIcon} />
+          </IconButton>
+          <IconButton size="small"
+            onClick={() => window.services.open_url("https://docs.ignitevfx.co.uk/")}
+          >
+            <HelpIcon style={{fontSize: "30px"}} />
+          </IconButton>
+          <IconButton size="small"
+            onClick={() => setSettingsOpen(true)}>
+            <SettingsIcon style={{fontSize: "30px"}} />
+          </IconButton>
         </div>
       </div>
     </>

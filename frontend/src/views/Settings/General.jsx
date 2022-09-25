@@ -69,7 +69,7 @@ const General = () => {
             id="server-address"
             size="small"
             label="Address"
-            value={settings.serverDetails.address}
+            value={settings.serverDetails.address || ""}
             onChange={e => handleServerDetailsChange("address", e.target.value)}
           />
           <TextField
@@ -78,7 +78,7 @@ const General = () => {
             label="Password"
             type="password"
             size="small"
-            value={settings.serverDetails.password}
+            value={settings.serverDetails.password || ""}
             onChange={e => handleServerDetailsChange("password", e.target.value)}
           />
         </div>
@@ -95,7 +95,7 @@ const General = () => {
           size="small"
           fullWidth
           disabled={settings.access.remote}
-          value={settings.access.projectsDir}
+          value={settings.access.projectsDir || ""}
           onChange={e => handleAccessChange("projectsDir", e.target.value)}
           buttonStyle={{marginTop: "4px"}}
         />
@@ -106,7 +106,7 @@ const General = () => {
           size="small"
           fullWidth
           disabled={isServerLocal}
-          value={settings.access.serverProjectsDir}
+          value={settings.access.serverProjectsDir || ""}
           onChange={e => handleAccessChange("serverProjectsDir", e.target.value)}
           style={{alignSelf: "stretch"}}
           buttonStyle={{marginTop: "4px"}}
