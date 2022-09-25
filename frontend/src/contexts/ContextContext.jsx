@@ -2,7 +2,7 @@ import { useState, createContext, useContext, useEffect } from "react";
 import BuildFileURL from "../services/BuildFileURL";
 import serverRequest from "../services/serverRequest";
 import { serverSocket } from "../services/serverWebSocket";
-import { ConfigContext } from "../contexts/ConfigContext";
+import { ConfigContext } from "./ConfigContext";
 
 export const ContextContext = createContext();
 

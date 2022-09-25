@@ -48,7 +48,7 @@
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
     "sanitize": "npx kill-port 3000",
-    "electron": "electron .",
+    "electron": "cross-env NODE_ENV=dev electron .",
     "electron-dev": "npm run sanitize && concurrently \"cross-env BROWSER=none npm start\" \"wait-on http://localhost:3000 && cross-env NODE_ENV=dev electron .\"",
     "package": "npm run build && electron-builder",
     "deploy-win": "..\\.secret && electron-builder --publish always",

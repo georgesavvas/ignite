@@ -74,6 +74,8 @@ function Vault(props) {
   }, [])
 
   useEffect(() => {
+    if (!props.open) return;
+    if (!Object.entries(config.access).length) return;
     serverRequest("get_collections", {data: {user: undefined}}).then(resp => {
       const data = resp.data
       setCollectionData(data && data.studio ? data.studio : [])
@@ -81,6 +83,7 @@ function Vault(props) {
   }, [vaultContext])
 
   useEffect(() => {
+    if (!props.open) return;
     const data = {
       path: BuildFileURL(`__vault__`, config, {reverse: true, pathOnly: true}),
       page: pages.current,
@@ -88,6 +91,7 @@ function Vault(props) {
       query: query
     }
     setIsLoading(true)
+    if (!Object.entries(config.access).length) return;
     serverRequest("get_assets", data).then(resp => {
       setIsLoading(false)
       setLoadedData(resp.data)

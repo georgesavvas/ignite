@@ -705,6 +705,43 @@ async def reorder_collection(request: Request):
     return {"ok": ok}
 
 
+@app.get("/api/v1/get_rule_templates")
+async def get_rule_templates():
+    data = api.get_rule_templates()
+    return {
+        "ok": True,
+        "data": data
+    }
+
+
+@app.post("/api/v1/add_rule_template")
+async def add_rule_template(request: Request):
+    result = await request.json()
+    log_request(result)
+    name = result.get("name")
+    data = result.get("data")
+    if not name or not data:
+        logging.error(f"name {name} data {data}")
+        return {"ok": False}
+    data = api.add_rule_template(data, name)
+    return {
+        "ok": True,
+        "data": data
+    }
+
+
+@app.post("/api/v1/remove_rule_template")
+async def remove_rule_template(request: Request):
+    result = await request.json()
+    log_request(result)
+    data = result.get("data", {})
+    data = api.remove_rule_template(data)
+    return {
+        "ok": True,
+        "data": data
+    }
+
+
 mount_root()
 
 
