@@ -1,25 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from "react";
+
+import Box from "@mui/material/Box";
+import Stack from "@mui/material/Stack";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
+import TextField from "@mui/material/TextField";
+import InputLabel from "@mui/material/InputLabel";
+import Button from "@mui/material/Button";
+import ClearIcon from "@mui/icons-material/Clear";
+
+import {DIRECTORYICONS} from "../constants";
 import styles from "./CreateDirModal.module.css";
 import DynamicList from "../components/DynamicList";
 import Modal from "../components/Modal";
-import Box from '@mui/material/Box';
-import Stack from '@mui/material/Stack';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
-import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
-import InputLabel from '@mui/material/InputLabel';
-import Button from '@mui/material/Button';
-import IconButton from '@mui/material/IconButton';
-import ClearIcon from '@mui/icons-material/Clear';
-import RemoveIcon from '@mui/icons-material/Remove';
-import { DIRECTORYICONS } from "../constants";
+
 
 const KINDTYPES = {
   task: [
@@ -32,19 +27,19 @@ const KINDTYPES = {
     ["asset", "Asset"],
     ["fx", "FX"]
   ]
-}
+};
 
 function Dir(props) {
   const kind = props.data.kind;
-  const hasTypes = KINDTYPES.hasOwnProperty(kind);
+  const types = KINDTYPES[kind];
 
-  const Icon = DIRECTORYICONS[props.dir.type ? `${kind}_${props.dir.type}` : kind]
+  const Icon = DIRECTORYICONS[props.dir.type ? `${kind}_${props.dir.type}` : kind];
 
   return (
     <Stack direction="row" gap={1} style={{width: "100%"}}>
-      <Box component={ClearIcon} onClick={e => props.onRemove(props.index)} sx={{width: "30px", height: "30px", m: "auto"}} className={styles.removeIcon} />
-      {hasTypes ?
-        <FormControl sx={{ minWidth: 120 }} size="small">
+      <Box component={ClearIcon} onClick={() => props.onRemove(props.index)} sx={{width: "30px", height: "30px", m: "auto"}} className={styles.removeIcon} />
+      {types ?
+        <FormControl sx={{minWidth: 120}} size="small">
           <InputLabel id="type">Type</InputLabel>
           <Select
             labelId="type"
@@ -54,10 +49,10 @@ function Dir(props) {
             name={"type-" + props.index}
             onChange={props.onChange}
           >
-            {KINDTYPES[kind].map(data => <MenuItem key={data[0]} value={data[0]} >{data[1]}</MenuItem>)}
+            {types.map(data => <MenuItem key={data[0]} value={data[0]} >{data[1]}</MenuItem>)}
           </Select>
         </FormControl>
-      : null}
+        : null}
       <TextField
         id={"name-" + props.index}
         name={"name-" + props.index}
@@ -68,15 +63,15 @@ function Dir(props) {
         size="small"
         fullWidth
       />
-      <Box component={Icon} sx={{ height: "30px", width: "30px", m: "auto", color: "lightgrey.main" }} />
+      <Box component={Icon} sx={{height: "30px", width: "30px", m: "auto", color: "lightgrey.main"}} />
     </Stack>
-  )
+  );
 }
 
 const dirTemplate = {
   type: "",
   name: ""
-}
+};
 
 const ShotRange = props => {
   const [start, setStart] = useState("");
@@ -94,11 +89,11 @@ const ShotRange = props => {
     });
     if (range.at(-1) !== end) range.push(end);
     props.setDirList(range.map(n => ({type: "", name: n})));
-  }
+  };
 
   const handleClear = () => {
-    props.setDirList([{...dirTemplate}])
-  }
+    props.setDirList([{...dirTemplate}]);
+  };
 
   return (
     <Stack gap="5px" direction="row" style={{margin: "10px 0px"}}>
@@ -135,19 +130,19 @@ const ShotRange = props => {
         Clear
       </Button>
     </Stack>
-  )
-}
+  );
+};
 
 function CreateDirModal(props) {
   const [dirList, setDirList] = useState([]);
 
   useEffect(() => {
     setDirList([{...dirTemplate}]);
-  }, [props.open])
+  }, [props.open]);
 
   const handleAdd = () => {
     setDirList(prevState => [...prevState, {...dirTemplate}]);
-  }
+  };
 
   const handleRemove = (index=-1) => {
     setDirList(prevState => {
@@ -155,8 +150,8 @@ function CreateDirModal(props) {
       if (index < 0) dirs.pop();
       else dirs.splice(index, 1);
       return dirs;
-    })
-  }
+    });
+  };
 
   const handleChange = e => {
     const [field, id] = e.target.name.split("-");
@@ -170,8 +165,8 @@ function CreateDirModal(props) {
       if (!name || name === previousType) dirs[id].name = value;
 
       return dirs;
-    })
-  }
+    });
+  };
 
   const handleCreate = () => {
     const data = {...props.data};
@@ -179,17 +174,17 @@ function CreateDirModal(props) {
     data.dirs = dirList.map(dir => ({
       dir_type: dir.type,
       dir_name: dir.name
-    }))
+    }));
     props.onCreate(data);
     props.onClose();
-  }
+  };
 
   const getDirList = dirs => {
-      return dirs.map((dir, index) => <Dir
-        key={"dir-" + index} index={index} dir={dir} onRemove={handleRemove}
-         onChange={handleChange} id={"dir-" + index} data={props.data}
-      />)
-  }
+    return dirs.map((dir, index) => <Dir
+      key={"dir-" + index} index={index} dir={dir} onRemove={handleRemove}
+      onChange={handleChange} id={"dir-" + index} data={props.data}
+    />);
+  };
 
   return (
     <Modal open={props.open} maxWidth="sm" onClose={props.onClose}
@@ -199,14 +194,14 @@ function CreateDirModal(props) {
     >
       {props.data.kind === "shot" ?
         <ShotRange setDirList={setDirList} /> :
-      null}
+        null}
       <div style={{display: "flex", flexDirection: "column", height: "60vh"}}>
         <DynamicList onAdd={handleAdd} onRemove={() => handleRemove(-1)}>
           {getDirList(dirList)}
         </DynamicList>
       </div>
     </Modal>
-  )
+  );
 }
 
 export default CreateDirModal;

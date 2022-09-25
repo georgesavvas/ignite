@@ -1,4 +1,4 @@
-import { useState, createContext } from "react";
+import React, {useState, createContext} from "react";
 
 export const EntityContext = createContext();
 
@@ -9,4 +9,4 @@ export const EntityProvider = props => {
       {props.children}
     </EntityContext.Provider>
   );
-}
+};

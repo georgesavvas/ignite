@@ -1,33 +1,35 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from "react";
+
+import Typography from "@mui/material/Typography";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
+import TextField from "@mui/material/TextField";
+import {useXarrow} from "react-xarrows";
+import Button from "@mui/material/Button";
+import {DndProvider} from "react-dnd";
+import {HTML5Backend} from "react-dnd-html5-backend";
+import {useDrop} from "react-dnd";
+import IconButton from "@mui/material/IconButton";
+import ClearIcon from "@mui/icons-material/Clear";
+
+import serverRequest from "../../services/serverRequest";
+import DataPlaceholder from "../../components/DataPlaceholder";
+import Modal from "../../components/Modal";
 import styles from "./Rules.module.css";
 import DynamicList from "../../components/DynamicList";
-import { Rule } from "./Rule";
-import Typography from '@mui/material/Typography';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
-import TextField from '@mui/material/TextField';
-import {useXarrow} from "react-xarrows";
-import { Button, Divider } from '@mui/material';
-import { DndProvider } from 'react-dnd'
-import { HTML5Backend } from 'react-dnd-html5-backend'
-import { useDrag, useDrop } from 'react-dnd'
-import IconButton from '@mui/material/IconButton';
-import RemoveIcon from '@mui/icons-material/Remove';
-import Modal from '../../components/Modal';
-import ClearIcon from '@mui/icons-material/Clear';
-import serverRequest from '../../services/serverRequest';
-import DataPlaceholder from "../../components/DataPlaceholder";
+import {Rule} from "./Rule";
+
 
 const RuleNameInputModal = ({onSubmit, open, onClose}) => {
-  const [name, setName] = useState("")
+  const [name, setName] = useState("");
 
   const handleSubmit = () => {
-    onSubmit(name)
-    onClose()
-    setName("")
-  }
+    onSubmit(name);
+    onClose();
+    setName("");
+  };
 
   return (
     <Modal
@@ -40,41 +42,41 @@ const RuleNameInputModal = ({onSubmit, open, onClose}) => {
     >
       <TextField fullWidth value={name} onChange={e => setName(e.target.value)} />
     </Modal>
-  )
-}
+  );
+};
 
 const RuleTemplates = props => {
-  const [templates, setTemplates] = useState([])
-  const [managerOpen, setManagerOpen] = useState(false)
-  const [ruleNameInputModalOpen, setRuleNameInputModalOpen] = useState(false)
-  const [ruleTemplateSelectOpen, setRuleTemplateSelectOpen] = useState(false)
+  const [templates, setTemplates] = useState([]);
+  const [managerOpen, setManagerOpen] = useState(false);
+  const [ruleNameInputModalOpen, setRuleNameInputModalOpen] = useState(false);
+  const [ruleTemplateSelectOpen, setRuleTemplateSelectOpen] = useState(false);
 
   const getRuleTemplates = (fn=undefined) => {
     serverRequest("get_rule_templates").then(resp => {
-      setTemplates(resp.data || [])
-      if (fn) fn()
-    })
-  }
+      setTemplates(resp.data || []);
+      if (fn) fn();
+    });
+  };
 
   const handleChange = e => {
-    const value = e.target.value
-    const template = templates.filter(template => template.name === value)[0]
+    const value = e.target.value;
+    const template = templates.filter(template => template.name === value)[0];
     props.onTemplateSelect(template.data);
-  }
+  };
 
   const handleSaveCurrent = ruleTemplateName => {
-    props.onSaveCurrent(ruleTemplateName)
-  }
+    props.onSaveCurrent(ruleTemplateName);
+  };
 
   const handleRuleTemplateSelectOpen = () => {
-    getRuleTemplates(setRuleTemplateSelectOpen(true))
-  }
+    getRuleTemplates(setRuleTemplateSelectOpen(true));
+  };
 
   const handleRemoveRule = name => {
     serverRequest("remove_rule_template", {data: name}).then(resp => {
-      setTemplates(resp.data)
-    })
-  }
+      setTemplates(resp.data);
+    });
+  };
 
   return (
     <>
@@ -127,8 +129,8 @@ const RuleTemplates = props => {
         <Button variant="outlined" onClick={() => setRuleNameInputModalOpen(true)}>Save current</Button>
       </div>
     </>
-  )
-}
+  );
+};
 
 function RuleList(props) {
   const updateXarrow = useXarrow();
@@ -138,8 +140,8 @@ function RuleList(props) {
   useEffect(() => {
     let rules = [];
     props.rules.forEach((rule, index) => {
-      rules.push({...rule, origIndex: index})
-    })
+      rules.push({...rule, origIndex: index});
+    });
     setTempRules({rules: rules, reorder: false});
   }, [props.rules]);
 
@@ -158,8 +160,8 @@ function RuleList(props) {
         const ruleToMove = rules.splice(index, 1)[0];
         rules.splice(index2, 0, ruleToMove);
         return {rules: rules, reorder: false};
-      })
-    }, [tempRules])
+      });
+    }, [tempRules]);
 
   const renderRule = useCallback((rule, index) => {
     return(
@@ -170,25 +172,25 @@ function RuleList(props) {
         onRulesChange={props.onRulesChange}
         id={"rule-" + rule.origIndex}
         moveRule={moveRule}
-      />)
-  }, [])
+      />);
+  }, []);
 
   return (
     <DynamicList innerRef={drop} onAdd={() => props.onRulesChange(null, "add")} onScroll={updateXarrow} onRemove={() => props.onRulesChange(null, "remove", -1)}>
       {tempRules.rules ? tempRules.rules.map((rule, index) => renderRule(rule, index)) : null}
     </DynamicList>
-  )
+  );
 }
 
 function Rules(props) {
 
   const handleTemplateSelect = data => {
-    props.onAddRules(data)
-  }
+    props.onAddRules(data);
+  };
 
   const handleSaveCurrent = name => {
-    serverRequest("add_rule_template", {data: props.rules, name: name})
-  }
+    serverRequest("add_rule_template", {data: props.rules, name: name});
+  };
 
   return (
     <div className={styles.container}>
@@ -201,7 +203,7 @@ function Rules(props) {
         <RuleList {...props} />
       </DndProvider>
     </div>
-  )
+  );
 }
 
 export default Rules;

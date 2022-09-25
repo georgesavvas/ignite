@@ -1,13 +1,16 @@
-import { Typography } from '@mui/material';
+import React, {useState} from "react";
+
+import Typography from "@mui/material/Typography";
+import {useSnackbar} from "notistack";
+
 import styles from "./URI.module.css";
 import ContextMenu, { handleContextMenu } from "./ContextMenu";
-import { CopyToClipboard } from "../views/ContextActions";
-import { useSnackbar } from 'notistack';
-import React, {useState} from 'react';
+import {CopyToClipboard} from "../views/ContextActions";
+
 
 function URI(props) {
   const [contextMenu, setContextMenu] = useState(null);
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const {enqueueSnackbar} = useSnackbar();
 
   const contextItems = [
     {
@@ -18,7 +21,7 @@ function URI(props) {
     //   "label": "Go to asset",
     //   "fn": () => CopyToClipboard(props.uri, enqueueSnackbar)
     // }
-  ]
+  ];
 
   if (!props.uri) return null;
 
@@ -29,7 +32,7 @@ function URI(props) {
         <Typography style={{color: "rgb(252, 140, 3)", direction: "rtl", textAlign: "left"}} noWrap>{props.uri}</Typography>
       </div>
     </>
-  )
+  );
 }
 
 export default URI;

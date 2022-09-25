@@ -1,12 +1,15 @@
 import React from "react";
-import Typography from '@mui/material/Typography';
+
+import Typography from "@mui/material/Typography";
+import Divider from "@mui/material/Divider";
+
 import DccSelector from "../DccSelector.jsx";
-import { Divider } from "@mui/material";
+
 
 const style = {
   width: "100%",
   height: "100%"
-}
+};
 
 function SceneDetails(props) {
   return (
@@ -20,7 +23,7 @@ function SceneDetails(props) {
         <Typography>{props.entity.scene}</Typography>
       </div>
     </div>
-  )
+  );
 }
 
 export default SceneDetails;

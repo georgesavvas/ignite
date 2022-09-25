@@ -1,27 +1,25 @@
-import React, {useEffect, useState, useContext} from "react";
-import Box from '@mui/material/Box';
-import Divider from '@mui/material/Divider';
-import Button from '@mui/material/Button';
-import Stack from '@mui/material/Stack';
-import ToggleButton from '@mui/material/ToggleButton';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import React, {useState, useContext} from "react";
+
+import Stack from "@mui/material/Stack";
+import ToggleButton from "@mui/material/ToggleButton";
+import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Checkbox from "@mui/material/Checkbox";
+import SortIcon from "@mui/icons-material/Sort";
+import IconButton from "@mui/material/IconButton";
+import Typography from "@mui/material/Typography";
+
+import IgnButton from "../../components/IgnButton";
+import ContextMenu, { handleContextMenu } from "../../components/ContextMenu";
+import FilterField from "../../components/FilterField";
 import GridViewIcon from "../../icons/GridViewIcon";
 import RowViewIcon from "../../icons/RowViewIcon";
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import {ContextContext} from "../../contexts/ContextContext";
 import DccSelector from "../DccSelector";
 import Ingest from "../Ingest/Ingest";
 import ContextBar from "./ContextBar";
 import Modal from "../../components/Modal";
-import SortIcon from '@mui/icons-material/Sort';
-import FilterListIcon from '@mui/icons-material/FilterList';
-import { IconButton, Typography } from "@mui/material";
-import IgnTextField from "../../components/IgnTextField";
-import IgnButton from "../../components/IgnButton";
-import ContextMenu, { handleContextMenu } from "../../components/ContextMenu";
-import FilterField from "../../components/FilterField";
 
 const style = { 
   display: "flex",
@@ -29,7 +27,7 @@ const style = {
   padding: "1px",
   alignItems: "center",
   gap: "5px"
-}
+};
 
 function ExplorerBar(props) {
   const [newSceneOpen, setNewSceneOpen] = useState(false);
@@ -46,18 +44,18 @@ function ExplorerBar(props) {
     if (value !== null) props.onViewTypeChange(value);
   };
 
-  const handleGoBack = e => {
+  const handleGoBack = () => {
     setCurrentContext(currentContext.parent);
-  }
+  };
 
   const handleFilterChange = value => {
     setFilterValue(value);
     props.onFilterChange(value);
-  }
+  };
 
   const handleSortChange = (field, reverse) => {
     props.setQuery(prevState => ({...prevState, sort: {field: field, reverse: reverse}}));
-  }
+  };
 
   const filterOptions = [
     {
@@ -84,11 +82,11 @@ function ExplorerBar(props) {
       label: "Version (Lowest first)",
       fn: () => handleSortChange("version", false),
     }
-  ]
+  ];
 
   const handleSortClicked = e => {
     handleContextMenu(e, filterMenu, setFilterMenu);
-  }
+  };
 
   return (
     <div style={{padding: "5px", display: "flex", flexDirection: "column", gap: "5px"}}>
@@ -116,10 +114,10 @@ function ExplorerBar(props) {
               <Typography variant="button">Dynamic</Typography>
             </ToggleButton>
             <ToggleButton value="assets" style={{height: "34.25px"}}>
-            <Typography variant="button">Assets</Typography>
+              <Typography variant="button">Assets</Typography>
             </ToggleButton>
             <ToggleButton value="scenes" style={{height: "34.25px"}}>
-            <Typography variant="button">Scenes</Typography>
+              <Typography variant="button">Scenes</Typography>
             </ToggleButton>
           </ToggleButtonGroup>
           <ToggleButtonGroup
@@ -145,13 +143,13 @@ function ExplorerBar(props) {
       </div>
       <div style={style}>
         <IgnButton
-            variant="outlined"
-            onClick={handleGoBack}
-            disabled={currentContext.dir_kind === "project"}
-            size="small"
-            style={{minWidth: "35px"}}
-          >
-            <ArrowUpwardIcon />
+          variant="outlined"
+          onClick={handleGoBack}
+          disabled={currentContext.dir_kind === "project"}
+          size="small"
+          style={{minWidth: "35px"}}
+        >
+          <ArrowUpwardIcon />
         </IgnButton>
         <ContextBar />
         <IgnButton
@@ -173,7 +171,7 @@ function ExplorerBar(props) {
         </IgnButton>
       </div>
     </div>
-  )
+  );
 }
 
 export default ExplorerBar;

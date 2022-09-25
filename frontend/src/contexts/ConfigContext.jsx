@@ -1,25 +1,26 @@
-import { useState, createContext, useEffect, useRef } from "react";
+import React, {useState, createContext, useEffect} from "react";
+
 import clientRequest from "../services/clientRequest";
-import serverRequest from "../services/serverRequest";
+
 
 export const ConfigContext = createContext();
 
 const serverDetailsDefault = {
   address: "",
   password: ""
-}
+};
 
 const accessDefault = {
   remote: false,
   projectsDir: "",
   serverProjectsDir: ""
-}
+};
 
 const placeholder_config = {
   path: "",
   exts: "",
   name: ""
-}
+};
 
 export const ConfigProvider = props => {
   const [config, setConfig] = useState({serverDetails: {}, access: {}, dccConfig: []});
@@ -35,12 +36,12 @@ export const ConfigProvider = props => {
         projectsDir: clientDataResults.access.projects_root,
         serverProjectsDir: clientDataResults.access.server_projects_root,
         remote: clientDataResults.access.remote
-      }
+      };
       const savedDccConfig = clientDataResults.dcc_config;
       window.services.set_envs({
         IGNITE_SERVER_ADDRESS: savedServerDetails.address,
         IGNITE_SERVER_PASSWORD: savedServerDetails.password
-      })
+      });
       window.services.get_env("IGNITE_CLIENT_ADDRESS").then(resp => {
         setConfig({
           serverDetails: {...serverDetailsDefault, ...savedServerDetails},
@@ -50,10 +51,10 @@ export const ConfigProvider = props => {
           },
           dccConfig: savedDccConfig,
           clientAddress: resp
-        })
-      })
+        });
+      });
     });
-  }, [])
+  }, []);
 
   useEffect(() => {
     if (writeIncr <= 0) {
@@ -63,26 +64,26 @@ export const ConfigProvider = props => {
     window.services.set_envs({
       IGNITE_SERVER_ADDRESS: config.serverDetails.address,
       IGNITE_SERVER_PASSWORD: config.serverDetails.password
-    })
+    });
     const isServerLocal = config.serverDetails.address.startsWith("localhost");
     const accessFormatted = {
       projects_root: config.access.projectsDir,
       server_projects_root: isServerLocal ? config.access.projectsDir :
         config.access.serverProjectsDir,
       remote: config.access.remote
-    }
+    };
     const data = {
       access: accessFormatted,
       dcc_config: config.dccConfig,
       server_details: config.serverDetails
-    }
+    };
     console.log("Setting config:", data);
-    clientRequest("set_config", {data: data})
-  }, [config])
+    clientRequest("set_config", {data: data});
+  }, [config]);
 
   const addToDCCConfig = (config, data) => {
     if (!data) {
-      return [...config, ...placeholder_config]
+      return [...config, ...placeholder_config];
     }
     let existing_paths = [];
     config.forEach(existing => {
@@ -92,70 +93,70 @@ export const ConfigProvider = props => {
       new_config => !existing_paths.includes(new_config.path)
     );
     return [...config, ...filtered];
-  }
+  };
 
   const modifyDCCConfig = (config, data) => {
     let cc = [...config];
     cc[data.index][data.field] = data.value;
     cc[data.index]["valid"] = data.valid;
     return cc;
-  }
+  };
 
   const removeFromDCCConfig = (config, data) => {
     let cc = [...config];
     cc.splice(data.index, 1);
     return cc;
-  }
+  };
 
   const handleSetServerDetails = data => {
     setConfig(prevState => ({...prevState, serverDetails: {...prevState.serverDetails, ...data}}));
-  }
+  };
 
   const handleSetAccess = data => {
     setConfig(prevState => ({...prevState, access: {...prevState.access, ...data}}));
-  }
+  };
 
   const handleSetDccConfig = (data, operation="modify") => {
     switch (operation) {
-      default: {
-        setConfig(prevState => (
-          {...prevState, dccConfig: modifyDCCConfig(prevState.dccConfig, data)}
-        ));
-        break;
-      }
-      case "add": {
-        setConfig(prevState => (
-          {...prevState, dccConfig: addToDCCConfig(prevState.dccConfig, data)}
-        ));
-        break;
-      }
-      case "remove": {
-        setConfig(prevState => (
-          {...prevState, dccConfig: removeFromDCCConfig(prevState.dccConfig, data)}
-        ));
-        break;
-      }
+    default: {
+      setConfig(prevState => (
+        {...prevState, dccConfig: modifyDCCConfig(prevState.dccConfig, data)}
+      ));
+      break;
     }
-  }
+    case "add": {
+      setConfig(prevState => (
+        {...prevState, dccConfig: addToDCCConfig(prevState.dccConfig, data)}
+      ));
+      break;
+    }
+    case "remove": {
+      setConfig(prevState => (
+        {...prevState, dccConfig: removeFromDCCConfig(prevState.dccConfig, data)}
+      ));
+      break;
+    }
+    }
+  };
 
   const handleSetConfig = (setting, data, operation) => {
     switch(setting) {
-      case "serverDetails": {
-        handleSetServerDetails(data); break;
-      }
-      case "access": {
-        handleSetAccess(data); break;
-      }
-      case "dccConfig": {
-        handleSetDccConfig(data, operation); break;
-      }
-      default: return;
+    case "serverDetails": {
+      handleSetServerDetails(data); break;
     }
-  }
+    case "access": {
+      handleSetAccess(data); break;
+    }
+    case "dccConfig": {
+      handleSetDccConfig(data, operation); break;
+    }
+    default: return;
+    }
+  };
 
   return (
     <ConfigContext.Provider value={[config, handleSetConfig]}>
       {props.children}
     </ConfigContext.Provider>
-  )
-}
+  );
+};

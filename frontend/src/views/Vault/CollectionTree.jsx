@@ -1,38 +1,40 @@
+
+import React, {useEffect, useState, memo, useRef} from "react";
+import PropTypes from "prop-types";
+
 import TreeView from "@mui/lab/TreeView";
 import TreeItem, {treeItemClasses} from "@mui/lab/TreeItem";
 import {styled} from "@mui/material/styles";
 import Box from "@mui/material/Box";
-import PropTypes from "prop-types";
 import Typography from "@mui/material/Typography";
-import React, { useEffect, useState, memo, useMemo, useRef } from "react";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import styles from "./CollectionTree.module.css";
-import ContextMenu, { handleContextMenu } from "../../components/ContextMenu";
-import { useSnackbar } from "notistack";
-import { CopyToClipboard, ShowInExplorer } from "../ContextActions";
-import { CreateColl, RenameColl, DeleteColl, EditColl } from "./Modals";
-import OutlinedInput from "@mui/material/OutlinedInput";
-import { useDrag, useDrop } from "react-dnd";
+import {useSnackbar} from "notistack";
+import {useDrag, useDrop} from "react-dnd";
+
 import serverRequest from "../../services/serverRequest";
 import FilterField from "../../components/FilterField";
-import { Button } from "@mui/material";
+import {CopyToClipboard} from "../ContextActions";
+import {CreateColl, RenameColl, DeleteColl, EditColl} from "./Modals";
+import styles from "./CollectionTree.module.css";
+import ContextMenu, {handleContextMenu} from "../../components/ContextMenu";
+
 
 function findNodeByPath(object, result, value, parents) {
-  if(object.hasOwnProperty("path") && object.path === value) {
-    result.push(object)
+  if (object.path && object.path === value) {
+    result.push(object);
     return;
   }
-  for(var i=0; i<Object.keys(object).length; i++){
-    const child = object[Object.keys(object)[i]]
-      if(child !== null && typeof child === "object"){
-          if (value.includes(child.path)) parents.push(child.id)
-          findNodeByPath(object[Object.keys(object)[i]], result, value, parents)
-      }
+  for (var i=0; i<Object.keys(object).length; i++) {
+    const child = object[Object.keys(object)[i]];
+    if (child !== null && typeof child === "object") {
+      if (value.includes(child.path)) parents.push(child.id);
+      findNodeByPath(object[Object.keys(object)[i]], result, value, parents);
+    }
   }
 }
 
-const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
+const StyledTreeItemRoot = styled(TreeItem)(({theme}) => ({
   color: theme.palette.text.secondary,
   [`& .${treeItemClasses.content}`]: {
     color: theme.palette.text.secondary,
@@ -54,18 +56,18 @@ const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
       color: "inherit",
     },
   }
-}))
+}));
 
 const shouldBeDisabled = (scope, path) => {
-  if (scope !== "studio") return
+  if (scope !== "studio") return;
   if (path.startsWith("/all/2d/elements") || path.startsWith("/all/projects")) {
-    return true
+    return true;
   }
-  if (path === "/all") return true
-}
+  if (path === "/all") return true;
+};
 
 function getContextItems(data, enqueueSnackbar) {
-  const disabled = shouldBeDisabled(data.scope, data.path)
+  const disabled = shouldBeDisabled(data.scope, data.path);
   return [
     {
       label: "Create",
@@ -91,85 +93,68 @@ function getContextItems(data, enqueueSnackbar) {
     {
       label: "Copy collection name",
       fn: () =>  CopyToClipboard(data.name, enqueueSnackbar)
-    },
-    // {
-    //   label: "Copy asset ids",
-    //   fn: () =>  CopyToClipboard("", enqueueSnackbar)
-    // },
-    // {
-    //   label: "Copy asset names",
-    //   fn: () =>  CopyToClipboard("", enqueueSnackbar)
-    // },
-    // {
-    //   label: "Copy asset paths",
-    //   fn: () =>  CopyToClipboard("", enqueueSnackbar)
-    // },
-  ]
+    }
+  ];
 }
 
 const StyledTreeItem = memo(function StyledTreeItem(props) {
   const [contextMenu, setContextMenu] = useState(null);
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const {enqueueSnackbar} = useSnackbar();
   const ref = useRef(null);
 
-  const [{ handlerId }, drop] = useDrop({
+  const [, drop] = useDrop({
     accept: "collection",
     collect(monitor) {
       return {
         handlerId: monitor.getHandlerId()
-      }
+      };
     },
-    hover(item, monitor) {
+    hover() {
       if (!ref.current) {
-        return
+        return;
       }
-      const hoverBoundingRect = ref.current?.getBoundingClientRect()
+      const hoverBoundingRect = ref.current?.getBoundingClientRect();
       props.custom.setdroppreviewdata({
         opacity: 1,
         top: hoverBoundingRect.top - 2,
         left: hoverBoundingRect.left - 5,
         height: hoverBoundingRect.height,
         width: hoverBoundingRect.width
-      })
+      });
     },
-    drop(item, monitor) {
+    drop(item) {
       if (!ref.current) {
-        return
+        return;
       }
-      props.custom.onreorder(item.path, props.path, 0)
+      props.custom.onreorder(item.path, props.path, 0);
     }
-  })
+  });
 
-  const [{isDragging}, drag] = useDrag(() => ({
+  const [, drag] = useDrag(() => ({
     type: "collection",
-    item: () => {return {path: props.path}},
-    end: () => {props.custom.setdroppreviewdata({opacity: 0})},
+    item: () => {return {path: props.path};},
+    end: () => {props.custom.setdroppreviewdata({opacity: 0});},
     collect: monitor => ({
       isDragging: !!monitor.isDragging(),
     }),
-  }))
-  drag(drop(ref))
+  }));
+  drag(drop(ref));
 
   const {
     bgColor,
     color,
-    depth = 2,
-    labelIcon: LabelIcon,
     labelInfo,
-    path,
-    dynamic,
-    onContextOpen,
     name,
     ...other
-  } = props
+  } = props;
 
   const handleClick = (action, data) => {
-    props.onContextOpen(action, data)
-    handleClose()
-  }
+    props.onContextOpen(action, data);
+    handleClose();
+  };
 
   const handleClose = () => {
-    setContextMenu(null)
+    setContextMenu(null);
   };
 
   const itemData = {
@@ -180,14 +165,14 @@ const StyledTreeItem = memo(function StyledTreeItem(props) {
     user: props.user,
     scope: props.scope,
     handleClick: handleClick
-  }
+  };
 
-  let contextItems = getContextItems(itemData, enqueueSnackbar)
+  let contextItems = getContextItems(itemData, enqueueSnackbar);
 
   const onContextMenu = e => {
-    e.stopPropagation()
-    handleContextMenu(e, contextMenu, setContextMenu)
-  }
+    e.stopPropagation();
+    handleContextMenu(e, contextMenu, setContextMenu);
+  };
 
   return (
     <div>
@@ -197,10 +182,9 @@ const StyledTreeItem = memo(function StyledTreeItem(props) {
       <StyledTreeItemRoot
         label={
           <Box onContextMenu={onContextMenu} ref={ref}
-            sx={{ display: "flex", alignItems: "center", p: 0.1, pr: 0.8 }} 
+            sx={{display: "flex", alignItems: "center", p: 0.1, pr: 0.8}} 
           >
-            {/* <Box component={LabelIcon} color="inherit" sx={{ height: "20px", width: "20px", mr: 1 }} /> */}
-            <Typography variant="body2" sx={{ textAlign: "left", fontWeight: "inherit", flexGrow: 1 }}>
+            <Typography variant="body2" sx={{textAlign: "left", fontWeight: "inherit", flexGrow: 1}}>
               {name}
             </Typography>
             <Typography variant="caption" color="rgb(100,100,100)">
@@ -215,8 +199,8 @@ const StyledTreeItem = memo(function StyledTreeItem(props) {
         {...other}
       />
     </div>
-  )
-})
+  );
+});
 
 StyledTreeItem.propTypes = {
   bgColor: PropTypes.string,
@@ -224,18 +208,18 @@ StyledTreeItem.propTypes = {
   labelIcon: PropTypes.elementType,
   labelInfo: PropTypes.string,
   name: PropTypes.string.isRequired
-}
+};
 
 function CollectionTree(props) {
   const [expandedItems, setExpandedItems] = useState(["/all"]);
   const [selectedItems, setSelectedItems] = useState("");
   const [contextMenu, setContextMenu] = useState(null);
-  const {enqueueSnackbar, closeSnackbar} = useSnackbar();
+  const {enqueueSnackbar} = useSnackbar();
   const [filterValue, setFilterValue] = useState("");
   const [modalData, setModalData] = useState({});
   const [dropPreviewData, setDropPreviewData] = useState({opacity: 0, top: 0, height: 20});
 
-  const scope = props.user ? "user" : "studio"
+  const scope = props.user ? "user" : "studio";
 
   // useEffect(() => {
   //   setSelectedItems("/all");
@@ -243,52 +227,52 @@ function CollectionTree(props) {
 
   useEffect(() => {
     if (!props.selectedCollection || !props.selectedCollection.path) return;
-    const [selectedScope, selectedPath] = props.selectedCollection.path.split(":")
+    const [selectedScope, selectedPath] = props.selectedCollection.path.split(":");
     if (scope !== selectedScope) {
-      setSelectedItems([])
-      return
+      setSelectedItems([]);
+      return;
     }
-    setSelectedItems(selectedPath)
-  }, [props.selectedCollection])
+    setSelectedItems(selectedPath);
+  }, [props.selectedCollection]);
 
   const collectionInfo = {
     name: "",
     path: "/",
     user: props.user,
     scope: scope
-  }
+  };
 
   const treeContextItems = [
     {
       label: "Create",
       fn: () => handleContextMenuSelection("create", collectionInfo)
     }
-  ]
+  ];
 
   const handleNodeSelect = (event, nodeId) => {
-    let iconClicked = event.target.closest(".MuiTreeItem-iconContainer")
-    if(iconClicked) return
+    let iconClicked = event.target.closest(".MuiTreeItem-iconContainer");
+    if(iconClicked) return;
 
-    let result = []
-    let parents = []
-    findNodeByPath(props.collectionData, result, nodeId, parents)
-    result = result[0]
-    props.setSelectedCollection(result)
-    setSelectedItems(nodeId)
-    props.onFilterChange({collection: result.expression})
-  }
+    let result = [];
+    let parents = [];
+    findNodeByPath(props.collectionData, result, nodeId, parents);
+    result = result[0];
+    props.setSelectedCollection(result);
+    setSelectedItems(nodeId);
+    props.onFilterChange({collection: result.expression});
+  };
 
   const handleNodeToggle = (event, nodeIds) => {
-    let iconClicked = event.target.closest(".MuiTreeItem-iconContainer")
+    let iconClicked = event.target.closest(".MuiTreeItem-iconContainer");
     if (iconClicked || nodeIds.length > expandedItems.length) {
-      setExpandedItems(nodeIds)
+      setExpandedItems(nodeIds);
     }
-  }
+  };
 
   const handleContextMenuSelection = (action, collectionInfo) => {
-    collectionInfo[`${action}Open`] = true
-    setModalData(collectionInfo)
-  }
+    collectionInfo[`${action}Open`] = true;
+    setModalData(collectionInfo);
+  };
 
   const handleReOrder = (source, target, offset) => {
     const data = {
@@ -297,17 +281,17 @@ function CollectionTree(props) {
       offset: offset,
       scope: scope,
       user: props.user
-    }
+    };
     serverRequest("reorder_collection", {data: data}).then(resp => {
-      if (resp.ok) enqueueSnackbar("Success!", {variant: "success"})
-      else enqueueSnackbar("Error reordering collection.", {variant: "error"})
-      props.onRefresh()
-    })
-  }
+      if (resp.ok) enqueueSnackbar("Success!", {variant: "success"});
+      else enqueueSnackbar("Error reordering collection.", {variant: "error"});
+      props.onRefresh();
+    });
+  };
 
   const renderTree = (nodes) => {
-    const filter_string = nodes.filter_strings.join(" ")
-    const hide = filterValue && !filter_string.includes(filterValue)
+    const filter_string = nodes.filter_strings.join(" ");
+    const hide = filterValue && !filter_string.includes(filterValue);
     return (
       <StyledTreeItem
         key={nodes.path}
@@ -328,8 +312,8 @@ function CollectionTree(props) {
           ? nodes.children.map((node) => renderTree(node))
           : null}
       </StyledTreeItem>
-    )
-  }
+    );
+  };
 
   const dropPreviewStyle = {
     opacity: dropPreviewData.opacity,
@@ -337,7 +321,7 @@ function CollectionTree(props) {
     left: dropPreviewData.left,
     height: dropPreviewData.height,
     width: dropPreviewData.width
-  }
+  };
 
   return (
     <div className={styles.container}
@@ -372,14 +356,14 @@ function CollectionTree(props) {
           onNodeToggle={handleNodeToggle}
           expanded={expandedItems}
           selected={selectedItems}
-          sx={{ flexGrow: 1, overflowX: "hidden", overflowY: "auto" }}
+          sx={{flexGrow: 1, overflowX: "hidden", overflowY: "auto"}}
         >
           {/* {renderTree(collectionData)} */}
           {props.collectionData.map((node) => renderTree(node))}
         </TreeView>
       </div>
     </div>
-  )
+  );
 }
 
-export default CollectionTree
+export default CollectionTree;

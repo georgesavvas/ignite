@@ -1,14 +1,17 @@
-import ProjectTree from "../views/TreeView/ProjectTree";
-import TopBar from "../views/TopBar/TopBar";
-import styles from "./Home.module.css";
-import Explorer from "../views/Explorer/Explorer";
+import React, {useEffect, useState} from "react";
+
 import Divider from "@mui/material/Divider";
+import {ReflexContainer, ReflexSplitter, ReflexElement} from "react-reflex";
+
 import Details from "../views/DetailsView/Details";
 import TaskManager from "../views/TaskManager/TaskManager";
 import saveReflexLayout from "../utils/saveReflexLayout";
 import loadReflexLayout from "../utils/loadReflexLayout";
-import {ReflexContainer, ReflexSplitter, ReflexElement} from "react-reflex";
-import { useEffect, useState } from "react";
+import ProjectTree from "../views/TreeView/ProjectTree";
+import TopBar from "../views/TopBar/TopBar";
+import styles from "./Home.module.css";
+import Explorer from "../views/Explorer/Explorer";
+
 
 const splitterStyle = {
   borderColor: "rgb(80,80,80)",
@@ -73,7 +76,7 @@ export default function Home() {
           </ReflexElement>
           <ReflexSplitter style={splitterStyle} />
           <ReflexElement flex={flexRatios["home.explorer"]} name="home.explorer"
-           onStopResize={handleResized}
+            onStopResize={handleResized}
           >
             <Explorer />
           </ReflexElement>

@@ -1,20 +1,19 @@
 import React, {useEffect, useState, useContext} from "react";
-import ProjectTreeView from "./ProjectTreeView";
-import FormControl from '@mui/material/FormControl';
-import OutlinedInput from '@mui/material/OutlinedInput';
+
 import styles from "./ProjectTree.module.css";
 import serverRequest from "../../services/serverRequest";
 import {ContextContext} from "../../contexts/ContextContext";
-import { ConfigContext } from "../../contexts/ConfigContext";
+import {ConfigContext} from "../../contexts/ConfigContext";
 import FilterField from "../../components/FilterField";
+import ProjectTreeView from "./ProjectTreeView";
+
 
 export default function ProjectTree() {
-  const [config, setConfig] = useContext(ConfigContext);
-  const [isLoading, setIsLoading] = useState(true);
+  const [config] = useContext(ConfigContext);
   const [loadedData, setLoadedData] = useState({});
   const [filterValue, setFilterValue] = useState("");
   const [updateTreeView, setUpdateTreeView] = useState(0);
-  const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
+  const [currentContext] = useContext(ContextContext);
 
   useEffect(() => {
     if (!config.access) return;
@@ -22,9 +21,7 @@ export default function ProjectTree() {
     const data = {
       project: currentContext.project
     };
-    setIsLoading(true);
     serverRequest("get_project_tree", data).then((resp) => {
-      setIsLoading(false);
       setLoadedData(resp.data);
     });
   }, [currentContext, config.access, updateTreeView]);

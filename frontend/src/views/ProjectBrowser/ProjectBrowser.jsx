@@ -1,32 +1,27 @@
-import { useRef, useState, useContext, useEffect } from "react";
-import styles from "./ProjectBrowser.module.css";
-import Typography from '@mui/material/Typography';
-import {setProject, ContextContext} from "../../contexts/ContextContext";
-import Button from '@mui/material/Button';
-import { DeleteDir, RenameDir, CreateDir } from "../ContextActions";
-import {ReflexContainer, ReflexSplitter, ReflexElement} from "react-reflex";
-import serverRequest from "../../services/serverRequest";
-import { ConfigContext } from "../../contexts/ConfigContext";
-import Modal from "../../components/Modal";
-import ProjectTile, { NewProjectTile } from "./ProjectTile";
-import { TextField } from "@mui/material";
-import { useSnackbar } from 'notistack';
-import { validateDirName } from "../../utils/validateDirName";
+import React, {useRef, useState, useContext, useEffect} from "react";
+
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import {useSnackbar} from "notistack";
+
+import {validateDirName} from "../../utils/validateDirName";
 import DataPlaceholder from "../../components/DataPlaceholder";
+import { DeleteDir, RenameDir } from "../ContextActions";
+import serverRequest from "../../services/serverRequest";
+import Modal from "../../components/Modal";
+import ProjectTile, {NewProjectTile} from "./ProjectTile";
+import styles from "./ProjectBrowser.module.css";
+import {setProject, ContextContext} from "../../contexts/ContextContext";
+
 
 const tileContainerStyle = {
   flexGrow: 1,
   display: "grid",
   overflowY: "auto",
-  gridTemplateColumns: `repeat(auto-fill, minmax(250px, 1fr))`,
+  gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
   gridGap: "5px",
   padding: "5px"
-}
-
-const splitterStyle = {
-  borderColor: "rgb(80,80,80)",
-  backgroundColor: "rgb(80,80,80)"
-}
+};
 
 const Browser = props => {
   const [tiles, setTiles] = useState([]);
@@ -55,8 +50,8 @@ const Browser = props => {
         {Object.keys(tiles).map((k) => tiles[k])}
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default function ProjectBrowser(props) {
   const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
@@ -66,7 +61,7 @@ export default function ProjectBrowser(props) {
   const [isLoading, setIsLoading] = useState(false);
   const [loadedData, setLoadedData] = useState([]);
   const newProjectNameRef = useRef();
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const {enqueueSnackbar} = useSnackbar();
 
   useEffect(() => {
     if (!props.open) return;
@@ -80,21 +75,21 @@ export default function ProjectBrowser(props) {
   const handleNewProject = () => {
     const data = {
       name: newProjectName
-    }
+    };
     serverRequest("create_project", data).then(resp => {
       if (resp.ok) {
-        setProject(newProjectName, setCurrentContext)
-        props.onClose()
-        setNewProjectName("")
-        setNewProjectOpen(false)
-        enqueueSnackbar("Project created!", {variant: "success"})
+        setProject(newProjectName, setCurrentContext);
+        props.onClose();
+        setNewProjectName("");
+        setNewProjectOpen(false);
+        enqueueSnackbar("Project created!", {variant: "success"});
         return;
       }
       enqueueSnackbar(
         `Couldn't create project - ${resp.error}`, {variant: "error"}
-      )
-    })
-  }
+      );
+    });
+  };
 
   const handleContextMenuSelection = (action, _data) => {
     const data = {..._data};
@@ -107,12 +102,12 @@ export default function ProjectBrowser(props) {
       setProject(entity.name, setCurrentContext);
     }
     props.onClose();
-  }
+  };
 
   const handleProjectNameChange = e => {
     const value = validateDirName(e.target.value);
-    setNewProjectName(value)
-  }
+    setNewProjectName(value);
+  };
 
   return (
     <Modal open={props.open} onClose={props.onClose} title="Project Browser"
@@ -147,5 +142,5 @@ export default function ProjectBrowser(props) {
         />
       }
     </Modal>
-  )
+  );
 }

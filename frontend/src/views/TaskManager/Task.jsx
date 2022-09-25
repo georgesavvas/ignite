@@ -1,18 +1,19 @@
-import { CircularProgress, Divider } from "@mui/material";
 import React from "react";
-import styles from "./Task.module.css";
-import Typography from '@mui/material/Typography';
-import PauseIcon from '@mui/icons-material/Pause';
-import WatchLaterOutlinedIcon from '@mui/icons-material/WatchLaterOutlined';
-import DirectionsRunOutlinedIcon from '@mui/icons-material/DirectionsRunOutlined';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import PendingOutlinedIcon from '@mui/icons-material/PendingOutlined';
-import ClearIcon from '@mui/icons-material/Clear';
-import LowPriorityIcon from '@mui/icons-material/LowPriority';
-import ReplayIcon from '@mui/icons-material/Replay';
+
+import Divider from "@mui/material/Divider";
+import Typography from "@mui/material/Typography";
+import PauseIcon from "@mui/icons-material/Pause";
+import WatchLaterOutlinedIcon from "@mui/icons-material/WatchLaterOutlined";
+import DirectionsRunOutlinedIcon from "@mui/icons-material/DirectionsRunOutlined";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import ClearIcon from "@mui/icons-material/Clear";
+import ReplayIcon from "@mui/icons-material/Replay";
+import CheckIcon from "@mui/icons-material/Check";
+import ErrorIcon from "@mui/icons-material/Error";
+
 import clientRequest from "../../services/clientRequest";
-import CheckIcon from '@mui/icons-material/Check';
-import ErrorIcon from '@mui/icons-material/Error';
+import styles from "./Task.module.css";
+
 
 const COLOURS = {
   waiting: "rgb(120, 120, 0)",
@@ -20,7 +21,7 @@ const COLOURS = {
   finished: "rgb(0, 80, 0)",
   error: "rgb(100, 0, 0)",
   running: "rgb(0, 50, 120)"
-}
+};
 
 const Task = props => {
   const state = props.task.state || "waiting";
@@ -29,9 +30,9 @@ const Task = props => {
     const data = {
       task_id: props.task.id,
       edit: action
-    }
-    clientRequest("edit_task", data)
-  }
+    };
+    clientRequest("edit_task", data);
+  };
 
   const handleClear = () => {
     const shouldKill = ["running", "paused"].includes(state);
@@ -40,65 +41,65 @@ const Task = props => {
     const data = {
       task_id: props.task.id,
       edit: shouldKill ? "kill" : "clear"
-    }
-    clientRequest("edit_task", data)
-  }
+    };
+    clientRequest("edit_task", data);
+  };
 
   const getStatusIcon = () => {
     switch (state) {
-      case "finished": return <CheckIcon className={styles.statusIcon} style={getIconStyle("finished")} />;
-      case "paused": return <PauseIcon className={styles.statusIcon} style={getIconStyle("paused")} />;
-      case "waiting": return <WatchLaterOutlinedIcon className={styles.statusIcon} style={getIconStyle("waiting")} />;
-      case "error": return <ErrorIcon className={styles.statusIcon} style={getIconStyle("error")} />
-      default: return <DirectionsRunOutlinedIcon className={styles.statusIcon} style={getIconStyle("running")} />;
+    case "finished": return <CheckIcon className={styles.statusIcon} style={getIconStyle("finished")} />;
+    case "paused": return <PauseIcon className={styles.statusIcon} style={getIconStyle("paused")} />;
+    case "waiting": return <WatchLaterOutlinedIcon className={styles.statusIcon} style={getIconStyle("waiting")} />;
+    case "error": return <ErrorIcon className={styles.statusIcon} style={getIconStyle("error")} />;
+    default: return <DirectionsRunOutlinedIcon className={styles.statusIcon} style={getIconStyle("running")} />;
     }
-  }
+  };
 
   const getActionButton = () => {
     switch (state) {
-      case "paused": return <PlayArrowIcon className={`${styles.button} ${styles.unpauseButton}`} onClick={() => handleAction("unpause")} />;
-      case "running": return <PauseIcon className={`${styles.button} ${styles.pauseButton}`} onClick={() => handleAction("pause")} />
-      case "finished": case "error": return <ReplayIcon className={`${styles.button} ${styles.retryButton}`} onClick={() => handleAction("retry")} />;
+    case "paused": return <PlayArrowIcon className={`${styles.button} ${styles.unpauseButton}`} onClick={() => handleAction("unpause")} />;
+    case "running": return <PauseIcon className={`${styles.button} ${styles.pauseButton}`} onClick={() => handleAction("pause")} />;
+    case "finished": case "error": return <ReplayIcon className={`${styles.button} ${styles.retryButton}`} onClick={() => handleAction("retry")} />;
       // default: return <LowPriorityIcon className={`${styles.button} ${styles.retryButton}`} onClick={() => handleAction("retry")} />;
-      default: return null;
+    default: return null;
     }
-  }
+  };
 
   const getIconStyle = state => {
     const colour = COLOURS[state];
     return {
       color: colour,
       filter: "brightness(150%)"
-    }
-  }
+    };
+  };
 
   const getProgressBarStyle = () => {
     const progress = props.task.progress;
     switch (state) {
-      case "waiting": return {
-        backgroundColor: "rgb(120, 120, 0)",
-        transition: "background-color 1s"
-      };
-      case "paused": return {
-        backgroundColor: "rgb(70, 70, 70)",
-        width: `${progress || 100}%`,
-        transition: "background-color 1s"
-      };
-      case "error": return {
-        backgroundColor: "rgb(100, 0, 0)",
-        transition: "background-color 1s"
-      };
-      case "finished": return {
-        backgroundColor: "rgb(0, 80, 0)",
-        transition: "background-color 1s"
-      };
-      default: return {
-        backgroundColor: "rgb(0, 50, 120)",
-        width: `${Math.max(1, progress || 100)}%`,
-        transition: progress === 0 ? "width 0.1s, background-color 1s" : "width 0.5s, background-color 1s"
-      };
+    case "waiting": return {
+      backgroundColor: "rgb(120, 120, 0)",
+      transition: "background-color 1s"
+    };
+    case "paused": return {
+      backgroundColor: "rgb(70, 70, 70)",
+      width: `${progress || 100}%`,
+      transition: "background-color 1s"
+    };
+    case "error": return {
+      backgroundColor: "rgb(100, 0, 0)",
+      transition: "background-color 1s"
+    };
+    case "finished": return {
+      backgroundColor: "rgb(0, 80, 0)",
+      transition: "background-color 1s"
+    };
+    default: return {
+      backgroundColor: "rgb(0, 50, 120)",
+      width: `${Math.max(1, progress || 100)}%`,
+      transition: progress === 0 ? "width 0.1s, background-color 1s" : "width 0.5s, background-color 1s"
+    };
     }
-  }
+  };
 
   return (
     <div className={styles.container} style={props.style}>
@@ -121,7 +122,7 @@ const Task = props => {
         <ClearIcon className={`${styles.button} ${["finished", "error"].includes(state) ? styles.pauseButton : styles.killButton}`} onClick={handleClear} />
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default Task;

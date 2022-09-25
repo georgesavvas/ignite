@@ -1,11 +1,12 @@
-import React from 'react';
-import styles from "./Files.module.css";
-import DynamicList from "../../components/DynamicList";
-import Typography from '@mui/material/Typography';
-import { TextField } from '@mui/material';
+import React from "react";
+
+import Typography from "@mui/material/Typography";
 import {useXarrow} from "react-xarrows";
-import Button from '@mui/material/Button';
-import FileInput from '../../components/FileInput';
+
+import styles from "./Files.module.css";
+import FileInput from "../../components/FileInput";
+import DynamicList from "../../components/DynamicList";
+
 
 function File({filepath, id}) {
   return (
@@ -13,25 +14,7 @@ function File({filepath, id}) {
       <Typography variant="caption">{filepath}</Typography>
       <div className={styles.connector} id={id} />
     </div>
-  )
-}
-
-const handleFileInput = e => {
-  window.api.fileInput().then(resp => {
-    if (resp.cancelled) return;
-    onFileSelected(e, resp.filePaths[0]);
-  })
-}
-
-const onFileSelected = (e, filepath) => {
-  const s = e.target.id.split("-");
-  const target_id = s[1];
-  const data = {
-    index: target_id,
-    field: "path",
-    value: filepath
-  }
-  // setDccConfig(data, "modify");
+  );
 }
 
 function Files(props) {
@@ -44,14 +27,14 @@ function Files(props) {
         onChange={props.onDirsChange} style={{alignSelf: "stretch"}}
       />
       <DynamicList dense noButtons onScroll={updateXarrow}>
-      {
-        props.files ?
-        props.files.map((child, index) => <File filepath={child} key={index} id={"file-" + index} />) :
-        null
-      }
+        {
+          props.files ?
+            props.files.map((child, index) => <File filepath={child} key={index} id={"file-" + index} />) :
+            null
+        }
       </DynamicList>
     </div>
-  )
+  );
 }
 
 export default Files;

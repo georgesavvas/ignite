@@ -1,25 +1,27 @@
 import React, {useEffect, useState, useContext} from "react";
-import classes from "./Explorer.module.css";
-import AssetTile from "./AssetTile";
-import DirectoryTile from "./DirectoryTile";
-import Divider from '@mui/material/Divider';
+
+import Divider from "@mui/material/Divider";
+import debounce from "lodash.debounce";
+import LinearProgress from "@mui/material/LinearProgress";
+import { useSnackbar } from "notistack";
+
+import BuildFileURL from "../../services/BuildFileURL";
+import {ConfigContext} from "../../contexts/ConfigContext";
+import DataPlaceholder from "../../components/DataPlaceholder";
+import {DIRCONTEXTOPTIONS} from "../../constants";
+import {CopyToClipboard, ShowInExplorer} from "../ContextActions";
+import loadExplorerSettings from "../../utils/loadExplorerSettings";
+import saveExplorerSettings from "../../utils/saveExplorerSettings";
+import ContextMenu, {handleContextMenu} from "../../components/ContextMenu";
 import ExplorerBar from "./ExplorerBar";
 import PageBar from "../../components/PageBar";
 import {EntityContext} from "../../contexts/EntityContext";
 import {ContextContext} from "../../contexts/ContextContext";
 import { DeleteDir, RenameDir, CreateDir } from "../ContextActions";
 import serverRequest from "../../services/serverRequest";
-import debounce from 'lodash.debounce';
-import { DIRCONTEXTOPTIONS } from "../../constants";
-import { CopyToClipboard, ShowInExplorer } from "../ContextActions";
-import loadExplorerSettings from "../../utils/loadExplorerSettings";
-import saveExplorerSettings from "../../utils/saveExplorerSettings";
-import ContextMenu, { handleContextMenu } from "../../components/ContextMenu";
-import { LinearProgress } from "@mui/material";
-import { useSnackbar } from 'notistack';
-import BuildFileURL from "../../services/BuildFileURL";
-import { ConfigContext } from "../../contexts/ConfigContext";
-import DataPlaceholder from "../../components/DataPlaceholder";
+import classes from "./Explorer.module.css";
+import AssetTile from "./AssetTile";
+import DirectoryTile from "./DirectoryTile";
 
 
 const debounced = debounce(fn => fn(), 500);
@@ -46,10 +48,10 @@ const defaultExplorerSettings = {
       current: "grid"
     }
   }
-}
+};
 
 function Explorer() {
-  const [config, setConfig] = useContext(ConfigContext);
+  const [config] = useContext(ConfigContext);
   const [isLoading, setIsLoading] = useState(true);
   const [loadedData, setLoadedData] = useState([]);
   const [pages, setPages] = useState({total: 1, current: 1});
@@ -58,19 +60,19 @@ function Explorer() {
   const [tiles, setTiles] = useState([]);
   const [modalData, setModalData] = useState({});
   const [selectedEntity, setSelectedEntity] = useContext(EntityContext);
-  const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
+  const [currentContext,, refreshContext] = useContext(ContextContext);
   const [contextMenu, setContextMenu] = useState(null);
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const {enqueueSnackbar} = useSnackbar();
 
   const methods = {
     dynamic: "get_contents",
     assets: "get_assetversions",
     scenes: "get_scenes"
-  }
+  };
 
   const handleEntitySelection = (entity) => {
     setSelectedEntity(entity);
-  }
+  };
 
   const handleContextMenuSelection = (action, _data) => {
     const data = {..._data};
@@ -86,7 +88,7 @@ function Explorer() {
 
   useEffect(() => {
     saveExplorerSettings(explorerSettings);
-  }, [explorerSettings])
+  }, [explorerSettings]);
 
   useEffect(() => {
     const data = {
@@ -112,7 +114,7 @@ function Explorer() {
       if (entity.components) {
         entity.components.forEach(comp => {
           comp.path = BuildFileURL(comp.path, config, {pathOnly: true});
-        })
+        });
       }
       if (entity.task) entity.task = BuildFileURL(entity.task, config, {pathOnly: true});
       if (entity.scene) entity.scene = BuildFileURL(entity.scene, config, {pathOnly: true});
@@ -132,7 +134,7 @@ function Explorer() {
       return obj;
     }, {});
     setTiles(_tiles);
-  }, [loadedData, selectedEntity.path, explorerSettings.currentViewType, explorerSettings.currentTileSize])
+  }, [loadedData, selectedEntity.path, explorerSettings.currentViewType, explorerSettings.currentTileSize]);
 
   const handlePageChange = (e, value) => {
     setPages((prevPages) => ({...prevPages, current: value}));
@@ -141,10 +143,10 @@ function Explorer() {
   const handleFilterChange = value => {
     setIsLoading(true);
     debounced(() => setQuery((prevState) => ({...prevState, filter_string: value})));
-  }
+  };
 
   const handleTilesPerPageChange = value => {
-    setExplorerSettings(prevState => ({...prevState, tilesPerPage: value}))
+    setExplorerSettings(prevState => ({...prevState, tilesPerPage: value}));
   };
 
   const handleResultTypeChange = value => {
@@ -156,8 +158,8 @@ function Explorer() {
         currentResultType: value,
         currentViewType: savedViewType,
         currentTileSize: savedTileSize
-      }
-    })
+      };
+    });
   };
 
   const handleViewTypeChange = value => {
@@ -171,8 +173,8 @@ function Explorer() {
         saved: saved,
         currentViewType: value,
         currentTileSize: savedTileSize
-      }
-    })
+      };
+    });
   };
 
   const handleTileSizeChange = value => {
@@ -184,13 +186,13 @@ function Explorer() {
       return {
         ...prevState,
         currentTileSize: value
-      }
-    })
-  }
+      };
+    });
+  };
 
   const handleLatestChange = e => {
-    setQuery(prevState => ({...prevState, latest: e.target.checked}))
-  }
+    setQuery(prevState => ({...prevState, latest: e.target.checked}));
+  };
 
   const tileContainerStyle = {
     flexGrow: 1,
@@ -199,10 +201,10 @@ function Explorer() {
     gridTemplateColumns: `repeat(auto-fill, minmax(${explorerSettings.currentTileSize * 40}px, 1fr))`,
     gridGap: "3px",
     padding: "0px 5px"
-  }
+  };
 
   if (explorerSettings.currentViewType === "row") {
-    tileContainerStyle.gridTemplateColumns = `repeat(1, 1fr)`;
+    tileContainerStyle.gridTemplateColumns = "repeat(1, 1fr)";
   }
 
   function getGenericContextItems(data, enqueueSnackbar) {
@@ -225,13 +227,13 @@ function Explorer() {
         fn: () => data.handleClick("delete", data),
         divider: true
       }
-    ]
+    ];
   }
 
   const handleClick = (action, data) => {
     handleContextMenuSelection(action, data);
     handleClose();
-  }
+  };
 
   const handleClose = () => {
     setContextMenu(null);
@@ -248,14 +250,14 @@ function Explorer() {
       fn: () => data.handleClick(
         "create", {...data, method: contextOption.name, kind: contextOption.dir_kind}
       )
-    }))
+    }));
   }
 
   const itemData = {
     path: currentContext.path,
     kind: currentContext.dir_kind,
     handleClick: handleClick
-  }
+  };
 
   let contextItems = getGenericContextItems(itemData, enqueueSnackbar);
   contextItems = contextItems.concat(getSpecificContextItems(itemData));
@@ -304,7 +306,7 @@ function Explorer() {
       <Divider />
       <PageBar pages={pages.total} onChange={handlePageChange} tileSize={explorerSettings.currentTileSize} onTilesPerPageChange={e => handleTilesPerPageChange(e.target.value)} onTileSizeChange={e => handleTileSizeChange(e.target.value)}/>
     </div>
-  )
+  );
 }
 
 export default Explorer;

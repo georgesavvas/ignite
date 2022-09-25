@@ -1,30 +1,26 @@
-import React, { useState, useEffect, useContext } from "react";
-import styles from "./DccSelector.module.css";
-import Typography from '@mui/material/Typography';
-import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
-import { Button } from "@mui/material";
-import LoadingButton from '@mui/lab/LoadingButton';
+import React, {useState, useEffect, useContext} from "react";
+
+import Typography from "@mui/material/Typography";
+import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
+import LoadingButton from "@mui/lab/LoadingButton";
+import {useSnackbar} from "notistack";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Switch from "@mui/material/Switch";
+
+import {DCCINFO} from "../constants/dccInfo";
+import clientRequest from "../services/clientRequest";
 import {ConfigContext} from "../contexts/ConfigContext";
 import {ContextContext} from "../contexts/ContextContext";
-import { useSnackbar } from 'notistack';
-import clientRequest from "../services/clientRequest";
-import {DCCINFO} from "../constants/dccInfo";
-import FormGroup from '@mui/material/FormGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Switch from '@mui/material/Switch';
+import styles from "./DccSelector.module.css";
 
-const style = {
-  width: "100%",
-  height: "100%"
-}
 
 function DccSelector(props) {
-  const [config, setConfig] = useContext(ConfigContext);
+  const [config] = useContext(ConfigContext);
   const [selectedDcc, setSelectedDcc] = useState("");
   const [showAll, setShowAll] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const [,, refreshContext] = useContext(ContextContext);
+  const {enqueueSnackbar} = useSnackbar();
 
   useEffect(() => {
     if (!props.scene) setShowAll(true);
@@ -32,16 +28,16 @@ function DccSelector(props) {
 
   const handleDccClick = (e) => {
     setSelectedDcc(e.currentTarget.id);
-  }
+  };
 
   const getDcc = () => {
     for(const dcc of config.dccConfig) {
       if (dcc.name === selectedDcc) return dcc;
     }
-  }
+  };
 
   const getDccName = path => {
-    const name = path.replaceAll("\\", "/").split("/").at(-1).split(".")[0]
+    const name = path.replaceAll("\\", "/").split("/").at(-1).split(".")[0];
     let dcc_name = "unknown";
     DCCINFO.forEach(dcc => {
       dcc.keywords.forEach(keyword => {
@@ -49,10 +45,10 @@ function DccSelector(props) {
       });
     });
     return dcc_name;
-  }
+  };
 
   const getDccIcon = path => {
-    const name = path.replaceAll("\\", "/").split("/").at(-1).split(".")[0]
+    const name = path.replaceAll("\\", "/").split("/").at(-1).split(".")[0];
     let icon = "media/dcc/unknown.png";
     DCCINFO.forEach(dcc => {
       dcc.keywords.forEach(keyword => {
@@ -60,7 +56,7 @@ function DccSelector(props) {
       });
     });
     return `url(${icon})`;
-  }
+  };
 
   function formatDcc(dcc, index) {
     const dccIcon = getDccIcon(dcc.path);
@@ -68,17 +64,17 @@ function DccSelector(props) {
     const containerStyle = {
       display: relevant || showAll ? null : "none",
       borderColor: dcc.name === selectedDcc ? "rgb(252, 140, 3)" : "rgb(70,70,70)"
-    }
+    };
 
     return (
       <div className={styles.dccContainer} id={dcc.name} key={index} onClick={handleDccClick} style={containerStyle}>
         <div className={styles.dccIcon} style={{backgroundImage: dccIcon}} />
         <Typography variant="subtitle1" className={styles.label}>{dcc.name}</Typography>
       </div>
-    )
+    );
   }
 
-  async function handleLaunchClick(e) {
+  async function handleLaunchClick() {
     setIsLoading(true);
     const dcc = getDcc();
     const dcc_name = getDccName(dcc.path);
@@ -137,7 +133,7 @@ function DccSelector(props) {
         </LoadingButton>
       </div>
     </div>
-  )
+  );
 }
 
 export default DccSelector;

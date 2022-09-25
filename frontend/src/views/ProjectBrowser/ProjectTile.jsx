@@ -1,22 +1,24 @@
-import React, { useContext } from "react";
+import React from "react";
+
+import Typography from "@mui/material/Typography";
+import {useSnackbar} from "notistack";
+import AddIcon from "@mui/icons-material/Add";
+
+import {CopyToClipboard, ShowInExplorer, clearRepr} from "../ContextActions";
 import styles from "./ProjectTile.module.css";
 import Tile from "../../components/Tile";
-import Typography from '@mui/material/Typography';
-import { useSnackbar } from 'notistack';
-import { CopyToClipboard, ShowInExplorer, clearRepr } from "../ContextActions";
-import AddIcon from '@mui/icons-material/Add';
-import { IconButton } from "@mui/material";
+
 
 export function NewProjectTile(props) {
   return (
     <div className={styles.newProjectTile} onClick={props.onClick}>
       <AddIcon className={styles.button} style={{fontSize: "48px"}} />
     </div>
-  )
+  );
 }
 
 function ProjectTile(props) {
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const {enqueueSnackbar} = useSnackbar();
 
   const hasThumbnail = props.entity.thumbnail && props.entity.thumbnail.filename;
   const thumbnailWidth = hasThumbnail ? "100%" : "50%";
@@ -25,7 +27,7 @@ function ProjectTile(props) {
     path: props.entity.path,
     kind: props.entity.dir_kind,
     name: props.entity.name
-  }
+  };
 
   function getGenericContextItems(entity) {
     return [
@@ -51,12 +53,12 @@ function ProjectTile(props) {
         label: `Delete ${entity.dir_kind}`,
         fn: () => props.onContextMenu("delete", dirData)
       }
-    ]
+    ];
   }
 
-  const handleClick = e => {
+  const handleClick = () => {
     props.onSelected(props.entity);
-  }
+  };
 
   function thumbnailPath() {
     let path = "media/folder_icon.png";
@@ -74,7 +76,7 @@ function ProjectTile(props) {
       <>
         <Typography align="left">{props.entity.name}</Typography>
       </>
-    )
+    );
   }
 
   let contextItems = getGenericContextItems(props.entity);

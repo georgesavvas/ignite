@@ -1,22 +1,17 @@
-import React, { useState, useContext, useEffect } from "react";
-import styles from "./Attributes.module.css";
+import React, {useState, useContext, useEffect} from "react";
+
 import Typography from "@mui/material/Typography";
-import IconButton from "@mui/material/IconButton";
-import CopyIcon from "../../icons/CopyIcon";
-import { useSnackbar } from "notistack";
-import { CopyToClipboard } from "../ContextActions";
-import {ContextContext} from "../../contexts/ContextContext";
-import clientRequest from "../../services/clientRequest";
-import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormHelperText from '@mui/material/FormHelperText';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
-import { rgbToHex } from "@mui/material";
-import serverRequest from "../../services/serverRequest";
-import DeleteIcon from '@mui/icons-material/DeleteOutlined';
+import {DataGrid, GridActionsCellItem} from "@mui/x-data-grid";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
+import DeleteIcon from "@mui/icons-material/DeleteOutlined";
+
+import styles from "./Attributes.module.css";
 import DataPlaceholder from "../../components/DataPlaceholder";
+import serverRequest from "../../services/serverRequest";
+import {ContextContext} from "../../contexts/ContextContext";
+
 
 const shouldBeEditable = params => {
   // console.log(params);
@@ -24,12 +19,12 @@ const shouldBeEditable = params => {
   if (params.field !== "name" && !row.name) return;
   if (row.inherited && params.field === "name") return;
   return true;
-}
+};
 
 const getRowStyle = params => {
   if (params.isEditable) return "";
   return "locked";
-}
+};
 
 const gridStyles = {
   "& .locked": {
@@ -41,10 +36,10 @@ const gridStyles = {
   // "& .actions": {
   //   backgroundColor: "rgb(30,30,30)"
   // }
-}
+};
 
 function Attributes(props) {
-  const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
+  const [,, refreshContext] = useContext(ContextContext);
   const [data, setData] = useState({attribs: [], shouldWrite: false});
 
   useEffect(() => {
@@ -55,8 +50,8 @@ function Attributes(props) {
 
   useEffect(() => {
     if (!data.shouldWrite) return;
-    serverRequest("set_attributes", {path: props.entityPath, attributes: data.attribs})
-    refreshContext()
+    serverRequest("set_attributes", {path: props.entityPath, attributes: data.attribs});
+    refreshContext();
   }, [data]);
 
   const actions = {
@@ -68,6 +63,7 @@ function Attributes(props) {
     getActions: params => {
       return [
         <GridActionsCellItem
+          key="delete"
           icon={<DeleteIcon />}
           label="Delete"
           onClick={handleDelete(params.id, params.row)}
@@ -75,7 +71,7 @@ function Attributes(props) {
         />,
       ];
     }
-  }
+  };
   
   const columns = [
     { field: "name", headerName: "Name", flex: 1, editable: true, cellClassName: getRowStyle},
@@ -92,10 +88,10 @@ function Attributes(props) {
       attribs.push({id: data.attribs.at(-1).id + 1, name: value});
       return {attribs: attribs, shouldWrite: false};
     });
-  }
+  };
 
   const handleEdit = (newValues, previousValues) => {
-    console.log(newValues, previousValues, newValues === previousValues)
+    console.log(newValues, previousValues, newValues === previousValues);
     if (newValues === previousValues) return newValues;
     let attribs = data.attribs;
     attribs.forEach(attrib => {
@@ -103,10 +99,10 @@ function Attributes(props) {
         attrib.name = newValues.name;
         attrib.override = newValues.override;
       }
-    })
+    });
     setData({attribs: attribs, shouldWrite: true});
     return newValues;
-  }
+  };
 
   const handleDelete = (id, row) => () => {
     if (row.inherited) {
@@ -127,7 +123,7 @@ function Attributes(props) {
 
   const handleError = error => {
     console.log(error);
-  }
+  };
 
   return (
     <div className={styles.container}>
@@ -164,7 +160,7 @@ function Attributes(props) {
         />
       </div>
     </div>
-  )
+  );
 }
 
 export default Attributes;

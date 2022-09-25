@@ -1,8 +1,11 @@
-import React from 'react';
-import FormControl from '@mui/material/FormControl';
-import OutlinedInput from '@mui/material/OutlinedInput';
+import React from "react";
+
+import FormControl from "@mui/material/FormControl";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import Typography from "@mui/material/Typography";
+
 import styles from "./FilterField.module.css";
-import { Typography } from '@mui/material';
+
 
 const FilterField = ({filterValue, setFilterValue, children}) => {
   return (
@@ -30,7 +33,7 @@ const FilterField = ({filterValue, setFilterValue, children}) => {
       </FormControl>
       {children}
     </div>
-  )
-}
+  );
+};
 
-export default FilterField
+export default FilterField;
