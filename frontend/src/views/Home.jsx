@@ -1,29 +1,25 @@
-import ProjectTree from '../views/TreeView/ProjectTree';
+import ProjectTree from "../views/TreeView/ProjectTree";
 import TopBar from "../views/TopBar/TopBar";
 import styles from "./Home.module.css";
 import Explorer from "../views/Explorer/Explorer";
-import Divider from '@mui/material/Divider';
-import Details from '../views/DetailsView/Details';
+import Divider from "@mui/material/Divider";
+import Details from "../views/DetailsView/Details";
 import TaskManager from "../views/TaskManager/TaskManager";
 import saveReflexLayout from "../utils/saveReflexLayout";
 import loadReflexLayout from "../utils/loadReflexLayout";
-import {
-  ReflexContainer,
-  ReflexSplitter,
-  ReflexElement
-} from 'react-reflex'
-import { useEffect, useState } from 'react';
+import {ReflexContainer, ReflexSplitter, ReflexElement} from "react-reflex";
+import { useEffect, useState } from "react";
 
 const splitterStyle = {
   borderColor: "rgb(80,80,80)",
   backgroundColor: "rgb(80,80,80)"
-}
+};
 
 const defaultFlexRations = {
   "home.tree": 0.2,
   "home.explorer": 0.5,
   "home.details": 0.3
-}
+};
 
 export default function Home() {
   const [flexRatios, setFlexRatios] = useState(defaultFlexRations);
@@ -32,14 +28,14 @@ export default function Home() {
     const data = loadReflexLayout();
     if (!data) {
       setFlexRatios(defaultFlexRations);
-      return
+      return;
     }
     const tree = data["home.tree"];
     const explorer = data["home.explorer"];
     const details = data["home.details"];
     if (!tree || !explorer || !details) {
       setFlexRatios(defaultFlexRations);
-      return
+      return;
     }
     const fullWidth = tree[0] + explorer[0] + details[0];
     const ratios = {
@@ -48,11 +44,11 @@ export default function Home() {
       "home.details": details[0] / fullWidth
     };
     setFlexRatios(ratios);
-  }, [])
+  }, []);
 
   const handleResized = data => {
-    saveReflexLayout(data)
-  }
+    saveReflexLayout(data);
+  };
 
   return (
     <div className={styles.container}>
