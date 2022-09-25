@@ -7,11 +7,7 @@ import saveReflexLayout from "../../utils/saveReflexLayout";
 import loadReflexLayout from "../../utils/loadReflexLayout";
 import { ConfigContext } from "../../contexts/ConfigContext";
 import {VaultContext} from "../../contexts/VaultContext";
-import {
-  ReflexContainer,
-  ReflexSplitter,
-  ReflexElement
-} from 'react-reflex';
+import {ReflexContainer, ReflexSplitter, ReflexElement} from "react-reflex";
 import serverRequest from "../../services/serverRequest";
 import BuildFileURL from "../../services/BuildFileURL";
 import { useSnackbar } from 'notistack';

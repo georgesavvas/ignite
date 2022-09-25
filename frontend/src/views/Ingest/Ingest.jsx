@@ -11,11 +11,7 @@ import Xarrow, { Xwrapper, useXarrow } from 'react-xarrows';
 import saveReflexLayout from "../../utils/saveReflexLayout";
 import loadReflexLayout from "../../utils/loadReflexLayout";
 import {ContextContext} from "../../contexts/ContextContext";
-import {
-  ReflexContainer,
-  ReflexSplitter,
-  ReflexElement
-} from 'react-reflex'
+import {ReflexContainer, ReflexSplitter, ReflexElement} from "react-reflex";
 import { useEffect, useState, useContext } from 'react';
 import debounce from 'lodash.debounce';
 import clientRequest from "../../services/clientRequest";

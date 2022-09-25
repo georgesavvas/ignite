@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import Typography from '@mui/material/Typography';
+import Typography from "@mui/material/Typography";
 import ComponentViewer from "./ComponentViewer";
 import ComponentList from "./ComponentList";
 import TagContainer from "./TagContainer";
@@ -7,14 +7,10 @@ import saveReflexLayout from "../../utils/saveReflexLayout";
 import loadReflexLayout from "../../utils/loadReflexLayout";
 import { ConfigContext } from "../../contexts/ConfigContext";
 import {ContextContext} from "../../contexts/ContextContext";
-import {
-  ReflexContainer,
-  ReflexSplitter,
-  ReflexElement
-} from 'react-reflex';
+import {ReflexContainer, ReflexSplitter, ReflexElement} from "react-reflex";
 import serverRequest from "../../services/serverRequest";
 import BuildFileURL from "../../services/BuildFileURL";
-import { useSnackbar } from 'notistack';
+import { useSnackbar } from "notistack";
 import { CopyToClipboard, ShowInExplorer } from "../ContextActions";
 import ContextMenu, { handleContextMenu } from "../../components/ContextMenu";
 import URI from "../../components/URI";
@@ -23,25 +19,18 @@ import Path from "../../components/Path";
 const splitterStyle = {
   borderColor: "rgb(80,80,80)",
   backgroundColor: "rgb(80,80,80)"
-}
+};
 
 const style = {
   width: "100%",
   height: "100%"
-}
+};
 
 const defaultFlexRations = {
   "asset.viewer": 0.4,
   "asset.details": 0.25,
   "asset.comps": 0.35
-}
-
-const rowStyle = {
-  display: "flex",
-  alignItems: "center",
-  gap: "10px",
-  marginTop: "5px"
-}
+};
 
 const compExtensionPreviewPriority = [
   ".mp4",
@@ -52,7 +41,7 @@ const compExtensionPreviewPriority = [
   ".tif",
   ".tiff",
   ".exr"
-]
+];
 
 function AssetDetails(props) {
   const [flexRatios, setFlexRatios] = useState(defaultFlexRations);
@@ -66,14 +55,14 @@ function AssetDetails(props) {
     const data = loadReflexLayout();
     if (!data) {
       setFlexRatios(defaultFlexRations);
-      return
+      return;
     }
     const viewer = data["asset.viewer"];
     const details = data["asset.details"];
     const comps = data["asset.comps"];
     if (!viewer || !details || !comps) {
       setFlexRatios(defaultFlexRations);
-      return
+      return;
     }
     const fullWidth = viewer[1] + details[1] + comps[1];
     const ratios = {
@@ -94,19 +83,19 @@ function AssetDetails(props) {
         setSelectedCompName(comp.filename);
         return;
       }
-    })
+    });
   }, [props.entity]);
 
   const handleResized = data => {
-    saveReflexLayout(data)
-  }
+    saveReflexLayout(data);
+  };
 
   const getComp = compName => {
     for(const comp of props.entity.components) {
       if (comp.filename === compName) return comp;
     }
     return {};
-  }
+  };
 
   const selectedComp = getComp(selectedCompName);
 
@@ -119,8 +108,8 @@ function AssetDetails(props) {
       if (resp.ok) console.log("done");
       else console.log("failed");
       refreshContext();
-    })
-  }
+    });
+  };
 
   const handleOnDeleteTagClicked = name => {
     const data = {
@@ -131,8 +120,8 @@ function AssetDetails(props) {
       if (resp.ok) console.log("done");
       else console.log("failed");
       refreshContext();
-    })
-  }
+    });
+  };
 
   const contextItems = [
     {
@@ -143,7 +132,7 @@ function AssetDetails(props) {
     //   label: "Add tags",
     //   fn: () => ShowInExplorer(props.entity.path, enqueueSnackbar)
     // }
-  ]
+  ];
 
   return (
     <div style={style}>
@@ -169,7 +158,7 @@ function AssetDetails(props) {
         </ReflexElement>
       </ReflexContainer>
     </div>
-  )
+  );
 }
 
 export default AssetDetails;

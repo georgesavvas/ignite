@@ -1,11 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import styles from "./Vault.module.css";
 import Modal from "../../components/Modal";
-import {
-  ReflexContainer,
-  ReflexSplitter,
-  ReflexElement
-} from 'react-reflex';
+import {ReflexContainer, ReflexSplitter, ReflexElement} from "react-reflex";
 import saveReflexLayout from "../../utils/saveReflexLayout";
 import loadReflexLayout from "../../utils/loadReflexLayout";
 import Browser from "./Browser";

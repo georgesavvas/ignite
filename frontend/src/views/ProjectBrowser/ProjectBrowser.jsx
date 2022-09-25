@@ -4,11 +4,7 @@ import Typography from '@mui/material/Typography';
 import {setProject, ContextContext} from "../../contexts/ContextContext";
 import Button from '@mui/material/Button';
 import { DeleteDir, RenameDir, CreateDir } from "../ContextActions";
-import {
-  ReflexContainer,
-  ReflexSplitter,
-  ReflexElement
-} from 'react-reflex'
+import {ReflexContainer, ReflexSplitter, ReflexElement} from "react-reflex";
 import serverRequest from "../../services/serverRequest";
 import { ConfigContext } from "../../contexts/ConfigContext";
 import Modal from "../../components/Modal";
