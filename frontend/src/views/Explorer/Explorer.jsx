@@ -22,6 +22,7 @@ import serverRequest from "../../services/serverRequest";
 import classes from "./Explorer.module.css";
 import AssetTile from "./AssetTile";
 import DirectoryTile from "./DirectoryTile";
+import RowView from "./RowView";
 
 
 const debounced = debounce(fn => fn(), 500);
@@ -33,6 +34,11 @@ const defaultExplorerSettings = {
   tilesPerPage: 50,
   saved: {
     dynamic: {
+      grid: 5,
+      row: 5,
+      current: "grid"
+    },
+    tasks: {
       grid: 5,
       row: 5,
       current: "grid"
@@ -66,6 +72,7 @@ function Explorer() {
 
   const methods = {
     dynamic: "get_contents",
+    tasks: "get_tasks",
     assets: "get_assetversions",
     scenes: "get_scenes"
   };
@@ -150,8 +157,8 @@ function Explorer() {
   };
 
   const handleResultTypeChange = value => {
-    const savedViewType = explorerSettings.saved[value].current;
-    const savedTileSize = explorerSettings.saved[value][savedViewType];
+    const savedViewType = explorerSettings.saved[value]?.current || "grid";
+    const savedTileSize = explorerSettings.saved[value]?.[savedViewType] || 5;
     setExplorerSettings(prevState => {
       return {
         ...prevState,
@@ -163,10 +170,10 @@ function Explorer() {
   };
 
   const handleViewTypeChange = value => {
-    const currentResultType = explorerSettings.currentResultType;
-    const savedTileSize = explorerSettings.saved[currentResultType][value];
+    const currentResultType = explorerSettings.currentResultType || "grid";
+    const savedTileSize = explorerSettings.saved[currentResultType]?.[value] || 5;
     setExplorerSettings(prevState => {
-      const saved = prevState.saved;
+      const saved = prevState.saved || defaultExplorerSettings.saved;
       saved[currentResultType].current = value;
       return {
         ...prevState,
@@ -262,6 +269,24 @@ function Explorer() {
   let contextItems = getGenericContextItems(itemData, enqueueSnackbar);
   contextItems = contextItems.concat(getSpecificContextItems(itemData));
 
+  const getView = () => {
+    if (!loadedData.length) return (
+      <DataPlaceholder text={isLoading ? "Fetching data..." : "No results"} />
+    );
+    if (explorerSettings.currentViewType == "row") return (
+      <RowView data={loadedData} page={pages.current} tileSize={explorerSettings.currentTileSize}
+        pageSize={explorerSettings.tilesPerPage}
+      />
+    );
+    return (
+      <div style={tileContainerStyle}
+        onContextMenu={e => handleContextMenu(e, contextMenu, setContextMenu)}
+      >
+        {Object.keys(tiles).map((k) => tiles[k])}
+      </div>
+    );
+  };
+
   return (
     <div className={classes.container}>
       <CreateDir open={modalData.createOpen} enqueueSnackbar={enqueueSnackbar}
@@ -291,14 +316,7 @@ function Explorer() {
       />
       <Divider />
       <LinearProgress color="ignite" style={{width: "100%", minHeight: "2px", visibility: isLoading ? "visible" : "hidden"}} />
-      {!loadedData.length ? <DataPlaceholder text={isLoading ? "Fetching data..." : "No results"} /> :
-        <div
-          style={tileContainerStyle}
-          onContextMenu={e => handleContextMenu(e, contextMenu, setContextMenu)}
-        >
-          {Object.keys(tiles).map((k) => tiles[k])}
-        </div>
-      }
+      {getView()}
       <div
         className={classes.layoutHelper}
         onContextMenu={e => handleContextMenu(e, contextMenu, setContextMenu)}

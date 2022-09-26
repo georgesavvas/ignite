@@ -87,10 +87,10 @@ function RowTile(props) {
   const hoverArea = createRef();
   const ThumbComp = props.thumbnailComp;
   const isStatic = props.thumbnail !== undefined || ThumbComp;
-  const sizeMult = 0.25;
+  const sizeMult = 1;
 
   const tileStyle = {
-    borderColor: props.selected ? "rgb(252, 140, 3)" : "rgb(50, 50, 50)",
+    // borderColor: props.selected ? "rgb(252, 140, 3)" : "rgb(50, 50, 50)",
     flexDirection: "row"
   };
 
@@ -143,11 +143,11 @@ function RowTile(props) {
       {props.contextItems ? <ContextMenu items={props.contextItems} contextMenu={contextMenu}
         setContextMenu={setContextMenu}
       /> : null}
-      <div className={styles.tile} style={tileStyle} onClick={handleClick}
+      <div className={styles.rowTile} style={tileStyle} onClick={handleClick}
         onContextMenu={e => handleContextMenu(e, contextMenu, setContextMenu)}
       >
         <div style={thumbnailContainer}>
-          {ThumbComp ? <ThumbComp sx={{ fontSize: props.size * 0.5 }} className={styles.thumbnail} /> : null}
+          {ThumbComp ? <ThumbComp sx={{ fontSize: props.size * sizeMult * 0.5 }} className={styles.thumbnail} /> : null}
           {!ThumbComp && thumbnailURL ?
             <img src={thumbnailURL} className={styles.thumbnail} style={thumbnailStyle} />
             : null}
@@ -157,9 +157,9 @@ function RowTile(props) {
         >
           {isStatic ? null : <div className={styles.bar} style={barStyle} />}
         </div>
-        <div className={styles.rowContents} style={gridStyle}>
+        {/* <div className={styles.rowContents} style={gridStyle}>
           {props.children}
-        </div>
+        </div> */}
       </div>
     </>
   );

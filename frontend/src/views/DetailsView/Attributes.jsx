@@ -83,9 +83,10 @@ function Attributes(props) {
   const handleAddAttrib = e => {
     let value = e.target.value;
     if (value === "custom") value = "";
+    const lastAttrib = data.attribs.at(-1);
     setData(prevState => {
       let attribs = [...prevState.attribs];
-      attribs.push({id: data.attribs.at(-1).id + 1, name: value});
+      attribs.push({id: lastAttrib ? lastAttrib.id + 1 : 0, name: value});
       return {attribs: attribs, shouldWrite: false};
     });
   };
