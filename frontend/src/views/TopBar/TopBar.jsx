@@ -1,10 +1,7 @@
 import React, {useState} from "react";
 
-import ButtonGroup from "@mui/material/ButtonGroup";
 import IconButton from "@mui/material/IconButton";
 import HelpIcon from "@mui/icons-material/Help";
-import BugReportIcon from "@mui/icons-material/BugReport";
-import ThumbsUpDownIcon from "@mui/icons-material/ThumbsUpDown";
 import SettingsIcon from "@mui/icons-material/Settings";
 
 import Settings from "../Settings/Settings.jsx";

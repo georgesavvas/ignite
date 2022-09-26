@@ -222,7 +222,6 @@ async def get_tasks(request: Request):
     query = result.get("query", {})
     data = api.discover_tasks(
         result.get("path"),
-        latest=query.get("latest", 0),
         sort=query.get("sort"),
         as_dict=True
     )

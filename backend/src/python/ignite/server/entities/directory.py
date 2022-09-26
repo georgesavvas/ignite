@@ -1,16 +1,15 @@
-import os
-import yaml
 import logging
+import os
 import shutil
-import datetime
+from datetime import datetime, timezone
 from pathlib import Path, PurePath
 
-from ignite.utils import get_logger
-from ignite.server import utils
-from ignite.server import api
+import timeago
+import yaml
+from ignite.server import api, utils
 from ignite.server.constants import ANCHORS
 from ignite.server.utils import CONFIG
-
+from ignite.utils import bytes_to_human_readable, get_logger
 
 LOGGER = get_logger(__name__)
 
@@ -33,6 +32,14 @@ class Directory():
         if path:
             path = Path(path)
             self.path = path
+            stat = path.stat()
+            self.creation_time = datetime.fromtimestamp(
+                stat.st_ctime, tz=timezone.utc
+            )
+            self.modification_time = datetime.fromtimestamp(
+                stat.st_mtime, tz=timezone.utc
+            )
+            self.size = stat.st_size
             anchor = ANCHORS[dir_kind]
             self.anchor = path / anchor
             if not self.anchor.is_file():
@@ -94,6 +101,13 @@ class Directory():
             d[s] = value
             if s in self.nr_attrs:
                 d[f"{s}_nr"] = utils.get_nr(value)
+        d["size"] = bytes_to_human_readable(self.size)
+        try:
+            now = datetime.now(tz=timezone.utc)
+            d["creation_time"] = timeago.format(self.creation_time, now)
+            d["modification_time"] = timeago.format(self.modification_time, now)
+        except Exception as e:
+            LOGGER.error(e)
         d["icon"] = self.dir_kind
         if hasattr(self, "task_type"):
             d["icon"] += "_" + self.task_type
@@ -143,10 +157,13 @@ class Directory():
         return children
 
     def update_config(self, data):
-        data["modification_time"] = datetime.datetime.utcnow()
+        data["modification_time"] = datetime.now(tz=timezone.utc)
         with open(self.anchor, "w+") as f:
             config = yaml.safe_load(f) or {}
             if not config.get("creation_time"):
+                if config == data:
+                    LOGGER.debug("Asset config identical - not writing.")
+                    return config
                 config["creation_time"] = data["modification_time"]
             config.update(data)
             yaml.safe_dump(config, f)

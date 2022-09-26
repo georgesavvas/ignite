@@ -63,7 +63,7 @@ function DirectoryTile(props) {
   }
 
   function getSpecificContextItems(entity) {
-    if (!DIRCONTEXTOPTIONS.hasOwnProperty(entity.dir_kind)) return [];
+    if (!DIRCONTEXTOPTIONS[entity.dir_kind]) return [];
     const kindOptions = DIRCONTEXTOPTIONS[entity.dir_kind];
     const namedOptions = kindOptions[entity.name] || kindOptions.default;
     return namedOptions.map(contextOption => ({
@@ -77,9 +77,10 @@ function DirectoryTile(props) {
   }
 
   const handleClick = e => {
+    console.log(props.entity);
     if (e.detail === 2) {
       var path = props.entity.path;
-      if (props.entity.hasOwnProperty("task")) {
+      if (props.entity.task) {
         path = props.entity.task.path;
       }
       setCurrentContext(path);
@@ -109,9 +110,12 @@ function DirectoryTile(props) {
       </>
     ); else return(
       <>
-        <Typography align="left">{props.entity.name}</Typography>
+        <Typography align="left">
+          {isScene ? props.entity.dcc : props.entity.name}
+        </Typography>
         <Typography align="left">{props.entity.version}</Typography>
-        <Typography align="left">{props.entity.full_context}</Typography>
+        <Typography align="left">{props.entity.dir_kind}</Typography>
+        <Typography align="left">{props.entity.context}</Typography>
       </>
     );
   }
@@ -134,7 +138,7 @@ function DirectoryTile(props) {
         thumbnailWidth={thumbnailWidth}
         onClick={handleClick}
         contextItems={contextItems}
-        columnWidths={["200px", "200px", "500px"]}
+        columnWidths={isScene ? ["100px", "100px", "100px", "200px"] : ["100px", "100px", "100px", "200px"]}
       >
         {details()}
       </Tile>

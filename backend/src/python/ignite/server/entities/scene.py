@@ -1,4 +1,6 @@
 import os
+import timeago
+from datetime import datetime, timezone
 from pathlib import Path, PurePath
 from ignite.server.constants import ANCHORS, DCC_EXTENSIONS
 from ignite.server import utils
@@ -30,6 +32,14 @@ class Scene(Directory):
         if self.path:
             path = Path(path)
             self.path = PurePath(self.path)
+            stat = path.stat()
+            self.creation_time = datetime.fromtimestamp(
+                stat.st_ctime, tz=timezone.utc
+            )
+            self.modification_time = datetime.fromtimestamp(
+                stat.st_mtime, tz=timezone.utc
+            )
+            self.size = stat.st_size
             anchor = ANCHORS["scene"]
             self.anchor = path / anchor
             if not self.anchor.is_file():

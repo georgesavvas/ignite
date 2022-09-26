@@ -56,6 +56,17 @@ function AssetTile(props) {
     }
   ];
 
+  const gridRowStyle = {
+    // borderLeft: "1px solid rgb(70, 70, 70)",
+    direction: "rtl",
+    textAlign: "left",
+    whiteSpace: "nowrap",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    paddingLeft: "10px",
+    paddingRight: "10px"
+  };
+
   function details() {
     if (props.viewType === "grid") return(
       <>
@@ -70,14 +81,20 @@ function AssetTile(props) {
         </Typography>
       </>
     ); else return(
-      <>
-        <Typography align="left">{props.entity.name} - {props.entity.version}</Typography>
-        <URI uri={props.entity.uri} />
-        <Path path={props.entity.creation_time} />
-        <Path path={props.entity.modification_time} />
-        <Path path={props.entity.size} />
-        {/* <Typography align="left">{props.entity.context}</Typography> */}
-      </>
+      null
+      // <>
+      //   <Typography style={{...gridRowStyle, padding: 0, border: "none"}}>
+      //     {props.entity.name}
+      //   </Typography>
+      //   <Typography style={gridRowStyle}>{props.entity.version}</Typography>
+      //   <URI uri={props.entity.uri} />
+      //   <Typography style={gridRowStyle}>{props.entity.context}</Typography>
+      //   <Typography style={gridRowStyle}>{props.entity.creation_time}</Typography>
+      //   <Typography style={gridRowStyle}>
+      //     <span style={{direction: "ltr"}}>{props.entity.modification_time}</span>
+      //   </Typography>
+      //   <Typography style={gridRowStyle}>{props.entity.size}</Typography>
+      // </>
     );
   }
 
@@ -85,7 +102,6 @@ function AssetTile(props) {
     <>
       <Tile {...props} contextItems={contextItems} thumbnailWidth={thumbnailWidth}
         thumbnail={hasThumbnail ? undefined : "media/no_icon_grey.png"}
-        columnWidths={["90px", "300px", "100px", "100%"]}
       >
         {details()}
       </Tile>

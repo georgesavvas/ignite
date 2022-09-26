@@ -113,6 +113,9 @@ function ExplorerBar(props) {
             <ToggleButton value="dynamic" style={{height: "34.25px"}}>
               <Typography variant="button">Dynamic</Typography>
             </ToggleButton>
+            <ToggleButton value="tasks" style={{height: "34.25px"}}>
+              <Typography variant="button">Tasks</Typography>
+            </ToggleButton>
             <ToggleButton value="assets" style={{height: "34.25px"}}>
               <Typography variant="button">Assets</Typography>
             </ToggleButton>

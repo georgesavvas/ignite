@@ -18,22 +18,18 @@ export function handleContextMenu(event, contextMenu, setContextMenu) {
 }
 
 function ContextMenu(props) {
-  // const [contextMenu, setContextMenu] = useState(null);
-
   const handleClose = () => {
     props.setContextMenu(null);
   };
 
   function formatItem(item, index) {
-    // if (item.type === "divider") return <Divider />
-    if (!item.fn) item.fn = () => {};
     if (!item.args) item.args = [];
-    return(
+    return (
       <MenuItem
         key={index}
         onClick={e => {
           e.stopPropagation();
-          item.fn(...item.args);
+          if (item.fn) item.fn(...item.args);
           handleClose();
         }}
         divider={item.divider || false}

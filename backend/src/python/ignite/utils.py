@@ -80,3 +80,11 @@ def remap_path(path, server_root, client_root):
         return str(path)
     rel = path.relative_to(client_root)
     return server_root / rel
+
+
+def bytes_to_human_readable(size, suffix="B"):
+    for unit in ["", "K", "M", "G", "T", "P"]:
+        if abs(size) < 1024.0:
+            return f"{size:3.1f} {unit}{suffix}"
+        size /= 1024.0
+    return f"{size:.1f}Yi{suffix}"
