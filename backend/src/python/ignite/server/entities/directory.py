@@ -39,7 +39,7 @@ class Directory():
             self.modification_time = datetime.fromtimestamp(
                 stat.st_mtime, tz=timezone.utc
             )
-            self.size = stat.st_size
+            self.size = 0 #stat.st_size
             anchor = ANCHORS[dir_kind]
             self.anchor = path / anchor
             if not self.anchor.is_file():
