@@ -89,7 +89,7 @@ function ExplorerBar(props) {
   };
 
   return (
-    <div style={{padding: "0 5px 3px 5px", display: "flex", flexDirection: "column", gap: "5px"}}>
+    <div style={{padding: "0 5px 3px 5px", display: "flex", flexDirection: "column"}}>
       <ContextMenu items={filterOptions} contextMenu={filterMenu}
         setContextMenu={setFilterMenu}
       />

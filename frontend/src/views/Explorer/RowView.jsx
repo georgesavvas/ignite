@@ -10,7 +10,6 @@ import DirectoryTile from "./DirectoryTile";
 
 
 const RowView = props => {
-
   const renderEntity = params => {
     switch (props.viewType) {
     default:
@@ -24,8 +23,6 @@ const RowView = props => {
     }
   };
 
-  // const memoRenderEntity = memo(renderEntity(memoRenderEntity));
-
   const renderUri = ({value}) => {
     return (
       <URI uri={value} />
@@ -34,7 +31,7 @@ const RowView = props => {
 
   const specificColumns = {
     assets: [
-      {index: 1, field: "name", headerName: "Name", flex: 0.08},
+      {index: 1, field: "name", headerName: "Name", flex: 0.1},
       {index: 2, field: "version", headerName: "Version", flex: 0.08},
       {
         index: 3, 
@@ -44,6 +41,13 @@ const RowView = props => {
         renderCell: renderUri,
         sortComparator: (r1, r2) => r1.uri < r2.uri
       }
+    ],
+    tasks: [
+      {index: 1, field: "name", headerName: "Name", flex: 0.1}
+    ],
+    scenes: [
+      {index: 1, field: "version", headerName: "Version", flex: 0.08},
+      {index: 2, field: "dcc", headerName: "DCC", flex: 0.1}
     ]
   };
 
@@ -78,6 +82,7 @@ const RowView = props => {
           id: index,
           thumbnail: entity,
           name: entity.name,
+          dcc: entity.dcc,
           version: entity.version,
           uri: entity.uri,
           context: entity.context,
@@ -87,17 +92,20 @@ const RowView = props => {
       })
     );
   };
-  console.log(props.tileSize, props.tileSize * 16, props.tileSize * 9);
+
+  const handleRowClick = params => {
+    props.onSelected(params.row.thumbnail);
+  };
+
   return (
     <div style={{height: "100%"}}>
       <DataGrid
+        onRowClick={handleRowClick}
         page={props.page - 1}
         pageSize={props.pageSize}
         rows={getRows()}
         sx={{
           border: "none",
-          "& .MuiDataGrid-columnHeaders": { display: "none" },
-          "& .MuiDataGrid-virtualScroller": { marginTop: "0!important" },
           "& .MuiDataGrid-row": {
             boxSizing: "border-box"
           },
@@ -117,6 +125,7 @@ const RowView = props => {
         }}
         rowHeight={props.tileSize * 9}
         // getRowHeight={() => "auto"}
+        headerHeight={0}
         hideFooter
         columns={addSpecificColumns(columns)}
         // isCellEditable={shouldBeEditable}

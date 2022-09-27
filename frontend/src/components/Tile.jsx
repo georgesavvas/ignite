@@ -53,7 +53,7 @@ export default function Tile(props) {
 
   const handleClick = e => {
     if (props.onClick) props.onClick(e);
-    props.onSelected(props.entity);
+    if (props.onSelected) props.onSelected(props.entity);
   };
 
   return (
@@ -71,8 +71,13 @@ export default function Tile(props) {
         }
         <div className={styles.hoverArea} onMouseMove={isStatic ? null : handleMouseMove} ref={hoverArea}>
           <div className={styles.overlay}>
-            <div className={styles.topGrad} />
-            <div className={styles.bottomGrad} />
+            {!ThumbComp && thumbnailURL ?
+              <>
+                <div className={styles.topGrad} />
+                <div className={styles.bottomGrad} />
+              </>
+              : null
+            }
             {props.noInfo ? null : props.children}
           </div>
           {isStatic ? null : <div className={styles.bar} style={barStyle} />}

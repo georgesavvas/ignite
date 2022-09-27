@@ -3,7 +3,7 @@ import React, {useEffect, useState, useContext} from "react";
 import Divider from "@mui/material/Divider";
 import debounce from "lodash.debounce";
 import LinearProgress from "@mui/material/LinearProgress";
-import { useSnackbar } from "notistack";
+import {useSnackbar} from "notistack";
 
 import BuildFileURL from "../../services/BuildFileURL";
 import {ConfigContext} from "../../contexts/ConfigContext";
@@ -17,7 +17,7 @@ import ExplorerBar from "./ExplorerBar";
 import PageBar from "../../components/PageBar";
 import {EntityContext} from "../../contexts/EntityContext";
 import {ContextContext} from "../../contexts/ContextContext";
-import { DeleteDir, RenameDir, CreateDir } from "../ContextActions";
+import {DeleteDir, RenameDir, CreateDir} from "../ContextActions";
 import serverRequest from "../../services/serverRequest";
 import classes from "./Explorer.module.css";
 import AssetTile from "./AssetTile";
@@ -279,6 +279,7 @@ function Explorer() {
         tileSize={explorerSettings.currentTileSize}
         pageSize={explorerSettings.tilesPerPage}
         viewType={explorerSettings.currentResultType}
+        onSelected={handleEntitySelection}
       />
     );
     return (
