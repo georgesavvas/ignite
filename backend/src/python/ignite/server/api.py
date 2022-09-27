@@ -421,23 +421,17 @@ def discover_assets(path, asset_kinds=[], sort=None, as_dict=False, filters={}, 
         assets = [a.as_dict() for a in assets]
         if filters:
             from pprint import pprint
-            print("BEFORE FILTERS", len(assets))
             assets = promote_av_attribs(assets)
-            pprint(assets[-1])
         if filters.get("collection"):
-            pprint(filters["collection"])
             query = Query(format_filter(filters["collection"]))
             filtered = list(filter(query.match, assets))
             assets = filtered
             print("AFTER COLLECTION FILTER", len(assets))
         if filters.get("search"):
-            pprint(filters["search"])
             expr = format_filter(filters["search"])
-            pprint(expr)
             query = Query(expr)
             filtered = list(filter(query.match, assets))
             assets = filtered
-            print("AFTER SEARCH FILTER", len(assets))
         assets = sort_results(assets, sort)
     return assets
 
