@@ -115,6 +115,7 @@ function Explorer() {
   }, [pages.current, explorerSettings.currentResultType, explorerSettings.tilesPerPage, currentContext, config.access, query]);
 
   useEffect(() => {
+    if (explorerSettings.currentViewType !== "grid") return;
     const _tiles = loadedData.reduce(function(obj, entity) {
       if (entity.path === selectedEntity.path) setSelectedEntity(entity);
       entity.path = BuildFileURL(entity.path, config, {pathOnly: true});
@@ -274,8 +275,10 @@ function Explorer() {
       <DataPlaceholder text={isLoading ? "Fetching data..." : "No results"} />
     );
     if (explorerSettings.currentViewType == "row") return (
-      <RowView data={loadedData} page={pages.current} tileSize={explorerSettings.currentTileSize}
+      <RowView data={loadedData} page={pages.current}
+        tileSize={explorerSettings.currentTileSize}
         pageSize={explorerSettings.tilesPerPage}
+        viewType={explorerSettings.currentResultType}
       />
     );
     return (

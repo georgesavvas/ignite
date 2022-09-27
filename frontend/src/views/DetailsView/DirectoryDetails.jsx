@@ -54,11 +54,10 @@ function DirectoryDetails(props) {
         <URI uri={props.entity.uri} />
         <Path path={props.entity.path} />
         <div style={rowStyle}>
-          <Typography style={{minWidth: "110px"}}>Thumbnail from:</Typography>
           {reptEdit || !props.entity.repr ?
             <TextField
               size="small"
-              label="Set Representative Asset"
+              label="Get thumbnail from"
               placeholder="Path or URI"
               fullWidth
               autoFocus={reptEdit && props.entity.repr && props.entity.repr !== null}
@@ -68,6 +67,7 @@ function DirectoryDetails(props) {
               onKeyPress={e => {if (e.key === "Enter") handleReptChange();}}
             /> :
             <>
+              <Typography style={{minWidth: "110px"}}>Thumbnail from:</Typography>
               <URI uri={props.entity.repr} />
               <Button
                 variant="outlined"

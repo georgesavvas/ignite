@@ -3,8 +3,6 @@ import React, {useContext} from "react";
 import Typography from "@mui/material/Typography";
 import { useSnackbar } from "notistack";
 
-import URI from "../../components/URI";
-import Path from "../../components/Path";
 import {CopyToClipboard, ShowInExplorer} from "../ContextActions";
 import {setReprForProject, setReprForParent} from "../ContextActions";
 import { ContextContext } from "../../contexts/ContextContext";
@@ -56,19 +54,8 @@ function AssetTile(props) {
     }
   ];
 
-  const gridRowStyle = {
-    // borderLeft: "1px solid rgb(70, 70, 70)",
-    direction: "rtl",
-    textAlign: "left",
-    whiteSpace: "nowrap",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    paddingLeft: "10px",
-    paddingRight: "10px"
-  };
-
   function details() {
-    if (props.viewType === "grid") return(
+    return(
       <>
         <Typography style={{position: "absolute", top: "5px", left: "10px"}}>
           {contextPath || "asset"}
@@ -80,21 +67,6 @@ function AssetTile(props) {
           {props.entity.version}
         </Typography>
       </>
-    ); else return(
-      null
-      // <>
-      //   <Typography style={{...gridRowStyle, padding: 0, border: "none"}}>
-      //     {props.entity.name}
-      //   </Typography>
-      //   <Typography style={gridRowStyle}>{props.entity.version}</Typography>
-      //   <URI uri={props.entity.uri} />
-      //   <Typography style={gridRowStyle}>{props.entity.context}</Typography>
-      //   <Typography style={gridRowStyle}>{props.entity.creation_time}</Typography>
-      //   <Typography style={gridRowStyle}>
-      //     <span style={{direction: "ltr"}}>{props.entity.modification_time}</span>
-      //   </Typography>
-      //   <Typography style={gridRowStyle}>{props.entity.size}</Typography>
-      // </>
     );
   }
 
