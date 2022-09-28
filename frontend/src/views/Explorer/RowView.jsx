@@ -200,8 +200,7 @@ const RowView = props => {
         onRowClick={handleRowClick}
         componentsProps={{
           row: {
-            onContextMenu: handleRowContextMenu,
-            style: {cursor: "context-menu"},
+            onContextMenu: handleRowContextMenu
           },
         }}
         page={props.page - 1}

@@ -741,6 +741,27 @@ async def remove_rule_template(request: Request):
     }
 
 
+@app.get("/api/v1/get_vault_asset_names")
+async def get_vault_asset_names():
+    data = api.get_vault_asset_names()
+    return {
+        "ok": True,
+        "data": data
+    }
+
+
+@app.post("/api/v1/vault_add")
+async def vault_add(request: Request):
+    result = await request.json()
+    log_request(result)
+    path = result.get("path")
+    name = result.get("name")
+    if not path or not name:
+        return error("invalid_data")
+    ok = api.vault_add(path, name)
+    return {"ok": ok}
+
+
 mount_root()
 
 
