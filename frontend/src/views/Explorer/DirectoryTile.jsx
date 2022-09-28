@@ -77,7 +77,6 @@ function DirectoryTile(props) {
   }
 
   const handleClick = e => {
-    console.log(props.entity);
     if (e.detail === 2) {
       var path = props.entity.path;
       if (props.entity.task) {
@@ -96,7 +95,7 @@ function DirectoryTile(props) {
   const name = isScene ? props.entity.dcc : props.entity.name;
 
   function details() {
-    if (props.viewType === "grid") return(
+    return (
       <>
         <Typography style={{position: "absolute", top: "5px", left: "10px"}}>
           {contextPath || props.entity.dir_kind}
@@ -107,15 +106,6 @@ function DirectoryTile(props) {
         <Typography style={{position: "absolute", bottom: "5px", right: "10px"}}>
           {props.entity.version}
         </Typography>
-      </>
-    ); else return(
-      <>
-        <Typography align="left">
-          {isScene ? props.entity.dcc : props.entity.name}
-        </Typography>
-        <Typography align="left">{props.entity.version}</Typography>
-        <Typography align="left">{props.entity.dir_kind}</Typography>
-        <Typography align="left">{props.entity.context}</Typography>
       </>
     );
   }

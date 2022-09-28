@@ -55,7 +55,7 @@ function AssetTile(props) {
   ];
 
   function details() {
-    return(
+    return (
       <>
         <Typography style={{position: "absolute", top: "5px", left: "10px"}}>
           {contextPath || "asset"}
