@@ -763,12 +763,17 @@ def get_vault_asset_names():
     return asset_names
 
 
-def vault_add(path):
+def vault_add(path, name):
     entity = find(path)
     if not entity:
         return
-    if not entity.dir_kind == "assetversion":
+    if entity.dir_kind != "assetversion":
         return
     vault = CONFIG["vault"]
-
-
+    vault_entity_path = vault / name
+    vault_entity = find(vault_entity_path)
+    if not vault_entity:
+        register_asset(vault_entity_path)
+        vault_entity = find(vault_entity_path)
+    if vault_entity.dir_kind != "asset":
+        
