@@ -19,8 +19,14 @@ export default function Tile(props) {
 
   const tileStyle = {
     borderStyle: props.noBorder ? "none" : "solid",
+    borderRightStyle: "solid",
     borderRadius: props.noBorder ? 0 : "3px",
     borderColor: props.selected ? "rgb(252, 140, 3)" : "rgb(50, 50, 50)"
+  };
+
+  const thumbnailCompStyle = {
+    width: props.thumbnailWidth || "100%",
+    height: "100%"
   };
 
   const thumbnailStyle = {
@@ -64,7 +70,7 @@ export default function Tile(props) {
       <div className={styles.tile} style={tileStyle} onClick={handleClick}
         onContextMenu={e => handleContextMenu(e, contextMenu, setContextMenu)}
       >
-        {ThumbComp ? <ThumbComp className={styles.thumbnail} style={thumbnailStyle} /> : null}
+        {ThumbComp ? <ThumbComp className={styles.thumbnail} style={thumbnailCompStyle} /> : null}
         {!ThumbComp && thumbnailURL ?
           <img src={thumbnailURL} className={styles.thumbnail} style={thumbnailStyle} />
           : null

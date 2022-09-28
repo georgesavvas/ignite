@@ -1,38 +1,69 @@
-import React, { memo, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 
-import Typography from "@mui/material/Typography";
-import {DataGrid, GridActionsCellItem} from "@mui/x-data-grid";
+import {DataGrid} from "@mui/x-data-grid";
 
 import DataPlaceholder from "../../components/DataPlaceholder";
 import AssetTile from "./AssetTile";
 import URI from "../../components/URI";
 import DirectoryTile from "./DirectoryTile";
+import ContextMenu, { handleContextMenu } from "../../components/ContextMenu";
+import { Typography } from "@mui/material";
 
 
 const RowView = props => {
+  const [contextMenu, setContextMenu] = useState(null);
+
   const renderEntity = params => {
     switch (props.viewType) {
     default:
       return useMemo(() =>
-        <DirectoryTile entity={params.value} noInfo noBorder />, [params.value]
+        <DirectoryTile
+          onContextMenu={props.onContextMenu}
+          entity={params.value}
+          noInfo
+          noBorder
+        />, [params.value]
       );
     case "assets":
       return useMemo(() =>
-        <AssetTile entity={params.value} noInfo noBorder />, [params.value]
+        <AssetTile
+          onContextMenu={props.onContextMenu}
+          entity={params.value}
+          noInfo
+          noBorder
+        />, [params.value]
       );
     }
   };
 
-  const renderUri = ({value}) => {
+  const renderUri = params => {
     return (
-      <URI uri={value} />
+      useMemo(() => <URI uri={params.value} />, [params.value])
+    );
+  };
+
+  const renderText = params => {
+    return (
+      useMemo(() => <Typography>{params.value}</Typography>, [params.value])
     );
   };
 
   const specificColumns = {
     assets: [
-      {index: 1, field: "name", headerName: "Name", flex: 0.1},
-      {index: 2, field: "version", headerName: "Version", flex: 0.08},
+      {
+        index: 1,
+        field: "name",
+        headerName: "Name",
+        flex: 0.1,
+        renderCell: renderText
+      },
+      {
+        index: 2,
+        field: "version",
+        headerName: "Version",
+        flex: 0.08,
+        renderCell: renderText
+      },
       {
         index: 3, 
         field: "uri", 
@@ -43,11 +74,29 @@ const RowView = props => {
       }
     ],
     tasks: [
-      {index: 1, field: "name", headerName: "Name", flex: 0.1}
+      {
+        index: 1,
+        field: "name",
+        headerName: "Name",
+        flex: 0.1,
+        renderCell: renderText
+      }
     ],
     scenes: [
-      {index: 1, field: "version", headerName: "Version", flex: 0.08},
-      {index: 2, field: "dcc", headerName: "DCC", flex: 0.1}
+      {
+        index: 1,
+        field: "version",
+        headerName: "Version",
+        flex: 0.08,
+        renderCell: renderText
+      },
+      {
+        index: 2,
+        field: "dcc",
+        headerName: "DCC",
+        flex: 0.1,
+        renderCell: renderText
+      }
     ]
   };
 
@@ -70,9 +119,19 @@ const RowView = props => {
       sortComparator: (r1, r2) => r1.name < r2.name,
       cellClassName: () => "thumbnailColumn"
     },
-    {field: "context", headerName: "Context", flex: 0.2},
-    {field: "creationTime", headerName: "Created", flex: 0.1},
-    {field: "modificationTime", headerName: "Modified", flex: 0.1}
+    {
+      field: "context",
+      headerName: "Context",
+      flex: 0.2,
+      renderCell: renderText
+    },
+    {
+      field: "modificationTime",
+      headerName: "Modified",
+      flex: 0.1,
+      renderCell: renderText
+    },
+    // {field: "creationTime", headerName: "Created", flex: 0.1}
   ];
 
   const getRows = () => {
@@ -97,10 +156,29 @@ const RowView = props => {
     props.onSelected(params.row.thumbnail);
   };
 
+  const handleRowContextMenu = e => {
+    e.preventDefault();
+    const row = e.target.dataset.field ? e.target.parentElement : e.target.parentElement.parentElement;
+    const tile = row.firstChild.firstChild;
+    for (const key in tile) {
+      if (key.startsWith("__reactProps$")) tile[key].onContextMenu(e);
+    }
+    console.log(e);
+  };
+
   return (
     <div style={{height: "100%"}}>
+      {/* <ContextMenu items={props.contextItems} contextMenu={contextMenu}
+        setContextMenu={setContextMenu}
+      /> */}
       <DataGrid
         onRowClick={handleRowClick}
+        componentsProps={{
+          row: {
+            onContextMenu: handleRowContextMenu,
+            style: {cursor: "context-menu"},
+          },
+        }}
         page={props.page - 1}
         pageSize={props.pageSize}
         rows={getRows()}
@@ -114,7 +192,7 @@ const RowView = props => {
             background: "rgb(40, 40, 40)"
           },
           // "& .MuiDataGrid-cell": {
-          //   borderLeft: "1px solid rgb(70, 70, 70)"
+          //   borderLeft: "1px solid rgb(30, 30, 30)"
           // },
           "& .MuiDataGrid-cell:focus": {
             outline: "none"

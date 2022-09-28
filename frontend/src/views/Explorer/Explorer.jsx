@@ -280,6 +280,7 @@ function Explorer() {
         pageSize={explorerSettings.tilesPerPage}
         viewType={explorerSettings.currentResultType}
         onSelected={handleEntitySelection}
+        onContextMenu={handleContextMenuSelection}
       />
     );
     return (
