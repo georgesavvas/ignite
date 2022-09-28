@@ -64,24 +64,8 @@ function Browser(props) {
     setTiles(_tiles);
   }, [props.loadedData, props.selectedEntity.path, explorerSettings.currentViewType, explorerSettings.currentTileSize]);
 
-  // const getColourNameCluster = (word, words) => {
-  //   const index = words.indexOf(word)
-  // }
-
-  // const getColoursFromString = s => {
-  //   const words = s.toLowerCase().split(" ")
-  //   let colours = []
-  //   words.map(word => {
-  //     const matches = namedColors.filter(c => c.name.toLowerCase() === word)
-  //     if (matches) colours = colours.concat(matches)
-  //   })
-  //   return colours
-  // }
-
   const handleFilterChange = data => {
     props.onFilterChange(data);
-    // const palette = getColoursFromString(filter_string);
-    // const palette = [];
   };
 
   const handlePageChange = (event, value) => {
@@ -109,15 +93,6 @@ function Browser(props) {
   const handleFilterStringChange = value => {
     props.handleQueryChange({filter_string: value});
   };
-
-  // const handleAssetDelete = assetID => {
-  //   setAssetDeleteModal({open: false})
-  //   serverRequest("delete_asset", {data: assetID}).then(resp => {
-  //     if (resp.ok) enqueueSnackbar("Successfully deleted!", {variant: "success"})
-  //     else enqueueSnackbar("There was an error deleting the asset.", {variant: "error"})
-  //   })
-  //   forceUpdate()
-  // }
 
   const getBrowserHelperText = () => {
     let s = `${props.pages.results} results | `;

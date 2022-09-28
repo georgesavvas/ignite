@@ -28,7 +28,11 @@ export default function ProjectTree() {
 
   var content = null;
   if (loadedData && loadedData.children) {
-    content = <ProjectTreeView data={loadedData} shouldUpdate={setUpdateTreeView} filter={filterValue} />;
+    content = <ProjectTreeView
+      data={loadedData}
+      shouldUpdate={setUpdateTreeView}
+      filter={filterValue}
+    />;
   }
 
   return (

@@ -122,11 +122,15 @@ export default function TaskManager() {
       <FilterField filterValue={filterValue} setFilterValue={setFilterValue}>
         <FormControlLabel 
           control={
-            <Switch checked={autoClear} onChange={e => setAutoClear(e.target.checked)} />
+            <Switch
+              checked={autoClear}
+              onChange={e => setAutoClear(e.target.checked)}
+              color="ignite"
+            />
           }
           label="Clear finished"
           labelPlacement="start"
-          style={{minWidth: "150px"}}
+          style={{minWidth: "150px", marginRight: "0px"}}
         />
       </FilterField>
       {!tasks.length ? <DataPlaceholder text="No Tasks" /> :

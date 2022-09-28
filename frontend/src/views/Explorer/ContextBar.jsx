@@ -40,7 +40,6 @@ export default function ContextBar() {
 
   const handleBlur = e => {
     const value = e.target.value;
-    console.log(currentContext.path, value);
     if (currentContext.path !== value) handlePathChange(value);
     setIsTextField(false);
   };

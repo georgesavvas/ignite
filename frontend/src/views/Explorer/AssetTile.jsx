@@ -3,7 +3,7 @@ import React, {useContext} from "react";
 import Typography from "@mui/material/Typography";
 import { useSnackbar } from "notistack";
 
-import {CopyToClipboard, ShowInExplorer} from "../ContextActions";
+import {CopyToClipboard, ShowInExplorer, addToVault} from "../ContextActions";
 import {setReprForProject, setReprForParent} from "../ContextActions";
 import { ContextContext } from "../../contexts/ContextContext";
 import Tile from "../../components/Tile";
@@ -21,7 +21,8 @@ function AssetTile(props) {
 
   const dirData = {
     kind: props.entity.dir_kind,
-    path: props.entity.path
+    path: props.entity.path,
+    name: props.entity.name
   };
 
   const contextItems = [
@@ -32,6 +33,11 @@ function AssetTile(props) {
     {
       label: "Copy path",
       fn: () =>  CopyToClipboard(props.entity.path, enqueueSnackbar),
+      divider: true
+    },
+    {
+      label: "Add to Vault",
+      fn: () =>  props.onContextMenu("vaultAdd", dirData),
       divider: true
     },
     {

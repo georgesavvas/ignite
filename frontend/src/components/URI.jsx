@@ -28,7 +28,7 @@ function URI(props) {
   return (
     <>
       <ContextMenu items={contextItems} contextMenu={contextMenu} setContextMenu={setContextMenu} />
-      <div className={styles.container} onClick={e => handleContextMenu(e, contextMenu, setContextMenu)}>
+      <div className={styles.container} onClick={e => handleContextMenu(e, contextMenu, setContextMenu)} style={props.style}>
         <Typography style={{color: "rgb(252, 140, 3)", direction: "rtl", textAlign: "left"}} noWrap>{props.uri}</Typography>
       </div>
     </>

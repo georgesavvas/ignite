@@ -38,17 +38,26 @@ const RowView = props => {
 
   const renderUri = params => {
     return (
-      useMemo(() => <URI uri={params.value} />, [params.value])
+      <URI uri={params.value} style={{pointerEvents: "none"}} />
     );
   };
 
   const renderText = params => {
     return (
-      useMemo(() => <Typography>{params.value}</Typography>, [params.value])
+      <Typography>{params.value}</Typography>
     );
   };
 
   const specificColumns = {
+    dynamic: [
+      {
+        index: 1,
+        field: "name",
+        headerName: "Name",
+        flex: 0.1,
+        renderCell: renderText
+      }
+    ],
     assets: [
       {
         index: 1,
@@ -71,6 +80,13 @@ const RowView = props => {
         flex: 0.4,
         renderCell: renderUri,
         sortComparator: (r1, r2) => r1.uri < r2.uri
+      },
+      {
+        index: 4,
+        field: "context",
+        headerName: "Context",
+        flex: 0.2,
+        renderCell: renderText
       }
     ],
     tasks: [
@@ -79,6 +95,13 @@ const RowView = props => {
         field: "name",
         headerName: "Name",
         flex: 0.1,
+        renderCell: renderText
+      },
+      {
+        index: 2,
+        field: "context",
+        headerName: "Context",
+        flex: 0.2,
         renderCell: renderText
       }
     ],
@@ -95,6 +118,13 @@ const RowView = props => {
         field: "dcc",
         headerName: "DCC",
         flex: 0.1,
+        renderCell: renderText
+      },
+      {
+        index: 3,
+        field: "context",
+        headerName: "Context",
+        flex: 0.2,
         renderCell: renderText
       }
     ]
@@ -120,15 +150,9 @@ const RowView = props => {
       cellClassName: () => "thumbnailColumn"
     },
     {
-      field: "context",
-      headerName: "Context",
-      flex: 0.2,
-      renderCell: renderText
-    },
-    {
       field: "modificationTime",
       headerName: "Modified",
-      flex: 0.1,
+      flex: 0.11,
       renderCell: renderText
     },
     // {field: "creationTime", headerName: "Created", flex: 0.1}
@@ -161,9 +185,10 @@ const RowView = props => {
     const row = e.target.dataset.field ? e.target.parentElement : e.target.parentElement.parentElement;
     const tile = row.firstChild.firstChild;
     for (const key in tile) {
-      if (key.startsWith("__reactProps$")) tile[key].onContextMenu(e);
+      if (key.startsWith("__reactProps$")) {
+        if (tile[key].onContextMenu) tile[key].onContextMenu(e);
+      }
     }
-    console.log(e);
   };
 
   return (

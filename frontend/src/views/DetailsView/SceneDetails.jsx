@@ -4,6 +4,7 @@ import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 
 import DccSelector from "../DccSelector.jsx";
+import Path from "../../components/Path.jsx";
 
 
 const style = {
@@ -17,10 +18,9 @@ function SceneDetails(props) {
       <div style={{margin: "5px", overflow: "hidden"}}>
         <DccSelector scene={props.entity} style={{maxHeight: "75vh"}} />
         <Divider style={{margin: "20px 0 20px 0"}} />
-        <Typography variant="h5">Scene Details</Typography>
-        <Typography>{props.entity.dcc}</Typography>
-        <Typography>{props.entity.path}</Typography>
-        <Typography>{props.entity.scene}</Typography>
+        <Typography variant="h5">Scene Details ({props.entity.dcc})</Typography>
+        <Path path={props.entity.path} />
+        <Path path={props.entity.scene} />
       </div>
     </div>
   );

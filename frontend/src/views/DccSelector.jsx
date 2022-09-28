@@ -108,7 +108,11 @@ function DccSelector(props) {
         </Typography>
         <FormControlLabel 
           control={
-            <Switch checked={showAll} onChange={e => setShowAll(e.target.checked)} />
+            <Switch
+              checked={showAll}
+              onChange={e => setShowAll(e.target.checked)}
+              color="ignite"
+            />
           }
           label="Show all"
           labelPlacement="start"
