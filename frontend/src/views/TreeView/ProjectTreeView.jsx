@@ -19,6 +19,8 @@ import ContextMenu, {handleContextMenu} from "../../components/ContextMenu";
 import {CopyToClipboard, ShowInExplorer} from "../ContextActions";
 import {DeleteDir, RenameDir, CreateDir} from "../ContextActions";
 import styles from "./ProjectTreeView.module.css";
+import {EntityContext} from "../../contexts/EntityContext";
+import serverRequest from "../../services/serverRequest";
 
 
 const StyledTreeItemRoot = styled(TreeItem)(({theme}) => ({
@@ -153,6 +155,7 @@ StyledTreeItem.propTypes = {
 
 function ProjectTreeView(props) {
   const [config] = useContext(ConfigContext);
+  const [selectedEntity, setSelectedEntity] = useContext(EntityContext);
   const [expandedItems, setExpandedItems] = useState(["root"]);
   const [modalData, setModalData] = useState({});
   const [selectedItems, setSelectedItems] = useState("root");
@@ -211,6 +214,9 @@ function ProjectTreeView(props) {
     result = result[0];
     setCurrentContext(result.path);
     setSelectedItems(nodeId);
+    serverRequest("find", {path: result.path}).then(resp => {
+      if (resp.data) setSelectedEntity(resp.data);
+    });
   };
 
   const handleNodeToggle = (event, nodeIds) => {

@@ -97,10 +97,49 @@ export function DeleteDir({data, open=false, onClose, enqueueSnackbar, fn}) {
         size="small"
         autoFocus
         inputRef={textFieldRef}
-        value={value}
+        value={value || ""}
         onChange={e => setValue(e.target.value)}
         helperText={solved ? "Go for it" : "Solve the above to continue"}
         color={solved ? "success" : "error"}
+      />
+    </Modal>
+  );
+}
+
+export function VaultAdd({data, open=false, onClose, enqueueSnackbar, fn}) {
+  const [nameValue, setNameValue] = useState("");
+  const textFieldRef = useRef();
+
+  useEffect(() => {
+    setNameValue(data.name);
+  }, [data.name]);
+
+  function handleSubmit() {
+    serverRequest("vault_add", {...data, name: nameValue}).then(resp => {
+      if (resp.ok) enqueueSnackbar("Done", {variant: "success"});
+      else enqueueSnackbar("An error occurred...", {variant: "error"});
+    });
+    if (fn) fn();
+    onClose();
+    setNameValue("");
+  }
+
+  return (
+    <Modal open={open} onFormSubmit={handleSubmit} focusRef={textFieldRef}
+      maxWidth="sm" closeButton onClose={onClose} title={"Add asset to vault"}
+      buttons={[<Button key="confirm" type="submit">Confirm</Button>]}
+    >
+      <TextField
+        id="name"
+        label="Name"
+        variant="outlined"
+        value={nameValue || ""}
+        onChange={e => setNameValue(e.target.value)}
+        size="small"
+        fullWidth
+        autoFocus
+        inputRef={textFieldRef}
+        style={{marginTop: "10px"}}
       />
     </Modal>
   );
@@ -129,6 +168,7 @@ export function RenameDir({data, open=false, onClose, enqueueSnackbar, fn}) {
     });
     if (fn) fn();
     onClose();
+    setNameValue("");
   }
 
   return (
@@ -140,7 +180,7 @@ export function RenameDir({data, open=false, onClose, enqueueSnackbar, fn}) {
         id="name"
         label="Name"
         variant="outlined"
-        value={nameValue}
+        value={nameValue || ""}
         onChange={e => setNameValue(e.target.value)}
         size="small"
         fullWidth

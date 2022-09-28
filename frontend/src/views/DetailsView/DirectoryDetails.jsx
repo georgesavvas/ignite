@@ -50,7 +50,9 @@ function DirectoryDetails(props) {
   return (
     <div style={style}>
       <div style={{margin: "10px", overflow: "hidden"}}>
-        <Typography variant="h5" style={{marginBottom: "10px"}}>{props.entity.name}</Typography>
+        <Typography variant="h5" style={{marginBottom: "10px"}}>
+          {props.entity.name}
+        </Typography>
         <URI uri={props.entity.uri} />
         <Path path={props.entity.path} />
         <div style={rowStyle}>

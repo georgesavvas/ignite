@@ -9,7 +9,7 @@ import BuildFileURL from "../../services/BuildFileURL";
 import {ConfigContext} from "../../contexts/ConfigContext";
 import DataPlaceholder from "../../components/DataPlaceholder";
 import {DIRCONTEXTOPTIONS} from "../../constants";
-import {CopyToClipboard, ShowInExplorer} from "../ContextActions";
+import {CopyToClipboard, ShowInExplorer, VaultAdd} from "../ContextActions";
 import loadExplorerSettings from "../../utils/loadExplorerSettings";
 import saveExplorerSettings from "../../utils/saveExplorerSettings";
 import ContextMenu, {handleContextMenu} from "../../components/ContextMenu";
@@ -304,6 +304,10 @@ function Explorer() {
       />
       <RenameDir open={modalData.renameOpen} enqueueSnackbar={enqueueSnackbar}
         onClose={() => setModalData(prevState => ({...prevState, renameOpen: false}))}
+        data={modalData} fn={refreshContext}
+      />
+      <VaultAdd open={modalData.vaultAddOpen} enqueueSnackbar={enqueueSnackbar}
+        onClose={() => setModalData(prevState => ({...prevState, vaultAddOpen: false}))}
         data={modalData} fn={refreshContext}
       />
       <ContextMenu items={contextItems} contextMenu={contextMenu}
