@@ -756,3 +756,19 @@ def write_rule_templates(data):
         rule_templates = yaml.safe_dump(data, file)
     return rule_templates
 
+
+def get_vault_asset_names():
+    vault = CONFIG["vault"]
+    asset_names = [a.name for a in vault.iterdir()]
+    return asset_names
+
+
+def vault_add(path):
+    entity = find(path)
+    if not entity:
+        return
+    if not entity.dir_kind == "assetversion":
+        return
+    vault = CONFIG["vault"]
+
+
