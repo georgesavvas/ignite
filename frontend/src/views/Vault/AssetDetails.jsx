@@ -19,6 +19,8 @@ import TagContainer from "../DetailsView/TagContainer";
 import saveReflexLayout from "../../utils/saveReflexLayout";
 import loadReflexLayout from "../../utils/loadReflexLayout";
 import {VaultContext} from "../../contexts/VaultContext";
+import {ConfigContext} from "../../contexts/ConfigContext";
+import BuildFileURL from "../../services/BuildFileURL";
 
 
 const splitterStyle = {
@@ -57,12 +59,10 @@ const compExtensionPreviewPriority = [
 
 function AssetDetails(props) {
   const [flexRatios, setFlexRatios] = useState(defaultFlexRations);
+  const [config] = useContext(ConfigContext);
   const [selectedCompName, setSelectedCompName] = useState("");
   const {enqueueSnackbar} = useSnackbar();
   const [contextMenu, setContextMenu] = useState(null);
-  const [selectedVersion, setSelectedVersion] = useState("");
-  const [assetVersion, setAssetVersion] = useState();
-  const [selectedComp, setSelectedComp] = useState();
   const [,, refreshVault] = useContext(VaultContext);
 
   useEffect(() => {
@@ -88,48 +88,45 @@ function AssetDetails(props) {
   }, []);
 
   useEffect(() => {
-    if (!props.entity || props.entity === null) return;
-    setSelectedVersion(props.entity.latest_v);
-  }, [props.entity]);
-
-  useEffect(() => {
-    if (!props.entity || props.entity === null) return;
-    if (!selectedVersion) return;
-    const path = `${props.entity.path}/${selectedVersion}`;
-    serverRequest("get_assetversion", {path: path}).then(resp => {
-      const av = resp.data;
-      setAssetVersion(av);
-      if (!av.components) {
-        setSelectedCompName("");
-        return;
-      }
-      av.components.forEach(comp => {
-        if (compExtensionPreviewPriority.includes(comp.ext)) {
-          setSelectedCompName(comp.filename);
-          return;
-        }
-      });
-    });
-  }, [props.entity, selectedVersion]);
-
-  useEffect(() => {
-    if (!selectedCompName) {
-      setSelectedComp();
+    const comps = props.entity?.components;
+    if (!comps) {
+      setSelectedCompName("");
       return;
     }
-    setSelectedComp(getComp(selectedCompName));
-  }, [selectedCompName]);
+    const found = compExtensionPreviewPriority.some(ext => {
+      const comp = comps.find(comp => comp.ext === ext);
+      if (comp) {
+        setSelectedCompName(comp.filename);
+        return true;
+      }
+    });
+    if (!found) setSelectedCompName(comps[0].filename);
+  }, [props.entity]);
+
+  const handleVersionChange = e => {
+    const version = e.target.value;
+    const path = BuildFileURL(
+      `${props.entity.asset}/${version}`,
+      config,
+      {reverse: true, pathOnly: true}
+    );
+    serverRequest("get_assetversion", {path: path}).then(resp => {
+      props.setSelectedEntity(resp.data);
+    });
+  };
 
   const handleResized = data => {
     saveReflexLayout(data);
   };
 
   const getComp = compName => {
-    for(const comp of assetVersion.components) {
+    for(const comp of props.entity.components) {
       if (comp.filename === compName) return comp;
     }
     return {};
   };
+
+  const selectedComp = getComp(selectedCompName);
 
   const contextItems = [
     {
@@ -141,8 +138,6 @@ function AssetDetails(props) {
     //   fn: () => ShowInExplorer(props.entity.path, enqueueSnackbar)
     // }
   ];
-
-  if (!assetVersion) return <DataPlaceholder text="Fetching data..." />;
 
   return (
     <div style={style}>
@@ -159,24 +154,23 @@ function AssetDetails(props) {
             <FormControl size="small" style={versionSelectStyle}>
               <InputLabel>Version</InputLabel>
               <Select
-                value={selectedVersion}
+                value={props.entity.version}
                 label="Version"
-                onChange={e => setSelectedVersion(e.target.value)}
+                onChange={handleVersionChange}
               >
                 {props.entity.versions.map(ver =>
                   <MenuItem key={ver} value={ver}>{ver}</MenuItem>
                 )}
               </Select>
             </FormControl>
-            <Typography variant="h5">{assetVersion.name}</Typography>
-            {/* <URI uri={assetVersion.uri} /> */}
-            <Path path={assetVersion.path} />
+            <Typography variant="h5">{props.entity.name}</Typography>
+            <Path path={props.entity.path} />
           </div>
-          <TagContainer entityPath={assetVersion.path} tags={assetVersion.tags || []} onRefresh={refreshVault} />
+          <TagContainer entityPath={props.entity.path} tags={props.entity.tags || []} onRefresh={refreshVault} />
         </ReflexElement>
         <ReflexSplitter style={splitterStyle} />
         <ReflexElement flex={flexRatios["vault.details.comps"]} name={"vault.details.comps"} onStopResize={handleResized}>
-          <ComponentList components={assetVersion.components || []} selectedComp={selectedComp} onSelect={setSelectedCompName} />
+          <ComponentList components={props.entity.components || []} selectedComp={selectedComp} onSelect={setSelectedCompName} />
         </ReflexElement>
       </ReflexContainer>
     </div>

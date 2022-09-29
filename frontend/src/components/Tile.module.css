@@ -1,5 +1,6 @@
 .tile {
     overflow: clip;
+    background-color: rgb(10, 10, 10);
     border-width: 1px;
     display: flex;
     flex-direction: column;

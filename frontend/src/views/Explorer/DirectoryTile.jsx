@@ -37,16 +37,21 @@ function DirectoryTile(props) {
         fn: () => ShowInExplorer(entity.path, enqueueSnackbar),
         divider: true
       },
+      // {
+      //   label: "Import asset from Vault",
+      //   fn: () =>  props.onContextMenu("vaultExport", dirData),
+      //   divider: true
+      // },
       {
-        label: "Clear representative",
+        label: "Clear thumbnail asset",
         fn: () => clearRepr(entity.path, enqueueSnackbar)
       },
       {
-        label: "Set representative for project",
+        label: "Use thumbnail for project",
         fn: () => setReprForProject(entity.path, enqueueSnackbar)
       },
       {
-        label: "Set representative for parent",
+        label: "Use representative for parent",
         fn: () => setReprForParent(entity.path, enqueueSnackbar),
         divider: true
       },

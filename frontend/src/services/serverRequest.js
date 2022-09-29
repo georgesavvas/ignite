@@ -9,17 +9,22 @@ async function serverRequest(method, data=undefined) {
     console.log("Invalid server address, aborting...");
     return;
   }
-  const resp = await fetch(`http://${address}/api/v1/${method}`, {
-    method: !data ? "GET" : "POST",
-    headers: {
-      "Accept": "application/json, text/plain, */*",
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(data)
-  });
-  const resp2 = await resp.json();
-  console.log("Server response:", method, resp2);
-  return resp2;
+  try {
+    const resp = await fetch(`http://${address}/api/v1/${method}`, {
+      method: !data ? "GET" : "POST",
+      headers: {
+        "Accept": "application/json, text/plain, */*",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    });
+    const resp2 = await resp.json();
+    console.log("Server response:", method, resp2);
+    return resp2;
+  } catch (error) {
+    console.log(error);
+    return {ok: false, msg: "Could not connect to Ignite server..."};
+  }
 }
 
 export default serverRequest;

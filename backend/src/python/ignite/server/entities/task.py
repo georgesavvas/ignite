@@ -3,6 +3,7 @@ from pathlib import Path, PurePath
 from ignite.server.constants import DCC_EXTENSIONS
 from ignite.server import utils
 from ignite.server.entities.directory import Directory
+from ignite.server.entities.asset import Asset
 from ignite.server.constants import ANCHORS
 
 
@@ -95,3 +96,8 @@ class Task(Directory):
         version += 1
         next_v = "v" + str(version).zfill(3)
         return self.scenes / next_v
+    
+    def get_next_export(self, asset_name):
+        path = self.exports / asset_name
+        asset = Asset(path)
+        return asset.next_path

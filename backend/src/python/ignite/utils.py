@@ -14,7 +14,7 @@ class LogFormatter(logging.Formatter):
     red = "\x1b[31;21m"
     bold_red = "\x1b[31;1m"
     reset = "\x1b[0m"
-    format = "%(asctime)s - %(name)-36s - %(levelname)-8s - %(message)s"
+    format = "%(asctime)s - %(name)-s - %(levelname)-6s - %(funcName)s - %(message)s"
 
     FORMATS = {
         logging.DEBUG: grey + format + reset,

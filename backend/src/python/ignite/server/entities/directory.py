@@ -21,8 +21,8 @@ class Directory():
         self.nr_attrs = ["path"]
         self.project = ""
         self.group = ""
+        self.uri = ""
         self.name = ""
-        self.uri = utils.get_uri(path)
         self.tags = []
         self._attributes = []
         self.dir_kind = dir_kind
@@ -32,14 +32,15 @@ class Directory():
         if path:
             path = Path(path)
             self.path = path
-            stat = path.stat()
-            self.creation_time = datetime.fromtimestamp(
-                stat.st_ctime, tz=timezone.utc
-            )
-            self.modification_time = datetime.fromtimestamp(
-                stat.st_mtime, tz=timezone.utc
-            )
-            self.size = 0 #stat.st_size
+            if path.is_dir():
+                stat = path.stat()
+                self.creation_time = datetime.fromtimestamp(
+                    stat.st_ctime, tz=timezone.utc
+                )
+                self.modification_time = datetime.fromtimestamp(
+                    stat.st_mtime, tz=timezone.utc
+                )
+                self.size = 0 #stat.st_size
             anchor = ANCHORS[dir_kind]
             self.anchor = path / anchor
             if not self.anchor.is_file():
@@ -66,6 +67,7 @@ class Directory():
         project = split2[0]
         self.project = project
         self.name = split2[-1]
+        self.uri = utils.get_uri(path)
         self.context = self.get_context()
         self.load_from_config()
 

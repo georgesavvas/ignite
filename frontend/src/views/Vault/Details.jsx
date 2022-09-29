@@ -12,13 +12,13 @@ const style = {
 };
 
 function Details(props) {
-  const selectedEntity = props.selectedEntity;
+  const entity = props.entity;
 
   return (
     <div style={style}>
       {
-        selectedEntity && Object.keys(selectedEntity).length ?
-          <AssetDetails entity={selectedEntity} onRefresh={props.onRefresh} /> :
+        entity && Object.keys(entity).length ?
+          <AssetDetails {...props} /> :
           <DataPlaceholder text="Nothing selected" />
       }
     </div>

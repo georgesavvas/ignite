@@ -94,10 +94,11 @@ function AssetDetails(props) {
       setSelectedCompName("");
       return;
     }
-    props.entity.components.forEach(comp => {
-      if (compExtensionPreviewPriority.includes(comp.ext)) {
+    compExtensionPreviewPriority.some(ext => {
+      const comp = props.entity.components.find(comp => comp.ext === ext);
+      if (comp) {
         setSelectedCompName(comp.filename);
-        return;
+        return true;
       }
     });
   }, [props.entity]);

@@ -16,7 +16,9 @@ export function CopyToClipboard(text, enqueueSnackbar) {
 
 export function ShowInExplorer(filepath, enqueueSnackbar) {
   clientRequest("show_in_explorer", {"filepath": filepath}).then((resp) => {
-    if (!resp.ok) enqueueSnackbar("Failed launching scene.", {variant: "error"});
+    if (!resp.ok) enqueueSnackbar(
+      resp.msg || "Failed launching scene.", {variant: "error"}
+    );
   });
 }
 
@@ -30,7 +32,7 @@ export function clearRepr(target, enqueueSnackbar, refresh) {
       enqueueSnackbar("Done", {variant: "success"});
       refresh();
     }
-    else enqueueSnackbar("Couldn't clear repr", {variant: "error"});
+    else enqueueSnackbar(resp.msg || "Couldn't clear repr", {variant: "error"});
   });
 }
 
@@ -50,7 +52,9 @@ export function setReprForParent(repr, enqueueSnackbar) {
   };
   serverRequest("set_repr_for_parent", data).then(resp => {
     if (resp.ok) enqueueSnackbar(`Repr set for ${resp.data}`, {variant: "success"});
-    else enqueueSnackbar(`Couldn't set repr for ${resp.data}`, {variant: "error"});
+    else enqueueSnackbar(
+      resp.msg || `Couldn't set repr for ${resp.data}`, {variant: "error"}
+    );
   });
 }
 
@@ -75,17 +79,20 @@ export function DeleteDir({data, open=false, onClose, enqueueSnackbar, fn}) {
   const handleDeleteEntity = () => {
     serverRequest("delete_entity", data).then(resp => {
       if (resp.ok) enqueueSnackbar("Successfully deleted!", {variant: "success"});
-      else enqueueSnackbar("There was an issue with deleting this.", {variant: "error"}
+      else enqueueSnackbar(
+        resp.msg || "There was an issue with deleting this.", {variant: "error"}
       );
     });
     if (fn) fn();
     onClose();
   };
 
+  const kind = data.kind === "assetversion" ? "asset version" : data.kind;
+
   return (
     <Modal open={open} title="Are you sure?" onFormSubmit={handleDeleteEntity}
       maxWidth="sm" closeButton onClose={onClose} focusRef={textFieldRef}
-      text={`This will permanently delete this ${data.kind}!`} focusDelay={1500}
+      text={`This will permanently delete this ${kind}!`} focusDelay={1500}
       buttons={[
         <Button disabled={!solved} type="submit" key="confirm">Confirm</Button>,
         <Button key="cancel" onClick={onClose}>Cancel</Button>
@@ -106,18 +113,21 @@ export function DeleteDir({data, open=false, onClose, enqueueSnackbar, fn}) {
   );
 }
 
-export function VaultAdd({data, open=false, onClose, enqueueSnackbar, fn}) {
+export function VaultImport({data, open=false, onClose, enqueueSnackbar, fn}) {
   const [nameValue, setNameValue] = useState("");
   const textFieldRef = useRef();
 
   useEffect(() => {
+    if (!open) return;
     setNameValue(data.name);
-  }, [data.name]);
+  }, [open]);
 
   function handleSubmit() {
-    serverRequest("vault_add", {...data, name: nameValue}).then(resp => {
+    serverRequest("vault_import", {...data, name: nameValue}).then(resp => {
       if (resp.ok) enqueueSnackbar("Done", {variant: "success"});
-      else enqueueSnackbar("An error occurred...", {variant: "error"});
+      else enqueueSnackbar(
+        resp.msg || "An error occurred...", {variant: "error"}
+      );
     });
     if (fn) fn();
     onClose();
@@ -145,13 +155,56 @@ export function VaultAdd({data, open=false, onClose, enqueueSnackbar, fn}) {
   );
 }
 
+export function VaultExport({data, open=false, onClose, enqueueSnackbar, fn}) {
+  const [nameValue, setNameValue] = useState("");
+  const textFieldRef = useRef();
+
+  useEffect(() => {
+    if (!open) return;
+    setNameValue(data.name);
+  }, [open]);
+
+  function handleSubmit() {
+    serverRequest("vault_export", {...data, name: nameValue}).then(resp => {
+      if (resp.ok) enqueueSnackbar("Done", {variant: "success"});
+      else enqueueSnackbar(
+        resp.msg || "An error occurred...", {variant: "error"}
+      );
+    });
+    if (fn) fn();
+    onClose();
+    setNameValue("");
+  }
+
+  return (
+    <Modal open={open} onFormSubmit={handleSubmit} focusRef={textFieldRef}
+      maxWidth="sm" closeButton onClose={onClose} title={"Import asset from vault"}
+      buttons={[<Button key="confirm" type="submit">Confirm</Button>]}
+    >
+      <TextField
+        id="name"
+        label="Name"
+        variant="outlined"
+        value={nameValue || ""}
+        onChange={e => setNameValue(e.target.value)}
+        size="small"
+        fullWidth
+        autoFocus
+        inputRef={textFieldRef}
+        style={{marginTop: "10px"}}
+      />
+    </Modal>
+  );
+}
+
 export function RenameDir({data, open=false, onClose, enqueueSnackbar, fn}) {
   const [nameValue, setNameValue] = useState("");
   const textFieldRef = useRef();
 
   useEffect(() => {
+    if (!open) return;
     setNameValue(data.name);
-  }, [data.name]);
+  }, [open]);
 
   function handleRenameDir() {
     if (nameValue === data.name) {
@@ -163,7 +216,10 @@ export function RenameDir({data, open=false, onClose, enqueueSnackbar, fn}) {
       else {
         let reason = "";
         if (resp.error) reason = ` - ${resp.error}`;
-        enqueueSnackbar(`Couldn't rename ${data.kind}${reason}.`, {variant: "error"});
+        enqueueSnackbar(
+          resp.msg || `Couldn't rename ${data.kind}${reason}.`,
+          {variant: "error"}
+        );
       }
     });
     if (fn) fn();
@@ -195,7 +251,9 @@ export function RenameDir({data, open=false, onClose, enqueueSnackbar, fn}) {
 export function CreateDir({data, open=false, onClose, enqueueSnackbar, fn}) {
   const handleOnCreate = data => {
     serverRequest("create_dirs", data).then((resp => {
-      enqueueSnackbar(resp.text, {variant: resp.ok ? "success" : "error"});
+      enqueueSnackbar(
+        resp.msg || resp.text, {variant: resp.ok ? "success" : "error"}
+      );
       if (fn) fn();
     }));
   };

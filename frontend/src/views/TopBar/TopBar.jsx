@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useContext} from "react";
 
 import IconButton from "@mui/material/IconButton";
 import HelpIcon from "@mui/icons-material/Help";
@@ -9,16 +9,23 @@ import ProjectBrowser from "../ProjectBrowser/ProjectBrowser";
 import Vault from "../Vault/Vault";
 import styles from "./TopBar.module.css";
 import IgnButton from "../../components/IgnButton";
+import {ContextContext} from "../../contexts/ContextContext";
 
 
 export default function TopBar() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [projectBrowserOpen, setProjectBrowserOpen] = useState(false);
   const [vaultOpen, setVaultOpen] = useState(false);
+  const [,, refreshContext] = useContext(ContextContext);
+
+  const handleVaultClose = () => {
+    setVaultOpen(false);
+    refreshContext();
+  };
 
   return (
     <>
-      <Vault open={vaultOpen} onClose={() => setVaultOpen(false)} />
+      <Vault open={vaultOpen} onClose={handleVaultClose} />
       <ProjectBrowser
         open={projectBrowserOpen}
         onClose={() => setProjectBrowserOpen(false)}

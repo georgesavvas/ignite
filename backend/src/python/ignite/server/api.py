@@ -190,7 +190,7 @@ def _find_from_path(path):
         "scene": Scene
     }
     path = Path(path)
-    if not path.is_dir():
+    if path.is_file():
         path = path.parent
     if not path.is_dir():
         LOGGER.error(f"Invalid path: {path}")
@@ -687,9 +687,9 @@ def rename_entity(path, entity_type, new_name):
             "but the entity was supposed to be", entity_type
         )
         return False, "wrong entity type"
-    contents = get_contents(path)
-    if contents and entity_type != "project":
-        return False, f"{entity_type} not empty"
+    # contents = get_contents(path)
+    # if contents and entity_type != "project":
+    #     return False, f"{entity_type} not empty"
     path = Path(path)
     path.rename(path.parent / new_name)
     return True, ""
@@ -763,11 +763,13 @@ def get_vault_asset_names():
     return asset_names
 
 
-def vault_add(path, name):
-    entity = find(path)
+def vault_import(source, name):
+    entity = find(source)
     if not entity:
+        LOGGER.error(f"Source entity {source} was not found")
         return
     if entity.dir_kind != "assetversion":
+        LOGGER.error(f"Source entity {source} is not an assetversion")
         return
     vault = CONFIG["vault"]
     vault_entity_path = vault / name
@@ -776,4 +778,31 @@ def vault_add(path, name):
         register_asset(vault_entity_path)
         vault_entity = find(vault_entity_path)
     if vault_entity.dir_kind != "asset":
-        
+        LOGGER.error(f"Target entity {vault_entity_path} kind is {vault_entity.dir_kind}, expected asset")
+        return
+    dest = vault_entity.next_path
+    shutil.copytree(source, dest)
+    return True
+
+
+def vault_export(source, task_path, name):
+    source = Path(source)
+    source_entity = find(source)
+    if not source_entity:
+        LOGGER.error(f"Source entity {source} was not found")
+        return
+    if source_entity.dir_kind != "assetversion":
+        LOGGER.error(f"Source entity {source} is not an assetversion")
+        return
+    task = find(task_path)
+    asset_path = task.exports / name
+    if not asset_path.is_dir():
+        register_asset(asset_path)
+    dest = task.get_next_export(name)
+    dest_asset = dest.parent
+    if not dest_asset.is_dir() or not (dest_asset / ANCHORS["asset"]).is_file():
+        source_asset_anchor = source.parent / ANCHORS["asset"]
+        if source_asset_anchor.is_file():
+            shutil.copy2(source_asset_anchor, dest_asset)
+    shutil.copytree(source, dest)
+    return True
