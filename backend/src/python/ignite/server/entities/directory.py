@@ -169,6 +169,8 @@ class Directory():
                 config["creation_time"] = data["modification_time"]
             config.update(data)
             yaml.safe_dump(config, f)
+        if hasattr(self, "post_write"):
+            self.post_write()
         return config
 
     def set_repr(self, uri):

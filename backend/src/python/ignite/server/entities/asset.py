@@ -105,6 +105,7 @@ class Asset(Directory):
                 best_av = av
         self._best_v = best_av.version
         self._best_av = best_av
+        self.check_symlinks()
 
     @property
     def next_version(self):
@@ -119,6 +120,16 @@ class Asset(Directory):
     def next_path(self):
         next_v = self.next_version
         return self.path / next_v
+
+    def post_write(self):
+        self.check_symlinks()
+
+    def check_symlinks(self):
+        path = Path(self.path)
+        latest = path / "latest"
+        best = path / "best"
+        latest.symlink_to(path / self.latest_v, target_is_directory=True)
+        best.symlink_to(path / self.best_v, target_is_directory=True)
 
     def as_dict(self):
         d = super().as_dict()
