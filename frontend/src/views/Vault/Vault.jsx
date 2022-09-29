@@ -74,12 +74,17 @@ function Vault(props) {
 
   useEffect(() => {
     if (!props.open) return;
+    setSelectedEntity("");
+  }, [props.open]);
+
+  useEffect(() => {
+    if (!props.open) return;
     if (!Object.entries(config.access).length) return;
     serverRequest("get_collections", {data: {user: undefined}}).then(resp => {
       const data = resp.data;
       setCollectionData(data && data.studio ? data.studio : []);
     });
-  }, [vaultContext]);
+  }, [vaultContext, refreshValue, props.open]);
 
   useEffect(() => {
     if (!props.open) return;
@@ -87,16 +92,16 @@ function Vault(props) {
       path: BuildFileURL("__vault__", config, {reverse: true, pathOnly: true}),
       page: pages.current,
       limit: tilesPerPage,
-      query: query
+      query: {...query, latest: true}
     };
     setIsLoading(true);
     if (!Object.entries(config.access).length) return;
-    serverRequest("get_assets", data).then(resp => {
+    serverRequest("get_assetversions", data).then(resp => {
       setIsLoading(false);
       setLoadedData(resp.data);
       setPages(prevState => ({...prevState, total: resp.pages.total, results: resp.pages.results}));
     });
-  }, [pages.current, vaultContext, query, tilesPerPage, selectedCollection]);
+  }, [pages.current, vaultContext, query, tilesPerPage, selectedCollection, refreshValue, props.open]);
 
   const handleEntitySelected = entity => {
     setSelectedEntity(entity);
@@ -172,7 +177,11 @@ function Vault(props) {
           name="vault.details"
           onStopResize={handleResized}
         >
-          <Details selectedEntity={selectedEntity} onRefresh={handleRefresh} />
+          <Details
+            entity={selectedEntity}
+            setSelectedEntity={setSelectedEntity}
+            onRefresh={handleRefresh}
+          />
         </ReflexElement>
       </ReflexContainer>
     </Modal>

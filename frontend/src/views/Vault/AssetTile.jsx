@@ -4,20 +4,19 @@ import Typography from "@mui/material/Typography";
 import { useSnackbar } from "notistack";
 
 import {CopyToClipboard, ShowInExplorer} from "../ContextActions";
-import {setReprForProject, setReprForParent} from "../ContextActions";
 import { ContextContext } from "../../contexts/ContextContext";
+import {ConfigContext} from "../../contexts/ConfigContext";
 import Tile from "../../components/Tile";
+import BuildFileURL from "../../services/BuildFileURL";
 
 
 function AssetTile(props) {
-  const {enqueueSnackbar} = useSnackbar();
   const [currentContext] = useContext(ContextContext);
+  const [config] = useContext(ConfigContext);
+  const {enqueueSnackbar} = useSnackbar();
 
   const hasThumbnail = props.entity.thumbnail && props.entity.thumbnail.filename;
   const thumbnailWidth = hasThumbnail ? "100%" : "50%";
-  const currentPath = currentContext.path_nr.replace(currentContext.project + "/", "");
-  let contextPath = props.entity.context.replace(currentPath, "");
-  if (contextPath.startsWith("/")) contextPath = contextPath.slice(1);
 
   const dirData = {
     kind: props.entity.dir_kind,
@@ -36,35 +35,9 @@ function AssetTile(props) {
       divider: true
     },
     {
-      label: "Add to Vault",
-      fn: () =>  props.onContextMenu("vaultImport", dirData)
-    },
-    // {
-    //   label: "Import new version from Vault",
-    //   fn: () =>  props.onContextMenu("vaultExport", dirData),
-    //   divider: true
-    // },
-    {
-      label: "Use thumbnail for project",
-      fn: () => setReprForProject(props.entity.path, enqueueSnackbar)
-    },
-    {
-      label: "Use thumbnail for parent",
-      fn: () => setReprForParent(props.entity.path, enqueueSnackbar),
-      divider: true
-    },
-    {
       label: "Open in file explorer",
       fn: () => ShowInExplorer(props.entity.path, enqueueSnackbar),
       divider: true
-    },
-    {
-      label: "Rename asset",
-      fn: () => props.onContextMenu("rename", {
-        name: props.entity.name,
-        kind: "asset",
-        path: props.entity.asset
-      })
     },
     {
       label: "Delete asset version",
@@ -72,17 +45,24 @@ function AssetTile(props) {
     }
   ];
 
+  const vaultExportItem = {
+    label: "Import to current task",
+    fn: () =>  props.onContextMenu("vaultExport", {
+      ...dirData,
+      task: BuildFileURL(currentContext.path, config, {pathOnly: true})
+    }),
+    divider: true
+  };
+
+  if (currentContext.dir_kind === "task") {
+    contextItems.splice(2, 0, vaultExportItem);
+  }
+
   function details() {
     return (
       <>
-        <Typography style={{position: "absolute", top: "5px", left: "10px"}}>
-          {contextPath || "asset"}
-        </Typography>
         <Typography style={{position: "absolute", bottom: "5px", left: "10px"}}>
           {props.entity.name}
-        </Typography>
-        <Typography style={{position: "absolute", bottom: "5px", right: "10px"}}>
-          {props.entity.version}
         </Typography>
       </>
     );
@@ -91,7 +71,7 @@ function AssetTile(props) {
   return (
     <>
       <Tile {...props} contextItems={contextItems} thumbnailWidth={thumbnailWidth}
-        thumbnail={hasThumbnail ? undefined : "media/no_icon_grey.png"}
+        thumbnail={hasThumbnail ? undefined : "media/no_icon_grey.png"} noTopGradient
       >
         {details()}
       </Tile>

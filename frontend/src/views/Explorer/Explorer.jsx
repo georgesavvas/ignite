@@ -9,7 +9,7 @@ import BuildFileURL from "../../services/BuildFileURL";
 import {ConfigContext} from "../../contexts/ConfigContext";
 import DataPlaceholder from "../../components/DataPlaceholder";
 import {DIRCONTEXTOPTIONS} from "../../constants";
-import {CopyToClipboard, ShowInExplorer, VaultAdd} from "../ContextActions";
+import {CopyToClipboard, ShowInExplorer, VaultExport, VaultImport} from "../ContextActions";
 import loadExplorerSettings from "../../utils/loadExplorerSettings";
 import saveExplorerSettings from "../../utils/saveExplorerSettings";
 import ContextMenu, {handleContextMenu} from "../../components/ContextMenu";
@@ -227,6 +227,11 @@ function Explorer() {
         divider: true
       },
       {
+        label: "Import asset from Vault",
+        fn: () =>  data.handleClick("vaultExport", data),
+        divider: true
+      },
+      {
         label: "Rename",
         fn: () => data.handleClick("rename", data)
       },
@@ -306,8 +311,12 @@ function Explorer() {
         onClose={() => setModalData(prevState => ({...prevState, renameOpen: false}))}
         data={modalData} fn={refreshContext}
       />
-      <VaultAdd open={modalData.vaultAddOpen} enqueueSnackbar={enqueueSnackbar}
-        onClose={() => setModalData(prevState => ({...prevState, vaultAddOpen: false}))}
+      <VaultImport open={modalData.vaultImportOpen} enqueueSnackbar={enqueueSnackbar}
+        onClose={() => setModalData(prevState => ({...prevState, vaultImportOpen: false}))}
+        data={modalData} fn={refreshContext}
+      />
+      <VaultExport open={modalData.vaultExportOpen} enqueueSnackbar={enqueueSnackbar}
+        onClose={() => setModalData(prevState => ({...prevState, vaultExportOpen: false}))}
         data={modalData} fn={refreshContext}
       />
       <ContextMenu items={contextItems} contextMenu={contextMenu}

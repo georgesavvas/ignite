@@ -750,15 +750,28 @@ async def get_vault_asset_names():
     }
 
 
-@app.post("/api/v1/vault_add")
-async def vault_add(request: Request):
+@app.post("/api/v1/vault_import")
+async def vault_import(request: Request):
     result = await request.json()
     log_request(result)
     path = result.get("path")
     name = result.get("name")
     if not path or not name:
         return error("invalid_data")
-    ok = api.vault_add(path, name)
+    ok = api.vault_import(path, name)
+    return {"ok": ok}
+
+
+@app.post("/api/v1/vault_export")
+async def vault_export(request: Request):
+    result = await request.json()
+    log_request(result)
+    path = result.get("path")
+    task = result.get("task")
+    name = result.get("name")
+    if not path or not task or not name:
+        return error("invalid_data")
+    ok = api.vault_export(path, task, name)
     return {"ok": ok}
 
 

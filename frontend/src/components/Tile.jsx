@@ -79,8 +79,8 @@ export default function Tile(props) {
           <div className={styles.overlay}>
             {!ThumbComp && thumbnailURL ?
               <>
-                <div className={styles.topGrad} />
-                <div className={styles.bottomGrad} />
+                {props.noTopGradient ? null : <div className={styles.topGrad} />}
+                {props.noBottomGradient ? null : <div className={styles.bottomGrad} />}
               </>
               : null
             }

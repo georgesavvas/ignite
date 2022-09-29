@@ -208,8 +208,12 @@ const RowView = props => {
         rows={getRows()}
         sx={{
           border: "none",
+          "& .MuiDataGrid-virtualScrollerRenderZone": {
+            marginTop: "1px!important"
+          },
           "& .MuiDataGrid-row": {
-            boxSizing: "border-box"
+            boxSizing: "border-box",
+            cursor: "pointer"
           },
           "& .MuiDataGrid-row.Mui-selected": {
             outline: "1px solid rgb(252, 140, 3)",

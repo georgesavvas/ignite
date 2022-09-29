@@ -4,16 +4,17 @@ import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
 import Typography from "@mui/material/Typography";
 import LinearProgress from "@mui/material/LinearProgress";
+import {useSnackbar} from "notistack";
 
 import TopBar from "./TopBar";
 import PageBar from "../../components/PageBar";
 import DataPlaceholder from "../../components/DataPlaceholder";
-import AssetTile from "../Explorer/AssetTile";
-import DirectoryTile from "../Explorer/DirectoryTile";
+import AssetTile from "./AssetTile";
 import {ConfigContext} from "../../contexts/ConfigContext";
 import styles from "./Browser.module.css";
 import FilterBar from "./FilterBar";
 import BuildFileURL from "../../services/BuildFileURL";
+import {DeleteDir, RenameDir, VaultExport} from "../ContextActions";
 
 
 const defaultExplorerSettings = {
@@ -27,6 +28,8 @@ function Browser(props) {
   const [tileSize, setTileSize] = useState(200);
   const [tiles, setTiles] = useState([]);
   const [config] = useContext(ConfigContext);
+  const [modalData, setModalData] = useState({});
+  const {enqueueSnackbar} = useSnackbar();
 
   useEffect(() => {
     const _tiles = props.loadedData.reduce(function(obj, entity) {
@@ -37,32 +40,25 @@ function Browser(props) {
           comp.path = BuildFileURL(comp.path, config, {pathOnly: true});
         });
       }
-      if (entity.task) entity.task = BuildFileURL(entity.task, config, {pathOnly: true});
-      if (entity.dir_kind === "assetversion") {
-        obj[entity.result_id] = <AssetTile key={entity.result_id}
-          entity={entity}
-          onSelected={props.handleEntitySelected}
-          size={explorerSettings.currentTileSize * 40}
-          viewType="grid"
-          selected={props.selectedEntity.path === entity.path}
-          refreshContext={props.onRefresh}
-          // onContextMenu={handleContextMenuSelection}
-        />;
-      } else {
-        obj[entity.result_id] = <DirectoryTile key={entity.result_id}
-          entity={entity}
-          onSelected={props.handleEntitySelected}
-          size={explorerSettings.currentTileSize * 40}
-          viewType="grid"
-          selected={props.selectedEntity.path === entity.path}
-          refreshContext={props.onRefresh}
-          // onContextMenu={handleContextMenuSelection}
-        />;
-      }
+      obj[entity.result_id] = <AssetTile key={entity.result_id}
+        entity={entity}
+        onSelected={props.handleEntitySelected}
+        size={explorerSettings.currentTileSize * 40}
+        viewType="grid"
+        selected={props.selectedEntity.path === entity.path}
+        refreshContext={props.onRefresh}
+        onContextMenu={handleContextMenuSelection}
+      />;
       return obj;
     }, {});
     setTiles(_tiles);
   }, [props.loadedData, props.selectedEntity.path, explorerSettings.currentViewType, explorerSettings.currentTileSize]);
+
+  const handleContextMenuSelection = (action, _data) => {
+    const data = {..._data};
+    data[`${action}Open`] = true;
+    setModalData(data);
+  };
 
   const handleFilterChange = data => {
     props.onFilterChange(data);
@@ -103,6 +99,18 @@ function Browser(props) {
 
   return (
     <div className={styles.container}>
+      <DeleteDir open={modalData.deleteOpen} enqueueSnackbar={enqueueSnackbar}
+        onClose={() => setModalData(prevState => ({...prevState, deleteOpen: false}))}
+        data={modalData} fn={props.onRefresh}
+      />
+      <RenameDir open={modalData.renameOpen} enqueueSnackbar={enqueueSnackbar}
+        onClose={() => setModalData(prevState => ({...prevState, renameOpen: false}))}
+        data={modalData} fn={props.onRefresh}
+      />
+      <VaultExport open={modalData.vaultExportOpen} enqueueSnackbar={enqueueSnackbar}
+        onClose={() => setModalData(prevState => ({...prevState, vaultExportOpen: false}))}
+        data={modalData} fn={props.onRefresh}
+      />
       <TopBar onRefresh={props.onRefresh}
         onFilterStringChange={handleFilterStringChange} setQuery={props.handleQueryChange}
         onFiltersToggle={() => setFiltersOpen(prevState => !prevState)}
