@@ -1,18 +1,16 @@
-import os
-import parse
 import glob
+import os
 import shutil
-import logging
-import importlib
-from string import Formatter
 from fnmatch import fnmatch
-from pathlib import PurePath, Path
+from pathlib import Path, PurePath
 from pprint import pprint
+from string import Formatter
 
-from ..utils import get_logger
+import parse
 from ignite.client import utils
 from ignite.client.utils import TASK_MANAGER
 
+from ..utils import get_logger
 
 LOGGER = get_logger(__name__)
 ENV = os.environ

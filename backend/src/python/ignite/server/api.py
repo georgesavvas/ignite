@@ -1,17 +1,13 @@
 import os
-from re import A
-import yaml
-import logging
 import shutil
 from pathlib import Path, PurePath
 
-from mongoquery import Query
-
-from ignite.utils import get_logger
+import yaml
 from ignite.server import utils
 from ignite.server.constants import ANCHORS
 from ignite.server.utils import CONFIG
-
+from ignite.utils import get_logger
+from mongoquery import Query
 
 LOGGER = get_logger(__name__)
 ENV = os.environ
@@ -164,16 +160,16 @@ def resolve(uri):
 
 
 def _find_from_path(path):
-    from ignite.server.entities.project import Project
+    from ignite.server.entities.asset import Asset
+    from ignite.server.entities.assetversion import AssetVersion
+    from ignite.server.entities.build import Build
     from ignite.server.entities.directory import Directory
     from ignite.server.entities.group import Group
-    from ignite.server.entities.build import Build
+    from ignite.server.entities.project import Project
+    from ignite.server.entities.scene import Scene
     from ignite.server.entities.sequence import Sequence
     from ignite.server.entities.shot import Shot
     from ignite.server.entities.task import Task
-    from ignite.server.entities.asset import Asset
-    from ignite.server.entities.assetversion import AssetVersion
-    from ignite.server.entities.scene import Scene
 
     kinds = {v: k for k, v in ANCHORS.items()}
     anchors = kinds.keys()

@@ -1,5 +1,5 @@
-import os
 from pathlib import PurePath
+
 import clique
 from ignite.server import utils
 

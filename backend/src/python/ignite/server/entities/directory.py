@@ -1,8 +1,6 @@
-import logging
-import os
 import shutil
 from datetime import datetime, timezone
-from pathlib import Path, PurePath
+from pathlib import Path
 
 import timeago
 import yaml
