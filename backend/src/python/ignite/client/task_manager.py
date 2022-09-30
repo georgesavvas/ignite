@@ -1,13 +1,12 @@
-import logging
 import asyncio
-import threading
 import importlib
-from uuid import uuid4
+import threading
 from pathlib import PurePath
-from tinydb import TinyDB, Query
+from uuid import uuid4
+
+from tinydb import Query, TinyDB
 
 from ..utils import get_logger
-
 
 LOGGER = get_logger(__name__)
 

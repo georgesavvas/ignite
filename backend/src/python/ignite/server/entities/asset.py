@@ -1,7 +1,8 @@
-import os
-import yaml
 from pathlib import Path
+
+import yaml
 from ignite.server.entities.directory import Directory
+
 
 class Asset(Directory):
     def __init__(self, path="") -> None:
@@ -122,7 +123,9 @@ class Asset(Directory):
         return self.path / next_v
 
     def post_write(self):
-        self.check_symlinks()
+        pass
+        # Disabled for now until there's a solution to Windows asking for UAC
+        # self.check_symlinks()
 
     def check_symlinks(self):
         path = Path(self.path)

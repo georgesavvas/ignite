@@ -1,29 +1,14 @@
-import os
 import math
-import json
-from posixpath import dirname
-import uvicorn
-import logging
-from uuid import uuid4
-from pprint import pprint
-from threading import Thread
+import os
 
 from fastapi import APIRouter, Request
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 
+from ..utils import get_logger, log_request
 from . import api
-from ..utils import get_logger, log_request, process_request, error
-
 
 ENV = os.environ
 LOGGER = get_logger(__name__)
 
-# LIB_CONFIG = load_assetlib_config()
-# LIB_PATH = LIB_CONFIG["library_path"]
-# LIB_TMP = LIB_CONFIG["tmp"].format(library_path=LIB_PATH)
-# LIB_PUBLIC = LIB_CONFIG["public"].format(library_path=LIB_PATH)
-# LIB_STORE = LIB_CONFIG["store"].format(library_path=LIB_PATH)
 VAULT_ROOT = ""
 
 

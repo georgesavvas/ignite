@@ -1,10 +1,10 @@
+import logging
 import os
 import platform
-import yaml
-import logging
 from pathlib import Path
-from platformdirs import user_config_dir
 
+import yaml
+from platformdirs import user_config_dir
 
 logging.basicConfig(level=logging.INFO)
 

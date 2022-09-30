@@ -1,7 +1,4 @@
-import logging
-
 from ignite.utils import get_logger
-
 
 LOGGER = get_logger(__name__)
 

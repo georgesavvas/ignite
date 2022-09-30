@@ -1,15 +1,13 @@
-from inspect import getcallargs
-import os
-import yaml
-import logging
-import re
-import parse
 import datetime
+import os
+import re
+from inspect import getcallargs
 from pathlib import Path, PurePath
 
-from ignite.utils import get_logger
+import parse
+import yaml
 from ignite.server.constants import ANCHORS
-
+from ignite.utils import get_logger
 
 LOGGER = get_logger(__name__)
 ENV = os.environ

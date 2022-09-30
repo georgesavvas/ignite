@@ -1,13 +1,11 @@
-import os
-from ignite.server.constants import COMP_TYPES
-import clique
 from pathlib import Path, PurePath
+
+import clique
 from ignite.server import utils
-from ignite.server.entities.directory import Directory
+from ignite.server.constants import COMP_TYPES, TAG_WEIGHTS
 from ignite.server.entities.asset import Asset
 from ignite.server.entities.component import Component
-from ignite.server.constants import TAG_WEIGHTS
-
+from ignite.server.entities.directory import Directory
 
 COMP_EXT_TYPES = {}
 for name, exts in COMP_TYPES.items():

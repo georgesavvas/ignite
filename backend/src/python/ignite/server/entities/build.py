@@ -1,8 +1,4 @@
-import os
-from pathlib import Path, PurePath
-from ignite.server import utils
 from ignite.server.entities.directory import Directory
-from ignite.server.utils import CONFIG
 
 
 class Build(Directory):

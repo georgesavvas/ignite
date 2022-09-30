@@ -1,5 +1,4 @@
 import os
-import logging
 import platform
 import yaml
 import glob
@@ -7,8 +6,6 @@ import subprocess
 import requests
 import importlib
 import shutil
-import asyncio
-import threading
 from copy import deepcopy
 from pprint import pprint
 from pathlib import PurePath, Path

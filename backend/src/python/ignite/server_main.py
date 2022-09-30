@@ -1,34 +1,26 @@
-import os
-import math
-import sys
 import logging
-from posixpath import dirname
+import math
+import os
+import sys
 from pathlib import Path
-import uvicorn
-from pprint import pprint
-from pathlib import PurePath
-from fastapi import FastAPI, Request, WebSocket
-from fastapi.responses import PlainTextResponse
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 
 import sentry_sdk
+import uvicorn
+from fastapi import FastAPI, Request, WebSocket
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import PlainTextResponse
+from fastapi.staticfiles import StaticFiles
+
 sentry_sdk.init(
     dsn="https://9930a18d142b45af9d27e35276e3de54@o1421552.ingest.sentry.io/6767422",
-
-    # Set traces_sample_rate to 1.0 to capture 100%
-    # of transactions for performance monitoring.
-    # We recommend adjusting this value in production.
     traces_sample_rate=1.0
 )
 
-# from ignite.vault import router as vault_router
-from ignite.utils import log_request, process_request, error, get_logger
 from ignite.server import utils
+from ignite.vault import api as vault_api
 from ignite.server.socket_manager import SocketManager
 from ignite.server.utils import CONFIG
-from ignite.vault import new_api as vault_api
-
+from ignite.utils import error, get_logger, log_request, process_request
 
 LOGGER = get_logger(__name__)
 SERVER_HOST, SERVER_PORT = CONFIG["server_address"].split(":")
@@ -37,7 +29,6 @@ ENV = os.environ
 ASSET_UPDATES_MANAGER = SocketManager()
 
 from ignite.server import api
-
 
 app = FastAPI()
 # app.include_router(vault_router.router)
