@@ -1,9 +1,3 @@
 ECHO OFF
-cd backend
-start src\bin\win\server.bat
-start src\bin\win\client.bat
-start src\bin\win\huey.bat
-cd ..\frontend
-start npm start
-set NODE_ENV=dev
+wt -w 0 "cd backend; start src\bin\win\server.bat" new-tab -c "cd backend; start src\bin\win\server.bat"
 exit

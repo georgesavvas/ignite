@@ -106,7 +106,7 @@ class TaskManager():
     def run_task(self, task):
         asyncio.create_task(self.send(task))
         future = asyncio.run_coroutine_threadsafe(task.run(), self.loop)
-        self.remove(task.id)
+        self.remove(Query().task.id)
         self.db.insert(task.as_dict())
         self.tasks.append({
             "id": task.id,
@@ -141,7 +141,7 @@ class TaskManager():
         task = self.get_task(task_id)
         asyncio.create_task(self.send(task, state="finished" if not task.state["killed"] else "error"))
         print(f"Removing {task_id} from db...")
-        self.db.remove(Query().id == task_id)
+        self.db.remove(Query().task_id == task_id)
         print("Done.")
     
     def get_task(self, task_id):

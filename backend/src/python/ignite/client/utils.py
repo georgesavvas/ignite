@@ -345,6 +345,7 @@ def server_request(method, data=None):
 
 def get_action_files():
     path = CONFIG_PATH / "actions"
+    print(path)
     files = {}
     for entity in ("scene", "asset", "assetversion", "component"):
         entity_path = path / entity
@@ -357,6 +358,7 @@ def get_action_files():
 def discover_actions():
     actions = {}
     for entity, files in get_action_files().items():
+        print(entity, files)
         actions[entity] = []
         for file in files:
             if file.name == "__init__.py":
