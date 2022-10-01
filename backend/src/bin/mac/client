@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# git pull --ff-only;
 lsof -P | grep ':9071' | awk '{print $2}' | xargs kill -9
+cd $0/../..;
 source env/bin/activate;
 cd src/python
 python3 -m ignite.client_main;
