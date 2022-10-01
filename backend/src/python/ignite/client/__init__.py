@@ -24,7 +24,7 @@ api_v = "v1"
 logging.debug(f"Setting IGNITE_API_VERSION to {api_v}")
 ENV["IGNITE_API_VERSION"] = api_v
 
-ignite_root = Path(DIR).parent.parent.parent.parent
+ignite_root = Path(DIR).parent.parent.parent.parent.parent
 logging.debug(f"Setting IGNITE_ROOT to {ignite_root}")
 ENV["IGNITE_ROOT"] = str(ignite_root)
 

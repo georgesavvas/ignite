@@ -229,7 +229,7 @@ app.whenReady().then(async () => {
   const contextMenu = Menu.buildFromTemplate([
     { label: "Show", click: () => window.show() },
     { label: "Exit", click: () => {
-      // backend.kill();
+      backend.kill();
       clientRequest(port, "quit");
       app.quit();
     } },

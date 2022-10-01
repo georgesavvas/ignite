@@ -89,7 +89,7 @@ function ComponentList(props) {
     clientRequest("get_actions").then(resp => {
       setActions(resp.data.component || []);
     });
-  }, []);
+  }, [props.components]);
 
   return (
     <div className={styles.container}>
