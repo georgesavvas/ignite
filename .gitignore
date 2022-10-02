@@ -1,5 +1,8 @@
 *.DS_Store
 
+*.code-workspace
+.DS_Store
+
 *.secret*
 installer/
 
