@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="frontend/public/media/logo_type.png" align="center" style="max-height:80px" />
+  <img src="frontend/public/media/logo_type.png" align="center" height="80" />
 </p>
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-whitesmoke.svg)](https://github.com/georgesavvas/ignite/blob/main/LICENSE)
