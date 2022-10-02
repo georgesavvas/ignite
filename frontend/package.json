@@ -1,7 +1,7 @@
 {
   "name": "ignite-frontend",
   "version": "0.0.0",
-  "license": "GPL-3.0-or-later",
+  "license": "Apache-2.0",
   "description": "Client app for the Ignite VFX pipeline",
   "author": "George Savvas <ignite@georgesavvas.co.uk>",
   "main": "public/main.js",
@@ -15,8 +15,6 @@
     "@mui/x-data-grid": "^5.17.2",
     "@react-three/drei": "^9.1.7",
     "@react-three/fiber": "^8.0.10",
-    "@sentry/electron": "^4.0.2",
-    "@sentry/tracing": "^7.13.0",
     "axios": "^0.27.2",
     "get-port": "^5.1.1",
     "lodash.debounce": "^4.0.8",
