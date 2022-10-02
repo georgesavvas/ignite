@@ -1,24 +1,24 @@
+// Copyright 2022 George Savvas
+
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+
+//     https://www.apache.org/licenses/LICENSE-2.0
+
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 
 import React from "react";
 import {createRoot} from "react-dom/client";
 
-import * as Sentry from "@sentry/electron";
-import {BrowserTracing} from "@sentry/tracing";
-
 import "./index.css";
 import App from "./App";
 
-
-// Sentry.init({dsn: "https://3037f050f6194c0dbc82183b252475fa@o1421552.ingest.sentry.io/6767421"});
-Sentry.init({
-  dsn: "https://b72a96c33b264edcae62be494ba6b47c@o1421552.ingest.sentry.io/6767423",
-  integrations: [new BrowserTracing()],
-
-  // Set tracesSampleRate to 1.0 to capture 100%
-  // of transactions for performance monitoring.
-  // We recommend adjusting this value in production
-  tracesSampleRate: 1.0,
-});
 
 const container = document.getElementById("root");
 const root = createRoot(container);
