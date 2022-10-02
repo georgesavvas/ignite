@@ -1,3 +1,5 @@
+#!/bin/bash
+
 if ! command -v gnome-terminal &> /dev/null; then
     gnome-terminal \
         --tab --title="server" -e "bash -c 'cd backend && ./src/bin/linux/start_server'" \
