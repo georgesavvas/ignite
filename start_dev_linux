@@ -1,8 +1,11 @@
-cd backend
-start src\bin\win\server.bat
-start src\bin\win\client.bat
-start src\bin\win\huey.bat
-cd ..\frontend
-start npm start
-export NODE_ENV=dev
-start npm run electron
+if ! command -v gnome-terminal &> /dev/null; then
+    gnome-terminal \
+        --tab --title="server" -e "bash -c 'cd backend && ./src/bin/linux/start_server'" \
+        --tab --title="client" -e "bash -c 'cd backend && ./src/bin/linux/start_client'" \
+        --tab --title="node" -e "bash -c 'cd ../frontend && npm start'" \
+        --tab --title="electron" -e "bash -c 'npm run electron'"
+elif ! command -v konsole &> /dev/null; then
+    konsole --hold --new-tab -e $SHELL -c "cd backend && ./src/bin/linux/start_server" &
+    konsole --hold --new-tab -e $SHELL -c "cd backend && ./src/bin/linux/start_client" &
+    konsole --hold --new-tab -e $SHELL -c "cd ../frontend && npm start" &
+    konsole --hold --new-tab -e $SHELL -c "cd ../frontend && npm run electron"
