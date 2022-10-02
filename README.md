@@ -2,7 +2,7 @@
   <img src="frontend/public/media/logo_type.png" align="center" height="80" />
 </p>
 
-[![License](https://img.shields.io/badge/License-Apache%202.0-whitesmoke.svg)](https://github.com/georgesavvas/ignite/blob/main/LICENSE)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/georgesavvas/ignite/blob/main/LICENSE)
 [![Discord](https://img.shields.io/discord/1022924444261429269?logo=discord&logoColor=whitesmoke)](https://discord.gg/2HWQduERrJ)
 
 > **Warning**<br>
