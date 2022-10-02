@@ -13,9 +13,10 @@
 #     konsole --hold --new-tab -e $SHELL -c "cd ../frontend && npm run electron"
 # fi
 
-cd $0/backend
+IGN=$( dirname -- "$0"; )
+cd $IGN/backend
 /bin/sh -ec "./src/bin/linux/start_server"
 /bin/sh -ec "./src/bin/linux/start_client"
-cd $0/frontend
+cd $IGN/frontend
 /bin/sh -ec "npm start"
 /bin/sh -ec "npm run electron"
