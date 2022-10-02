@@ -11,3 +11,4 @@ elif ! command -v konsole &> /dev/null; then
     konsole --hold --new-tab -e $SHELL -c "cd backend && ./src/bin/linux/start_client" &
     konsole --hold --new-tab -e $SHELL -c "cd ../frontend && npm start" &
     konsole --hold --new-tab -e $SHELL -c "cd ../frontend && npm run electron"
+fi
