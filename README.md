@@ -13,7 +13,7 @@
 Ignite is a VFX pipeline solution aimed at freelancers running jobs from home. Its purpose is to offer studio-like tools that take away the complexities of managing the project file structure and naming conventions without requiring any technical knowledge to set up.
 
 # Installation
-Download and run the appropriate installer for your platform from the Releases section on the right.
+Download and run the installer from the Releases section on the right.
 
 # Developers
 
@@ -22,7 +22,7 @@ Ignite requires the **ignite_server** and **ignite_client** to function. During 
 To launch the UI head inside `frontend` and run `npm start` for the auto-reload development server and `npm run electron` for the app.
 
 # Supported Platforms
-Currently supported platforms are Windows and OSX. Linux support is in the works!
+Currently only Windows is supported. OSX support is in development and Linux is to follow!
 
 # Docs
 [Github Wiki](https://github.com/georgesavvas/ignite/wiki)
