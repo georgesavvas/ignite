@@ -2,7 +2,7 @@
   "name": "ignite-frontend",
   "version": "0.0.0",
   "license": "Apache-2.0",
-  "description": "Client app for the Ignite VFX pipeline",
+  "description": "VFX pipeline software",
   "author": "George Savvas <ignite@georgesavvas.co.uk>",
   "main": "public/main.js",
   "homepage": ".",
