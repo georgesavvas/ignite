@@ -12,12 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/* eslint-disable @typescript-eslint/no-var-requires */
 
 const {app, BrowserWindow, protocol, ipcMain, dialog, Tray, Menu, shell} = require("electron");
 const os = require("os");
 const fs = require("fs").promises;
 const path = require("path");
-const { spawn } = require("child_process");
+const {spawn} = require("child_process");
 const getPort = require("get-port");
 const axios = require("axios");
 require("v8-compile-cache");
@@ -32,7 +33,8 @@ let platformName = process.platform;
 let appQuitting = false;
 let tray = null;
 let window = null;
-let backend = null;
+let serverBackend = null;
+let clientBackend = null;
 const isDev = process.env.NODE_ENV === "dev";
 
 const cpu = osu.cpu;
@@ -47,18 +49,41 @@ const getResourceUsage = async () => {
   return usage;
 };
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 async function clientRequest(port, method, data=undefined) {
   console.log(`http://localhost:${port}/api/v1/${method}`);
-  const resp = await axios({
-    url: `http://localhost:${port}/api/v1/${method}`,
-    method: !data ? "get" : "post",
-    headers: {
-      "Accept": "application/json, text/plain, */*",
-      "Content-Type": "application/json"
-    },
-    data: JSON.stringify(data)
-  });
-  return await resp.data;
+  try {
+    const resp = await axios({
+      url: `http://localhost:${port}/api/v1/${method}`,
+      method: !data ? "get" : "post",
+      headers: {
+        "Accept": "application/json, text/plain, */*",
+        "Content-Type": "application/json"
+      },
+      data: JSON.stringify(data)
+    });
+    return await resp.data;
+  } catch {
+    console.log(`Client request "${method}" did not respond`);
+  }
+}
+
+async function clientLaunched(port) {
+  let ok = false;
+  while (!ok) {
+    await sleep(1000);
+    clientRequest(port, "ping").then(resp => {
+      if (resp) {
+        console.log("Client is up!");
+        ok = true;
+        return;
+      } else console.log("Client not running, waiting...");
+    });
+  }
+  return true;
 }
 
 const iconPaths = {
@@ -230,19 +255,34 @@ app.whenReady().then(async () => {
   if (isDev) {
     // backend = spawn(`python ${clientPath} ${port}`, { detached: true, shell: true, stdio: "inherit" });
   } else {
-    const cmd = {
-      darwin: `open -gj ${clientPath} --args`,
-      linux: `./${clientPath}`,
-      win32: `start ./${clientPath}`
+    const client_cmd = {
+      darwin: `open -gj ${clientPath}`,
+      linux: `${clientPath}`,
+      win32: `start ${clientPath}`
     }[platformName];
-    backend = spawn(`${cmd} ${port}`, { detached: false, shell: true, stdio: "pipe" });
+    clientBackend = spawn(client_cmd, {shell: true, stdio: "pipe", env: {IGNITE_CLIENT_ADDRESS: process.env.IGNITE_CLIENT_ADDRESS}});
+    clientLaunched(port).then(() => {
+      clientRequest(port, "is_local_server_running").then(resp => {
+        if (resp && resp.ok) {
+          console.log("Found local Ignite server!");
+          return;
+        }
+        console.log("Local Ignite server was not found, launching...");
+        const server_cmd = {
+          darwin: `open -gj ${serverPath}`,
+          linux: `${serverPath}`,
+          win32: `start ${serverPath}`
+        }[platformName];
+        serverBackend = spawn(server_cmd, {shell: true, stdio: "pipe", env: {IGNITE_CLIENT_ADDRESS: process.env.IGNITE_CLIENT_ADDRESS}});
+      });
+    });
   }
 
   if (tray === null) tray = new Tray("public/media/icon.png");
   const contextMenu = Menu.buildFromTemplate([
     { label: "Show", click: () => window.show() },
     { label: "Exit", click: () => {
-      backend.kill();
+      clientBackend.kill();
       clientRequest(port, "quit");
       app.quit();
     } },

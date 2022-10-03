@@ -100,6 +100,7 @@ class TaskManager():
         self.tasks = []
         self.processes_manager = processes_manager
 
+    def start(self):
         self.loop = asyncio.new_event_loop()
         self.thread = threading.Thread(
             target=start_worker, args=(self.loop,), daemon=True

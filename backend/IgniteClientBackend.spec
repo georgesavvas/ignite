@@ -5,7 +5,7 @@ block_cipher = None
 
 
 a = Analysis(
-    ['src/python/client_main.py'],
+    ['src\\python\\ignite\\client_main.py'],
     pathex=[],
     binaries=[],
     datas=[],
@@ -35,17 +35,11 @@ exe = EXE(
     upx=True,
     upx_exclude=[],
     runtime_tmpdir=None,
-    console=False,
+    console=True,
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon='../frontend/public/media/desktop_icon/mac/icon.icns',
-)
-app = BUNDLE(
-    exe,
-    name='IgniteClientBackend.app',
-    icon='../frontend/public/media/desktop_icon/mac/icon.icns',
-    bundle_identifier=None,
+    icon='..\\frontend\\public\\media\\desktop_icon\\win\\icon.ico',
 )
