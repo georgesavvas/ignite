@@ -23,7 +23,7 @@ from string import Formatter
 
 import parse
 from ignite.client import utils
-from ignite.client.utils import TASK_MANAGER
+from ignite.client.utils import TASK_MANAGER, CONFIG, server_request
 
 from ..utils import get_logger
 
@@ -332,3 +332,11 @@ def edit_task(task_id, edit):
 def get_tasks(session_id):
     data = TASK_MANAGER.report(session_id)
     return data
+
+
+def is_local_server_running():
+    address = CONFIG["server_details"].get("address")
+    if not address or address.startswith("localhost"):
+        return True
+    resp = server_request("ping")
+    return resp != None

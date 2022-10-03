@@ -44,6 +44,7 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup_event():
+    TASK_MANAGER.start()
     TASK_MANAGER.restore_tasks()
 
 
@@ -235,29 +236,29 @@ async def get_tasks(request: Request):
 
 
 @app.get("/api/v1/quit")
-async def rename_entity(request: Request):
-    LOGGER.info("Asked to shut down, cya!")
-    sys.exit()
+async def force_quit(request: Request):
+    LOGGER.info("Asked to quit, cya!")
+    os._exit(0)
 
 
 mount_root()
 
-
 if __name__ == "__main__":
     host = "localhost"
     port = 9071
-    args = sys.argv
-    if len(args) >= 2:
-        port = int(args[1])
+    inherited = ENV.get("IGNITE_CLIENT_ADDRESS")
+    if inherited:
+        _, port = inherited.split(":")
+        port = int(port)
+        LOGGER.info(f"Client port inherited from env.")
     IGNITE_CLIENT_ADDRESS = f"{host}:{port}"
     LOGGER.info(f"Setting IGNITE_CLIENT_ADDRESS to {IGNITE_CLIENT_ADDRESS}")
     ENV["IGNITE_CLIENT_ADDRESS"] = IGNITE_CLIENT_ADDRESS
-    LOGGER.info(f"Launching server at {host}:{port}")
+    LOGGER.info(f"Launching server at {IGNITE_CLIENT_ADDRESS}")
     uvicorn.run(
         f"{__name__}:app",
         host=host,
         port=port,
         log_level="warning",
-        reload=True,
-        workers=2
+        workers=1
     )
