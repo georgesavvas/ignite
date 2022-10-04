@@ -23,8 +23,8 @@ const getPort = require("get-port");
 const axios = require("axios");
 require("v8-compile-cache");
 const uuid4 = require("uuid4");
-const osu = require("node-os-utils");
-
+const { findSourceMap } = require("module");
+// const osu = require("node-os-utils");
 
 const sessionID = uuid4();
 const appPath = app.getAppPath();
@@ -37,17 +37,17 @@ let serverBackend = null;
 let clientBackend = null;
 const isDev = process.env.NODE_ENV === "dev";
 
-const cpu = osu.cpu;
-const mem = osu.mem;
-const getResourceUsage = async () => {
-  const cpu_data = await cpu.usage();
-  const mem_data = await mem.info();
-  const usage = {
-    cpu: cpu_data,
-    mem: mem_data.usedMemPercentage,
-  };
-  return usage;
-};
+// const cpu = osu.cpu;
+// const mem = osu.mem;
+// const getResourceUsage = async () => {
+//   const cpu_data = await cpu.usage();
+//   const mem_data = await mem.info();
+//   const usage = {
+//     cpu: cpu_data,
+//     mem: mem_data.usedMemPercentage,
+//   };
+//   return usage;
+// };
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -71,7 +71,35 @@ async function clientRequest(port, method, data=undefined) {
   }
 }
 
-async function clientLaunched(port) {
+function launchServer() {
+  const serverCmd = {
+    darwin: `open -gj ${serverPath}`,
+    linux: `${serverPath}`,
+    win32: `start ${serverPath}`
+  }[platformName];
+  console.log("Launching server...", serverCmd);
+  return spawn(serverCmd, {
+    shell: true,
+    stdio: "pipe",
+    env: {IGNITE_CLIENT_ADDRESS: process.env.IGNITE_CLIENT_ADDRESS}
+  });
+}
+
+function launchClient() {
+  const clientCmd = {
+    darwin: `open -gj ${clientPath}`,
+    linux: `${clientPath}`,
+    win32: `start ${clientPath}`
+  }[platformName];
+  console.log("Launching client...", clientCmd);
+  return spawn(clientCmd, {
+    shell: true,
+    stdio: "pipe",
+    env: {IGNITE_CLIENT_ADDRESS: process.env.IGNITE_CLIENT_ADDRESS}
+  });
+}
+
+async function waitForClient(port) {
   let ok = false;
   while (!ok) {
     await sleep(1000);
@@ -84,6 +112,34 @@ async function clientLaunched(port) {
     });
   }
   return true;
+}
+
+async function checkServer(port, attempt=0) {
+  clientRequest(port, "is_local_server_running").then(resp => {
+    if (resp && resp.ok) {
+      console.log(`Check server - all good! (attempt ${attempt}`);
+      return true;
+    }
+    console.log(`Check server - not responding... (attempt ${attempt})`);
+    if (attempt == 3) {
+      serverBackend = launchServer();
+      return true;
+    } else setTimeout(checkServer, 3000, port, attempt += 1);
+  });
+}
+
+async function checkClient(port, attempt=0) {
+  clientRequest(port, "ping").then(resp => {
+    if (resp && resp.ok) {
+      console.log(`Check client - all good! (attempt ${attempt})`);
+      return true;
+    }
+    console.log(`Check client - not responding... (attempt ${attempt})`);
+    if (attempt == 3) {
+      clientBackend = launchClient();
+      return true;
+    } else setTimeout(checkClient, 3000, port, attempt += 1);
+  });
 }
 
 const iconPaths = {
@@ -141,11 +197,6 @@ function createWindow (port) {
     win.loadFile("build/index.html");
   }
 
-  // setTimeout(function () {
-  //   splash.close();
-  //   win.show();
-  // }, 7000);
-
   win.on("close", e => {
     if (!appQuitting) {
       e.preventDefault();
@@ -162,7 +213,7 @@ function createWindow (port) {
       else return true;
     });
   });
-  
+
   ipcMain.handle("load_data", async (e, filename) => {
     const filepath = path.join(os.homedir(), ".ignite", filename);
     fs.readFile(filepath, (err) => {
@@ -174,7 +225,7 @@ function createWindow (port) {
   ipcMain.handle("open_url", async (e, url) => {
     shell.openExternal(url);
   });
-  
+
   ipcMain.handle("check_path", async (e, filepath) => {
     let valid = true;
     try {
@@ -184,15 +235,15 @@ function createWindow (port) {
     }
     return valid;
   });
-  
-  ipcMain.handle("file_input", async (e, default_dir="") => {
+
+  ipcMain.handle("file_input", async () => {
     return dialog.showOpenDialog({properties: ["openFile"] });
   });
-  
+
   ipcMain.handle("get_env", (e, env_name) => {
     return process.env[env_name];
   });
-  
+
   ipcMain.handle("set_env", (e, env_name, env_value) => {
     process.env[env_name] = env_value;
     console.log("Setting", env_name, "to", env_value, "->", process.env[env_name]);
@@ -209,10 +260,10 @@ function createWindow (port) {
     return port;
   });
 
-  setInterval(async () => {
-    const data = await getResourceUsage();
-    win.webContents.send("resource_usage", data);
-  }, 2000);
+  // setInterval(async () => {
+  //   const data = await getResourceUsage();
+  //   win.webContents.send("resource_usage", data);
+  // }, 2000);
 
   return win;
 }
@@ -252,28 +303,24 @@ app.whenReady().then(async () => {
     if (proc) return true;
   });
 
-  if (isDev) {
-    // backend = spawn(`python ${clientPath} ${port}`, { detached: true, shell: true, stdio: "inherit" });
-  } else {
-    const client_cmd = {
-      darwin: `open -gj ${clientPath}`,
-      linux: `${clientPath}`,
-      win32: `start ${clientPath}`
-    }[platformName];
-    clientBackend = spawn(client_cmd, {shell: true, stdio: "pipe", env: {IGNITE_CLIENT_ADDRESS: process.env.IGNITE_CLIENT_ADDRESS}});
-    clientLaunched(port).then(() => {
+  ipcMain.handle("check_server", async () => {
+    return checkServer(port);
+  });
+
+  ipcMain.handle("check_client", async () => {
+    return checkClient(port);
+  });
+
+  if (!isDev) {
+    clientBackend = launchClient();
+    waitForClient(port).then(() => {
       clientRequest(port, "is_local_server_running").then(resp => {
         if (resp && resp.ok) {
           console.log("Found local Ignite server!");
           return;
         }
         console.log("Local Ignite server was not found, launching...");
-        const server_cmd = {
-          darwin: `open -gj ${serverPath}`,
-          linux: `${serverPath}`,
-          win32: `start ${serverPath}`
-        }[platformName];
-        serverBackend = spawn(server_cmd, {shell: true, stdio: "pipe", env: {IGNITE_CLIENT_ADDRESS: process.env.IGNITE_CLIENT_ADDRESS}});
+        serverBackend = launchServer();
       });
     });
   }
@@ -305,20 +352,18 @@ app.on("ready", async () => {
   });
 });
 
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
+
 // app.on('window-all-closed', () => {
 //   if (process.platform !== 'darwin') {
 //     app.quit()
 //   }
 // })
 
-app.on("before-quit", e => {
+app.on("before-quit", () => {
   appQuitting = true;
 });
 
-app.on("activate", e => {
+app.on("activate", () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   

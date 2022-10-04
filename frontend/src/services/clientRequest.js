@@ -20,6 +20,10 @@ async function clientRequest(method, data=undefined) {
     console.log("Invalid client address, aborting...");
     return;
   }
+  return await request(address, method, data);
+}
+
+async function request(address, method, data, attempt=0) {
   try {
     const resp = await fetch(`http://${address}/api/v1/${method}`, {
       method: !data ? "GET" : "POST",
@@ -34,7 +38,13 @@ async function clientRequest(method, data=undefined) {
     return resp2;
   } catch (error) {
     console.log(error);
-    return {ok: false, msg: "Could not connect to Ignite client..."};
+    if (attempt == 0) {
+      await window.services.check_client();
+      setTimeout(request, 4000, address, method, data, attempt += 1);
+    }
+    else if (attempt <= 2) {
+      setTimeout(request, 2000, address, method, data, attempt += 1);
+    } else return {ok: false, msg: "Could not connect to Ignite client..."};
   }
 }
 
