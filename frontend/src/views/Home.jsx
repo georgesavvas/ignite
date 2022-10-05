@@ -13,7 +13,7 @@
 // limitations under the License.
 
 
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useState, useContext} from "react";
 
 import Divider from "@mui/material/Divider";
 import {ReflexContainer, ReflexSplitter, ReflexElement} from "react-reflex";
@@ -27,6 +27,7 @@ import TopBar from "../views/TopBar/TopBar";
 import styles from "./Home.module.css";
 import Explorer from "../views/Explorer/Explorer";
 import LostConnectionOverlay from "./LostConnectionOverlay";
+import {ConfigContext} from "../contexts/ConfigContext";
 
 
 const splitterStyle = {
@@ -42,6 +43,7 @@ const defaultFlexRations = {
 
 export default function Home() {
   const [flexRatios, setFlexRatios] = useState(defaultFlexRations);
+  const [config] = useContext(ConfigContext);
 
   useEffect(() => {
     const data = loadReflexLayout();
@@ -71,7 +73,7 @@ export default function Home() {
 
   return (
     <div className={styles.container}>
-      <LostConnectionOverlay />
+      <LostConnectionOverlay show={config.lostConnection} />
       <div className={styles.topBar}>
         <TopBar />
         <Divider />
