@@ -26,6 +26,7 @@ import ProjectTree from "../views/TreeView/ProjectTree";
 import TopBar from "../views/TopBar/TopBar";
 import styles from "./Home.module.css";
 import Explorer from "../views/Explorer/Explorer";
+import LostConnectionOverlay from "./LostConnectionOverlay";
 
 
 const splitterStyle = {
@@ -70,6 +71,7 @@ export default function Home() {
 
   return (
     <div className={styles.container}>
+      <LostConnectionOverlay />
       <div className={styles.topBar}>
         <TopBar />
         <Divider />
