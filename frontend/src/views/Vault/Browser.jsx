@@ -47,6 +47,7 @@ function Browser(props) {
   const {enqueueSnackbar} = useSnackbar();
 
   useEffect(() => {
+    if (!props.loadedData) return;
     const _tiles = props.loadedData.reduce(function(obj, entity) {
       if (entity.path === props.selectedEntity.path) props.handleEntitySelected(entity);
       entity.path = BuildFileURL(entity.path, config, {pathOnly: true});
@@ -148,7 +149,7 @@ function Browser(props) {
               {getBrowserHelperText()}
             </Typography>
           </div>
-          {props.loadedData.length ?
+          {props.loadedData && props.loadedData.length ?
             <Box className={styles.tileContainer} style={tileContainerStyle}>
               {Object.keys(tiles).map((k) => tiles[k])}
             </Box> :
@@ -160,7 +161,7 @@ function Browser(props) {
         </div>
       </div>
       <Divider />
-      <PageBar pages={props.pages.total} currentPage={props.pages.current}
+      <PageBar pages={props.pages?.total} currentPage={props.pages.current}
         onChange={handlePageChange}
         onTilesPerPageChange={handleTilesPerPageChange}
         onTileSizeChange={handleTileSizeChange} tileSize={explorerSettings.currentTileSize}

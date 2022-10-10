@@ -121,7 +121,7 @@ class Asset(Directory):
                 best_av = av
         self._best_v = best_av.version
         self._best_av = best_av
-        self.check_symlinks()
+        # self.check_symlinks()
 
     @property
     def next_version(self):

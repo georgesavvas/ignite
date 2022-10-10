@@ -71,17 +71,17 @@ function App() {
       <GlobalStyles styles={{...darkScrollbar()}} />
       <div className="App">
         <ErrorBoundary FallbackComponent={ErrorFallback}>
-          <ConfigProvider>
-            <ContextProvider>
-              <EntityProvider>
-                <VaultProvider>
-                  <SnackbarProvider maxSnack={3} autoHideDuration={2500}>
+          <SnackbarProvider maxSnack={3} autoHideDuration={2500}>
+            <ConfigProvider>
+              <ContextProvider>
+                <EntityProvider>
+                  <VaultProvider>
                     <Home />
-                  </SnackbarProvider>
-                </VaultProvider>
-              </EntityProvider>
-            </ContextProvider>
-          </ConfigProvider>
+                  </VaultProvider>
+                </EntityProvider>
+              </ContextProvider>
+            </ConfigProvider>
+          </SnackbarProvider>
         </ErrorBoundary>
       </div>
     </ThemeProvider>

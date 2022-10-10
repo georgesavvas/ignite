@@ -1,8 +1,8 @@
 {
-  "name": "ignite-frontend",
+  "name": "ignite",
   "version": "0.0.0",
   "license": "Apache-2.0",
-  "description": "VFX pipeline software",
+  "description": "Ignite UI",
   "author": "George Savvas <ignite@georgesavvas.co.uk>",
   "main": "public/main.js",
   "homepage": ".",
@@ -40,7 +40,7 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "cross-env BROWSER=none react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
@@ -48,7 +48,7 @@
     "dist": "electron-builder",
     "sanitize": "npx kill-port 3000",
     "electron": "cross-env NODE_ENV=dev electron .",
-    "electron-dev": "npm run sanitize && concurrently \"cross-env BROWSER=none npm start\" \"wait-on http://localhost:3000 && cross-env NODE_ENV=dev electron .\"",
+    "electron-dev": "npm run sanitize && concurrently \"npm start\" \"wait-on http://localhost:3000 && cross-env NODE_ENV=dev electron .\"",
     "package": "npm run build && electron-builder",
     "deploy-win": "..\\.secret && electron-builder --publish always",
     "deploy-unix": "source ../.secret && electron-builder --publish always"
@@ -92,8 +92,7 @@
       "main": "build/main.js"
     },
     "files": [
-      "build/**/*",
-      "node_modules/**/*"
+      "build/**/*"
     ],
     "extraFiles": [
       {

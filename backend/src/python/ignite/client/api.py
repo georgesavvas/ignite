@@ -336,7 +336,9 @@ def get_tasks(session_id):
 
 def is_local_server_running():
     address = CONFIG["server_details"].get("address")
-    if not address or address.startswith("localhost"):
+    if not address:
+        return True
+    if not address.startswith("localhost") and not address.startswith("127.0.0.1"):
         return True
     resp = server_request("ping")
     return resp != None

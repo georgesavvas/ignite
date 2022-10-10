@@ -16,11 +16,11 @@
 import React, {useContext} from "react";
 
 import Typography from "@mui/material/Typography";
-import { useSnackbar } from "notistack";
+import {useSnackbar} from "notistack";
 
 import {CopyToClipboard, ShowInExplorer} from "../ContextActions";
 import {setReprForProject, setReprForParent} from "../ContextActions";
-import { ContextContext } from "../../contexts/ContextContext";
+import {ContextContext} from "../../contexts/ContextContext";
 import Tile from "../../components/Tile";
 
 

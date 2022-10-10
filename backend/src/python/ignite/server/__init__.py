@@ -15,15 +15,19 @@
 
 import logging
 import os
+import sys
 import platform
 from pathlib import Path
 
 import yaml
 from platformdirs import user_config_dir
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 
-DIR = os.path.dirname(__file__)
+if getattr(sys, "frozen", False):
+    DIR = sys._MEIPASS
+else:
+    DIR = os.path.dirname(os.path.abspath(__file__))
 ENV = os.environ
 
 OS_NAME = platform.system()
@@ -38,7 +42,9 @@ api_v = "v1"
 logging.debug(f"Setting IGNITE_API_VERSION to {api_v}")
 ENV["IGNITE_API_VERSION"] = api_v
 
-ignite_root = Path(DIR).parent.parent.parent.parent.parent
+ignite_root = Path(DIR)
+if __file__.endswith(".py"):
+    ignite_root = Path(DIR).parent.parent.parent.parent.parent
 logging.debug(f"Setting IGNITE_ROOT to {ignite_root}")
 ENV["IGNITE_ROOT"] = str(ignite_root)
 
