@@ -42,19 +42,35 @@ const General = () => {
     });
   }, [config.serverDetails, config.access]);
 
+  useEffect(() => {
+    let changed = false;
+    if (
+      JSON.stringify(config.serverDetails) !==
+      JSON.stringify(settings.serverDetails)
+    ) changed = true;
+    const configAccess = {...config.access};
+    delete configAccess.remote;
+    if (
+      JSON.stringify(configAccess) !==
+      JSON.stringify(settings.access)
+    ) changed = true;
+    setCanSave(changed);
+  }, [settings]);
+
   const handleServerDetailsChange = (field, value) => {
-    setSettings(prevState => ({
-      ...prevState,
-      serverDetails: {...prevState.serverDetails[field], value}
-    }));
+    setSettings(prevState => {
+      const existing = {...prevState};
+      existing["serverDetails"][field] = value;
+      return existing;
+    });
   };
 
   const handleAccessChange = (field, value) => {
-    setSettings(prevState => ({
-      ...prevState,
-      access: {...prevState.access[field], value}
-    }));
-    checkSave();
+    setSettings(prevState => {
+      const existing = {...prevState};
+      existing["access"][field] = value;
+      return existing;
+    });
   };
 
   const handleSave = () => {
@@ -63,14 +79,8 @@ const General = () => {
     setCanSave(false);
   };
 
-  const checkSave = () => {
-    let changed = false;
-    if (config.serverDetails !== settings.serverDetails) changed = true;
-    if (config.access !== settings.access) changed = true;
-    setCanSave(changed);
-  };
-
-  const isServerLocal = settings.serverDetails.address && settings.serverDetails.address.startsWith("localhost");
+  const isServerLocal = settings.serverDetails.address &&
+    settings.serverDetails.address.startsWith("localhost");
 
   return (
     <div className={styles.container}>
@@ -111,7 +121,7 @@ const General = () => {
           fullWidth
           disabled={settings.access.remote}
           value={settings.access.projectsDir || ""}
-          onChange={e => handleAccessChange("projectsDir", e.target.value)}
+          onChange={value => handleAccessChange("projectsDir", value)}
           buttonStyle={{marginTop: "4px"}}
         />
         <FileInput
@@ -122,7 +132,7 @@ const General = () => {
           fullWidth
           disabled={isServerLocal}
           value={settings.access.serverProjectsDir || ""}
-          onChange={e => handleAccessChange("serverProjectsDir", e.target.value)}
+          onChange={value => handleAccessChange("serverProjectsDir", value)}
           style={{alignSelf: "stretch"}}
           buttonStyle={{marginTop: "4px"}}
         />

@@ -114,7 +114,7 @@ function Vault(props) {
     serverRequest("get_assetversions", data).then(resp => {
       setIsLoading(false);
       setLoadedData(resp.data);
-      setPages(prevState => ({...prevState, total: resp.pages.total, results: resp.pages.results}));
+      setPages(prevState => ({...prevState, total: resp.pages?.total, results: resp.pages?.results}));
     });
   }, [pages.current, vaultContext, query, tilesPerPage, selectedCollection, refreshValue, props.open]);
 

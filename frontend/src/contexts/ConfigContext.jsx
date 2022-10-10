@@ -15,7 +15,10 @@
 
 import React, {useState, createContext, useEffect} from "react";
 
+import {useSnackbar} from "notistack";
+
 import clientRequest from "../services/clientRequest";
+import serverRequest from "../services/serverRequest";
 
 
 export const ConfigContext = createContext();
@@ -38,12 +41,15 @@ const placeholder_config = {
 };
 
 export const ConfigProvider = props => {
-  const [config, setConfig] = useState({serverDetails: {}, access: {}, dccConfig: []});
-  const [writeIncr, setWriteIncr] = useState(0);
+  const {enqueueSnackbar} = useSnackbar();
+  const [config, setConfig] = useState(
+    {serverDetails: {}, access: {}, dccConfig: []}
+  );
 
   useEffect(() => {
     const clientData = clientRequest("get_config");
-    Promise.all([clientData]).then(resp => {
+    const clientAddress = window.services.get_env("IGNITE_CLIENT_ADDRESS");
+    Promise.all([clientData, clientAddress]).then(resp => {
       const clientDataResults = resp[0].data;
       console.log("Config received:", clientDataResults);
       const savedServerDetails = clientDataResults.server_details;
@@ -57,25 +63,58 @@ export const ConfigProvider = props => {
         IGNITE_SERVER_ADDRESS: savedServerDetails.address,
         IGNITE_SERVER_PASSWORD: savedServerDetails.password
       });
-      window.services.get_env("IGNITE_CLIENT_ADDRESS").then(resp => {
-        setConfig({
-          serverDetails: {...serverDetailsDefault, ...savedServerDetails},
-          access: {
-            ...accessDefault,
-            ...savedAccess
-          },
-          dccConfig: savedDccConfig,
-          clientAddress: resp
-        });
+      setConfig({
+        serverDetails: {...serverDetailsDefault, ...savedServerDetails},
+        access: {
+          ...accessDefault,
+          ...savedAccess
+        },
+        dccConfig: savedDccConfig,
+        clientAddress: resp[1],
+        canWrite: true
       });
     });
   }, []);
 
   useEffect(() => {
-    if (writeIncr <= 0) {
-      setWriteIncr(1);
-      return;
-    }
+    const interval = setInterval(() => {
+      serverRequest("ping").then(resp => {
+        if (!resp.ok) {
+          if (config.lostConnection) return;
+          console.log("Lost connection to server...");
+          enqueueSnackbar("Lost connection to server...", {variant: "error"});
+          setConfig(prevState => {
+            const prev = {...prevState};
+            prev["lostConnection"] = true;
+            return prev;
+          });
+          window.services.check_server();
+        }
+        else {
+          if (!config.lostConnection) return;
+          console.log("Server connection restored...");
+          enqueueSnackbar("Connection restored!", {variant: "success"});
+          setConfig(prevState => {
+            const prev = {...prevState};
+            prev["lostConnection"] = false;
+            return prev;
+          });
+        }
+      });
+      clientRequest("ping").then(resp => {
+        if (!resp.ok) {
+          console.log("Lost connection to client...");
+          window.services.check_client();
+        }
+      });
+    }, 3000);
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [config.lostConnection]);
+
+  useEffect(() => {
+    if (!config.canWrite) return;
     window.services.set_envs({
       IGNITE_SERVER_ADDRESS: config.serverDetails.address,
       IGNITE_SERVER_PASSWORD: config.serverDetails.password

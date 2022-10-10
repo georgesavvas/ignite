@@ -130,7 +130,7 @@ def create_anchor(path, name):
     return full_path
 
 
-def get_uri(path, version=None):
+def get_uri(path, version_override=None):
     if not path:
         return ""
     dir_kind = get_dir_kind(path)
@@ -156,14 +156,21 @@ def get_uri(path, version=None):
     else:
         context = "/".join(splt[2:])
 
-    bits = [project, group, context, task, name, version]
+    bits = [project, group, context, task, name]
     uri = "ign"
     for bit in bits:
         if bit:
             uri += f":{bit}"
     # uri = f"ign:{project}:{group}:{context}:{task}:{name}"
-    if version:
+    if version_override:
+        if isinstance(version_override, str):
+            version_override = int(version_override.replace("v", ""))
+        uri += f"@{version_override}"
+    elif version:
+        if isinstance(version, str):
+            version = int(version.replace("v", ""))
         uri += f"@{version}"
+    print("---", path, version, uri)
     return uri
 
 

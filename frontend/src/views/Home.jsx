@@ -73,7 +73,7 @@ export default function Home() {
 
   return (
     <div className={styles.container}>
-      <LostConnectionOverlay show={config.lostConnection} />
+      {config.lostConnection ? <LostConnectionOverlay /> : null}
       <div className={styles.topBar}>
         <TopBar />
         <Divider />

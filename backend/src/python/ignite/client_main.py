@@ -238,7 +238,7 @@ async def get_tasks(request: Request):
 @app.get("/api/v1/is_local_server_running")
 async def is_local_server_running():
     data = api.is_local_server_running()
-    return {"ok": True, "data": data}
+    return {"ok": data}
 
 
 @app.get("/api/v1/quit")

@@ -23,19 +23,22 @@ const getPort = require("get-port");
 const axios = require("axios");
 require("v8-compile-cache");
 const uuid4 = require("uuid4");
-const { findSourceMap } = require("module");
 // const osu = require("node-os-utils");
 
 const sessionID = uuid4();
-const appPath = app.getAppPath();
+let appPath = app.getAppPath();
+if (appPath.endsWith("app.asar")) appPath = path.dirname(app.getPath("exe"));
 process.env.IGNITE_SESSION_ID = sessionID;
 let platformName = process.platform;
 let appQuitting = false;
 let tray = null;
 let window = null;
 let serverBackend = null;
+let serverLock = true;
 let clientBackend = null;
+let clientLock = true;
 const isDev = process.env.NODE_ENV === "dev";
+const public = path.join(__dirname, "..", isDev ? "public" : "build");
 
 // const cpu = osu.cpu;
 // const mem = osu.mem;
@@ -48,6 +51,40 @@ const isDev = process.env.NODE_ENV === "dev";
 //   };
 //   return usage;
 // };
+
+const iconPaths = {
+  "win32": "media/desktop_icon/win/icon.ico",
+  "darwin": "media/desktop_icon/mac/icon.icns",
+  "linux": "media/desktop_icon/linux/icon.png"
+};
+
+const serverPaths = {
+  "win32": "IgniteServer.exe",
+  "darwin": "IgniteServer",
+  "linux": "IgniteServer"
+};
+const serverPathDev = "../backend/src/python/server_main.py";
+const serverPath = path.join(
+  appPath,
+  process.env.NODE_ENV === "dev" ?
+    serverPathDev :
+    serverPaths[platformName]
+);
+console.log("platformName", platformName);
+
+const clientPaths = {
+  "win32": "IgniteClientBackend.exe",
+  "darwin": "IgniteClientBackend",
+  "linux": "IgniteClientBackend"
+};
+const clientPathDev = "../backend/src/python/client_main.py";
+const clientPath = path.join(
+  appPath,
+  process.env.NODE_ENV === "dev" ?
+    clientPathDev :
+    clientPaths[platformName]
+);
+console.log("clientPath", clientPath);
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -115,64 +152,36 @@ async function waitForClient(port) {
 }
 
 async function checkServer(port, attempt=0) {
+  serverLock = true;
   clientRequest(port, "is_local_server_running").then(resp => {
     if (resp && resp.ok) {
-      console.log(`Check server - all good! (attempt ${attempt}`);
+      console.log(`Check server - all good! (attempt ${attempt})`);
       return true;
     }
     console.log(`Check server - not responding... (attempt ${attempt})`);
-    if (attempt == 3) {
+    if (attempt == 3 && !isDev) {
       serverBackend = launchServer();
+      serverLock = false;
       return true;
     } else setTimeout(checkServer, 3000, port, attempt += 1);
   });
 }
 
 async function checkClient(port, attempt=0) {
+  clientLock = true;
   clientRequest(port, "ping").then(resp => {
     if (resp && resp.ok) {
       console.log(`Check client - all good! (attempt ${attempt})`);
       return true;
     }
     console.log(`Check client - not responding... (attempt ${attempt})`);
-    if (attempt == 3) {
+    if (attempt == 3 && !isDev) {
       clientBackend = launchClient();
+      clientLock = false;
       return true;
     } else setTimeout(checkClient, 3000, port, attempt += 1);
   });
 }
-
-const iconPaths = {
-  "win32": "media/desktop_icon/win/icon.ico",
-  "darwin": "media/desktop_icon/mac/icon.icns",
-  "linux": "media/desktop_icon/linux/icon.png"
-};
-
-const serverPaths = {
-  "win32": "IgniteServer.exe",
-  "darwin": "IgniteServer",
-  "linux": "IgniteServer"
-};
-const serverPathDev = "../backend/src/python/server_main.py";
-const serverPath = path.join(
-  appPath,
-  process.env.NODE_ENV === "dev" ?
-    serverPathDev :
-    serverPaths[platformName]
-);
-
-const clientPaths = {
-  "win32": "IgniteClientBackend.exe",
-  "darwin": "IgniteClientBackend",
-  "linux": "IgniteClientBackend"
-};
-const clientPathDev = "../backend/src/python/client_main.py";
-const clientPath = path.join(
-  appPath,
-  process.env.NODE_ENV === "dev" ?
-    clientPathDev :
-    clientPaths[platformName]
-);
 
 function createWindow (port) {
   const win = new BrowserWindow({
@@ -278,7 +287,7 @@ function createSplash () {
     alwaysOnTop: true,
     icon: path.join(__dirname, iconPaths[platformName])
   });
-  win.loadFile("public/splash.html");
+  win.loadFile(`${public}/splash.html`);
   return win;
 }
 
@@ -288,7 +297,7 @@ app.whenReady().then(async () => {
   const port = await getPort({
     port: getPort.makeRange(9071, 9999)
   });
-  console.log("Registering client port", port);
+
   process.env.IGNITE_CLIENT_ADDRESS = `127.0.0.1:${port}`;
 
   window = createWindow(port);
@@ -304,15 +313,18 @@ app.whenReady().then(async () => {
   });
 
   ipcMain.handle("check_server", async () => {
+    if (serverLock || isDev) return;
     return checkServer(port);
   });
 
   ipcMain.handle("check_client", async () => {
+    if (clientLock || isDev) return;
     return checkClient(port);
   });
 
   if (!isDev) {
     clientBackend = launchClient();
+    clientLock = false;
     waitForClient(port).then(() => {
       clientRequest(port, "is_local_server_running").then(resp => {
         if (resp && resp.ok) {
@@ -321,15 +333,16 @@ app.whenReady().then(async () => {
         }
         console.log("Local Ignite server was not found, launching...");
         serverBackend = launchServer();
+        serverLock = false;
       });
     });
   }
 
-  if (tray === null) tray = new Tray("public/media/icon.png");
+  if (tray === null) tray = new Tray(`${public}/media/icon.png`);
   const contextMenu = Menu.buildFromTemplate([
     { label: "Show", click: () => window.show() },
     { label: "Exit", click: () => {
-      clientBackend.kill();
+      if (clientBackend) clientBackend.kill();
       clientRequest(port, "quit");
       app.quit();
     } },
@@ -352,7 +365,6 @@ app.on("ready", async () => {
   });
 });
 
-
 // app.on('window-all-closed', () => {
 //   if (process.platform !== 'darwin') {
 //     app.quit()
@@ -364,9 +376,6 @@ app.on("before-quit", () => {
 });
 
 app.on("activate", () => {
-  // On macOS it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
-  
   if (BrowserWindow.getAllWindows().length === 0) {
     window = createWindow();
   }

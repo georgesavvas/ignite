@@ -56,6 +56,10 @@ export const ContextProvider = props => {
     });
   }, [config.serverDetails]);
 
+  useEffect(() => {
+    if (!config.lostConnection) refresh();
+  }, [config.lostConnection]);
+
   async function handleContextChange(path) {
     const path_processed = BuildFileURL(path, config, {reverse: true, pathOnly: true});
     let success = false;

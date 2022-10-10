@@ -125,11 +125,12 @@ function Explorer() {
     serverRequest(method, data).then(resp => {
       setIsLoading(false);
       setLoadedData(resp.data);
-      setPages((prevPages) => ({...prevPages, total: resp.pages.total}));
+      setPages((prevPages) => ({...prevPages, total: resp.pages?.total}));
     });
   }, [pages.current, explorerSettings.currentResultType, explorerSettings.tilesPerPage, currentContext, config.access, query]);
 
   useEffect(() => {
+    if (!loadedData) return;
     if (explorerSettings.currentViewType !== "grid") return;
     const _tiles = loadedData.reduce(function(obj, entity) {
       if (entity.path === selectedEntity.path) setSelectedEntity(entity);
@@ -189,7 +190,7 @@ function Explorer() {
     const currentResultType = explorerSettings.currentResultType || "grid";
     const savedTileSize = explorerSettings.saved[currentResultType]?.[value] || 5;
     setExplorerSettings(prevState => {
-      const saved = prevState.saved || defaultExplorerSettings.saved;
+      const saved = prevState.saved ?? defaultExplorerSettings.saved;
       saved[currentResultType].current = value;
       return {
         ...prevState,
@@ -291,7 +292,7 @@ function Explorer() {
   contextItems = contextItems.concat(getSpecificContextItems(itemData));
 
   const getView = () => {
-    if (!loadedData.length) return (
+    if (!loadedData || !loadedData.length) return (
       <DataPlaceholder text={isLoading ? "Fetching data..." : "No results"} />
     );
     if (explorerSettings.currentViewType == "row") return (

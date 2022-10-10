@@ -780,4 +780,10 @@ mount_root()
 
 if __name__ == "__main__":
     LOGGER.info(f"Launching server at {SERVER_HOST}:{SERVER_PORT}")
-    uvicorn.run(f"{__name__}:app", host=SERVER_HOST, port=int(SERVER_PORT), log_level="info", workers=1)
+    uvicorn.run(
+        f"{__name__}:app",
+        host=SERVER_HOST,
+        port=int(SERVER_PORT),
+        log_level="warning",
+        workers=1
+    )

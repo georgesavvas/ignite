@@ -102,7 +102,12 @@ export default function TaskManager() {
       };
       const ws = createProcessesSocket(config, resp, websocketConfig);
       clientRequest("get_tasks", {session_id: resp}).then(resp2 => {
-        setTasks(prevState => [...prevState, ...sortTasks(resp2.data)]);
+        setTasks(prevState => {
+          const incoming = resp2.data;
+          const incomingIds = incoming.map(t => t.id);
+          const existing = prevState.filter(t => !incomingIds.includes(t.id));
+          return sortTasks([...existing, ...incoming]);
+        });
       });
       if (!ws) return;
       setSocket(ws);

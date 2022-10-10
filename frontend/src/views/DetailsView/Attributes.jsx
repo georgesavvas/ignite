@@ -43,14 +43,8 @@ const getRowStyle = params => {
 
 const gridStyles = {
   "& .locked": {
-    "&. MuiDataGrid-cellContent": {
-      backgroundColor: "red"
-    },
-    backgroundColor: "rgb(30,30,30)"
+    backgroundColor: "rgb(81,81,81)"
   },
-  // "& .actions": {
-  //   backgroundColor: "rgb(30,30,30)"
-  // }
 };
 
 function Attributes(props) {
@@ -164,6 +158,7 @@ function Attributes(props) {
         <DataGrid
           sx={gridStyles}
           disableSelectionOnClick
+          hideFooter
           rows={data.attribs}
           columns={columns}
           isCellEditable={shouldBeEditable}
