@@ -28,6 +28,8 @@ import styles from "./Home.module.css";
 import Explorer from "../views/Explorer/Explorer";
 import LostConnectionOverlay from "./LostConnectionOverlay";
 import {ConfigContext} from "../contexts/ConfigContext";
+import Welcome from "./Welcome";
+import serverRequest from "../services/serverRequest";
 
 
 const splitterStyle = {
@@ -43,6 +45,7 @@ const defaultFlexRations = {
 
 export default function Home() {
   const [flexRatios, setFlexRatios] = useState(defaultFlexRations);
+  const [welcomeOpen, setWelcomeOpen] = useState(false);
   const [config] = useContext(ConfigContext);
 
   useEffect(() => {
@@ -67,6 +70,19 @@ export default function Home() {
     setFlexRatios(ratios);
   }, []);
 
+  useEffect(() => {
+    const noWelcome = localStorage.getItem("disable_welcome");
+    console.log("---", noWelcome);
+    if (noWelcome) return;
+    serverRequest("get_projects").then(resp => {
+      // if (resp.data) {
+      //   localStorage.setItem("disable_welcome", true);
+      //   return;
+      // }
+      setWelcomeOpen(true);
+    });
+  }, []);
+
   const handleResized = data => {
     saveReflexLayout(data);
   };
@@ -74,6 +90,7 @@ export default function Home() {
   return (
     <div className={styles.container}>
       {config.lostConnection ? <LostConnectionOverlay /> : null}
+      <Welcome open={welcomeOpen} />
       <div className={styles.topBar}>
         <TopBar />
         <Divider />

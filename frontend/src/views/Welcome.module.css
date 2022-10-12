@@ -1,0 +1,11 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.row {
+    margin-top: 20px;
+    display: flex;
+    gap: 5px;
+}

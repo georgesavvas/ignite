@@ -15,13 +15,27 @@
 
 import React from "react";
 
-import Modal from "../../components/Modal";
+import { Typography } from "@mui/material";
+
+import IgnButton from "../components/IgnButton";
+import Modal from "../components/Modal";
+import styles from "./Welcome.module.css";
+import IgnTextField from "../components/IgnTextField";
 
 
 const Welcome = props => {
   return (
-    <Modal open={props.open}>
-
+    <Modal open={props.open} maxWidth="sm">
+      <div className={styles.container}>
+        <Typography variant="h4">Welcome to Ignite!</Typography>
+        <div className={styles.section}>
+          <Typography></Typography>
+        </div>
+        <div className={styles.row}>
+          <IgnTextField label="Project Name" fullWidth />
+          <IgnButton color="ignite" style={{minWidth: "250px"}}>Create your first project</IgnButton>
+        </div>
+      </div>
     </Modal>
   );
 };
