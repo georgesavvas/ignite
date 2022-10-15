@@ -105,13 +105,16 @@ const Welcome = props => {
         <div className={styles.section}>
           <Typography variant="h5">Check the docs</Typography>
           <div className={styles.row}>
-            <Link
-              href="docs.ignitevfx.co.uk"
-              underline="none"
+            <Typography
+              onClick={
+                () => window.services.open_url("https://docs.ignitevfx.co.uk")
+              }
+              sx={{cursor: "pointer"}}
               color="rgb(252, 140, 3)"
+              variant="inherit"
             >
               docs.ignitevfx.co.uk
-            </Link>
+            </Typography>
           </div>
         </div>
         <Divider />
@@ -174,7 +177,9 @@ const Welcome = props => {
             <img
               src="media/discord.svg"
               className={styles.discord}
-              onClick={() => window.services.open_url("https://discord.gg/2HWQduERrJ")}
+              onClick={
+                () => window.services.open_url("https://discord.gg/2HWQduERrJ")
+              }
             />
           </div>
         </div>
