@@ -57,6 +57,9 @@ const General = () => {
     setCanSave(changed);
   }, [settings]);
 
+  const isServerLocal = settings.serverDetails.address &&
+    settings.serverDetails.address.startsWith("localhost");
+
   const handleServerDetailsChange = (field, value) => {
     setSettings(prevState => {
       const existing = {...prevState};
@@ -69,6 +72,9 @@ const General = () => {
     setSettings(prevState => {
       const existing = {...prevState};
       existing["access"][field] = value;
+      if (isServerLocal && field === "projectsDir") {
+        existing["access"]["serverProjectsDir"] = value;
+      }
       return existing;
     });
   };
@@ -78,9 +84,6 @@ const General = () => {
     setConfig("access", {...settings.access});
     setCanSave(false);
   };
-
-  const isServerLocal = settings.serverDetails.address &&
-    settings.serverDetails.address.startsWith("localhost");
 
   return (
     <div className={styles.container}>
@@ -119,6 +122,7 @@ const General = () => {
           label="Projects directory"
           size="small"
           fullWidth
+          directory
           disabled={settings.access.remote}
           value={settings.access.projectsDir || ""}
           onChange={value => handleAccessChange("projectsDir", value)}
@@ -130,6 +134,7 @@ const General = () => {
           label="Server projects directory"
           size="small"
           fullWidth
+          directory
           disabled={isServerLocal}
           value={settings.access.serverProjectsDir || ""}
           onChange={value => handleAccessChange("serverProjectsDir", value)}
