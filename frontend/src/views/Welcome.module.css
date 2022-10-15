@@ -5,7 +5,12 @@
 }
 
 .row {
-    margin-top: 20px;
+    margin-top: 15px;
     display: flex;
     gap: 5px;
+}
+
+.discord {
+    height: 50px;
+    cursor: pointer;
 }

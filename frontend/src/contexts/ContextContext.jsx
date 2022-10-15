@@ -57,6 +57,11 @@ export const ContextProvider = props => {
   }, [config.serverDetails]);
 
   useEffect(() => {
+    if (currentContext ?? true) return;
+    setCurrentContext(currentContext.project);
+  }, [config.access]);
+
+  useEffect(() => {
     if (!config.lostConnection) refresh();
   }, [config.lostConnection]);
 

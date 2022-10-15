@@ -46,7 +46,8 @@ export default function FileInput(props) {
   const style = { 
     display: "flex",
     alignItems: !props.multiline ? "center" : "flex-start",
-    gap: "5px"
+    gap: "5px",
+    flexGrow: 10
   };
 
   return (
@@ -64,11 +65,12 @@ export default function FileInput(props) {
       >
         ...
       </IgnButton>
+      {props.children}
       <input
         ref={hiddenFileInput}
         type="file"
-        webkitdirectory={props.directory ? "true" : undefined}
-        directory={props.directory ? "true" : undefined}
+        // webkitdirectory={props.directory ? "true" : undefined}
+        // directory={props.directory ? "true" : undefined}
         multiple={props.multiline}
         style={{display: "none"}}
         onChange={handleFileInput}

@@ -90,7 +90,7 @@ export default function Home() {
   return (
     <div className={styles.container}>
       {config.lostConnection ? <LostConnectionOverlay /> : null}
-      <Welcome open={welcomeOpen} />
+      <Welcome open={welcomeOpen} onClose={() => setWelcomeOpen(false)} />
       <div className={styles.topBar}>
         <TopBar />
         <Divider />
