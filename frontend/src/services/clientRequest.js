@@ -15,11 +15,11 @@
 
 async function clientRequest(method, data=undefined) {
   const address = await window.services.get_env("IGNITE_CLIENT_ADDRESS");
-  if (method !== "ping") console.log("Client request:", address, method, data);
   if (!address) {
-    console.log("Invalid client address, aborting...");
+    // console.log("Invalid client address, aborting...");
     return;
   }
+  if (method !== "ping") console.log("Client request:", address, method, data);
   return await request(address, method, data);
 }
 

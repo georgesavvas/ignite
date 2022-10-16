@@ -119,8 +119,6 @@ function Explorer() {
       path: BuildFileURL(currentContext.path, config, {reverse: true, pathOnly: true}),
       query: query
     };
-    console.log("----", config);
-    console.log("-----", currentContext);
     const method = methods[explorerSettings.currentResultType];
     setIsLoading(true);
     if (!Object.entries(config.access).length) return;
@@ -161,6 +159,10 @@ function Explorer() {
     }, {});
     setTiles(_tiles);
   }, [loadedData, selectedEntity.path, explorerSettings.currentViewType, explorerSettings.currentTileSize]);
+
+  useEffect(() => {
+    setPages((prevPages) => ({...prevPages, current: 1}));
+  }, [query, explorerSettings.tilesPerPage]);
 
   const handlePageChange = (e, value) => {
     setPages((prevPages) => ({...prevPages, current: value}));

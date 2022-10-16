@@ -67,6 +67,7 @@ def ensure_path(path):
         except Exception as e:
             LOGGER.error(e)
             return False
+    return True
 
 
 ensure_path(CONFIG["root"])
@@ -80,13 +81,15 @@ def set_projects_root(path):
     if path.as_posix() == CONFIG["root"].as_posix():
         return True
     if path.is_file():
+        LOGGER.error(f"New projects root {path} is pointing to a file...")
         return False
     ok = ensure_path(path)
     if not ok:
+        LOGGER.error(f"Failed to create new projects root {path}")
         return False
 
     config = get_config(False)
-    config["projects_root"] = path
+    config["projects_root"] = str(path)
     with open(SERVER_CONFIG_PATH, "w") as f:
         yaml.safe_dump(config, f)
 
@@ -170,7 +173,6 @@ def get_uri(path, version_override=None):
         if isinstance(version, str):
             version = int(version.replace("v", ""))
         uri += f"@{version}"
-    print("---", path, version, uri)
     return uri
 
 

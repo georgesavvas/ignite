@@ -127,7 +127,6 @@ const Welcome = props => {
               label="Projects directory"
               size="small"
               fullWidth
-              directory
               disabled={access.remote}
               value={access.projectsDir || ""}
               onChange={value => handleAccessChange("projectsDir", value)}

@@ -72,13 +72,12 @@ export default function Home() {
 
   useEffect(() => {
     const noWelcome = localStorage.getItem("disable_welcome");
-    console.log("---", noWelcome);
     if (noWelcome) return;
     serverRequest("get_projects").then(resp => {
-      // if (resp.data) {
-      //   localStorage.setItem("disable_welcome", true);
-      //   return;
-      // }
+      if (resp.data) {
+        localStorage.setItem("disable_welcome", true);
+        return;
+      }
       setWelcomeOpen(true);
     });
   }, []);

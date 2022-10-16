@@ -122,7 +122,6 @@ const General = () => {
           label="Projects directory"
           size="small"
           fullWidth
-          directory
           disabled={settings.access.remote}
           value={settings.access.projectsDir || ""}
           onChange={value => handleAccessChange("projectsDir", value)}
@@ -134,7 +133,6 @@ const General = () => {
           label="Server projects directory"
           size="small"
           fullWidth
-          directory
           disabled={isServerLocal}
           value={settings.access.serverProjectsDir || ""}
           onChange={value => handleAccessChange("serverProjectsDir", value)}

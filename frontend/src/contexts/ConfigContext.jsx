@@ -71,7 +71,7 @@ export const ConfigProvider = props => {
         },
         dccConfig: savedDccConfig,
         clientAddress: resp[1],
-        canWrite: true
+        write: false
       });
     });
   }, []);
@@ -86,6 +86,7 @@ export const ConfigProvider = props => {
           setConfig(prevState => {
             const prev = {...prevState};
             prev["lostConnection"] = true;
+            prev["write"] = false;
             return prev;
           });
           window.services.check_server();
@@ -97,6 +98,7 @@ export const ConfigProvider = props => {
           setConfig(prevState => {
             const prev = {...prevState};
             prev["lostConnection"] = false;
+            prev["write"] = false;
             return prev;
           });
         }
@@ -114,7 +116,7 @@ export const ConfigProvider = props => {
   }, [config.lostConnection]);
 
   useEffect(() => {
-    if (!config.canWrite) return;
+    if (!config.write) return;
     window.services.set_envs({
       IGNITE_SERVER_ADDRESS: config.serverDetails.address,
       IGNITE_SERVER_PASSWORD: config.serverDetails.password
@@ -163,30 +165,50 @@ export const ConfigProvider = props => {
   };
 
   const handleSetServerDetails = data => {
-    setConfig(prevState => ({...prevState, serverDetails: {...prevState.serverDetails, ...data}}));
+    setConfig(prevState => ({
+      ...prevState,
+      write: true,
+      serverDetails: {...prevState.serverDetails, ...data}
+    }));
   };
 
   const handleSetAccess = data => {
-    setConfig(prevState => ({...prevState, access: {...prevState.access, ...data}}));
+    setConfig(prevState => ({
+      ...prevState,
+      write: true,
+      access: {...prevState.access, ...data}
+    }));
   };
 
   const handleSetDccConfig = (data, operation="modify") => {
     switch (operation) {
     default: {
       setConfig(prevState => (
-        {...prevState, dccConfig: modifyDCCConfig(prevState.dccConfig, data)}
+        {
+          ...prevState,
+          write: true,
+          dccConfig: modifyDCCConfig(prevState.dccConfig, data)
+        }
       ));
       break;
     }
     case "add": {
       setConfig(prevState => (
-        {...prevState, dccConfig: addToDCCConfig(prevState.dccConfig, data)}
+        {
+          ...prevState,
+          write: true,
+          dccConfig: addToDCCConfig(prevState.dccConfig, data)
+        }
       ));
       break;
     }
     case "remove": {
       setConfig(prevState => (
-        {...prevState, dccConfig: removeFromDCCConfig(prevState.dccConfig, data)}
+        {
+          ...prevState,
+          write: true,
+          dccConfig: removeFromDCCConfig(prevState.dccConfig, data)
+        }
       ));
       break;
     }
