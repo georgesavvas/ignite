@@ -34,6 +34,7 @@
     "string-to-color": "^2.2.2",
     "three": "^0.139.2",
     "tree-kill": "^1.2.2",
+    "update-electron-app": "^2.0.1",
     "uuid4": "^2.0.3",
     "v8-compile-cache": "^2.3.0",
     "valtio": "^1.5.2",

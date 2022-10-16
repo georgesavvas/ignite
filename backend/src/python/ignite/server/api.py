@@ -78,7 +78,12 @@ def get_project(name):
     from ignite.server.entities.project import Project
     path = CONFIG["root"] / name
     if not Path(CONFIG["root"]).is_dir():
+        LOGGER.error(f"Invalid root {CONFIG['root']}")
         return None
+    # try:
+    #     return Project(path=path)
+    # except Exception as e:
+    #     LOGGER.error(e)
     return Project(path=path)
 
 

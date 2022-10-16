@@ -23,6 +23,7 @@ const getPort = require("get-port");
 const axios = require("axios");
 require("v8-compile-cache");
 const uuid4 = require("uuid4");
+require("update-electron-app")();
 // const osu = require("node-os-utils");
 
 const sessionID = uuid4();
@@ -342,8 +343,10 @@ app.whenReady().then(async () => {
   const contextMenu = Menu.buildFromTemplate([
     { label: "Show", click: () => window.show() },
     { label: "Exit", click: () => {
-      if (clientBackend) clientBackend.kill();
-      clientRequest(port, "quit");
+      if (!isDev) {
+        if (clientBackend) clientBackend.kill();
+        clientRequest(port, "quit");
+      }
       app.quit();
     } },
   ]);

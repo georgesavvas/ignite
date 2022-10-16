@@ -87,7 +87,8 @@ def set_config(data):
 
     new_projects_root = config["access"]["server_projects_root"]
     if new_projects_root != old_config["access"]["server_projects_root"]:
-        LOGGER.warning(f"Asking server to mount root {new_projects_root}")
+        LOGGER.warning("New projects root received.")
+        LOGGER.warning(f"Asking server to mount {new_projects_root}")
         server_request("set_projects_root", {"path": new_projects_root})
 
     config["root"] = config["access"].get("projects_root", "")

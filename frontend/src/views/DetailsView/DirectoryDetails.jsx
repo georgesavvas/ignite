@@ -37,7 +37,7 @@ const rowStyle = {
   display: "flex",
   alignItems: "center",
   gap: "10px",
-  marginTop: "5px"
+  marginTop: "10px"
 };
 
 function DirectoryDetails(props) {
@@ -74,7 +74,7 @@ function DirectoryDetails(props) {
           {reptEdit || !props.entity.repr ?
             <TextField
               size="small"
-              label="Get thumbnail from"
+              label="Get thumbnail from..."
               placeholder="Path or URI"
               fullWidth
               autoFocus={reptEdit && props.entity.repr && props.entity.repr !== null}

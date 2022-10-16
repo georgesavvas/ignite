@@ -123,7 +123,7 @@ async def get_project_tree(request: Request):
     project = api.get_project(result.get("project"))
     if not project:
         return error("entity_not_found")
-    data = project.get_project_tree() if project else {}
+    data = project.get_project_tree() or {}
     return {"ok": True, "data": data}
 
 
@@ -194,7 +194,7 @@ async def get_contents(request: Request):
         as_dict=True
     )
     data = utils.query_filter(data, query)
-    limit = result.get("limit", 20)
+    limit = int(result.get("limit", 20))
     total = len(data)
     print(f"{total} results")
     pages = int(math.ceil(total/limit))

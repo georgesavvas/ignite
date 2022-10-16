@@ -104,17 +104,21 @@ class Project(Directory):
                     name = x.name
                     _id[0] += 1
                     if name in (".config", "common"):
+                        LOGGER.debug(f"Skipping {x} - reserved name.")
                         continue
                     if name in anchors:
                         kind = kinds[name]
                         if kind in ("asset", "assetversion"):
+                            LOGGER.debug(f"Skipping {x} - is asset or av.")
                             continue
                         d["dir_kind"] = kind
                         d["anchor"] = x
                         continue
                     if name.startswith("."):
+                        LOGGER.debug(f"Skipping {x} - starts with period.")
                         continue
                     elif not d["dir_kind"]:
+                        LOGGER.debug(f"Skipping {x} - no anchor.")
                         return
                     if d["dir_kind"] == "task" and d["anchor"]:
                         with open(d["anchor"], "r") as f:
