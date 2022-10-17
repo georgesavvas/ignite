@@ -37,6 +37,7 @@ const RowView = props => {
           entity={params.value}
           noInfo
           noBorder
+          noOverlay
         />, [params.value]
       );
     case "assets":
@@ -46,6 +47,7 @@ const RowView = props => {
           entity={params.value}
           noInfo
           noBorder
+          noOverlay
         />, [params.value]
       );
     }

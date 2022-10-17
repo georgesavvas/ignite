@@ -66,7 +66,12 @@ export const ContextProvider = props => {
   }, [config.lostConnection]);
 
   async function handleContextChange(path) {
-    const path_processed = BuildFileURL(path, config, {reverse: true, pathOnly: true});
+    let path_processed = path;
+    if (!path_processed.startsWith("ign:")) path_processed = BuildFileURL(
+      path,
+      config,
+      {reverse: true, pathOnly: true}
+    );
     let success = false;
     const resp = await serverRequest("get_context_info", {path: path_processed});
     let data = resp.data;

@@ -28,13 +28,11 @@ import IgnTextField from "../../components/IgnTextField";
 export default function ContextBar() {
   const [currentContext, setCurrentContext] = useContext(ContextContext);
   const [contextPath, setContextPath] = useState("");
-  const [contextPathError, setContextPathError] = useState([false, ""]);
   const [isTextField, setIsTextField] = useState(false);
   const {enqueueSnackbar} = useSnackbar();
 
   useEffect(() => {
     if (currentContext.path !== undefined) {
-      setContextPathError([false, ""]);
       setContextPath(currentContext.path || "");
     }
   },[currentContext]);
@@ -42,7 +40,6 @@ export default function ContextBar() {
   const handlePathChange = value => {
     setCurrentContext(value).then((success => {
       if (!success) {
-        setContextPathError([true, "Not found"]);
         enqueueSnackbar("Path not found", {variant: "error"});
         setContextPath(currentContext.path);
       }
@@ -75,10 +72,9 @@ export default function ContextBar() {
       {isTextField ?
         <IgnTextField
           id="outlined-basic"
-          fullWidth={true}
+          fullWidth
           placeholder="Location"
           variant="outlined"
-          error={contextPathError[0]}
           value={contextPath}
           onChange={e => setContextPath(e.target.value)}
           onKeyPress={e => e.key === "Enter" ? handleBlur(e) : null}

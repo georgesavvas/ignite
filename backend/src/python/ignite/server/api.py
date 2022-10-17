@@ -92,6 +92,16 @@ def get_context_info(path):
         return {}
     kinds = list(KINDS.keys())
     path = Path(path)
+    exists = path.exists()
+    if not exists and utils.is_uri(path):
+        entity = find(path)
+        kind = entity.dir_kind
+        if kind == "assetversion":
+            path = entity.task
+        elif kind == "asset":
+            path = entity.path.parent
+        else:
+            path = entity.path
     if not path.exists():
         return {}
     if path.name in ("exports", "scenes") or path.is_file():
