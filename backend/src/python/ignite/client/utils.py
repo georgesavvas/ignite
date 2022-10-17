@@ -106,11 +106,13 @@ def set_config(data):
     return config, root_changed
 
 
-def replace_vars(d):
+def replace_vars(d, projects_root=None):
     vars = {
         "os": OS_NAME,
         "dcc": str(DCC),
-        "projects_root": server_request("get_projects_root").get("data", "")
+        "projects_root": (
+            projects_root or server_request("get_projects_root").get("data", "")
+        )
     }
     env = {}
     for k, v in d.items():
@@ -123,7 +125,7 @@ def replace_vars(d):
     return env
 
 
-def get_generic_env():
+def get_generic_env(projects_root=None):
     IGNITE_CLIENT_ADDRESS = ENV["IGNITE_CLIENT_ADDRESS"]
     env = {
         "IGNITE_SERVER_ADDRESS": IGNITE_SERVER_ADDRESS,
@@ -131,7 +133,7 @@ def get_generic_env():
         "IGNITE_TOOLS": ENV["IGNITE_TOOLS"],
         "IGNITE_API_VERSION": ENV["IGNITE_API_VERSION"]
     }
-    env.update(replace_vars(GENERIC_ENV))
+    env.update(replace_vars(GENERIC_ENV, projects_root=projects_root))
     return env
 
 
@@ -167,20 +169,21 @@ def get_scene_env(scene):
     return env
 
 
-def get_dcc_env(dcc):
+def get_dcc_env(dcc, projects_root=None):
     if not dcc in DCC_ENVS.keys():
         return {}
-    return replace_vars(DCC_ENVS[dcc])
+    return replace_vars(DCC_ENVS[dcc], projects_root=projects_root)
 
 
 def get_env(task="", dcc="", scene={}):
     # env = os.environ.copy()
+    projects_root = server_request("get_projects_root").get("data", "")
     env = {}
-    env.update(get_generic_env())
+    env.update(get_generic_env(projects_root))
     if task:
         env.update(get_task_env(task))
     if dcc:
-        env.update(get_dcc_env(dcc))
+        env.update(get_dcc_env(dcc, projects_root))
     if scene:
         env.update(get_scene_env(scene))
     env = {k: str(v) for k, v in env.items()}
@@ -374,7 +377,6 @@ def get_action_files():
 def discover_actions():
     actions = {}
     for entity, files in get_action_files().items():
-        print(entity, files)
         actions[entity] = []
         for file in files:
             if file.name == "__init__.py":

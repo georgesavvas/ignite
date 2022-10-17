@@ -105,8 +105,9 @@ function AssetTile(props) {
 
   return (
     <>
-      <Tile {...props} contextItems={contextItems} thumbnailWidth={thumbnailWidth}
+      <Tile {...props} contextItems={contextItems}
         thumbnail={hasThumbnail ? undefined : "media/no_icon_grey.png"}
+        thumbnailWidth={thumbnailWidth}
       >
         {details()}
       </Tile>

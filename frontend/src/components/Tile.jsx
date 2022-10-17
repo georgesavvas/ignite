@@ -28,6 +28,7 @@ export default function Tile(props) {
   const [progress, setProgress] = useState(0);
   const hoverArea = createRef();
   const ThumbComp = props.thumbnailComp;
+  const overlay = props.noOverlay === undefined ? true : !props.noOverlay;
 
   let isStatic = props.thumbnail !== undefined || ThumbComp;
   if (!isStatic && !props.entity.thumbnail.path.includes("####")) isStatic = true;
@@ -92,7 +93,7 @@ export default function Tile(props) {
         }
         <div className={styles.hoverArea} onMouseMove={isStatic ? null : handleMouseMove} ref={hoverArea}>
           <div className={styles.overlay}>
-            {!ThumbComp && thumbnailURL ?
+            {!ThumbComp && thumbnailURL && overlay ?
               <>
                 {props.noTopGradient ? null : <div className={styles.topGrad} />}
                 {props.noBottomGradient ? null : <div className={styles.bottomGrad} />}
