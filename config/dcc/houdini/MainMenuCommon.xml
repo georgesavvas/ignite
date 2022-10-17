@@ -1,37 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mainMenu>
 
-  <addScriptItem id="h.ignite_save">
+  <addScriptItem id="h.ign_save_next">
     <label>Save As Next Version (Ignite)</label>
     <parent>file_menu</parent>
     <insertBefore>h.save_as</insertBefore>
-    <scriptPath>C:\dev\ignite\cg\houdini\python\ign_save_next_version.py</scriptPath>
+    <scriptPath>$IGNITE_DCC/houdini/python/ign_save_next.py</scriptPath>
   </addScriptItem>
 
   <menuBar>
-    <subMenu id="ignite">
+    <subMenu id="ign">
       <label>Ignite</label>
 
       <actionItem id="h.save">
         <label>Save</label>
       </actionItem>
 
-      <scriptItem id="h.ignite_save">
+      <scriptItem id="h.ign_save_next">
         <label>Save As Next Version</label>
+        <scriptPath>$IGNITE_DCC/python/ign_save_next.py</scriptPath>
       </scriptItem>
 
       <separatorItem/>
 
-      <scriptItem id="h.ignite_comment">
+      <scriptItem id="h.ign_scene_comment">
         <label>Set Scene Comment</label>
+        <scriptPath>$IGNITE_DCC/python/ign_scene_comment.py</scriptPath>
       </scriptItem>
 
-      <scriptItem id="h.ignite_thumbnail">
+      <scriptItem id="h.ign_scene_thumbnail">
         <label>Set Scene Thumbnail</label>
+        <scriptPath>$IGNITE_DCC/python/ign_scene_thumbnail.py</scriptPath>
       </scriptItem>
 
-      <scriptItem id="h.ignite_preview">
+      <scriptItem id="h.ign_scene_preview">
         <label>Set Scene Preview</label>
+        <scriptPath>$IGNITE_DCC/python/ign_scene_preview.py</scriptPath>
       </scriptItem>
     </subMenu>
   </menuBar>
