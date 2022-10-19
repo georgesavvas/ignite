@@ -26,7 +26,7 @@ class Scene(Directory):
     def __init__(self, path="") -> None:
         self.dict_attrs = ["path", "project", "name", "group" ,"dcc", "extension",
             "version", "dir_kind", "scene", "context", "task", "version", "vsn", "tags",
-            "attributes", "creation_time", "modification_time"]
+            "attributes", "creation_time", "modification_time", "comment"]
         self.nr_attrs = ["path", "task", "scene"]
         self.project = ""
         self.group = ""
@@ -37,6 +37,7 @@ class Scene(Directory):
         self.tags = []
         self.dir_kind = "scene"
         self.dcc = ""
+        self.comment = ""
         self.version = ""
         self.vsn = 0
         self.path = path
@@ -108,6 +109,9 @@ class Scene(Directory):
         d = super().as_dict()
         d["exports"] = os.path.join(self.task, "exports")
         return d
+
+    def set_comment(self, comment):
+        self.comment = comment
 
     def next_version(self):
         version = int(self.version.lstrip("v"))

@@ -775,6 +775,16 @@ async def vault_export(request: Request):
     return {"ok": ok}
 
 
+@app.post("/api/v1/set_scene_comment")
+async def set_scene_comment(request: Request):
+    result = await request.json()
+    log_request(result)
+    path = result.get("path")
+    comment = result.get("comment")
+    ok = api.set_scene_comment(path, comment)
+    return {"ok": ok}
+
+
 mount_root()
 
 
