@@ -14,13 +14,10 @@
 
 
 import os
-import sys
 from pprint import pprint
 from pathlib import Path
-import uvicorn
 
-from fastapi import FastAPI, Request, WebSocket
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import APIRouter, Request, WebSocket
 from fastapi.staticfiles import StaticFiles
 
 from ignite.utils import get_logger
@@ -31,24 +28,18 @@ from ignite.client.utils import TASK_MANAGER, PROCESSES_MANAGER, CONFIG
 LOGGER = get_logger(__name__)
 ENV = os.environ
 
-app = FastAPI()
-origins = ["*"]
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+
+router = APIRouter(
+    prefix="/api/v1"
 )
 
-
-@app.on_event("startup")
+@router.on_event("startup")
 async def startup_event():
     TASK_MANAGER.start()
     TASK_MANAGER.restore_tasks()
 
 
-@app.websocket("/ws/processes/{session_id}")
+@router.websocket("/ws/processes/{session_id}")
 async def processes(websocket: WebSocket, session_id: str):
     if session_id:
         LOGGER.warning(f"Request to open socket from {session_id}")
@@ -76,21 +67,21 @@ def mount_root():
         LOGGER.warning(f"Projects root {projects_root} does not exist, skipping mounting...")
         return
     LOGGER.debug(f"Attempting to mount {projects_root}")
-    app.mount("/files", StaticFiles(directory=projects_root), name="projects_root")
+    router.mount("/files", StaticFiles(directory=projects_root), name="projects_root")
 
 
-@app.get("/api/v1/ping")
+@router.get("/ping")
 async def ping():
     return {"ok": True}
 
 
-@app.get("/api/v1/get_config")
+@router.get("/get_config")
 async def get_config():
     data = utils.get_config()
     return {"ok": True, "data": data}
 
 
-@app.post("/api/v1/set_config")
+@router.post("/set_config")
 async def set_config(request: Request):
     result = await request.json()
     log_request(result)
@@ -101,7 +92,7 @@ async def set_config(request: Request):
     return {"ok": True}
 
 
-@app.post("/api/v1/launch_dcc")
+@router.post("/launch_dcc")
 async def launch_dcc(request: Request):
     result = await request.json()
     log_request(result)
@@ -123,7 +114,7 @@ async def launch_dcc(request: Request):
     return {"ok": ok}
 
 
-@app.post("/api/v1/get_launch_cmd")
+@router.post("/get_launch_cmd")
 async def get_launch_cmd(request: Request):
     result = await request.json()
     log_request(result)
@@ -140,7 +131,7 @@ async def get_launch_cmd(request: Request):
     return {"ok": True, "data": data}
 
 
-@app.post("/api/v1/show_in_explorer")
+@router.post("/show_in_explorer")
 async def show_in_explorer(request: Request):
     result = await request.json()
     log_request(result)
@@ -151,7 +142,7 @@ async def show_in_explorer(request: Request):
     return {"ok": ok}
 
 
-@app.post("/api/v1/get_explorer_cmd")
+@router.post("/get_explorer_cmd")
 async def get_explorer_cmd(request: Request):
     result = await request.json()
     log_request(result)
@@ -162,7 +153,7 @@ async def get_explorer_cmd(request: Request):
     return {"ok": True, "data": data}
 
 
-@app.post("/api/v1/get_env")
+@router.post("/get_env")
 async def get_env(request: Request):
     result = await request.json()
     log_request(result)
@@ -172,7 +163,7 @@ async def get_env(request: Request):
     return {"ok": True, "data": env}
 
 
-@app.post("/api/v1/ingest_get_files")
+@router.post("/ingest_get_files")
 async def ingest_get_files(request: Request):
     result = await request.json()
     log_request(result)
@@ -181,7 +172,7 @@ async def ingest_get_files(request: Request):
     return {"ok": True, "data": resp}
 
 
-@app.post("/api/v1/ingest")
+@router.post("/ingest")
 async def ingest(request: Request):
     result = await request.json()
     log_request(result)
@@ -190,19 +181,19 @@ async def ingest(request: Request):
     return {"ok": True, "data": resp}
 
 
-@app.get("/api/v1/get_actions")
+@router.get("/get_actions")
 async def get_actions():
     data = api.get_actions()
     return {"ok": True, "data": data}
 
 
-@app.get("/api/v1/discover_dcc")
+@router.get("/discover_dcc")
 async def discover_dcc():
     data = utils.discover_dcc()
     return {"ok": True, "data": data}
 
 
-@app.post("/api/v1/run_action")
+@router.post("/run_action")
 async def run_action(request: Request):
     result = await request.json()
     log_request(result)
@@ -216,7 +207,7 @@ async def run_action(request: Request):
     return {"ok": True}
 
 
-@app.post("/api/v1/edit_task")
+@router.post("/edit_task")
 async def edit_task(request: Request):
     result = await request.json()
     log_request(result)
@@ -226,7 +217,7 @@ async def edit_task(request: Request):
     return {"ok": True}
 
 
-@app.post("/api/v1/get_tasks")
+@router.post("/get_tasks")
 async def get_tasks(request: Request):
     result = await request.json()
     log_request(result)
@@ -235,36 +226,13 @@ async def get_tasks(request: Request):
     return {"ok": True, "data": data}
 
 
-@app.get("/api/v1/is_local_server_running")
+@router.get("/is_local_server_running")
 async def is_local_server_running():
     data = api.is_local_server_running()
     return {"ok": data}
 
 
-@app.get("/api/v1/quit")
+@router.get("/quit")
 async def force_quit(request: Request):
     LOGGER.info("Asked to quit, cya!")
     os._exit(0)
-
-
-mount_root()
-
-if __name__ == "__main__":
-    host = "localhost"
-    port = 9071
-    inherited = ENV.get("IGNITE_CLIENT_ADDRESS")
-    if inherited:
-        _, port = inherited.split(":")
-        port = int(port)
-        LOGGER.info(f"Client port inherited from env.")
-    IGNITE_CLIENT_ADDRESS = f"{host}:{port}"
-    LOGGER.info(f"Setting IGNITE_CLIENT_ADDRESS to {IGNITE_CLIENT_ADDRESS}")
-    ENV["IGNITE_CLIENT_ADDRESS"] = IGNITE_CLIENT_ADDRESS
-    LOGGER.info(f"Launching server at {IGNITE_CLIENT_ADDRESS}")
-    uvicorn.run(
-        f"{__name__}:app",
-        host=host,
-        port=port,
-        log_level="warning",
-        workers=1
-    )
