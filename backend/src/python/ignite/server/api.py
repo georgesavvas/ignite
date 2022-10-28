@@ -384,6 +384,9 @@ def discover_tasks(path, task_types=[], sort=None, as_dict=False):
                     l.append(d)
         return l
 
+    if not path:
+        return []
+
     data = discover(Path(path))
     tasks = [Task(path=task["path"]) for task in data]
     if as_dict:

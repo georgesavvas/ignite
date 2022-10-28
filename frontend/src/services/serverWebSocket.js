@@ -15,6 +15,6 @@
 
 export function serverSocket(endpoint, config, sessionID) {
   const address = config.serverDetails.address;
-  const ws = new WebSocket(`ws://${address}/ws/${endpoint}/${sessionID}`);
+  const ws = new WebSocket(`ws://${address}/api/v1/ws/${endpoint}/${sessionID}`);
   return ws;
 }

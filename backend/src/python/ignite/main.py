@@ -51,6 +51,6 @@ if __name__ == "__main__":
         f"{__name__}:app",
         host=SERVER_HOST,
         port=int(SERVER_PORT),
-        log_level="debug",
+        # log_level="debug",
         workers=1
     )

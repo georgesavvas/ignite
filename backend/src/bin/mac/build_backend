@@ -1,2 +1,2 @@
-pyinstaller src/python/ignite/main.py --noconfirm --onefile --name=IgniteBackend --windowed --icon=../frontend/public/media/desktop_icon/mac/icon.icns
-cp -R dist/IgniteBackend.app ../frontend
+pyinstaller src/python/ignite/main.py --noconfirm --onefile --name=IgniteBackend --icon=../frontend/public/media/desktop_icon/mac/icon.icns
+cp dist/IgniteBackend ../frontend

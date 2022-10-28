@@ -61,7 +61,7 @@ console.log("platformName", platformName);
 
 const backendPaths = {
   "win32": "IgniteBackend.exe",
-  "darwin": "IgniteBackend.app",
+  "darwin": "IgniteBackend",
   "linux": "IgniteBackend"
 };
 const backendPathDev = "../backend/src/python/main.py";

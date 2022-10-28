@@ -19,50 +19,26 @@ import os
 import sys
 from pathlib import Path
 
-import uvicorn
 from fastapi import APIRouter, Request, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 
-from ignite.server import utils
+from ignite.server import api, utils
 from ignite.vault import api as vault_api
 from ignite.server.socket_manager import SocketManager
 from ignite.server.utils import CONFIG
 from ignite.utils import error, get_logger, log_request, process_request
-from ignite.client import utils, api
 from ignite.client.utils import TASK_MANAGER, PROCESSES_MANAGER, CONFIG
 
 LOGGER = get_logger(__name__)
 
 ASSET_UPDATES_MANAGER = SocketManager()
 
-from ignite.server import api
-
 
 router = APIRouter(
     prefix="/api/v1"
 )
-
-
-@router.on_event("startup")
-async def startup_event():
-    TASK_MANAGER.start()
-    TASK_MANAGER.restore_tasks()
-
-
-@router.websocket("/ws/processes/{session_id}")
-async def processes(websocket: WebSocket, session_id: str):
-    if session_id:
-        LOGGER.warning(f"Request to open socket from {session_id}")
-        await PROCESSES_MANAGER.connect(websocket, session_id)
-    while True:
-        try:
-            received = await websocket.receive_text()
-            await websocket.send_json({"data": TASK_MANAGER.report()})
-        except Exception as e:
-            print("error:", e)
-            break
 
 
 def mount_root():
