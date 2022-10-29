@@ -6,9 +6,9 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'My Site',
-  tagline: 'Dinosaurs are cool',
-  url: 'https://your-docusaurus-test-site.com',
+  title: "Ignite",
+  tagline: "Open Source VFX Pipeline",
+  url: "https://ignitevfx.co.uk",
   baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
@@ -16,8 +16,8 @@ const config = {
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'facebook', // Usually your GitHub org/user name.
-  projectName: 'docusaurus', // Usually your repo name.
+  organizationName: 'georgesavvas', // Usually your GitHub org/user name.
+  projectName: 'ignite', // Usually your repo name.
 
   // Even if you don't use internalization, you can use this field to set useful
   // metadata like html lang. For example, if your site is Chinese, you may want
@@ -36,15 +36,15 @@ const config = {
           sidebarPath: require.resolve('./sidebars.js'),
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-          editUrl:
-            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+          // editUrl:
+          //   'https://github.com/georgesavvas/ignite/tree/main/packages/',
         },
         blog: {
           showReadingTime: true,
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-          editUrl:
-            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+          // editUrl:
+          //   'https://github.com/georgesavvas/ignite/tree/main/packages/',
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
@@ -57,21 +57,22 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       navbar: {
-        title: 'My Site',
+        title: 'Ignite',
         logo: {
-          alt: 'My Site Logo',
-          src: 'img/logo.svg',
+          alt: 'Ignite Logo',
+          src: 'img/ignite_logo.png',
+          href: 'https://ignitevfx.co.uk'
         },
+        hideOnScroll: true,
         items: [
           {
             type: 'doc',
-            docId: 'intro',
+            docId: 'installation',
             position: 'left',
-            label: 'Tutorial',
+            label: 'Docs',
           },
-          {to: '/blog', label: 'Blog', position: 'left'},
           {
-            href: 'https://github.com/facebook/docusaurus',
+            href: 'https://github.com/georgesavvas/ignite',
             label: 'GitHub',
             position: 'right',
           },
@@ -79,48 +80,45 @@ const config = {
       },
       footer: {
         style: 'dark',
-        links: [
-          {
-            title: 'Docs',
-            items: [
-              {
-                label: 'Tutorial',
-                to: '/docs/intro',
-              },
-            ],
-          },
-          {
-            title: 'Community',
-            items: [
-              {
-                label: 'Stack Overflow',
-                href: 'https://stackoverflow.com/questions/tagged/docusaurus',
-              },
-              {
-                label: 'Discord',
-                href: 'https://discordapp.com/invite/docusaurus',
-              },
-              {
-                label: 'Twitter',
-                href: 'https://twitter.com/docusaurus',
-              },
-            ],
-          },
-          {
-            title: 'More',
-            items: [
-              {
-                label: 'Blog',
-                to: '/blog',
-              },
-              {
-                label: 'GitHub',
-                href: 'https://github.com/facebook/docusaurus',
-              },
-            ],
-          },
-        ],
-        copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
+        // links: [
+        //   {
+        //     title: 'Docs',
+        //     items: [
+        //       {
+        //         label: 'Docs',
+        //         to: '/docs/installation',
+        //       },
+        //     ],
+        //   },
+        //   {
+        //     title: 'Community',
+        //     items: [
+        //       {
+        //         label: 'Discord',
+        //         href: 'https://discordapp.com/invite/docusaurus',
+        //       }
+        //     ],
+        //   },
+        //   {
+        //     title: 'More',
+        //     items: [
+        //       {
+        //         label: 'Blog',
+        //         to: '/blog',
+        //       },
+        //       {
+        //         label: 'GitHub',
+        //         href: 'https://github.com/georgesavvas/ignite',
+        //       },
+        //     ],
+        //   },
+        // ],
+        copyright: `Copyright © ${new Date().getFullYear()} Ignite, George Savvas`,
+      },
+      colorMode: {
+        defaultMode: 'dark',
+        disableSwitch: true,
+        respectPrefersColorScheme: false,
       },
       prism: {
         theme: lightCodeTheme,
