@@ -85,7 +85,7 @@ export default function TaskManager() {
   const [filterValue, setFilterValue] = useState("");
 
   useEffect(() => {
-    if (!config.serverDetails.address) return;
+    if (!config.clientAddress) return;
     if (socket) return;
     window.services.get_env("IGNITE_SESSION_ID").then(resp => {
       const websocketConfig = {
@@ -117,7 +117,7 @@ export default function TaskManager() {
       destroySocket(socket);
       setSocket();
     });
-  }, [config.serverDetails]);
+  }, [config.clientAddress]);
 
   useEffect(() => {
     if (!autoClear) return;

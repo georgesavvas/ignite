@@ -14,10 +14,12 @@
 
 
 import os
+from pathlib import Path
 
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from platformdirs import user_data_dir
 
 from ignite.server import router as server_router
 from ignite.client import router as client_router
@@ -46,6 +48,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+path = Path.home() / ".ignite"
+path.mkdir(parents=True, exist_ok=True)
+port_file = path / "ignite.port"
+pid_file = path / "ignite.pid"
+if port_file.exists() or pid_file.exists():
+    LOGGER.warning(f"Last shutdown was not clean")
+port_file.write_text(SERVER_PORT)
+pid_file.write_text(str(os.getpid()))
+
+@app.on_event("shutdown")
+def shutdown_event():
+    LOGGER.info(f"Cleaning up...")
+    port_file.unlink()
+    pid_file.unlink()
 
 if __name__ == "__main__":
     LOGGER.info(f"Launching server at {SERVER_HOST}:{SERVER_PORT}")

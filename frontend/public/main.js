@@ -16,7 +16,7 @@
 
 const {app, BrowserWindow, protocol, ipcMain, dialog, Tray, Menu, shell} = require("electron");
 const os = require("os");
-const fs = require("fs").promises;
+const fs = require("fs");
 const path = require("path");
 const {spawn} = require("child_process");
 const getPort = require("get-port");
@@ -28,7 +28,11 @@ require("update-electron-app")();
 
 const sessionID = uuid4();
 let appPath = app.getAppPath();
-if (appPath.endsWith("app.asar")) appPath = path.dirname(app.getPath("exe"));
+if (appPath.endsWith("app.asar")) {
+  appPath = path.dirname(app.getPath("exe"));
+  appPath = path.join(appPath, "..");
+}
+console.log("appPath:", appPath);
 process.env.IGNITE_SESSION_ID = sessionID;
 let platformName = process.platform;
 let appQuitting = false;
@@ -36,6 +40,7 @@ let tray = null;
 let window = null;
 let backend = null;
 let backendLock = true;
+let port = -1;
 const isDev = process.env.NODE_ENV === "dev";
 const public = path.join(__dirname, "..", isDev ? "public" : "build");
 
@@ -57,8 +62,6 @@ const iconPaths = {
   "linux": "media/desktop_icon/linux/icon.png"
 };
 
-console.log("platformName", platformName);
-
 const backendPaths = {
   "win32": "IgniteBackend.exe",
   "darwin": "IgniteBackend",
@@ -71,13 +74,8 @@ const backendPath = path.join(
     backendPathDev :
     backendPaths[platformName]
 );
-console.log("clientPath", backendPath);
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-async function clientRequest(port, method, data=undefined) {
+async function clientRequest(method, data=undefined) {
   console.log(`http://localhost:${port}/api/v1/${method}`);
   try {
     const resp = await axios({
@@ -104,47 +102,66 @@ function launchBackend() {
   console.log("Launching backend...", backendCmd);
   return spawn(backendCmd, {
     shell: true,
-    stdio: "pipe",
+    // stdio: "pipe",
     env: {IGNITE_CLIENT_ADDRESS: process.env.IGNITE_CLIENT_ADDRESS}
   });
 }
 
-async function waitForBackend(port) {
-  let ok = false;
-  while (!ok) {
-    await sleep(1000);
-    clientRequest(port, "ping").then(resp => {
-      if (resp) {
-        console.log("Client is up!");
-        ok = true;
-        return;
-      } else console.log("Backend not running, waiting...");
+function isPidAlive(pid) {
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
+
+async function checkBackend() {
+  if (isDev) {
+    process.env.IGNITE_CLIENT_ADDRESS = "localhost:9070";
+    return;
+  }
+  let shouldLaunch = true;
+  const configPath = path.join(os.homedir(), ".ignite");
+  let existing_port = -1;
+  let existing_pid = -1;
+  try {
+    existing_pid = fs.readFileSync(path.join(configPath, "ignite.pid"), "utf8");
+  } catch (err) {
+    console.error(err);
+  }
+  if (existing_pid >= 0 && isPidAlive(existing_pid)) {
+    try {
+      existing_port = fs.readFileSync(path.join(configPath, "ignite.port"), "utf8");
+    // eslint-disable-next-line no-empty
+    } catch (err) { }
+  }
+  if (existing_port >= 0) {
+    console.log(`Found existing backend running at port ${existing_port}`);
+    clientRequest(existing_port, "ping").then(resp => {
+      if (resp && resp.ok) {
+        console.log("Successfully connected to existing backend");
+        port = existing_port;
+        process.env.IGNITE_CLIENT_ADDRESS = `localhost:${port}`;
+        shouldLaunch = false;
+      } else {
+        console.log("Existing backend not responding, relaunching...");
+      }
     });
   }
-  return true;
-}
-
-async function checkBackend(port, attempt=0) {
-  backendLock = true;
-  clientRequest(port, "ping").then(resp => {
-    if (resp && resp.ok) {
-      console.log(`Check backend - all good! (attempt ${attempt})`);
-      backendLock = false;
-      return true;
-    }
-    console.log(`Check backend - not responding... (attempt ${attempt})`);
-    if (attempt == 3 && !isDev) {
-      backend = launchBackend();
-      return true;
-    } else setTimeout(checkBackend, 3000, port, attempt += 1);
+  if (!shouldLaunch) return;
+  port = await getPort({
+    port: getPort.makeRange(9070, 9999)
   });
+  process.env.IGNITE_CLIENT_ADDRESS = `localhost:${port}`;
+  backend = launchBackend();
 }
 
-function createWindow (port) {
+function createWindow (show=true) {
   const win = new BrowserWindow({
     width: 1280,
     height: 720,
-    show: false,
+    show: show,
     icon: path.join(__dirname, iconPaths[platformName]),
     backgroundColor: "#141414",
     webPreferences: {
@@ -172,7 +189,7 @@ function createWindow (port) {
 
   ipcMain.handle("store_data", async (e, filename, data) => {
     const filepath = path.join(os.homedir(), ".ignite", filename);
-    fs.writeFile(filepath, data, (err) => {
+    fs.promises.writeFile(filepath, data, (err) => {
       if (err) throw err;
       else return true;
     });
@@ -180,7 +197,7 @@ function createWindow (port) {
 
   ipcMain.handle("load_data", async (e, filename) => {
     const filepath = path.join(os.homedir(), ".ignite", filename);
-    fs.readFile(filepath, (err) => {
+    fs.promises.readFile(filepath, (err) => {
       if (err) throw err;
       return true;
     });
@@ -193,7 +210,7 @@ function createWindow (port) {
   ipcMain.handle("check_path", async (e, filepath) => {
     let valid = true;
     try {
-      await fs.access(filepath);
+      await fs.promises.access(filepath);
     } catch (err) {
       valid = false;
     }
@@ -209,18 +226,21 @@ function createWindow (port) {
   });
 
   ipcMain.handle("get_env", (e, env_name) => {
+    // console.log(env_name, process.env[env_name]);
     return process.env[env_name];
   });
 
   ipcMain.handle("set_env", (e, env_name, env_value) => {
+    const prev = process.env[env_name];
+    // console.log("Setting", env_name, "from", prev, "to", env_value);
     process.env[env_name] = env_value;
-    console.log("Setting", env_name, "to", env_value, "->", process.env[env_name]);
   });
 
   ipcMain.handle("set_envs", (e, data) => {
     for (const [env_name, env_value] of Object.entries(data)) {
+      const prev = process.env[env_name];
+      // console.log("Setting", env_name, "from", prev, "to", env_value);
       process.env[env_name] = env_value;
-      console.log("Setting", env_name, "to", env_value, "->", process.env[env_name]);
     }
   });
 
@@ -251,15 +271,9 @@ function createSplash () {
 }
 
 app.whenReady().then(async () => {
+  checkBackend();
   const splash = createSplash();
-
-  const port = await getPort({
-    port: getPort.makeRange(9070, 9999)
-  });
-
-  process.env.IGNITE_CLIENT_ADDRESS = `localhost:${port}`;
-
-  window = createWindow(port);
+  window = createWindow(false);
 
   window.webContents.once("did-finish-load", () => {
     splash.destroy();
@@ -276,20 +290,15 @@ app.whenReady().then(async () => {
     return checkBackend(port);
   });
 
-  if (!isDev) {
-    backend = launchBackend();
-    backendLock = true;
-    setTimeout(() => checkBackend(port), 5000);
-  }
-
   if (tray === null) tray = new Tray(`${public}/media/icon.png`);
   const contextMenu = Menu.buildFromTemplate([
     { label: "Show", click: () => window.show() },
     { label: "Exit", click: () => {
       if (!isDev) {
+        console.log("BYE!!!!!!");
         if (backend) backend.kill();
         clientRequest(port, "quit");
-      }
+      } else console.log("not bye!");
       app.quit();
     } },
   ]);
@@ -298,6 +307,7 @@ app.whenReady().then(async () => {
   tray.on("click", () => window.show());
   tray.on("double-click", () => window.show());
 });
+
 app.on("ready", async () => {
   const protocolName = "ign";
   protocol.registerFileProtocol(protocolName, (request, callback) => {

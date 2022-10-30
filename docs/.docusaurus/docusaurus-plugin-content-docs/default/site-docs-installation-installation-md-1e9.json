@@ -1,0 +1,24 @@
+{
+  "unversionedId": "installation/installation",
+  "id": "installation/installation",
+  "title": "Installation",
+  "description": "Setting up ignite on a single workstation",
+  "source": "@site/docs/installation/installation.md",
+  "sourceDirName": "installation",
+  "slug": "/installation/",
+  "permalink": "/docs/installation/",
+  "draft": false,
+  "editUrl": "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/docs/installation/installation.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Tutorial Intro",
+    "permalink": "/docs/intro"
+  },
+  "next": {
+    "title": "Installation",
+    "permalink": "/docs/installation"
+  }
+}

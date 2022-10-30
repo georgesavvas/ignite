@@ -103,7 +103,10 @@ class TaskManager():
     def start(self):
         self.loop = asyncio.new_event_loop()
         self.thread = threading.Thread(
-            target=start_worker, args=(self.loop,), daemon=True
+            name="IgniteWorker",
+            target=start_worker,
+            args=(self.loop,),
+            daemon=True
         )
         self.thread.start()
 

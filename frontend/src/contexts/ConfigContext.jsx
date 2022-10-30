@@ -47,9 +47,11 @@ export const ConfigProvider = props => {
   );
 
   useEffect(() => {
+    if (config.lostConnection) return;
     const clientData = clientRequest("get_config");
     const clientAddress = window.services.get_env("IGNITE_CLIENT_ADDRESS");
     Promise.all([clientData, clientAddress]).then(resp => {
+      if (!resp[0]) return;
       const clientDataResults = resp[0].data;
       console.log("Config received:", clientDataResults);
       const savedServerDetails = clientDataResults.server_details;
@@ -74,7 +76,7 @@ export const ConfigProvider = props => {
         write: false
       });
     });
-  }, []);
+  }, [config.lostConnection]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -89,7 +91,6 @@ export const ConfigProvider = props => {
             prev["write"] = false;
             return prev;
           });
-          window.services.check_server();
         }
         else {
           if (!config.lostConnection) return;
@@ -104,9 +105,10 @@ export const ConfigProvider = props => {
         }
       });
       clientRequest("ping").then(resp => {
-        if (!resp.ok) {
+        if (!resp || !resp.ok) {
+          if (config.lostConnection) return;
           console.log("Lost connection to client...");
-          window.services.check_client();
+          window.services.check_backend();
         }
       });
     }, 3000);

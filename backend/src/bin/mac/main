@@ -1,7 +1,10 @@
 #!/bin/bash
 
-lsof -P | grep ':9071' | awk '{print $2}' | xargs kill -9
-cd $0/../..;
-source env/bin/activate;
+echo "Killing processes listening on 9070...";
+lsof -P | grep ':9070' | awk '{print $2}' | xargs kill -9
+parent_path=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
+cd "$parent_path"
+cd ../../..
+source env/bin/activate
 cd src/python
-python3 -m ignite.main;
+python3 -m ignite.main

@@ -1,0 +1,48 @@
+{
+  "docusaurus-plugin-content-docs": {
+    "default": {
+      "path": "/docs",
+      "versions": [
+        {
+          "name": "current",
+          "label": "Next",
+          "isLast": true,
+          "path": "/docs",
+          "mainDocId": "installation",
+          "docs": [
+            {
+              "id": "getting_started/creating_project",
+              "path": "/docs/getting_started/creating_project",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "getting_started/index",
+              "path": "/docs/getting_started/",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "getting_started/launching_software",
+              "path": "/docs/getting_started/launching_software",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "installation",
+              "path": "/docs/installation",
+              "sidebar": "tutorialSidebar"
+            }
+          ],
+          "draftIds": [],
+          "sidebars": {
+            "tutorialSidebar": {
+              "link": {
+                "path": "/docs/installation",
+                "label": "installation"
+              }
+            }
+          }
+        }
+      ],
+      "breadcrumbs": true
+    }
+  }
+}
