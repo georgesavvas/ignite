@@ -835,3 +835,18 @@ def vault_export(source, task_path, name):
             shutil.copy2(source_asset_anchor, dest_asset)
     shutil.copytree(source, dest)
     return True
+
+
+def set_scene_comment(path, text):
+    from ignite.server.entities.scene import Scene
+    path = Path(path)
+    if not path.exists():
+        LOGGER.error(f"Failed to set comment to {path} cause it doesn't exist.")
+        return
+    if path.is_file():
+        path = path.parent
+    scene = Scene(path)
+    if not scene:
+        return
+    scene.set_comment(text)
+    return True

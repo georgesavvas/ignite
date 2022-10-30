@@ -26,10 +26,12 @@ from ignite.server.utils import CONFIG
 from ignite.utils import error, get_logger
 from ignite.client.utils import CONFIG
 
+
 LOGGER = get_logger(__name__)
 SERVER_HOST = "0.0.0.0"
 _, SERVER_PORT = CONFIG["server_details"].get("address", ":").split(":")
 ENV = os.environ
+ENV["IGNITE_ADDRESS"] = f"{SERVER_HOST}:{SERVER_PORT}"
 
 ASSET_UPDATES_MANAGER = SocketManager()
 

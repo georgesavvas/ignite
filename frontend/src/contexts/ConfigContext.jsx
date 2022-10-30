@@ -79,7 +79,7 @@ export const ConfigProvider = props => {
   useEffect(() => {
     const interval = setInterval(() => {
       serverRequest("ping").then(resp => {
-        if (!resp.ok) {
+        if (!resp || !resp.ok) {
           if (config.lostConnection) return;
           console.log("Lost connection to server...");
           enqueueSnackbar("Lost connection to server...", {variant: "error"});

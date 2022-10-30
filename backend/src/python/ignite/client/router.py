@@ -21,8 +21,10 @@ from fastapi import APIRouter, Request, WebSocket
 from fastapi.staticfiles import StaticFiles
 
 from ignite.utils import get_logger
+from ignite.server import api as server_api
 from ignite.client import utils, api
 from ignite.client.utils import TASK_MANAGER, PROCESSES_MANAGER, CONFIG
+from ignite.client.utils import is_server_local
 
 
 LOGGER = get_logger(__name__)
@@ -106,7 +108,10 @@ async def launch_dcc(request: Request):
             "task": task,
             "dcc": dcc
         }
-        resp = utils.server_request("copy_default_scene", data)
+        if is_server_local():
+            resp = server_api.copy_default_scene(task, dcc)
+        else:
+            resp = utils.server_request("copy_default_scene", data)
         scene = resp.get("scene", "")
     elif new_scene and not task:
         return {"ok": False}

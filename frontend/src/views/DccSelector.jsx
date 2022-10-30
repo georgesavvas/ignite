@@ -116,7 +116,7 @@ function DccSelector(props) {
   dccConfigSorted.sort((a, b) => a.name.localeCompare(b.name));
 
   return (
-    <div className={styles.container} {...props}>
+    <div className={styles.container} style={props.style}>
       <div className={styles.topBar}>
         <Typography variant="h5">
           Scene Launcher

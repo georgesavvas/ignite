@@ -66,6 +66,7 @@ export const ContextProvider = props => {
   }, [config.lostConnection]);
 
   async function handleContextChange(path) {
+    if (!path) return false;
     let path_processed = path;
     if (!path_processed.startsWith("ign:")) path_processed = BuildFileURL(
       path,

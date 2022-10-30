@@ -99,6 +99,7 @@ class Scene(Directory):
         self.task = path=path.parent.parent
         self.dcc = ext_dcc.get(ext, "")
         self.context = self.get_context()
+        self.load_from_config()
     
     def is_valid(self):
         if not self.task or not self.version or not self.task or not self.extension:
@@ -112,6 +113,7 @@ class Scene(Directory):
 
     def set_comment(self, comment):
         self.comment = comment
+        self.update_config({"comment": comment})
 
     def next_version(self):
         version = int(self.version.lstrip("v"))
