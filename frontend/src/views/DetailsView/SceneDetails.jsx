@@ -35,7 +35,9 @@ function SceneDetails(props) {
         <Divider style={{margin: "20px 0 20px 0"}} />
         <Typography variant="h5">Scene Details ({props.entity.dcc})</Typography>
         {props.entity.comment ?
-          <Typography variant="body1">Comment: {props.entity.comment}</Typography>
+          <Typography variant="body1">
+            Comment: {props.entity.comment}
+          </Typography>
           : null
         }
         <Path path={props.entity.path} />

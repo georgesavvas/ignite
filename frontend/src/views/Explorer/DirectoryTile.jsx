@@ -114,6 +114,12 @@ function DirectoryTile(props) {
 
   const name = isScene ? props.entity.dcc : props.entity.name;
 
+  let icon = undefined;
+  if (!props.entity.thumbnail) {
+    icon = props.entity.icon && props.entity.icon in DIRECTORYICONS ?
+      DIRECTORYICONS[props.entity.icon] : undefined;
+  }
+
   function details() {
     return (
       <>
@@ -126,18 +132,27 @@ function DirectoryTile(props) {
         <Typography style={{position: "absolute", bottom: "5px", right: "10px"}}>
           {props.entity.version}
         </Typography>
+        {props.entity.thumbnail ?
+          <img
+            src={thumbnailPath()}
+            style={{
+              position: "absolute",
+              top: "10px",
+              right: "10px",
+              height: "25px",
+              width: "25px",
+              borderRadius: "2px"
+
+            }}
+          />
+          : null
+        }
       </>
     );
   }
 
   let contextItems = getGenericContextItems(props.entity);
   contextItems = contextItems.concat(getSpecificContextItems(props.entity));
-
-  let icon = undefined;
-  if (!props.entity.thumbnail) {
-    icon = props.entity.icon && props.entity.icon in DIRECTORYICONS ?
-      DIRECTORYICONS[props.entity.icon] : undefined;
-  }
 
   return (
     <>

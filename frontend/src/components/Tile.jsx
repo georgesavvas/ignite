@@ -64,8 +64,12 @@ export default function Tile(props) {
     const hasThumbnail = thumbnail && (thumbnail !== {} || thumbnail.path === "");
     let thumbnailPath = thumbnail.path;
     if (hasThumbnail && !thumbnail.static) {
-      let frame = thumbnail.first_frame + (thumbnail.last_frame - thumbnail.first_frame) * progress;
-      frame = clamp(Math.round(frame), thumbnail.first_frame, thumbnail.last_frame);
+      const amount = thumbnail.frames.length;
+      const sectionSize = 1 / amount;
+      const section = clamp(Math.floor(progress / sectionSize), 0, amount);
+      const frame = thumbnail.frames[section];
+      // let frame = thumbnail.first_frame + (thumbnail.last_frame - thumbnail.first_frame) * progress;
+      // frame = clamp(Math.round(frame), thumbnail.first_frame, thumbnail.last_frame);
       thumbnailPath = thumbnailPath.replace("####", frame);
     }
     if (!hasThumbnail) return "";
