@@ -15,12 +15,10 @@
 
 import os
 from pprint import pprint
-from pathlib import Path
 
 from fastapi import APIRouter, Request, WebSocket
-from fastapi.staticfiles import StaticFiles
 
-from ignite.utils import get_logger
+from ignite.utils import get_logger, mount_root
 from ignite.server import api as server_api
 from ignite.client import utils, api
 from ignite.client.utils import TASK_MANAGER, PROCESSES_MANAGER, CONFIG
@@ -63,15 +61,6 @@ def error(s):
     return {"ok": False, "error": s}
 
 
-def mount_root():
-    projects_root = CONFIG["root"]
-    if not projects_root or not Path(projects_root).is_dir():
-        LOGGER.warning(f"Projects root {projects_root} does not exist, skipping mounting...")
-        return
-    LOGGER.debug(f"Attempting to mount {projects_root}")
-    router.mount("/files", StaticFiles(directory=projects_root), name="projects_root")
-
-
 @router.get("/ping")
 async def ping():
     return {"ok": True}
@@ -90,7 +79,7 @@ async def set_config(request: Request):
     data = result.get("data", {})
     CONFIG, mount = utils.set_config(data)
     if mount:
-        mount_root()
+        mount_root(router, CONFIG)
     return {"ok": True}
 
 
@@ -126,13 +115,12 @@ async def get_launch_cmd(request: Request):
     task = result.get("task", "")
     scene = result.get("scene", "")
     dcc = result.get("dcc", "")
-    dcc_name = result.get("dcc_name", "")
     new_scene = result.get("new_scene", False)
     if new_scene and task:
         scene = utils.copy_default_scene(task, dcc)
     elif new_scene and not task:
         return {"ok": False}
-    data = utils.get_launch_cmd(dcc, dcc_name, task, scene)
+    data = utils.get_launch_cmd(dcc, task, scene)
     return {"ok": True, "data": data}
 
 

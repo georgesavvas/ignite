@@ -97,8 +97,8 @@ function Browser(props) {
     display: "grid",
     overflowY: "auto",
     gridTemplateColumns: `repeat(auto-fill, minmax(${tileSize}px, 1fr))`,
-    gridGap: "10px",
-    padding: "10px",
+    gridGap: "5px",
+    padding: "5px",
     paddingTop: "5px"
   };
 

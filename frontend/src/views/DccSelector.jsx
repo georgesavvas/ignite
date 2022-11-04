@@ -92,16 +92,16 @@ function DccSelector(props) {
   async function handleLaunchClick() {
     setIsLoading(true);
     const dcc = getDcc();
-    const dcc_name = getDccName(dcc.path);
+    // const dcc_name = getDccName(dcc.path);
     const data = {
-      dcc: dcc_name,
-      dcc_name: dcc.name,
+      dcc: dcc,
       scene: props.scene,
       new_scene: props.newScene,
       task: props.task
     };
     const ok = await clientRequest("get_launch_cmd", data).then(resp => {
       const data = resp.data;
+      if (!data || data === null) return false;
       return window.api.launch_dcc(data.cmd, data.args, data.env);
     });
 

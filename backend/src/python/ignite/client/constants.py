@@ -11,7 +11,7 @@ DCC_ENVS = {
         "HOUDINI_PATH": "{dcc}/houdini;&",
         "HOUDINI_MENU_PATH": "{dcc}/houdini;&",
         "HOUDINI_OTLSCAN_PATH": "&;{dcc}/houdini/otls",
-        "PXR_PLUGINPATH_NAME": "{dcc}/houdini/dso/19.5/{os}/resources"
+        "PXR_PLUGINPATH_NAME": "{dcc}/houdini/dso/{version}/{os}/resources"
     }
 }
 
@@ -20,11 +20,13 @@ DCC_LOCATIONS = {
     "houdini": ""
 }
 
+
 OS_NAMES = {
     "Windows": "win",
     "Darwin": "darwin",
     "Linux": "linux"
 }
+
 
 DCC_DISCOVERY = {
     "houdinifx": {
@@ -262,3 +264,14 @@ DCC_DISCOVERY = {
         }
     }
 }
+
+
+DCC_VERSIONS = [
+    {
+        "name": "houdini",
+        "versions": {
+            "19.5": ["19.5."],
+            "19.0": ["19.0."]
+        }
+    }
+]

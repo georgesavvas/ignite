@@ -24,9 +24,8 @@ from platformdirs import user_data_dir
 from ignite.server import router as server_router
 from ignite.client import router as client_router
 from ignite.server.socket_manager import SocketManager
-from ignite.server.utils import CONFIG
-from ignite.utils import error, get_logger
 from ignite.client.utils import CONFIG
+from ignite.utils import get_logger, mount_root
 
 
 LOGGER = get_logger(__name__)
@@ -57,6 +56,10 @@ if port_file.exists() or pid_file.exists():
 port_file.write_text(SERVER_PORT)
 pid_file.write_text(str(os.getpid()))
 
+@app.on_event("startup")
+def startup_event():
+    mount_root(app, CONFIG)
+
 @app.on_event("shutdown")
 def shutdown_event():
     LOGGER.info(f"Cleaning up...")
@@ -69,6 +72,6 @@ if __name__ == "__main__":
         f"{__name__}:app",
         host=SERVER_HOST,
         port=int(SERVER_PORT),
-        # log_level="debug",
+        log_level="info",
         workers=1
     )

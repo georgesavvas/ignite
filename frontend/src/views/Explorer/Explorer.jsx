@@ -17,6 +17,7 @@ import React, {useEffect, useState, useContext} from "react";
 
 import Divider from "@mui/material/Divider";
 import debounce from "lodash.debounce";
+import Typography from "@mui/material/Typography";
 import LinearProgress from "@mui/material/LinearProgress";
 import {useSnackbar} from "notistack";
 
@@ -76,7 +77,7 @@ function Explorer() {
   const [isLoading, setIsLoading] = useState(true);
   const [loadedData, setLoadedData] = useState([]);
   const [pages, setPages] = useState({total: 1, current: 1});
-  const [query, setQuery] = useState({latest: 1, sort: {field: "name", reverse: false}});
+  const [query, setQuery] = useState({latest: 1, sort: {field: "date", reverse: true, label: "Date (Newest first)"}});
   const [explorerSettings, setExplorerSettings] = useState(defaultExplorerSettings);
   const [tiles, setTiles] = useState([]);
   const [modalData, setModalData] = useState({});
@@ -125,7 +126,7 @@ function Explorer() {
     serverRequest(method, data).then(resp => {
       setIsLoading(false);
       setLoadedData(resp.data);
-      setPages((prevPages) => ({...prevPages, total: resp.pages?.total}));
+      setPages(prevPages => ({...prevPages, total: resp.pages?.total}));
     });
   }, [pages.current, explorerSettings.currentResultType, explorerSettings.tilesPerPage, currentContext, config.access, query]);
 
@@ -295,6 +296,12 @@ function Explorer() {
   let contextItems = getGenericContextItems(itemData, enqueueSnackbar);
   contextItems = contextItems.concat(getSpecificContextItems(itemData));
 
+  const getBrowserHelperText = () => {
+    let s = `${loadedData.length} results | `;
+    s += query.sort ? `Sorted by: ${query.sort.label}` : "";
+    return s;
+  };
+
   const getView = () => {
     if (!loadedData || !loadedData.length) return (
       <DataPlaceholder text={isLoading ? "Fetching data..." : "No results"} />
@@ -354,6 +361,11 @@ function Explorer() {
       />
       <Divider />
       <LinearProgress color="ignite" style={{width: "100%", minHeight: "2px", visibility: isLoading ? "visible" : "hidden"}} />
+      <div className={classes.helperTextContainer}>
+        <Typography variant="caption" style={{color: "grey"}}>
+          {getBrowserHelperText()}
+        </Typography>
+      </div>
       {getView()}
       <div
         className={classes.layoutHelper}

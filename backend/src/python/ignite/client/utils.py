@@ -28,7 +28,8 @@ from pathlib import PurePath, Path
 from ..utils import get_logger
 from ignite.server import api as server_api
 from ignite.server.socket_manager import SocketManager
-from ignite.client.constants import GENERIC_ENV, DCC_ENVS, OS_NAMES, DCC_DISCOVERY
+from ignite.client.constants import GENERIC_ENV, DCC_ENVS, OS_NAMES
+from ignite.client.constants import DCC_DISCOVERY, DCC_VERSIONS
 from ignite.client.task_manager import TaskManager
 
 LOGGER = get_logger(__name__)
@@ -117,7 +118,28 @@ def is_server_local():
             return True
 
 
-def replace_vars(d, projects_root=None):
+def get_dcc_name(dcc):
+    path = dcc["path"]
+    name = path.replace("\\", "/").split("/")[-1].split(".")[0]
+    return name
+
+
+def get_dcc_version(dcc):
+    if not dcc:
+        return "default"
+    dcc_name = dcc["name"]
+    dcc_path = dcc["path"]
+    for data in DCC_VERSIONS:
+        if dcc_name != data["name"]:
+            continue
+        for actual_v, strings in data["versions"].items():
+            for v in strings:
+                if v in dcc_path:
+                    return actual_v
+    return "default"
+
+
+def replace_vars(d, projects_root=None, dcc={}):
     fetched_projects_root = None
     if not projects_root:
         if is_server_local():
@@ -129,6 +151,7 @@ def replace_vars(d, projects_root=None):
     vars = {
         "os": OS_NAME,
         "dcc": str(DCC),
+        "version": get_dcc_version(dcc),
         "projects_root": (
             projects_root or fetched_projects_root
         )
@@ -193,12 +216,18 @@ def get_scene_env(scene):
 
 
 def get_dcc_env(dcc, projects_root=None):
-    if not dcc in DCC_ENVS.keys():
+    dcc_name = dcc["name"]
+    if not dcc_name in DCC_ENVS:
+        print(dcc_name, "not in", list(DCC_ENVS.keys()))
         return {}
-    return replace_vars(DCC_ENVS[dcc], projects_root=projects_root)
+    return replace_vars(
+        DCC_ENVS[dcc_name],
+        projects_root=projects_root,
+        dcc=dcc
+    )
 
 
-def get_env(task="", dcc="", scene={}):
+def get_env(task="", dcc={}, scene={}):
     if is_server_local():
         projects_root = server_api.get_projects_root()
     else:
@@ -275,14 +304,15 @@ def launch_dcc(dcc, dcc_name, scene):
     return True
 
 
-def get_launch_cmd(dcc, dcc_name, task, scene):
+def get_launch_cmd(dcc, task, scene):
     if not task:
         task = scene.get("task", "")
-    print("Getting env with (task, dcc, scene) -", task, "-", dcc, "-", scene)
+    dcc_label = dcc["name"]
+    dcc["name"] = get_dcc_name(dcc)
     env = get_env(task, dcc, scene)
     scene = scene.get("scene")
     for config in CONFIG.get("dcc_config", []):
-        if config["name"] == dcc_name:
+        if config["name"] == dcc_label:
             dcc_config = config
             break
     else:

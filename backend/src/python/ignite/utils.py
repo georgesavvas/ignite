@@ -15,8 +15,10 @@
 
 import logging
 import os
-from pathlib import PurePath
+from pathlib import PurePath, Path
 from pprint import pprint
+
+from fastapi.staticfiles import StaticFiles
 
 ENV = os.environ
 
@@ -102,3 +104,15 @@ def bytes_to_human_readable(size, suffix="B"):
             return f"{size:3.1f} {unit}{suffix}"
         size /= 1024.0
     return f"{size:.1f}Yi{suffix}"
+
+
+def mount_root(app, config):
+    projects_root = config["root"]
+    if not projects_root or not Path(projects_root).is_dir():
+        LOGGER.warning(f"Projects root {projects_root} does not exist, skipping mounting...")
+        return
+    LOGGER.debug(f"Attempting to mount {projects_root}")
+    app.mount(
+        "/files", StaticFiles(directory=projects_root), name="projects_root"
+    )
+    LOGGER.debug("Mounted on /files")

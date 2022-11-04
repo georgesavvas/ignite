@@ -15,21 +15,16 @@
 
 import logging
 import math
-import os
 import sys
-from pathlib import Path
 
 from fastapi import APIRouter, Request, WebSocket
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse
-from fastapi.staticfiles import StaticFiles
 
 from ignite.server import api, utils
 from ignite.vault import api as vault_api
 from ignite.server.socket_manager import SocketManager
-from ignite.server.utils import CONFIG
 from ignite.utils import error, get_logger, log_request, process_request
-from ignite.client.utils import TASK_MANAGER, PROCESSES_MANAGER, CONFIG
+from ignite.utils import mount_root
 
 LOGGER = get_logger(__name__)
 
@@ -39,16 +34,6 @@ ASSET_UPDATES_MANAGER = SocketManager()
 router = APIRouter(
     prefix="/api/v1"
 )
-
-
-def mount_root():
-    if not CONFIG["root"] or not Path(CONFIG["root"]).is_dir():
-        LOGGER.warning(f"Projects root {CONFIG['root']} does not exist, skipping mounting...")
-        return
-    LOGGER.debug(f"Attempting to mount {CONFIG['root']}")
-    router.mount(
-        "/files", StaticFiles(directory=CONFIG['root']), name="projects_root"
-    )
 
 
 @router.get("/get_projects_root")
@@ -66,7 +51,7 @@ async def set_projects_root(request: Request):
     path = result.get("path")
     ok = utils.set_projects_root(path)
     if ok:
-        mount_root()
+        mount_root(router, CONFIG)
     return {"ok": ok}
 
 

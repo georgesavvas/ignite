@@ -132,7 +132,7 @@ function DirectoryTile(props) {
         <Typography style={{position: "absolute", bottom: "5px", right: "10px"}}>
           {props.entity.version}
         </Typography>
-        {props.entity.thumbnail ?
+        {isScene && props.entity.thumbnail ?
           <img
             src={thumbnailPath()}
             style={{
