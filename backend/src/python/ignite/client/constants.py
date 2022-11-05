@@ -1,20 +1,33 @@
 GENERIC_ENV = {
     "PROJECTS_ROOT": "{projects_root}",
-    "OCIO": "{dcc}/ocio/aces_1.2/config.ocio"
+    # "OCIO": "{dcc}/ocio/aces_1.2/config.ocio"
 }
 
 
 DCC_ENVS = {
     "houdini": {
         "IGNITE_DCC": "{dcc}/houdini",
-        "PYTHONPATH": "{dcc}/houdini/python;&",
+        "PYTHONPATH": "{dcc}/houdini/python;{dcc}/common/python;&",
         "HOUDINI_PATH": "{dcc}/houdini;&",
         "HOUDINI_MENU_PATH": "{dcc}/houdini;&",
         "HOUDINI_OTLSCAN_PATH": "&;{dcc}/houdini/otls",
+        "HOUDINI_PYTHON_PANEL_PATH": "{dcc}/houdini/python_panels",
         "PXR_PLUGINPATH_NAME": "{dcc}/houdini/dso/{version}/{os}/resources"
     },
     "maya": {
+        "PYTHONPATH": "{dcc}/maya/python;{dcc}/common/python",
+        "MAYA_SHELF_PATH": "{dcc}/maya/shelf",
+        "MAYA_SCRIPT_PATH": "{dcc}/maya/scripts",
         "MAYA_PLUG_IN_PATH": "{dcc}/maya/plug-ins"
+    },
+    "nuke": {
+        "PYTHONPATH": "{dcc}/nuke/python;{dcc}/common/python",
+        "NUKE_PATH": "{dcc}/nuke;{dcc}/nuke/scripts;{dcc}/nuke/gizmos",
+        "HIERO_PLUGIN_PATH": "{dcc}/hiero"
+    },
+    "mari": {
+        "PYTHONPATH": "{dcc}/mari/python;{dcc}/common/python",
+        "MARI_SCRIPT_PATH": "{dcc}/mari/scripts"
     }
 }
 

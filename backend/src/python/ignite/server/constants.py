@@ -50,7 +50,7 @@ ANCHORS = {
 
 DCC_EXTENSIONS = {
     "houdini": ["hip", "hipnc"],
-    "maya": ["ma"],
+    "maya": ["ma", "mb"],
     "nuke": ["nk"],
     "natron": [],
     "substance_designer": ["sbs"],

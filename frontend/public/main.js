@@ -281,7 +281,10 @@ app.whenReady().then(async () => {
   });
 
   ipcMain.handle("launch_dcc", async (e, cmd, args, env) => {
-    const proc = spawn(cmd, args, {env: env, detached: true});
+    console.log("Running", cmd, args);
+    console.log(env);
+    const proc = spawn(cmd, args, {env: {ALLUSERSPROFILE: process.env.ALLUSERSPROFILE, ...env}, detached: true});
+    proc.unref();
     if (proc) return true;
   });
 

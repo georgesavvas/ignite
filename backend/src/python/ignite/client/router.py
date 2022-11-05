@@ -114,7 +114,7 @@ async def get_launch_cmd(request: Request):
     log_request(result)
     task = result.get("task", "")
     scene = result.get("scene", "")
-    dcc = result.get("dcc", "")
+    dcc = result.get("dcc", {})
     new_scene = result.get("new_scene", False)
     if new_scene and task:
         scene = utils.copy_default_scene(task, dcc)

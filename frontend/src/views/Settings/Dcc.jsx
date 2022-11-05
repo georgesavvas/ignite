@@ -13,7 +13,7 @@
 // limitations under the License.
 
 
-import React, {useContext} from "react";
+import React, {useContext, useState, useEffect, useRef} from "react";
 
 import Divider from "@mui/material/Divider";
 import Stack from "@mui/material/Stack";
@@ -23,16 +23,74 @@ import ListItem from "@mui/material/ListItem";
 import IconButton from "@mui/material/IconButton";
 import Clear from "@mui/icons-material/Clear";
 import TextField from "@mui/material/TextField";
+import debounce from "lodash.debounce";
 
 import clientRequest from "../../services/clientRequest";
 import styles from "./Dcc.module.css";
 import {ConfigContext} from "../../contexts/ConfigContext";
 
 
+const debounced = debounce(fn => fn(), 1000);
+
+const placeholder_config = {
+  path: "",
+  exts: "",
+  name: ""
+};
+
 const Dcc = () => {
   const [config, setConfig] = useContext(ConfigContext);
+  const [dcc, setDcc] = useState([]);
+  const shouldWrite = useRef(false);
 
-  const handleDccConfigChange = (e) => {
+  useEffect(() => {
+    if (!Array.isArray(config.dccConfig)) {
+      console.log("DCC Config is corrupt, resetting...");
+      setDcc([placeholder_config]);
+      setConfig("dccConfig", [placeholder_config], "set");
+    }
+    setDcc(config.dccConfig);
+  }, []);
+
+  useEffect(() => {
+    if (!shouldWrite.current) return;
+    debounced(() => {
+      setConfig("dccConfig", dcc, "set");
+    });
+  }, [dcc]);
+
+  const handleDccAdd = data => {
+    if (!data || !data.length) {
+      setDcc(prevState => [placeholder_config, ...prevState]);
+      return;
+    }
+    let existing_paths = [];
+    dcc.forEach(existing => {
+      existing_paths.push(existing.path);
+    });
+    const filtered = data.filter(
+      new_dcc => !existing_paths.includes(new_dcc.path)
+    );
+    setDcc(prevState => [...prevState, ...filtered]);
+  };
+
+  const handleDccModify = data => {
+    setDcc(prevState => {
+      let cc = [...prevState];
+      cc[data.index][data.field] = data.value;
+      return cc;
+    });
+  };
+
+  const handleDccRemove = data => {
+    setDcc(prevState => {
+      let cc = [...prevState];
+      cc.splice(data.index, 1);
+      return cc;
+    });
+  };
+
+  const handleDccConfigChange = e => {
     const s = e.currentTarget.id.split("-");
     const target_id = s[1];
     const target_field = s[0];
@@ -41,16 +99,18 @@ const Dcc = () => {
       field: target_field,
       value: e.target.value
     };
-    window.api.checkPath(data.value).then(exists => {
-      data.valid = exists;
-      return setConfig("dccConfig", data, "modify");
-    });
+    shouldWrite.current = true;
+    handleDccModify(data);
   };
 
-  const handleRemoveDcc = (e) => {
+  const handleRemoveDcc = e => {
     const target_id = e.currentTarget.id.split("-")[1];
     const data = {index: target_id};
-    setConfig("dccConfig", data, "remove");
+    shouldWrite.current = true;
+    handleDccRemove(data);
+    // debounced(() => {
+    //   setConfig("dccConfig", data, "remove");
+    // });
   };
 
   const handleFileInput = e => {
@@ -68,11 +128,14 @@ const Dcc = () => {
       field: "path",
       value: filepath
     };
-    setConfig("dccConfig", data, "modify");
+    shouldWrite.current = true;
+    handleDccModify(data);
   };
 
   const handleAddDcc = () => {
-    setConfig("dccConfig", [], "add");
+    shouldWrite.current = true;
+    handleDccAdd();
+    // setConfig("dccConfig", [], "add");
   };
 
   const handleDiscoverDcc = () => {
@@ -93,10 +156,9 @@ const Dcc = () => {
     });
   };
 
-  function renderDcc(dcc, index) {
-    if (dcc.valid === undefined) dcc.valid = false;
+  function renderDcc(dcc_, index) {
     return (
-      <ListItem key={index}>
+      <ListItem key={dcc_.path || index}>
         <IconButton
           color="primary"
           component="span"
@@ -114,9 +176,8 @@ const Dcc = () => {
               label="Executable"
               fullWidth
               variant="outlined"
-              value={dcc.path}
+              value={dcc_.path}
               size="small"
-              color={dcc.valid ? "success" : "warning"}
               onChange={handleDccConfigChange}
               className={styles.textField}
               InputProps={{
@@ -132,7 +193,7 @@ const Dcc = () => {
               label="Name"
               variant="outlined"
               fullWidth
-              value={dcc.name}
+              value={dcc_.name}
               size="small"
               onChange={handleDccConfigChange}
               className={styles.textField}
@@ -148,7 +209,7 @@ const Dcc = () => {
               label="Extensions"
               fullWidth
               variant="outlined"
-              value={dcc.exts}
+              value={dcc_.exts}
               size="small"
               onChange={handleDccConfigChange}
               className={styles.textField}
@@ -171,7 +232,10 @@ const Dcc = () => {
         <Button variant="outlined" onClick={handleDiscoverDcc}>Discover</Button>
       </Stack>
       <List sx={{width: "100%"}}>
-        {config.dccConfig.map((dcc, index) => renderDcc(dcc, index))}
+        {Array.isArray(dcc) ?
+          dcc.map((dcc_, index) => renderDcc(dcc_, index))
+          : null
+        }
       </List>
     </div>
   );

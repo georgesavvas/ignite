@@ -108,7 +108,14 @@ function DirectoryTile(props) {
 
   function thumbnailPath() {
     let path = "media/folder_icon.png";
-    if (isScene) path = `media/dcc/${props.entity.dcc}.png`;
+    if (isScene) {
+      const available = [
+        "aftereffects", "blender", "designer", "houdini", "illustrator", "maya",
+        "natron", "nuke", "painter", "photoshop", "premiere", "unreal", "vscode"
+      ];
+      if (!available.includes(props.entity.dcc)) return "media/dcc/unknown.png";
+      return `media/dcc/${props.entity.dcc}.png`;
+    }
     return path;
   }
 

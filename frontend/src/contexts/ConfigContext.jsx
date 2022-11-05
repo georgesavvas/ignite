@@ -140,8 +140,8 @@ export const ConfigProvider = props => {
   }, [config]);
 
   const addToDCCConfig = (config, data) => {
-    if (!data) {
-      return [...config, ...placeholder_config];
+    if (!data || !data.length) {
+      return [placeholder_config, ...config];
     }
     let existing_paths = [];
     config.forEach(existing => {
@@ -189,7 +189,7 @@ export const ConfigProvider = props => {
         {
           ...prevState,
           write: true,
-          dccConfig: modifyDCCConfig(prevState.dccConfig, data)
+          dccConfig: data
         }
       ));
       break;

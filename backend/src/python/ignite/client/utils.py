@@ -218,7 +218,6 @@ def get_scene_env(scene):
 def get_dcc_env(dcc, projects_root=None):
     dcc_name = dcc["name"]
     if not dcc_name in DCC_ENVS:
-        print(dcc_name, "not in", list(DCC_ENVS.keys()))
         return {}
     return replace_vars(
         DCC_ENVS[dcc_name],
@@ -350,10 +349,11 @@ def copy_default_scene(task, dcc):
         return
     with open(filepath, "r") as f:
         data = yaml.safe_load(f)
-    if dcc not in data.keys():
+    dcc_name = get_dcc_name(dcc)
+    if dcc_name not in data:
         LOGGER.error(f"Default scenes config is empty {filepath}")
         return
-    src = DCC / "default_scenes" / data[dcc]
+    src = DCC / "default_scenes" / data[dcc_name]
     dest = Path(task.get("next_scene"))
     dest.mkdir(parents=True, exist_ok=True)
     LOGGER.info(f"Copying default scene {src} to {dest}")
