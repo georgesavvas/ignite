@@ -29,8 +29,8 @@ LOGGER = get_logger(__name__)
 
 class Directory():
     def __init__(self, path="", dir_kind="directory") -> None:
-        self.dict_attrs = ["path", "dir_kind", "anchor", "project", "name", "context",
-            "repr", "tags", "attributes", "uri"]
+        self.dict_attrs = ["path", "dir_kind", "anchor", "project", "name",
+            "repr", "tags", "attributes", "uri", "context"]
         self.nr_attrs = ["path"]
         self.project = ""
         self.group = ""
@@ -121,8 +121,14 @@ class Directory():
             now = datetime.now(tz=timezone.utc)
             d["creation_time"] = timeago.format(self.creation_time, now)
             d["modification_time"] = timeago.format(self.modification_time, now)
+            d["creation_ts"] = self.creation_time.timestamp()
+            d["modification_ts"] = self.modification_time.timestamp()
         except Exception as e:
             LOGGER.error(e)
+            d["creation_time"] = "data error"
+            d["modification_time"] = "data error"
+            d["creation_ts"] = 0
+            d["modification_ts"] = 0
         d["icon"] = self.dir_kind
         if hasattr(self, "task_type"):
             d["icon"] += "_" + self.task_type

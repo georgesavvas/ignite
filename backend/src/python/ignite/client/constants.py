@@ -12,6 +12,9 @@ DCC_ENVS = {
         "HOUDINI_MENU_PATH": "{dcc}/houdini;&",
         "HOUDINI_OTLSCAN_PATH": "&;{dcc}/houdini/otls",
         "PXR_PLUGINPATH_NAME": "{dcc}/houdini/dso/{version}/{os}/resources"
+    },
+    "maya": {
+        "MAYA_PLUG_IN_PATH": "{dcc}/maya/plug-ins"
     }
 }
 

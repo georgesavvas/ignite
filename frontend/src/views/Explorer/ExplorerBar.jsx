@@ -83,11 +83,11 @@ function ExplorerBar(props) {
     },
     {
       label: "Date (Newest first)",
-      fn: () => handleSortChange("date", true, "Date (Newest first)"),
+      fn: () => handleSortChange("modification_ts", true, "Date (Newest first)"),
     },
     {
       label: "Date (Oldest first)",
-      fn: () => handleSortChange("date", false, "Date (Oldest first)"),
+      fn: () => handleSortChange("modification_ts", false, "Date (Oldest first)"),
     },
     {
       label: "Version (Higher first)",

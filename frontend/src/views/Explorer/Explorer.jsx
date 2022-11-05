@@ -72,12 +72,21 @@ const defaultExplorerSettings = {
   }
 };
 
+const defaultQuery = {
+  latest: 1,
+  sort: {
+    field: "modification_ts",
+    reverse: true,
+    label: "Date (Newest first)"
+  }
+};
+
 function Explorer() {
   const [config] = useContext(ConfigContext);
   const [isLoading, setIsLoading] = useState(true);
   const [loadedData, setLoadedData] = useState([]);
   const [pages, setPages] = useState({total: 1, current: 1});
-  const [query, setQuery] = useState({latest: 1, sort: {field: "date", reverse: true, label: "Date (Newest first)"}});
+  const [query, setQuery] = useState(defaultQuery);
   const [explorerSettings, setExplorerSettings] = useState(defaultExplorerSettings);
   const [tiles, setTiles] = useState([]);
   const [modalData, setModalData] = useState({});

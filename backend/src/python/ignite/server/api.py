@@ -259,6 +259,8 @@ def create_dirs(path, method, dirs):
 
 
 def sort_results(results, sort):
+    from pprint import pprint
+    pprint(results)
     if sort and results:
         keys = list(results[0].keys())
         field = sort["field"]
