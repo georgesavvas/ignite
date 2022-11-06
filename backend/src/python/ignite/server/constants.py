@@ -55,7 +55,7 @@ DCC_EXTENSIONS = {
     "natron": ["ntp"],
     "substance_designer": ["sbs"],
     "substance_painter": [],
-    "blender": []
+    "blender": ["blend"]
 }
 
 COMP_TYPES = {

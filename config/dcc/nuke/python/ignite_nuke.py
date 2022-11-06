@@ -18,7 +18,7 @@ def save_next():
     new_dir = current.parent.parent / f"v{next_v}"
     new_dir.mkdir(exist_ok=False)
     new_filepath = new_dir / filename
-    nuke.scriptSaveAs(filename=new_filepath)
+    nuke.scriptSaveAs(filename=str(new_filepath))
     anchor = new_dir / ".ign_scene.yaml"
     anchor.touch()
 

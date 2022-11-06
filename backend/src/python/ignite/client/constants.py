@@ -33,6 +33,10 @@ DCC_ENVS = {
         "PYTHONPATH": "{dcc}/natron/python;{dcc}/common/python",
         "NATRON_PLUGIN_PATH": "{dcc}/natron/Plugins"
     },
+    "blender": {
+        "PYTHONPATH": "{dcc}/blender/python;{dcc}/common/python",
+        "BLENDER_USER_SCRIPTS": "{dcc}/blender/scripts"
+    }
 }
 
 
