@@ -28,7 +28,11 @@ DCC_ENVS = {
     "mari": {
         "PYTHONPATH": "{dcc}/mari/python;{dcc}/common/python",
         "MARI_SCRIPT_PATH": "{dcc}/mari/scripts"
-    }
+    },
+    "natron": {
+        "PYTHONPATH": "{dcc}/natron/python;{dcc}/common/python",
+        "NATRON_PLUGIN_PATH": "{dcc}/natron/Plugins"
+    },
 }
 
 

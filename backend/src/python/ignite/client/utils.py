@@ -120,7 +120,7 @@ def is_server_local():
 
 def get_dcc_name(dcc):
     path = dcc["path"]
-    name = path.replace("\\", "/").split("/")[-1].split(".")[0]
+    name = path.replace("\\", "/").split("/")[-1].split(".")[0].lower()
     return name
 
 

@@ -67,13 +67,6 @@ def create_menu():
         )
 
 
-def scene_resolution():
-    return [
-        cmds.getAttr("defaultResolution.width"),
-        cmds.getAttr("defaultResolution.height")
-    ]
-
-
 def save():
     cmds.file(save=True)
 
@@ -110,7 +103,7 @@ def scene_comment():
         ignite.server_request("set_scene_comment", data)
         cmds.inViewMessage(msg="Done", f=True, fot=3)
         return
-    cmds.inViewMessage(msg="Lost connection to ignite...", f=True, fot=3)
+    cmds.inViewMessage(msg="Failed to set comment", f=True, fot=3)
 
 
 def playblast(path, frange):

@@ -52,7 +52,7 @@ DCC_EXTENSIONS = {
     "houdini": ["hip", "hipnc"],
     "maya": ["ma", "mb"],
     "nuke": ["nk"],
-    "natron": [],
+    "natron": ["ntp"],
     "substance_designer": ["sbs"],
     "substance_painter": [],
     "blender": []

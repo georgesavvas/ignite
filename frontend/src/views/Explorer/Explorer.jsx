@@ -306,7 +306,9 @@ function Explorer() {
   contextItems = contextItems.concat(getSpecificContextItems(itemData));
 
   const getBrowserHelperText = () => {
-    let s = `${loadedData.length} results | `;
+    const amount = loadedData.length;
+    const single = amount === 1 ? "" : "s";
+    let s = `${amount} result${single} | `;
     s += query.sort ? `Sorted by: ${query.sort.label}` : "";
     return s;
   };
