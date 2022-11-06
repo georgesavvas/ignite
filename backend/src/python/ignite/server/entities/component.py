@@ -56,6 +56,7 @@ class Component():
     def load_from_clique_collection(self, c):
         path = PurePath(c.format("{head}####{tail}"))
         indexes = list(c.indexes)
+        indexes = [str(i).zfill(4) for i in indexes]
         name = path.name
         ext = c.tail
         self.name = path.stem.replace(".####", "")

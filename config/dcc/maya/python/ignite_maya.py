@@ -113,18 +113,20 @@ def scene_comment():
     cmds.inViewMessage(msg="Lost connection to ignite...", f=True, fot=3)
 
 
-def playblast(path, range):
+def playblast(path, frange):
     frame_settings = {
-        "startTime": range[0],
-        "endTime": range[1]
+        "startTime": frange[0],
+        "endTime": frange[1]
     }
-    if len(range) == 3 and range[2] > 1:
+    if len(frange) == 3 and frange[2] > 1:
+        frames = list(range(frange[0], frange[1], frange[2]))
+        print(f"Playblast frames: {frames}")
         frame_settings = {
-            "frames": list(range(range[0], range[1], range[2]))
+            "frame": frames
         }
     cmds.setAttr("defaultRenderGlobals.imageFormat", 8)
     cmds.playblast(
-        completeFilename=path,
+        filename=path,
         forceOverwrite=True,
         format="image",
         viewer=False,
@@ -135,12 +137,12 @@ def playblast(path, range):
 def scene_preview():
     save()
     path = Path(cmds.file(q=True, sn=True)).parent
-    output_path = path / "preview/preview.####.jpg"
+    output_path = path / "preview/preview"
     if output_path.parent.is_dir():
         shutil.rmtree(output_path.parent)
     output_path.parent.mkdir(exist_ok=True, parents=True)
-    start_frame = cmds.playbackOptions(q=True, minTime=True)
-    end_frame = cmds.playbackOptions(q=True, maxTime=True)
+    start_frame = round(cmds.playbackOptions(q=True, minTime=True))
+    end_frame = round(cmds.playbackOptions(q=True, maxTime=True))
     inc = round((end_frame - start_frame) / 25)
 
     playblast(output_path, [start_frame, end_frame, inc])
