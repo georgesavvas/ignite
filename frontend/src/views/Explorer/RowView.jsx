@@ -80,7 +80,7 @@ const RowView = props => {
         index: 1,
         field: "name",
         headerName: "Name",
-        flex: 0.1,
+        flex: 0.25,
         renderCell: renderText
       },
       {

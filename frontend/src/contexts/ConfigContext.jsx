@@ -43,7 +43,7 @@ const placeholder_config = {
 export const ConfigProvider = props => {
   const {enqueueSnackbar} = useSnackbar();
   const [config, setConfig] = useState(
-    {serverDetails: {}, access: {}, dccConfig: []}
+    {serverDetails: {}, access: {}, dccConfig: [], ready: false}
   );
 
   useEffect(() => {
@@ -73,7 +73,8 @@ export const ConfigProvider = props => {
         },
         dccConfig: savedDccConfig,
         clientAddress: resp[1],
-        write: false
+        write: false,
+        ready: true
       });
     });
   }, [config.lostConnection]);
@@ -99,7 +100,7 @@ export const ConfigProvider = props => {
           setConfig(prevState => {
             const prev = {...prevState};
             prev["lostConnection"] = false;
-            prev["write"] = false;
+            prev["write"] = true;
             return prev;
           });
         }
@@ -119,25 +120,30 @@ export const ConfigProvider = props => {
 
   useEffect(() => {
     if (!config.write) return;
+    if (config.lostConnection) window.services.check_backend();
+    else handleConfigChange(config);
+  }, [config]);
+
+  const handleConfigChange = c => {
     window.services.set_envs({
-      IGNITE_SERVER_ADDRESS: config.serverDetails.address,
-      IGNITE_SERVER_PASSWORD: config.serverDetails.password
+      IGNITE_SERVER_ADDRESS: c.serverDetails.address,
+      IGNITE_SERVER_PASSWORD: c.serverDetails.password
     });
-    const isServerLocal = config.serverDetails.address.startsWith("localhost");
+    const isServerLocal = c.serverDetails.address.startsWith("localhost");
     const accessFormatted = {
-      projects_root: config.access.projectsDir,
-      server_projects_root: isServerLocal ? config.access.projectsDir :
-        config.access.serverProjectsDir,
-      remote: config.access.remote
+      projects_root: c.access.projectsDir,
+      server_projects_root: isServerLocal ? c.access.projectsDir :
+        c.access.serverProjectsDir,
+      remote: c.access.remote
     };
     const data = {
       access: accessFormatted,
-      dcc_config: config.dccConfig,
-      server_details: config.serverDetails
+      dcc_config: c.dccConfig,
+      server_details: c.serverDetails
     };
     console.log("Setting config:", data);
     clientRequest("set_config", {data: data});
-  }, [config]);
+  };
 
   const addToDCCConfig = (config, data) => {
     if (!data || !data.length) {

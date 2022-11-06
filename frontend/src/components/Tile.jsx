@@ -66,7 +66,7 @@ export default function Tile(props) {
     if (hasThumbnail && !thumbnail.static) {
       const amount = thumbnail.frames.length;
       const sectionSize = 1 / amount;
-      const section = clamp(Math.floor(progress / sectionSize), 0, amount);
+      const section = clamp(Math.floor(progress / sectionSize), 0, amount - 1);
       const frame = thumbnail.frames[section];
       // let frame = thumbnail.first_frame + (thumbnail.last_frame - thumbnail.first_frame) * progress;
       // frame = clamp(Math.round(frame), thumbnail.first_frame, thumbnail.last_frame);

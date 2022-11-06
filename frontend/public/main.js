@@ -27,19 +27,22 @@ require("update-electron-app")();
 // const osu = require("node-os-utils");
 
 const sessionID = uuid4();
+let platformName = process.platform;
 let appPath = app.getAppPath();
-if (appPath.endsWith("app.asar")) {
+if (platformName === "win32") {
+  appPath = path.dirname(app.getPath("exe"));
+}
+else if (appPath.endsWith("app.asar")) {
   appPath = path.dirname(app.getPath("exe"));
   appPath = path.join(appPath, "..");
 }
 console.log("appPath:", appPath);
 process.env.IGNITE_SESSION_ID = sessionID;
-let platformName = process.platform;
 let appQuitting = false;
 let tray = null;
 let window = null;
 let backend = null;
-let backendLock = true;
+let backendLock = false;
 let port = -1;
 const isDev = process.env.NODE_ENV === "dev";
 const public = path.join(__dirname, "..", isDev ? "public" : "build");
@@ -102,7 +105,7 @@ function launchBackend() {
   console.log("Launching backend...", backendCmd);
   return spawn(backendCmd, {
     shell: true,
-    // stdio: "pipe",
+    stdio: "pipe",
     env: {IGNITE_CLIENT_ADDRESS: process.env.IGNITE_CLIENT_ADDRESS}
   });
 }
@@ -121,15 +124,16 @@ async function checkBackend() {
     process.env.IGNITE_CLIENT_ADDRESS = "localhost:9070";
     return;
   }
+  if (backendLock) return;
+  backendLock = true;
   let shouldLaunch = true;
   const configPath = path.join(os.homedir(), ".ignite");
   let existing_port = -1;
   let existing_pid = -1;
   try {
     existing_pid = fs.readFileSync(path.join(configPath, "ignite.pid"), "utf8");
-  } catch (err) {
-    console.error(err);
-  }
+    // eslint-disable-next-line no-empty
+  } catch (err) { }
   if (existing_pid >= 0 && isPidAlive(existing_pid)) {
     try {
       existing_port = fs.readFileSync(path.join(configPath, "ignite.port"), "utf8");
@@ -149,12 +153,16 @@ async function checkBackend() {
       }
     });
   }
-  if (!shouldLaunch) return;
+  if (!shouldLaunch) {
+    backendLock = false;
+    return;
+  }
   port = await getPort({
     port: getPort.makeRange(9070, 9999)
   });
   process.env.IGNITE_CLIENT_ADDRESS = `localhost:${port}`;
   backend = launchBackend();
+  backendLock = false;
 }
 
 function createWindow (show=true) {
@@ -289,7 +297,7 @@ app.whenReady().then(async () => {
   });
 
   ipcMain.handle("check_backend", async () => {
-    if (backendLock || isDev) return;
+    if (isDev) return;
     return checkBackend(port);
   });
 
@@ -297,11 +305,11 @@ app.whenReady().then(async () => {
   const contextMenu = Menu.buildFromTemplate([
     { label: "Show", click: () => window.show() },
     { label: "Exit", click: () => {
-      if (!isDev) {
-        console.log("BYE!!!!!!");
-        if (backend) backend.kill();
-        clientRequest(port, "quit");
-      } else console.log("not bye!");
+      // if (!isDev) {
+      //   console.log("Attempting to kill backend...");
+      //   if (backend) backend.kill("SIGINT");
+      //   clientRequest("quit");
+      // } else console.log("not bye!");
       app.quit();
     } },
   ]);
