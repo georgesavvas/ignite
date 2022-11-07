@@ -99,7 +99,7 @@ function AssetTile(props) {
         <Typography style={{position: "absolute", bottom: "5px", right: "10px"}}>
           {props.entity.version}
         </Typography>
-        {!props.entity.protected ?
+        {props.entity.protected ?
           <img
             alt="protected"
             src="media/shield.png"

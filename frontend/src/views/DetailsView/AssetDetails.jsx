@@ -167,7 +167,27 @@ function AssetDetails(props) {
         <ReflexElement flex={flexRatios["asset.details"]} name={"asset.details"} onStopResize={handleResized}>
           <div style={{margin: "10px", overflow: "hidden"}}>
             <div style={{marginTop: "6px", display: "flex", justifyContent: "space-between"}}>
-              <Typography variant="h5">{props.entity.name}</Typography>
+              <div style={{display: "flex", gap: "10px"}}>
+                <Typography variant="h5">{props.entity.name}</Typography>
+                {props.entity.protected ?
+                  <img
+                    alt="protected"
+                    src="media/shield.png"
+                    style={{
+                      height: "35px",
+                      width: "35px"
+                    }}
+                  /> :
+                  <img
+                    alt="unprotected"
+                    src="media/shield_broken.png"
+                    style={{
+                      height: "35px",
+                      width: "35px"
+                    }}
+                  />
+                }
+              </div>
               <FormControl size="small">
                 <InputLabel>Version</InputLabel>
                 <Select
