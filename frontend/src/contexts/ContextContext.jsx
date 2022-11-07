@@ -23,8 +23,8 @@ import { ConfigContext } from "./ConfigContext";
 
 export const ContextContext = createContext();
 
-const createAssetUpdatesSocket = (config, sessionID) => {
-  return serverSocket("asset_updates", config, sessionID);
+const createAssetUpdatesSocket = (sessionID, address) => {
+  return serverSocket("asset_updates", sessionID, address);
 };
 
 const destroySocket = socket => {
@@ -45,8 +45,10 @@ export const ContextProvider = props => {
     if (!context || !context.path) return;
     setCurrentContext(context);
     if (socket) return;
-    window.services.get_env("IGNITE_SESSION_ID").then(resp => {
-      const ws = createAssetUpdatesSocket(config, resp);
+    const sessionID = window.services.get_env("IGNITE_SESSION_ID");
+    const serverAddress = window.services.get_env("IGNITE_SERVER_ADDRESS");
+    Promise.all([sessionID, serverAddress]).then(resp => {
+      const ws = createAssetUpdatesSocket(resp[0], resp[1]);
       ws.onmessage = data => console.log("ASSET_UPDATES RECEIVED:", data);
       setSocket(ws);
     });

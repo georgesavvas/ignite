@@ -121,7 +121,7 @@ class Asset(Directory):
                 best_av = av
         self._best_v = best_av.version
         self._best_av = best_av
-        # self.check_symlinks()
+        self.check_symlinks()
 
     @property
     def next_version(self):
@@ -140,7 +140,7 @@ class Asset(Directory):
     def post_write(self):
         pass
         # Disabled for now until there's a solution to Windows asking for UAC
-        # self.check_symlinks()
+        self.check_symlinks()
 
     def check_symlinks(self):
         path = Path(self.path)
