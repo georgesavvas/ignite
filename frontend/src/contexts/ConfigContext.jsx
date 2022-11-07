@@ -24,7 +24,7 @@ import serverRequest from "../services/serverRequest";
 export const ConfigContext = createContext();
 
 const serverDetailsDefault = {
-  address: "",
+  address: "localhost",
   password: ""
 };
 
@@ -50,11 +50,18 @@ export const ConfigProvider = props => {
     if (config.lostConnection) return;
     const clientData = clientRequest("get_config");
     const clientAddress = window.services.get_env("IGNITE_CLIENT_ADDRESS");
-    Promise.all([clientData, clientAddress]).then(resp => {
+    const serverPort = window.services.get_port();
+    Promise.all([clientData, clientAddress, serverPort]).then(resp => {
       if (!resp[0]) return;
       const clientDataResults = resp[0].data;
       console.log("Config received:", clientDataResults);
       const savedServerDetails = clientDataResults.server_details;
+      let savedServerAddress = savedServerDetails.address;
+      if (["localhost", "0.0.0.0"].includes(savedServerAddress)) {
+        const port = resp[2];
+        console.log(`Local server port not defined, fetched ${port}`);
+        savedServerAddress += `:${port}`;
+      }
       const savedAccess = {
         projectsDir: clientDataResults.access.projects_root,
         serverProjectsDir: clientDataResults.access.server_projects_root,
@@ -62,7 +69,7 @@ export const ConfigProvider = props => {
       };
       const savedDccConfig = clientDataResults.dcc_config;
       window.services.set_envs({
-        IGNITE_SERVER_ADDRESS: savedServerDetails.address,
+        IGNITE_SERVER_ADDRESS: savedServerAddress,
         IGNITE_SERVER_PASSWORD: savedServerDetails.password
       });
       setConfig({
@@ -124,12 +131,20 @@ export const ConfigProvider = props => {
     else handleConfigChange(config);
   }, [config]);
 
-  const handleConfigChange = c => {
+  const handleConfigChange = async c => {
+    let serverAddress = c.serverDetails.address;
+    if (serverAddress === "localhost" || serverAddress === "0.0.0.0") {
+      console.log("Local server port not defined, fetching from main process");
+      const port = await window.services.get_port();
+      serverAddress += `:${port}`;
+      console.log(`Port is ${port}, new address is ${serverAddress}`);
+    }
     window.services.set_envs({
-      IGNITE_SERVER_ADDRESS: c.serverDetails.address,
+      IGNITE_SERVER_ADDRESS: serverAddress,
       IGNITE_SERVER_PASSWORD: c.serverDetails.password
     });
-    const isServerLocal = c.serverDetails.address.startsWith("localhost");
+    const isServerLocal = serverAddress.startsWith("localhost") ||
+      serverAddress.startsWith("0.0.0.0");
     const accessFormatted = {
       projects_root: c.access.projectsDir,
       server_projects_root: isServerLocal ? c.access.projectsDir :

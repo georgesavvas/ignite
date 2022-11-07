@@ -53,5 +53,8 @@ contextBridge.exposeInMainWorld("services", {
   },
   set_envs: data => {
     ipcRenderer.invoke("set_envs", data);
+  },
+  get_port: () => {
+    return ipcRenderer.invoke("get_port");
   }
 });

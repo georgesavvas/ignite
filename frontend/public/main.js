@@ -122,30 +122,31 @@ function isPidAlive(pid) {
 async function checkBackend() {
   if (isDev) {
     process.env.IGNITE_CLIENT_ADDRESS = "localhost:9070";
+    port = 9070;
     return;
   }
   if (backendLock) return;
   backendLock = true;
   let shouldLaunch = true;
   const configPath = path.join(os.homedir(), ".ignite");
-  let existing_port = -1;
-  let existing_pid = -1;
+  let existingPort = -1;
+  let existingPid = -1;
   try {
-    existing_pid = fs.readFileSync(path.join(configPath, "ignite.pid"), "utf8");
+    existingPid = fs.readFileSync(path.join(configPath, "ignite.pid"), "utf8");
     // eslint-disable-next-line no-empty
   } catch (err) { }
-  if (existing_pid >= 0 && isPidAlive(existing_pid)) {
+  if (existingPid >= 0 && isPidAlive(existingPid)) {
     try {
-      existing_port = fs.readFileSync(path.join(configPath, "ignite.port"), "utf8");
+      existingPort = fs.readFileSync(path.join(configPath, "ignite.port"), "utf8");
     // eslint-disable-next-line no-empty
     } catch (err) { }
   }
-  if (existing_port >= 0) {
-    console.log(`Found existing backend running at port ${existing_port}`);
-    clientRequest(existing_port, "ping").then(resp => {
+  if (existingPort >= 0) {
+    console.log(`Found existing backend running at port ${existingPort}`);
+    clientRequest(existingPort, "ping").then(resp => {
       if (resp && resp.ok) {
         console.log("Successfully connected to existing backend");
-        port = existing_port;
+        port = existingPort;
         process.env.IGNITE_CLIENT_ADDRESS = `localhost:${port}`;
         shouldLaunch = false;
       } else {
@@ -253,6 +254,7 @@ function createWindow (show=true) {
   });
 
   ipcMain.handle("get_port", () => {
+    console.log("get_port", port);
     return port;
   });
 
@@ -292,24 +294,23 @@ app.whenReady().then(async () => {
     console.log("Running", cmd, args);
     console.log(env);
     const proc = spawn(cmd, args, {env: {ALLUSERSPROFILE: process.env.ALLUSERSPROFILE, ...env}, detached: true});
-    proc.unref();
     if (proc) return true;
   });
 
   ipcMain.handle("check_backend", async () => {
     if (isDev) return;
-    return checkBackend(port);
+    return checkBackend();
   });
 
   if (tray === null) tray = new Tray(`${public}/media/icon.png`);
   const contextMenu = Menu.buildFromTemplate([
     { label: "Show", click: () => window.show() },
     { label: "Exit", click: () => {
-      // if (!isDev) {
-      //   console.log("Attempting to kill backend...");
-      //   if (backend) backend.kill("SIGINT");
-      //   clientRequest("quit");
-      // } else console.log("not bye!");
+      if (!isDev) {
+        console.log("Attempting to kill backend...");
+        if (backend) backend.kill("SIGINT");
+        clientRequest("quit");
+      } else console.log("not bye!");
       app.quit();
     } },
   ]);
