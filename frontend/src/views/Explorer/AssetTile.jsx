@@ -99,6 +99,30 @@ function AssetTile(props) {
         <Typography style={{position: "absolute", bottom: "5px", right: "10px"}}>
           {props.entity.version}
         </Typography>
+        {!props.entity.protected ?
+          <img
+            alt="protected"
+            src="media/shield.png"
+            style={{
+              position: "absolute",
+              top: "5px",
+              right: "5px",
+              height: "20px",
+              width: "20px"
+            }}
+          /> :
+          <img
+            alt="unprotected"
+            src="media/shield_broken.png"
+            style={{
+              position: "absolute",
+              top: "5px",
+              right: "5px",
+              height: "20px",
+              width: "20px"
+            }}
+          />
+        }
       </>
     );
   }

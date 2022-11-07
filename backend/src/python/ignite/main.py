@@ -28,10 +28,13 @@ from ignite.client.utils import CONFIG
 from ignite.utils import get_logger, mount_root
 
 
+ENV = os.environ
 LOGGER = get_logger(__name__)
 SERVER_HOST = "0.0.0.0"
-_, SERVER_PORT = CONFIG["server_details"].get("address", ":").split(":")
-ENV = os.environ
+# address = CONFIG["server_details"].get("address", "")
+address = ENV.get("IGNITE_CLIENT_ADDRESS", "")
+SERVER_PORT = address.split[":"][1] if ":" in address else "9070"
+
 ENV["IGNITE_ADDRESS"] = f"{SERVER_HOST}:{SERVER_PORT}"
 
 ASSET_UPDATES_MANAGER = SocketManager()

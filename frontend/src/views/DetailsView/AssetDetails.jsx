@@ -138,7 +138,7 @@ function AssetDetails(props) {
     for(const comp of props.entity.components) {
       if (comp.filename === compName) return comp;
     }
-    return {};
+    return;
   };
 
   const selectedComp = getComp(selectedCompName);

@@ -57,11 +57,18 @@ export const ConfigProvider = props => {
       console.log("Config received:", clientDataResults);
       const savedServerDetails = clientDataResults.server_details;
       let savedServerAddress = savedServerDetails.address;
+      const port = resp[2];
+      serverDetailsDefault.address += `:${port}`;
       if (["localhost", "0.0.0.0"].includes(savedServerAddress)) {
-        const port = resp[2];
         console.log(`Local server port not defined, fetched ${port}`);
         savedServerAddress += `:${port}`;
       }
+      const finalServerDetails= {
+        ...serverDetailsDefault,
+        ...savedServerDetails,
+        address: savedServerAddress
+      };
+      console.log("finalServerDetails", finalServerDetails);
       const savedAccess = {
         projectsDir: clientDataResults.access.projects_root,
         serverProjectsDir: clientDataResults.access.server_projects_root,
@@ -69,11 +76,11 @@ export const ConfigProvider = props => {
       };
       const savedDccConfig = clientDataResults.dcc_config;
       window.services.set_envs({
-        IGNITE_SERVER_ADDRESS: savedServerAddress,
-        IGNITE_SERVER_PASSWORD: savedServerDetails.password
+        IGNITE_SERVER_ADDRESS: finalServerDetails.address,
+        IGNITE_SERVER_PASSWORD: finalServerDetails.password
       });
       setConfig({
-        serverDetails: {...serverDetailsDefault, ...savedServerDetails},
+        serverDetails: finalServerDetails,
         access: {
           ...accessDefault,
           ...savedAccess
