@@ -97,12 +97,18 @@ async function clientRequest(method, data=undefined) {
 }
 
 function launchBackend() {
+  // const backendCmd = {
+  //   darwin: `open -gj ${backendPath}`,
+  //   linux: `${backendPath}`,
+  //   win32: `start ${backendPath}`
+  // }[platformName];
   const backendCmd = {
-    darwin: `open -gj ${backendPath}`,
+    darwin: `${backendPath}`,
     linux: `${backendPath}`,
-    win32: `start ${backendPath}`
+    win32: `${backendPath}`
   }[platformName];
   console.log("Launching backend...", backendCmd);
+  // return spawn(backendCmd);
   return spawn(backendCmd, {
     shell: true,
     stdio: "pipe",
