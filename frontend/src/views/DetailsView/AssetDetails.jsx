@@ -37,6 +37,7 @@ import serverRequest from "../../services/serverRequest";
 import {EntityContext} from "../../contexts/EntityContext";
 import BuildFileURL from "../../services/BuildFileURL";
 import {ConfigContext} from "../../contexts/ConfigContext";
+import styles from "./AssetDetails.module.css";
 
 
 const splitterStyle = {
@@ -166,25 +167,19 @@ function AssetDetails(props) {
         <ReflexSplitter style={splitterStyle} />
         <ReflexElement flex={flexRatios["asset.details"]} name={"asset.details"} onStopResize={handleResized}>
           <div style={{margin: "10px", overflow: "hidden"}}>
-            <div style={{marginTop: "6px", display: "flex", justifyContent: "space-between"}}>
-              <div style={{display: "flex", gap: "10px"}}>
+            <div style={{height: "40px", margin: "6px 0px", display: "flex", justifyContent: "space-between"}}>
+              <div style={{display: "flex", gap: "10px", alignItems: "center"}}>
                 <Typography variant="h5">{props.entity.name}</Typography>
                 {props.entity.protected ?
                   <img
                     alt="protected"
                     src="media/shield.png"
-                    style={{
-                      height: "35px",
-                      width: "35px"
-                    }}
+                    className={styles.button}
                   /> :
                   <img
                     alt="unprotected"
                     src="media/shield_broken.png"
-                    style={{
-                      height: "35px",
-                      width: "35px"
-                    }}
+                    className={styles.button}
                   />
                 }
               </div>
