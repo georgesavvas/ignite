@@ -84,9 +84,13 @@ export default function Tile(props) {
 
   return (
     <>
-      {props.contextItems ? <ContextMenu items={props.contextItems} contextMenu={contextMenu}
-        setContextMenu={setContextMenu}
-      /> : null}
+      {props.contextItems ?
+        <ContextMenu items={props.contextItems} contextMenu={contextMenu}
+          setContextMenu={setContextMenu} title={props.entity.name}
+          subtitle={props.entity.dir_kind}
+        />
+        : null
+      }
       <div className={styles.tile} style={tileStyle} onClick={handleClick}
         onContextMenu={e => handleContextMenu(e, contextMenu, setContextMenu)}
       >

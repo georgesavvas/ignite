@@ -759,3 +759,13 @@ async def set_scene_comment(request: Request):
     comment = result.get("comment")
     ok = api.set_scene_comment(path, comment)
     return {"ok": ok}
+
+
+@router.post("/set_directory_protected")
+async def set_directory_protected(request: Request):
+    result = await request.json()
+    log_request(result)
+    path = result.get("path")
+    protected = result.get("protected")
+    ok = api.set_directory_protected(path, protected)
+    return {"ok": ok}

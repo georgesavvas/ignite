@@ -160,6 +160,21 @@ function DirectoryTile(props) {
 
   let contextItems = getGenericContextItems(props.entity);
   contextItems = contextItems.concat(getSpecificContextItems(props.entity));
+  if (isScene) {
+    const goToTaskItem = {
+      label: "Go to task",
+      fn: () =>  setCurrentContext(props.entity.task),
+      divider: true
+    };
+    contextItems.splice(2, 0, goToTaskItem);
+  } else if (props.entity.dir_kind === "task") {
+    const goToTaskItem = {
+      label: "Go to task",
+      fn: () =>  setCurrentContext(props.entity.path),
+      divider: true
+    };
+    contextItems.splice(2, 0, goToTaskItem);
+  }
 
   return (
     <>

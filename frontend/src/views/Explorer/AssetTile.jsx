@@ -26,7 +26,7 @@ import Tile from "../../components/Tile";
 
 function AssetTile(props) {
   const {enqueueSnackbar} = useSnackbar();
-  const [currentContext] = useContext(ContextContext);
+  const [currentContext, setCurrentContext] = useContext(ContextContext);
 
   const hasThumbnail = props.entity.thumbnail && props.entity.thumbnail.filename;
   const thumbnailWidth = hasThumbnail ? "100%" : "50%";
@@ -48,6 +48,11 @@ function AssetTile(props) {
     {
       label: "Copy path",
       fn: () =>  CopyToClipboard(props.entity.path, enqueueSnackbar),
+      divider: true
+    },
+    {
+      label: "Go to task",
+      fn: () =>  setCurrentContext(props.entity.task),
       divider: true
     },
     {

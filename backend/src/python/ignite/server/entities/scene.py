@@ -26,10 +26,9 @@ from ignite.server.utils import CONFIG
 
 class Scene(Directory):
     def __init__(self, path="") -> None:
-        self.dict_attrs = ["path", "project", "name", "group" ,"dcc",
-            "version", "dir_kind", "scene", "context", "task", "version", "vsn",
-            "attributes", "comment", "thumbnail", "tags", "extension"]
-        self.nr_attrs = ["path", "task", "scene"]
+        self.dict_attrs = ["group" ,"dcc", "version", "scene", "task",
+            "version", "vsn", "attributes", "comment", "thumbnail", "extension"]
+        self.nr_attrs = ["task", "scene"]
         self.project = ""
         self.group = ""
         self.context = ""
@@ -45,6 +44,7 @@ class Scene(Directory):
         self.path = path
         self.scene = PurePath()
         self.task = None
+        self.protected = False
         if self.path:
             path = Path(path)
             self.path = PurePath(self.path)

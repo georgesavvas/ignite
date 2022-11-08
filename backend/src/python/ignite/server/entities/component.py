@@ -21,8 +21,8 @@ from ignite.server import utils
 
 class Component():
     def __init__(self, path=None) -> None:
-        self.dict_attrs = ["name", "filename", "path", "ext", "static", "first_frame",
-            "last_frame", "frames"]
+        self.dict_attrs = ["name", "filename", "path", "ext", "static",
+            "first_frame", "last_frame", "frames"]
         self.nr_attrs = ["path"]
         self.name = ""
         self.filename = ""

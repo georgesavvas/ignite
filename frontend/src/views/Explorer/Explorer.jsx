@@ -39,6 +39,8 @@ import classes from "./Explorer.module.css";
 import AssetTile from "./AssetTile";
 import DirectoryTile from "./DirectoryTile";
 import RowView from "./RowView";
+import Modal from "../../components/Modal";
+import DccSelector from "../DccSelector";
 
 
 const debounced = debounce(fn => fn(), 500);
@@ -92,6 +94,7 @@ function Explorer() {
   const [modalData, setModalData] = useState({});
   const [selectedEntity, setSelectedEntity] = useContext(EntityContext);
   const [currentContext,, refreshContext] = useContext(ContextContext);
+  const [newSceneOpen, setNewSceneOpen] = useState(false);
   const [contextMenu, setContextMenu] = useState(null);
   const {enqueueSnackbar} = useSnackbar();
 
@@ -304,6 +307,13 @@ function Explorer() {
 
   let contextItems = getGenericContextItems(itemData, enqueueSnackbar);
   contextItems = contextItems.concat(getSpecificContextItems(itemData));
+  if (currentContext.dir_kind === "task") {
+    const newSceneItem = {
+      label: "New Scene",
+      fn: () =>  setNewSceneOpen(true)
+    };
+    contextItems.push(newSceneItem);
+  }
 
   const getBrowserHelperText = () => {
     const amount = loadedData ? loadedData.length : 0;
@@ -323,7 +333,7 @@ function Explorer() {
         pageSize={explorerSettings.tilesPerPage}
         viewType={explorerSettings.currentResultType}
         onSelected={handleEntitySelection}
-        onContextMenu={handleContextMenuSelection}
+        onContextMenu={e => handleContextMenu(e, contextMenu, setContextMenu)}
       />
     );
     return (
@@ -335,8 +345,15 @@ function Explorer() {
     );
   };
 
+  const handleNewScene = () => setNewSceneOpen(true);
+
   return (
     <div className={classes.container}>
+      <Modal open={newSceneOpen} onClose={() => setNewSceneOpen(false)} maxWidth="xs">
+        <DccSelector newScene={true} task={currentContext.path}
+          onClose={() => setNewSceneOpen(false)}
+        />
+      </Modal>
       <CreateDir open={modalData.createOpen} enqueueSnackbar={enqueueSnackbar}
         onClose={() => setModalData(prevState => ({...prevState, createOpen: false}))}
         data={modalData} fn={refreshContext}
@@ -358,7 +375,8 @@ function Explorer() {
         data={modalData} fn={refreshContext}
       />
       <ContextMenu items={contextItems} contextMenu={contextMenu}
-        setContextMenu={setContextMenu}
+        setContextMenu={setContextMenu} title={currentContext.name}
+        subtitle={currentContext.dir_kind}
       />
       <ExplorerBar
         onFilterChange={handleFilterChange}
@@ -367,6 +385,7 @@ function Explorer() {
         viewType={explorerSettings.currentViewType}
         onLatestChange={handleLatestChange}
         onViewTypeChange={handleViewTypeChange}
+        onNewScene={handleNewScene}
         enqueueSnackbar={enqueueSnackbar}
         setQuery={setQuery}
       />

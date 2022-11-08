@@ -13,6 +13,7 @@
 # limitations under the License.
 
 
+import os
 import shutil
 from datetime import datetime, timezone
 from pathlib import Path
@@ -29,8 +30,7 @@ LOGGER = get_logger(__name__)
 
 class Directory():
     def __init__(self, path="", dir_kind="directory") -> None:
-        self.dict_attrs = ["path", "dir_kind", "anchor", "project", "name",
-            "repr", "tags", "attributes", "uri", "context"]
+        self.dict_attrs = ["repr", "attributes", "uri"]
         self.nr_attrs = ["path"]
         self.project = ""
         self.group = ""
@@ -41,6 +41,7 @@ class Directory():
         self.dir_kind = dir_kind
         self.context = ""
         self._repr = None
+        self.protected = False
         self.path = ""
         if path:
             path = Path(path)
@@ -81,6 +82,7 @@ class Directory():
         self.project = project
         self.name = split2[-1]
         self.uri = utils.get_uri(path)
+        self.protected = not os.access(path, os.W_OK)
         self.context = self.get_context()
         self.load_from_config()
 
@@ -107,7 +109,15 @@ class Directory():
             return self.path.parent
 
     def as_dict(self):
+        default = ["path", "protected", "dir_kind", "anchor", "project", "tags",
+            "name", "context"]
+        default_nr = ["path"]
         d = {}
+        for s in default:
+            value = getattr(self, s)
+            d[s] = value
+            if s in default_nr or s in self.nr_attrs:
+                d[f"{s}_nr"] = utils.get_nr(value)
         attrs = dir(self)
         for s in self.dict_attrs:
             if not s in attrs:
@@ -118,9 +128,14 @@ class Directory():
                 d[f"{s}_nr"] = utils.get_nr(value)
         d["size"] = bytes_to_human_readable(self.size)
         try:
-            now = datetime.now(tz=timezone.utc)
-            d["creation_time"] = timeago.format(self.creation_time, now)
-            d["modification_time"] = timeago.format(self.modification_time, now)
+            d["creation_time"] = timeago.format(
+                self.creation_time,
+                datetime.now(tz=self.creation_time.tzinfo)
+            )
+            d["modification_time"] = timeago.format(
+                self.modification_time,
+                datetime.now(tz=self.modification_time.tzinfo)
+            )
             d["creation_ts"] = self.creation_time.timestamp()
             d["modification_ts"] = self.modification_time.timestamp()
         except Exception as e:
@@ -249,6 +264,15 @@ class Directory():
         existing = list(set(existing))
         self.update_config({"tags": existing})
         return existing
+
+    def set_protected(self, protected):
+        mode = 0o444 if protected else 0o777
+        try:
+            self.path.chmod(mode)
+        except Exception as e:
+            LOGGER.error(e)
+            return
+        return True
 
     @property
     def attributes(self):

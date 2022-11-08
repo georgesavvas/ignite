@@ -38,6 +38,7 @@ import {EntityContext} from "../../contexts/EntityContext";
 import BuildFileURL from "../../services/BuildFileURL";
 import {ConfigContext} from "../../contexts/ConfigContext";
 import styles from "./AssetDetails.module.css";
+import { Tooltip } from "@mui/material";
 
 
 const splitterStyle = {
@@ -155,6 +156,34 @@ function AssetDetails(props) {
     // }
   ];
 
+  const handleProtect = () => {
+    const data = {
+      path: props.entity.path,
+      protected: true
+    };
+    serverRequest("set_directory_protected", data).then(resp => {
+      const ok = resp.ok;
+      if (!ok) enqueueSnackbar(
+        "Failed to change permissions...", {variant: "error"}
+      );
+      else refreshContext();
+    });
+  };
+
+  const handleUnProtect = () => {
+    const data = {
+      path: props.entity.path,
+      protected: false
+    };
+    serverRequest("set_directory_protected", data).then(resp => {
+      const ok = resp.ok;
+      if (!ok) enqueueSnackbar(
+        "Failed to change permissions...", {variant: "error"}
+      );
+      else refreshContext();
+    });
+  };
+
   return (
     <div style={style}>
       <ContextMenu items={contextItems} contextMenu={contextMenu}
@@ -171,16 +200,22 @@ function AssetDetails(props) {
               <div style={{display: "flex", gap: "10px", alignItems: "center"}}>
                 <Typography variant="h5">{props.entity.name}</Typography>
                 {props.entity.protected ?
-                  <img
-                    alt="protected"
-                    src="media/shield.png"
-                    className={styles.button}
-                  /> :
-                  <img
-                    alt="unprotected"
-                    src="media/shield_broken.png"
-                    className={styles.button}
-                  />
+                  <Tooltip title="Un-protect">
+                    <img
+                      alt="protected"
+                      src="media/shield.png"
+                      className={styles.button}
+                      onClick={handleProtect}
+                    />
+                  </Tooltip> :
+                  <Tooltip title="Protect">
+                    <img
+                      alt="unprotected"
+                      src="media/shield_broken.png"
+                      className={styles.button}
+                      onClick={handleUnProtect}
+                    />
+                  </Tooltip>
                 }
               </div>
               <FormControl size="small">

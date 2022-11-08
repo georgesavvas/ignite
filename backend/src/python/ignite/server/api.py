@@ -126,7 +126,7 @@ def get_context_info(path):
         )[1].lstrip("/").split("/")[0]
         data = {
             "root": CONFIG["root"].as_posix(),
-            "name": name,
+            "name": path.name,
             "path": str(path),
             "path_nr": utils.get_nr(path),
             "posix": path.as_posix(),
@@ -352,7 +352,7 @@ def get_task(path):
 def discover_tasks(path, task_types=[], sort=None, as_dict=False):
     from ignite.server.entities.task import Task
 
-    def discover(path, l=[]):
+    def discover(path, l=[], ignore=[]):
         name = path.name
         if path.is_dir():
             d = {}
@@ -379,7 +379,7 @@ def discover_tasks(path, task_types=[], sort=None, as_dict=False):
                         config = config or {}
                         d["task_type"] = config.get("task_type")
                 discover(x, l)
-            if d["dir_kind"] == "task":
+            if d["dir_kind"] == "task" and not path in ignore:
                 if not task_types or d["task_type"] in task_types:
                     l.append(d)
         return l
@@ -387,7 +387,8 @@ def discover_tasks(path, task_types=[], sort=None, as_dict=False):
     if not path:
         return []
 
-    data = discover(Path(path))
+    p = Path(path)
+    data = discover(p, ignore=[p])
     tasks = [Task(path=task["path"]) for task in data]
     if as_dict:
         tasks = [t.as_dict() for t in tasks]
@@ -850,3 +851,10 @@ def set_scene_comment(path, text):
         return
     scene.set_comment(text)
     return True
+
+
+def set_directory_protected(path, protected):
+    entity = find(path)
+    if not entity:
+        return
+    return entity.set_protected(protected)

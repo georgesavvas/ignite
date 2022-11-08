@@ -116,3 +116,7 @@ def mount_root(app, config):
         "/files", StaticFiles(directory=projects_root), name="projects_root"
     )
     LOGGER.debug("Mounted on /files")
+
+
+def symlink_points_to(symlink, path):
+    return path == symlink.resolve()

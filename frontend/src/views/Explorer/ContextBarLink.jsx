@@ -46,7 +46,9 @@ function ContextBarLink(props) {
 
   return (
     <>
-      <ContextMenu items={contextItems} contextMenu={contextMenu} setContextMenu={setContextMenu} />
+      <ContextMenu items={contextItems} contextMenu={contextMenu}
+        setContextMenu={setContextMenu}
+      />
       <Link underline="hover" style={{cursor: "pointer"}}
         onClick={e => {
           e.stopPropagation();

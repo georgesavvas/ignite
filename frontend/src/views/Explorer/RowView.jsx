@@ -13,20 +13,20 @@
 // limitations under the License.
 
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useContext } from "react";
 
 import {DataGrid} from "@mui/x-data-grid";
+import { Typography } from "@mui/material";
 
 import DataPlaceholder from "../../components/DataPlaceholder";
 import AssetTile from "./AssetTile";
 import URI from "../../components/URI";
 import DirectoryTile from "./DirectoryTile";
-import ContextMenu, { handleContextMenu } from "../../components/ContextMenu";
-import { Typography } from "@mui/material";
+import {ContextContext} from "../../contexts/ContextContext";
 
 
 const RowView = props => {
-  const [contextMenu, setContextMenu] = useState(null);
+  const [, setCurrentContext] = useContext(ContextContext);
 
   const renderEntity = params => {
     switch (props.viewType) {
@@ -193,13 +193,23 @@ const RowView = props => {
     );
   };
 
-  const handleRowClick = params => {
+  const handleRowClick = (params, e) => {
+    if (e.detail === 2) {
+      var path = params.row.thumbnail.path;
+      if (params.row.thumbnail.task) {
+        path = params.row.thumbnail.task.path;
+      }
+      setCurrentContext(path);
+    }
     props.onSelected(params.row.thumbnail);
   };
 
   const handleRowContextMenu = e => {
+    // Bit ugly but upon right click on any point on a row, it finds the
+    // thumbnail element and triggers onContextMenu()
     e.preventDefault();
-    const row = e.target.dataset.field ? e.target.parentElement : e.target.parentElement.parentElement;
+    const row = e.target.dataset.field ?
+      e.target.parentElement : e.target.parentElement.parentElement;
     const tile = row.firstChild.firstChild;
     for (const key in tile) {
       if (key.startsWith("__reactProps$")) {
@@ -209,10 +219,7 @@ const RowView = props => {
   };
 
   return (
-    <div style={{height: "100%"}}>
-      {/* <ContextMenu items={props.contextItems} contextMenu={contextMenu}
-        setContextMenu={setContextMenu}
-      /> */}
+    <div style={{height: "100%"}} onContextMenu={props.onContextMenu}>
       <DataGrid
         onRowClick={handleRowClick}
         componentsProps={{

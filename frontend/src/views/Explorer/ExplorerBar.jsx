@@ -45,7 +45,6 @@ const style = {
 };
 
 function ExplorerBar(props) {
-  const [newSceneOpen, setNewSceneOpen] = useState(false);
   const [ingestOpen, setIngestOpen] = useState(false);
   const [filterMenu, setFilterMenu] = useState(null);
   const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
@@ -109,11 +108,6 @@ function ExplorerBar(props) {
         setContextMenu={setFilterMenu}
       />
       <div style={style}>
-        <Modal open={newSceneOpen} onClose={() => setNewSceneOpen(false)} maxWidth="xs">
-          <DccSelector newScene={true} task={currentContext.path}
-            onClose={() => setNewSceneOpen(false)}
-          />
-        </Modal>
         <Ingest open={ingestOpen} onClose={() => setIngestOpen(false)}
           enqueueSnackbar={props.enqueueSnackbar}
         />
@@ -183,7 +177,7 @@ function ExplorerBar(props) {
           color="ignite"
           variant="outlined"
           disabled={currentContext.dir_kind !== "task"}
-          onClick={() => setNewSceneOpen(true)}
+          onClick={() => props.onNewScene()}
         >
           New Scene
         </IgnButton>
