@@ -36,6 +36,14 @@ DCC_ENVS = {
     "blender": {
         "PYTHONPATH": "{dcc}/blender/python;{dcc}/common/python",
         "BLENDER_USER_SCRIPTS": "{dcc}/blender/scripts"
+    },
+    "substance_designer": {
+        "PYTHONPATH": "{dcc}/substance_designer/python;{dcc}/common/python",
+        "SBS_DESIGNER_PYTHON_PATH":  "{dcc}/substance_designer/plugins"
+    },
+    "substance_painter": {
+        "PYTHONPATH": "{dcc}/substance_painter/python;{dcc}/common/python",
+        "SUBSTANCE_PAINTER_PLUGINS_PATH":  "{dcc}/substance_painter/plugins"
     }
 }
 

@@ -15,7 +15,7 @@
 
 import logging
 import math
-import sys
+import os
 
 from fastapi import APIRouter, Request, WebSocket
 from fastapi.responses import PlainTextResponse
@@ -26,13 +26,15 @@ from ignite.server.socket_manager import SocketManager
 from ignite.utils import error, get_logger, log_request, process_request
 from ignite.utils import mount_root
 
+
 LOGGER = get_logger(__name__)
-
 ASSET_UPDATES_MANAGER = SocketManager()
+ENV = os.environ
 
 
+api_version = ENV["IGNITE_API_VERSION"]
 router = APIRouter(
-    prefix="/api/v1"
+    prefix=f"/api/{api_version}"
 )
 
 
@@ -505,12 +507,6 @@ async def set_attributes(request: Request):
     if not ok:
         return error("generic_error")
     return {"ok": True}
-
-
-@router.get("/quit")
-async def rename_entity(request: Request):
-    LOGGER.info("Asked to shut down, cya!")
-    sys.exit()
 
 
 @router.websocket("/ws/asset_updates/{session_id}")

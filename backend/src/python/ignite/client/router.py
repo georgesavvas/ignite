@@ -18,7 +18,8 @@ from pprint import pprint
 
 from fastapi import APIRouter, Request, WebSocket
 
-from ignite.utils import get_logger, mount_root
+from ignite.logger import get_logger
+from ignite.utils import mount_root
 from ignite.server import api as server_api
 from ignite.client import utils, api
 from ignite.client.utils import TASK_MANAGER, PROCESSES_MANAGER, CONFIG
@@ -29,9 +30,11 @@ LOGGER = get_logger(__name__)
 ENV = os.environ
 
 
+api_version = ENV["IGNITE_API_VERSION"]
 router = APIRouter(
-    prefix="/api/v1"
+    prefix=f"/api/{api_version}"
 )
+
 
 @router.on_event("startup")
 async def startup_event():
@@ -223,9 +226,3 @@ async def get_tasks(request: Request):
 async def is_local_server_running():
     data = api.is_local_server_running()
     return {"ok": data}
-
-
-@router.get("/quit")
-async def force_quit(request: Request):
-    LOGGER.info("Asked to quit, cya!")
-    os._exit(0)

@@ -101,6 +101,7 @@ class TaskManager():
         self.processes_manager = processes_manager
 
     def start(self):
+        pass
         self.loop = asyncio.new_event_loop()
         self.thread = threading.Thread(
             name="IgniteWorker",

@@ -16,6 +16,11 @@
 import os
 from pathlib import Path
 
+import sys
+import asyncio
+import contextlib
+import time
+import threading
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -25,13 +30,13 @@ from ignite.server import router as server_router
 from ignite.client import router as client_router
 from ignite.server.socket_manager import SocketManager
 from ignite.client.utils import CONFIG
-from ignite.utils import get_logger, mount_root
+from ignite.utils import mount_root
+from ignite.logger import get_logger
 
 
 ENV = os.environ
 LOGGER = get_logger(__name__)
 SERVER_HOST = "0.0.0.0"
-# address = CONFIG["server_details"].get("address", "")
 address = ENV.get("IGNITE_CLIENT_ADDRESS", "")
 SERVER_PORT = address.split[":"][1] if ":" in address else "9070"
 
@@ -50,6 +55,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 path = Path.home() / ".ignite"
 path.mkdir(parents=True, exist_ok=True)
 port_file = path / "ignite.port"
@@ -59,9 +65,11 @@ if port_file.exists() or pid_file.exists():
 port_file.write_text(SERVER_PORT)
 pid_file.write_text(str(os.getpid()))
 
+
 @app.on_event("startup")
 def startup_event():
     mount_root(app, CONFIG)
+
 
 @app.on_event("shutdown")
 def shutdown_event():
@@ -69,12 +77,25 @@ def shutdown_event():
     port_file.unlink()
     pid_file.unlink()
 
+
+@app.get("/api/v1/quit")
+async def force_quit():
+    print("Asked to quit, cya!")
+    global server
+    global loop
+    # loop.stop()
+    server.should_exit = True
+    server.force_exit = True
+    await server.shutdown()
+
+
 if __name__ == "__main__":
-    LOGGER.info(f"Launching server at {SERVER_HOST}:{SERVER_PORT}")
-    uvicorn.run(
+    config = uvicorn.Config(
         f"{__name__}:app",
         host=SERVER_HOST,
         port=int(SERVER_PORT),
-        log_level="info",
-        workers=1
+        log_level="info"
     )
+    server = uvicorn.Server(config=config)
+    LOGGER.info(f"Launching server at {SERVER_HOST}:{SERVER_PORT}")
+    server.run()

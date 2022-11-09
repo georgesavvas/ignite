@@ -21,7 +21,7 @@ import yaml
 from ignite.server import utils
 from ignite.server.constants import ANCHORS
 from ignite.server.utils import CONFIG
-from ignite.utils import get_logger
+from ignite.logger import get_logger
 from mongoquery import Query
 
 LOGGER = get_logger(__name__)

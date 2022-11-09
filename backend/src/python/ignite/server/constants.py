@@ -53,8 +53,8 @@ DCC_EXTENSIONS = {
     "maya": ["ma", "mb"],
     "nuke": ["nk"],
     "natron": ["ntp"],
-    "substance_designer": ["sbs"],
-    "substance_painter": [],
+    "substance_designer": ["sbs", "sbsar", "sbsasm"],
+    "substance_painter": ["toc", "spp"],
     "blender": ["blend"]
 }
 
