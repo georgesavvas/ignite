@@ -97,18 +97,12 @@ async function clientRequest(method, data=undefined) {
 }
 
 function launchBackend() {
-  // const backendCmd = {
-  //   darwin: `open -gj ${backendPath}`,
-  //   linux: `${backendPath}`,
-  //   win32: `start ${backendPath}`
-  // }[platformName];
   const backendCmd = {
     darwin: `${backendPath}`,
     linux: `${backendPath}`,
     win32: `${backendPath}`
   }[platformName];
   console.log("Launching backend...", backendCmd);
-  // return spawn(backendCmd);
   return spawn(backendCmd, {
     shell: true,
     stdio: "pipe",
@@ -169,6 +163,7 @@ async function checkBackend() {
   });
   process.env.IGNITE_CLIENT_ADDRESS = `localhost:${port}`;
   backend = launchBackend();
+  await new Promise(resolve => setTimeout(resolve, 5000));
   backendLock = false;
 }
 
