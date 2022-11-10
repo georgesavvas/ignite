@@ -1,3 +1,2 @@
-pyinstaller src/python/ignite/server_main.py --noconfirm --onefile --name=IgniteServer --icon=../icon.icns
-pyinstaller src/python/ignite/client_main.py --noconfirm --onefile --name=IgniteClientBackend --icon=../icons.icns
+pyinstaller src/python/ignite/main.py --noconfirm --onefile --name=IgniteBackend --icon=../icon.icns
 cp dist/Ignite* ../frontend

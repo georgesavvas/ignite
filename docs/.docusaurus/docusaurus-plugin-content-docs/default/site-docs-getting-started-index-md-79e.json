@@ -1,0 +1,25 @@
+{
+  "unversionedId": "getting_started/index",
+  "id": "getting_started/index",
+  "title": "Getting Started",
+  "description": "",
+  "source": "@site/docs/getting_started/index.md",
+  "sourceDirName": "getting_started",
+  "slug": "/getting_started/",
+  "permalink": "/docs/getting_started/",
+  "draft": false,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "Getting Started"
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Installation",
+    "permalink": "/docs/installation"
+  },
+  "next": {
+    "title": "Creating a project",
+    "permalink": "/docs/getting_started/creating_project"
+  }
+}

@@ -26,7 +26,7 @@ export function clientSocket(endpoint, config, sessionID, websocketConfig={}) {
     // onerror: e => console.log(e)
   };
   const ws = new Sockette(
-    `ws://${address}/ws/${endpoint}/${sessionID}`,
+    `ws://${address}/api/v1/ws/${endpoint}/${sessionID}`,
     {...defaultWebsocketConfig, ...websocketConfig}
   );
   return ws;

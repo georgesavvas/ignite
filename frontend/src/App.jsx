@@ -44,7 +44,6 @@ let darkTheme = createTheme({
     },
   },
   typography: {
-    // htmlFontSize: 18,
     fontSize: 12.5,
     allVariants: {
       color: "lightgrey"

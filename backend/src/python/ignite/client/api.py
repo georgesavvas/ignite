@@ -22,8 +22,10 @@ from pprint import pprint
 from string import Formatter
 
 import parse
+from ignite.server import api as server_api
+from ignite.server import utils as server_utils
 from ignite.client import utils
-from ignite.client.utils import TASK_MANAGER, CONFIG, server_request
+from ignite.client.utils import TASK_MANAGER, CONFIG, server_request, is_server_local
 
 from ..utils import get_logger
 
@@ -257,9 +259,13 @@ def ingest_asset(data):
     asset = task / "exports" / name
     asset_dict = None
     if asset.exists():
-        asset_dict = utils.server_request(
-            "find", {"path": asset.as_posix()}
-        ).get("data")
+        if is_server_local():
+            entity = server_api.find(asset.as_posix())
+            asset_dict = entity.as_dict() if hasattr(entity, "as_dict") else {}
+        else:
+            asset_dict = utils.server_request(
+                "find", {"path": asset.as_posix()}
+            ).get("data")
         if not asset_dict:
             LOGGER.error(f"Tried to create an asset at {asset} but couldn't, possibly directory exists already.")
             return
@@ -269,10 +275,16 @@ def ingest_asset(data):
     else:
         asset.mkdir()
         asset_path = asset.as_posix()
-        resp = utils.server_request("register_asset", {"path": asset_path})
-        if not resp.get("ok"):
-            print("Failed.")
-            return
+        if is_server_local():
+            ok = server_api.register_asset(asset_path)
+            if not ok:
+                print("Failed.")
+                return
+        else:
+            resp = utils.server_request("register_asset", {"path": asset_path})
+            if not resp.get("ok"):
+                print("Failed.")
+                return
         new_version_path = asset / "v001"
     new_version_path.mkdir(parents=True)
     for comp in comps:
@@ -281,12 +293,18 @@ def ingest_asset(data):
         dest = new_version_path / (comp_name + comp_path.suffix)
         print(f"Copying {comp_path} to {dest}")
         shutil.copyfile(comp_path, dest)
-    resp = utils.server_request(
-        "register_assetversion", {"path": new_version_path.as_posix()}
-    )
-    if not resp.get("ok"):
-        print("Failed.")
-        return
+    if is_server_local():
+        ok = server_api.register_assetversion(new_version_path.as_posix())
+        if not ok:
+            print("Failed.")
+            return
+    else:
+        resp = utils.server_request(
+            "register_assetversion", {"path": new_version_path.as_posix()}
+        )
+        if not resp.get("ok"):
+            print("Failed.")
+            return
 
 
 def get_actions():
@@ -332,13 +350,3 @@ def edit_task(task_id, edit):
 def get_tasks(session_id):
     data = TASK_MANAGER.report(session_id)
     return data
-
-
-def is_local_server_running():
-    address = CONFIG["server_details"].get("address")
-    if not address:
-        return True
-    if not address.startswith("localhost") and not address.startswith("127.0.0.1"):
-        return True
-    resp = server_request("ping")
-    return resp != None

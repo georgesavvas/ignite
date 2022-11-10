@@ -98,9 +98,13 @@ function EXRViewer(props) {
   let path = "media/no_icon.png";
   if (comp.path) path = BuildFileURL(comp.path, props.config, {forceRemote: true});
   if (!comp.static) {
-    let frame = comp.first_frame + (comp.last_frame - comp.first_frame) * progress;
-    frame = Math.round(frame);
-    frame = clamp(frame, comp.first_frame, comp.last_frame);
+    const amount = comp.frames.length;
+    const sectionSize = 1 / amount;
+    const section = clamp(Math.floor(progress / sectionSize), 0, amount - 1);
+    const frame = comp.frames[section];
+    // let frame = comp.first_frame + (comp.last_frame - comp.first_frame) * progress;
+    // frame = Math.round(frame);
+    // frame = clamp(frame, comp.first_frame, comp.last_frame);
     path = path.replace("####", frame);
   }
   
@@ -113,16 +117,19 @@ function EXRViewer(props) {
   return (
     <div style={{position: "relative", height: "100%", width: "100%"}}>
       <div style={{...sliderContainerStyle, display: comp.static ? "none" : "inherit"}}>
-        <Slider
-          defaultValue={comp.first}
-          valueLabelDisplay="auto"
-          track={false}
-          step={1}
-          onChange={(e, value) => handleFrameChange(value)}
-          marks
-          min={comp.first_frame}
-          max={comp.last_frame}
-        />
+        {comp.frames.length > 0 ?
+          <Slider
+            defaultValue={comp.first}
+            valueLabelDisplay="auto"
+            track={false}
+            step={1}
+            onChange={(e, value) => handleFrameChange(value)}
+            marks
+            min={parseInt(comp.frames[0])}
+            max={parseInt(comp.frames.at(-1))}
+          />
+          : null
+        }
       </div>
       <Canvas orthographic camera={{ zoom: 350, position: [0, 0, 1] }}>
         <OrbitControls enableRotate={false} enableDamping={false} zoomSpeed={3} mouseButtons=
@@ -201,7 +208,6 @@ function ComponentViewer(props) {
   const [config] = useContext(ConfigContext);
   
   const comp = props.comp;
-
   if (!comp) return (
     <DataPlaceholder text="No component selected" />
   );
@@ -209,8 +215,10 @@ function ComponentViewer(props) {
   let path = "media/no_icon.png";
   if (comp.path_nr) path = BuildFileURL(comp.path_nr, config, {forceRemote: true});
   if (!comp.static) {
-    let frame = comp.first_frame + (comp.last_frame - comp.first_frame) * 0.5;
-    frame = Math.round(frame);
+    const amount = comp.frames.length;
+    const frame = comp.frames[Math.round(amount / 2)];
+    // let frame = comp.first_frame + (comp.last_frame - comp.first_frame) * 0.5;
+    // frame = Math.round(frame);
     path = path.replace("####", frame);
   }
 

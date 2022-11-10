@@ -17,6 +17,7 @@ import React, {useEffect, useState, useContext} from "react";
 
 import Divider from "@mui/material/Divider";
 import debounce from "lodash.debounce";
+import Typography from "@mui/material/Typography";
 import LinearProgress from "@mui/material/LinearProgress";
 import {useSnackbar} from "notistack";
 
@@ -38,6 +39,8 @@ import classes from "./Explorer.module.css";
 import AssetTile from "./AssetTile";
 import DirectoryTile from "./DirectoryTile";
 import RowView from "./RowView";
+import Modal from "../../components/Modal";
+import DccSelector from "../DccSelector";
 
 
 const debounced = debounce(fn => fn(), 500);
@@ -71,17 +74,27 @@ const defaultExplorerSettings = {
   }
 };
 
+const defaultQuery = {
+  latest: 1,
+  sort: {
+    field: "modification_ts",
+    reverse: true,
+    label: "Date (Newest first)"
+  }
+};
+
 function Explorer() {
   const [config] = useContext(ConfigContext);
   const [isLoading, setIsLoading] = useState(true);
   const [loadedData, setLoadedData] = useState([]);
   const [pages, setPages] = useState({total: 1, current: 1});
-  const [query, setQuery] = useState({latest: 1, sort: {field: "name", reverse: false}});
+  const [query, setQuery] = useState(defaultQuery);
   const [explorerSettings, setExplorerSettings] = useState(defaultExplorerSettings);
   const [tiles, setTiles] = useState([]);
   const [modalData, setModalData] = useState({});
   const [selectedEntity, setSelectedEntity] = useContext(EntityContext);
   const [currentContext,, refreshContext] = useContext(ContextContext);
+  const [newSceneOpen, setNewSceneOpen] = useState(false);
   const [contextMenu, setContextMenu] = useState(null);
   const {enqueueSnackbar} = useSnackbar();
 
@@ -125,7 +138,7 @@ function Explorer() {
     serverRequest(method, data).then(resp => {
       setIsLoading(false);
       setLoadedData(resp.data);
-      setPages((prevPages) => ({...prevPages, total: resp.pages?.total}));
+      setPages(prevPages => ({...prevPages, total: resp.pages?.total}));
     });
   }, [pages.current, explorerSettings.currentResultType, explorerSettings.tilesPerPage, currentContext, config.access, query]);
 
@@ -294,6 +307,21 @@ function Explorer() {
 
   let contextItems = getGenericContextItems(itemData, enqueueSnackbar);
   contextItems = contextItems.concat(getSpecificContextItems(itemData));
+  if (currentContext.dir_kind === "task") {
+    const newSceneItem = {
+      label: "New Scene",
+      fn: () =>  setNewSceneOpen(true)
+    };
+    contextItems.push(newSceneItem);
+  }
+
+  const getBrowserHelperText = () => {
+    const amount = loadedData ? loadedData.length : 0;
+    const single = amount === 1 ? "" : "s";
+    let s = `${amount} result${single} | `;
+    s += query.sort ? `Sorted by: ${query.sort.label}` : "";
+    return s;
+  };
 
   const getView = () => {
     if (!loadedData || !loadedData.length) return (
@@ -305,7 +333,7 @@ function Explorer() {
         pageSize={explorerSettings.tilesPerPage}
         viewType={explorerSettings.currentResultType}
         onSelected={handleEntitySelection}
-        onContextMenu={handleContextMenuSelection}
+        onContextMenu={e => handleContextMenu(e, contextMenu, setContextMenu)}
       />
     );
     return (
@@ -317,8 +345,15 @@ function Explorer() {
     );
   };
 
+  const handleNewScene = () => setNewSceneOpen(true);
+
   return (
     <div className={classes.container}>
+      <Modal open={newSceneOpen} onClose={() => setNewSceneOpen(false)} maxWidth="xs">
+        <DccSelector newScene={true} task={currentContext.path}
+          onClose={() => setNewSceneOpen(false)}
+        />
+      </Modal>
       <CreateDir open={modalData.createOpen} enqueueSnackbar={enqueueSnackbar}
         onClose={() => setModalData(prevState => ({...prevState, createOpen: false}))}
         data={modalData} fn={refreshContext}
@@ -340,7 +375,8 @@ function Explorer() {
         data={modalData} fn={refreshContext}
       />
       <ContextMenu items={contextItems} contextMenu={contextMenu}
-        setContextMenu={setContextMenu}
+        setContextMenu={setContextMenu} title={currentContext.name}
+        subtitle={currentContext.dir_kind}
       />
       <ExplorerBar
         onFilterChange={handleFilterChange}
@@ -349,11 +385,17 @@ function Explorer() {
         viewType={explorerSettings.currentViewType}
         onLatestChange={handleLatestChange}
         onViewTypeChange={handleViewTypeChange}
+        onNewScene={handleNewScene}
         enqueueSnackbar={enqueueSnackbar}
         setQuery={setQuery}
       />
       <Divider />
       <LinearProgress color="ignite" style={{width: "100%", minHeight: "2px", visibility: isLoading ? "visible" : "hidden"}} />
+      <div className={classes.helperTextContainer}>
+        <Typography variant="caption" style={{color: "grey"}}>
+          {getBrowserHelperText()}
+        </Typography>
+      </div>
       {getView()}
       <div
         className={classes.layoutHelper}

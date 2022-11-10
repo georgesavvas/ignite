@@ -39,11 +39,8 @@ contextBridge.exposeInMainWorld("services", {
     ipcRenderer.removeAllListeners("resource_usage");
     ipcRenderer.on("resource_usage", callback);
   },
-  check_server: () => {
-    return ipcRenderer.invoke("check_server");
-  },
-  check_client: () => {
-    return ipcRenderer.invoke("check_client");
+  check_backend: () => {
+    return ipcRenderer.invoke("check_backend");
   }, 
   get_env: env_name => {
     return ipcRenderer.invoke("get_env", env_name);
@@ -56,5 +53,8 @@ contextBridge.exposeInMainWorld("services", {
   },
   set_envs: data => {
     ipcRenderer.invoke("set_envs", data);
+  },
+  get_port: () => {
+    return ipcRenderer.invoke("get_port");
   }
 });

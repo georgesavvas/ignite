@@ -85,7 +85,7 @@ export default function TaskManager() {
   const [filterValue, setFilterValue] = useState("");
 
   useEffect(() => {
-    if (!config.serverDetails.address) return;
+    if (!config.clientAddress) return;
     if (socket) return;
     window.services.get_env("IGNITE_SESSION_ID").then(resp => {
       const websocketConfig = {
@@ -102,8 +102,9 @@ export default function TaskManager() {
       };
       const ws = createProcessesSocket(config, resp, websocketConfig);
       clientRequest("get_tasks", {session_id: resp}).then(resp2 => {
+        if (!resp2) return;
         setTasks(prevState => {
-          const incoming = resp2.data;
+          const incoming = resp2.data || [];
           const incomingIds = incoming.map(t => t.id);
           const existing = prevState.filter(t => !incomingIds.includes(t.id));
           return sortTasks([...existing, ...incoming]);
@@ -116,7 +117,7 @@ export default function TaskManager() {
       destroySocket(socket);
       setSocket();
     });
-  }, [config.serverDetails]);
+  }, [config.clientAddress]);
 
   useEffect(() => {
     if (!autoClear) return;

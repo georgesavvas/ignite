@@ -50,12 +50,12 @@ ANCHORS = {
 
 DCC_EXTENSIONS = {
     "houdini": ["hip", "hipnc"],
-    "maya": ["ma"],
+    "maya": ["ma", "mb"],
     "nuke": ["nk"],
-    "natron": [],
-    "substance_designer": ["sbs"],
-    "substance_painter": [],
-    "blender": []
+    "natron": ["ntp"],
+    "substance_designer": ["sbs", "sbsar", "sbsasm"],
+    "substance_painter": ["toc", "spp"],
+    "blender": ["blend"]
 }
 
 COMP_TYPES = {

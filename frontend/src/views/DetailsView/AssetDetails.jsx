@@ -37,6 +37,8 @@ import serverRequest from "../../services/serverRequest";
 import {EntityContext} from "../../contexts/EntityContext";
 import BuildFileURL from "../../services/BuildFileURL";
 import {ConfigContext} from "../../contexts/ConfigContext";
+import styles from "./AssetDetails.module.css";
+import { Tooltip } from "@mui/material";
 
 
 const splitterStyle = {
@@ -138,7 +140,7 @@ function AssetDetails(props) {
     for(const comp of props.entity.components) {
       if (comp.filename === compName) return comp;
     }
-    return {};
+    return;
   };
 
   const selectedComp = getComp(selectedCompName);
@@ -154,6 +156,34 @@ function AssetDetails(props) {
     // }
   ];
 
+  const handleProtect = () => {
+    const data = {
+      path: props.entity.path,
+      protected: true
+    };
+    serverRequest("set_directory_protected", data).then(resp => {
+      const ok = resp.ok;
+      if (!ok) enqueueSnackbar(
+        "Failed to change permissions...", {variant: "error"}
+      );
+      else refreshContext();
+    });
+  };
+
+  const handleUnProtect = () => {
+    const data = {
+      path: props.entity.path,
+      protected: false
+    };
+    serverRequest("set_directory_protected", data).then(resp => {
+      const ok = resp.ok;
+      if (!ok) enqueueSnackbar(
+        "Failed to change permissions...", {variant: "error"}
+      );
+      else refreshContext();
+    });
+  };
+
   return (
     <div style={style}>
       <ContextMenu items={contextItems} contextMenu={contextMenu}
@@ -166,8 +196,28 @@ function AssetDetails(props) {
         <ReflexSplitter style={splitterStyle} />
         <ReflexElement flex={flexRatios["asset.details"]} name={"asset.details"} onStopResize={handleResized}>
           <div style={{margin: "10px", overflow: "hidden"}}>
-            <div style={{marginTop: "6px", display: "flex", justifyContent: "space-between"}}>
-              <Typography variant="h5">{props.entity.name}</Typography>
+            <div style={{height: "40px", margin: "6px 0px", display: "flex", justifyContent: "space-between"}}>
+              <div style={{display: "flex", gap: "10px", alignItems: "center"}}>
+                <Typography variant="h5">{props.entity.name}</Typography>
+                {props.entity.protected ?
+                  <Tooltip title="Un-protect">
+                    <img
+                      alt="protected"
+                      src="media/shield.png"
+                      className={styles.button}
+                      onClick={handleProtect}
+                    />
+                  </Tooltip> :
+                  <Tooltip title="Protect">
+                    <img
+                      alt="unprotected"
+                      src="media/shield_broken.png"
+                      className={styles.button}
+                      onClick={handleUnProtect}
+                    />
+                  </Tooltip>
+                }
+              </div>
               <FormControl size="small">
                 <InputLabel>Version</InputLabel>
                 <Select

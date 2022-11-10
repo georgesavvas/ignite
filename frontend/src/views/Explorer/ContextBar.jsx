@@ -46,7 +46,8 @@ export default function ContextBar() {
     }));
   };
 
-  const handleBreadCrumbClick = () => {
+  const handleBreadCrumbClick = e => {
+    if (e.target.className.startsWith("MuiBackdrop")) return;
     setIsTextField(true);
   };
 
@@ -88,7 +89,11 @@ export default function ContextBar() {
             const kind = currentContext.ancestor_kinds[path] || "directory";
             const Icon = DIRECTORYICONS[kind];
             return (
-              <ContextBarLink setCurrentContext={setCurrentContext} icon={Icon} path={path} key={index}>{section}</ContextBarLink>
+              <ContextBarLink setCurrentContext={setCurrentContext} icon={Icon}
+                path={path} key={index}
+              >
+                {section}
+              </ContextBarLink>
             );
           })}     
         </Breadcrumbs>

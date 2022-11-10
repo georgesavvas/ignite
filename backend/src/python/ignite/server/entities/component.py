@@ -21,8 +21,8 @@ from ignite.server import utils
 
 class Component():
     def __init__(self, path=None) -> None:
-        self.dict_attrs = ["name", "filename", "path", "ext", "static", "first_frame",
-            "last_frame"]
+        self.dict_attrs = ["name", "filename", "path", "ext", "static",
+            "first_frame", "last_frame", "frames"]
         self.nr_attrs = ["path"]
         self.name = ""
         self.filename = ""
@@ -31,6 +31,7 @@ class Component():
         self.static = False
         self.first_frame = 0
         self.last_frame = 0
+        self.frames = []
         if path:
             self.load_from_path(path)
         
@@ -50,10 +51,12 @@ class Component():
         self.static = True
         self.first_frame = 0
         self.last_frame = 0
+        self.frames = []
 
     def load_from_clique_collection(self, c):
         path = PurePath(c.format("{head}####{tail}"))
         indexes = list(c.indexes)
+        indexes = [str(i).zfill(4) for i in indexes]
         name = path.name
         ext = c.tail
         self.name = path.stem.replace(".####", "")
@@ -64,6 +67,7 @@ class Component():
         self.static = False
         self.first_frame = indexes[0]
         self.last_frame = indexes[-1]
+        self.frames = indexes
 
     def as_dict(self):
         d = {}

@@ -80,12 +80,21 @@ function Component(props) {
   )));
 
   return (
-    <div onContextMenu={e => handleContextMenu(e, contextMenu, setContextMenu)} style={props.style}>
-      <ContextMenu items={contextItems} contextMenu={contextMenu} setContextMenu={setContextMenu} />
-      <div className={styles.compContainer} id={props.comp.filename} onClick={handleClick} style={containerStyle}>
+    <div onContextMenu={e => handleContextMenu(e, contextMenu, setContextMenu)}
+      style={props.style}
+    >
+      <ContextMenu items={contextItems} contextMenu={contextMenu}
+        setContextMenu={setContextMenu} title={props.comp.name}
+        subtitle={props.comp.ext}
+      />
+      <div className={styles.compContainer} id={props.comp.filename}
+        onClick={handleClick} style={containerStyle}
+      >
         <div className={styles.compIcon} />
         <div className={styles.textContainer}>
-          <Typography variant="subtitle1" className={styles.label}>{props.comp.filename}</Typography>
+          <Typography variant="subtitle1" className={styles.label}>
+            {props.comp.filename}
+          </Typography>
         </div>
         <div className={styles.spacer} />
         <IconButton onClick={e => handleCopy(e, props.comp.path)}>

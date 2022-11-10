@@ -86,7 +86,7 @@ function TopBar(props) {
   return (
     <div style={style}>
       <ContextMenu items={sortOptions} contextMenu={sortMenu}
-        setContextMenu={setSortMenu}
+        setContextMenu={setSortMenu} title="Sort By"
       />
       <IconButton onClick={props.onRefresh} size="small">
         <SyncIcon style={{fontSize: "24px"}} />

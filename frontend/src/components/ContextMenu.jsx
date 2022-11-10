@@ -17,7 +17,17 @@ import React from "react";
 
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
+import { Typography } from "@mui/material";
 
+
+const style = {
+  display: "flex",
+  gap: "5px",
+  justifyContent: "center",
+  backgroundColor: "rgb(30, 30, 30)",
+  padding: "2px",
+  marginBottom: "2px"
+};
 
 export function handleContextMenu(event, contextMenu, setContextMenu) {
   event.preventDefault();
@@ -63,7 +73,7 @@ function ContextMenu(props) {
     <Menu
       open={props.contextMenu !== null}
       onClose={handleClose}
-      MenuListProps={{style: {padding: "4px 0"}}}
+      MenuListProps={{style: {padding: 0, paddingBottom: "4px"}}}
       anchorReference="anchorPosition"
       anchorPosition={
         props.contextMenu !== null
@@ -71,6 +81,13 @@ function ContextMenu(props) {
           : undefined
       }
     >
+      <div style={style}>
+        {props.title ? <Typography>{props.title}</Typography> : null}
+        {props.subtitle ? 
+          <Typography color="darkgrey">({props.subtitle})</Typography>
+          : null
+        }
+      </div>
       {props.items.map((item, index) => formatItem(item, index))}
     </Menu>
   );

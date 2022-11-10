@@ -18,7 +18,7 @@ import re
 from pathlib import Path, PurePath
 
 import yaml
-from ignite.utils import get_logger
+from ignite.logger import get_logger
 
 LOGGER = get_logger(__name__)
 ENV = os.environ

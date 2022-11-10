@@ -10,6 +10,8 @@
         "DCCINFO",
         "DIRCONTEXTOPTIONS",
         "DIRECTORYICONS",
+        "frange",
+        "getpid",
         "hypercorn",
         "KINDTYPES",
         "Mult",

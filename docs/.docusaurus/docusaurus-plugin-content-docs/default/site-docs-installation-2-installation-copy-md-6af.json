@@ -1,0 +1,24 @@
+{
+  "unversionedId": "installation2/installation copy",
+  "id": "installation2/installation copy",
+  "title": "Advanced setup",
+  "description": "The Ignite Server can function separately to the UI. This is useful when you want the server to run on a different box (for example a raspberry pi) and serve content to actual workstations. In that case the UI can be set up to connect to the existing server as opposed to firing up its own.",
+  "source": "@site/docs/installation2/installation copy.md",
+  "sourceDirName": "installation2",
+  "slug": "/installation2/installation copy",
+  "permalink": "/docs/installation2/installation copy",
+  "draft": false,
+  "editUrl": "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/docs/installation2/installation copy.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Software discovery",
+    "permalink": "/docs/installation2/discovery"
+  },
+  "next": {
+    "title": "Setting up ignite on a single workstation",
+    "permalink": "/docs/installation2/single"
+  }
+}

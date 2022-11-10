@@ -1,0 +1,22 @@
+{
+  "unversionedId": "installation",
+  "id": "installation",
+  "title": "Installation",
+  "description": "Setting up ignite on a single workstation",
+  "source": "@site/docs/installation.md",
+  "sourceDirName": ".",
+  "slug": "/installation",
+  "permalink": "/docs/installation",
+  "draft": false,
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 1,
+  "frontMatter": {
+    "sidebar_position": 1
+  },
+  "sidebar": "tutorialSidebar",
+  "next": {
+    "title": "Getting Started",
+    "permalink": "/docs/getting_started/"
+  }
+}

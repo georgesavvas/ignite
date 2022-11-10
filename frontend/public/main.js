@@ -16,7 +16,7 @@
 
 const {app, BrowserWindow, protocol, ipcMain, dialog, Tray, Menu, shell} = require("electron");
 const os = require("os");
-const fs = require("fs").promises;
+const fs = require("fs");
 const path = require("path");
 const {spawn} = require("child_process");
 const getPort = require("get-port");
@@ -27,17 +27,23 @@ require("update-electron-app")();
 // const osu = require("node-os-utils");
 
 const sessionID = uuid4();
-let appPath = app.getAppPath();
-if (appPath.endsWith("app.asar")) appPath = path.dirname(app.getPath("exe"));
-process.env.IGNITE_SESSION_ID = sessionID;
 let platformName = process.platform;
+let appPath = app.getAppPath();
+if (platformName === "win32") {
+  appPath = path.dirname(app.getPath("exe"));
+}
+else if (appPath.endsWith("app.asar")) {
+  appPath = path.dirname(app.getPath("exe"));
+  appPath = path.join(appPath, "..");
+}
+console.log("appPath:", appPath);
+process.env.IGNITE_SESSION_ID = sessionID;
 let appQuitting = false;
 let tray = null;
 let window = null;
-let serverBackend = null;
-let serverLock = true;
-let clientBackend = null;
-let clientLock = true;
+let backend = null;
+let backendLock = false;
+let port = -1;
 const isDev = process.env.NODE_ENV === "dev";
 const public = path.join(__dirname, "..", isDev ? "public" : "build");
 
@@ -59,39 +65,20 @@ const iconPaths = {
   "linux": "media/desktop_icon/linux/icon.png"
 };
 
-const serverPaths = {
-  "win32": "IgniteServer.exe",
-  "darwin": "IgniteServer",
-  "linux": "IgniteServer"
+const backendPaths = {
+  "win32": "IgniteBackend.exe",
+  "darwin": "IgniteBackend",
+  "linux": "IgniteBackend"
 };
-const serverPathDev = "../backend/src/python/server_main.py";
-const serverPath = path.join(
+const backendPathDev = "../backend/src/python/main.py";
+const backendPath = path.join(
   appPath,
   process.env.NODE_ENV === "dev" ?
-    serverPathDev :
-    serverPaths[platformName]
+    backendPathDev :
+    backendPaths[platformName]
 );
-console.log("platformName", platformName);
 
-const clientPaths = {
-  "win32": "IgniteClientBackend.exe",
-  "darwin": "IgniteClientBackend",
-  "linux": "IgniteClientBackend"
-};
-const clientPathDev = "../backend/src/python/client_main.py";
-const clientPath = path.join(
-  appPath,
-  process.env.NODE_ENV === "dev" ?
-    clientPathDev :
-    clientPaths[platformName]
-);
-console.log("clientPath", clientPath);
-
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-async function clientRequest(port, method, data=undefined) {
+async function clientRequest(method, data=undefined) {
   console.log(`http://localhost:${port}/api/v1/${method}`);
   try {
     const resp = await axios({
@@ -109,86 +96,82 @@ async function clientRequest(port, method, data=undefined) {
   }
 }
 
-function launchServer() {
-  const serverCmd = {
-    darwin: `open -gj ${serverPath}`,
-    linux: `${serverPath}`,
-    win32: `start ${serverPath}`
+function launchBackend() {
+  const backendCmd = {
+    darwin: `${backendPath}`,
+    linux: `${backendPath}`,
+    win32: `${backendPath}`
   }[platformName];
-  console.log("Launching server...", serverCmd);
-  return spawn(serverCmd, {
+  console.log("Launching backend...", backendCmd);
+  return spawn(backendCmd, {
     shell: true,
     stdio: "pipe",
     env: {IGNITE_CLIENT_ADDRESS: process.env.IGNITE_CLIENT_ADDRESS}
   });
 }
 
-function launchClient() {
-  const clientCmd = {
-    darwin: `open -gj ${clientPath}`,
-    linux: `${clientPath}`,
-    win32: `start ${clientPath}`
-  }[platformName];
-  console.log("Launching client...", clientCmd);
-  return spawn(clientCmd, {
-    shell: true,
-    stdio: "pipe",
-    env: {IGNITE_CLIENT_ADDRESS: process.env.IGNITE_CLIENT_ADDRESS}
-  });
+function isPidAlive(pid) {
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch (err) {
+    return false;
+  }
 }
 
-async function waitForClient(port) {
-  let ok = false;
-  while (!ok) {
-    await sleep(1000);
-    clientRequest(port, "ping").then(resp => {
-      if (resp) {
-        console.log("Client is up!");
-        ok = true;
-        return;
-      } else console.log("Client not running, waiting...");
+async function checkBackend() {
+  if (isDev) {
+    process.env.IGNITE_CLIENT_ADDRESS = "localhost:9070";
+    port = 9070;
+    return;
+  }
+  if (backendLock) return;
+  backendLock = true;
+  let shouldLaunch = true;
+  const configPath = path.join(os.homedir(), ".ignite");
+  let existingPort = -1;
+  let existingPid = -1;
+  try {
+    existingPid = fs.readFileSync(path.join(configPath, "ignite.pid"), "utf8");
+    // eslint-disable-next-line no-empty
+  } catch (err) { }
+  if (existingPid >= 0 && isPidAlive(existingPid)) {
+    try {
+      existingPort = fs.readFileSync(path.join(configPath, "ignite.port"), "utf8");
+    // eslint-disable-next-line no-empty
+    } catch (err) { }
+  }
+  if (existingPort >= 0) {
+    console.log(`Found existing backend running at port ${existingPort}`);
+    clientRequest(existingPort, "ping").then(resp => {
+      if (resp && resp.ok) {
+        console.log("Successfully connected to existing backend");
+        port = existingPort;
+        process.env.IGNITE_CLIENT_ADDRESS = `localhost:${port}`;
+        shouldLaunch = false;
+      } else {
+        console.log("Existing backend not responding, relaunching...");
+      }
     });
   }
-  return true;
-}
-
-async function checkServer(port, attempt=0) {
-  serverLock = true;
-  clientRequest(port, "is_local_server_running").then(resp => {
-    if (resp && resp.ok) {
-      console.log(`Check server - all good! (attempt ${attempt})`);
-      return true;
-    }
-    console.log(`Check server - not responding... (attempt ${attempt})`);
-    if (attempt == 3 && !isDev) {
-      serverBackend = launchServer();
-      serverLock = false;
-      return true;
-    } else setTimeout(checkServer, 3000, port, attempt += 1);
+  if (!shouldLaunch) {
+    backendLock = false;
+    return;
+  }
+  port = await getPort({
+    port: getPort.makeRange(9070, 9999)
   });
+  process.env.IGNITE_CLIENT_ADDRESS = `localhost:${port}`;
+  backend = launchBackend();
+  await new Promise(resolve => setTimeout(resolve, 5000));
+  backendLock = false;
 }
 
-async function checkClient(port, attempt=0) {
-  clientLock = true;
-  clientRequest(port, "ping").then(resp => {
-    if (resp && resp.ok) {
-      console.log(`Check client - all good! (attempt ${attempt})`);
-      return true;
-    }
-    console.log(`Check client - not responding... (attempt ${attempt})`);
-    if (attempt == 3 && !isDev) {
-      clientBackend = launchClient();
-      clientLock = false;
-      return true;
-    } else setTimeout(checkClient, 3000, port, attempt += 1);
-  });
-}
-
-function createWindow (port) {
+function createWindow (show=true) {
   const win = new BrowserWindow({
     width: 1280,
     height: 720,
-    show: false,
+    show: show,
     icon: path.join(__dirname, iconPaths[platformName]),
     backgroundColor: "#141414",
     webPreferences: {
@@ -216,17 +199,15 @@ function createWindow (port) {
 
   ipcMain.handle("store_data", async (e, filename, data) => {
     const filepath = path.join(os.homedir(), ".ignite", filename);
-    fs.writeFile(filepath, data, (err) => {
-      if (err) {
-        throw err;
-      }
+    fs.promises.writeFile(filepath, data, (err) => {
+      if (err) throw err;
       else return true;
     });
   });
 
   ipcMain.handle("load_data", async (e, filename) => {
     const filepath = path.join(os.homedir(), ".ignite", filename);
-    fs.readFile(filepath, (err) => {
+    fs.promises.readFile(filepath, (err) => {
       if (err) throw err;
       return true;
     });
@@ -239,11 +220,15 @@ function createWindow (port) {
   ipcMain.handle("check_path", async (e, filepath) => {
     let valid = true;
     try {
-      await fs.access(filepath);
+      await fs.promises.access(filepath);
     } catch (err) {
       valid = false;
     }
     return valid;
+  });
+
+  ipcMain.handle("dir_input", async () => {
+    return dialog.showOpenDialog({properties: ["openFile"] });
   });
 
   ipcMain.handle("file_input", async () => {
@@ -251,22 +236,26 @@ function createWindow (port) {
   });
 
   ipcMain.handle("get_env", (e, env_name) => {
+    // console.log(env_name, process.env[env_name]);
     return process.env[env_name];
   });
 
   ipcMain.handle("set_env", (e, env_name, env_value) => {
+    const prev = process.env[env_name];
+    // console.log("Setting", env_name, "from", prev, "to", env_value);
     process.env[env_name] = env_value;
-    console.log("Setting", env_name, "to", env_value, "->", process.env[env_name]);
   });
 
   ipcMain.handle("set_envs", (e, data) => {
     for (const [env_name, env_value] of Object.entries(data)) {
+      const prev = process.env[env_name];
+      // console.log("Setting", env_name, "from", prev, "to", env_value);
       process.env[env_name] = env_value;
-      console.log("Setting", env_name, "to", env_value, "->", process.env[env_name]);
     }
   });
 
   ipcMain.handle("get_port", () => {
+    console.log("get_port", port);
     return port;
   });
 
@@ -293,15 +282,9 @@ function createSplash () {
 }
 
 app.whenReady().then(async () => {
+  checkBackend();
   const splash = createSplash();
-
-  const port = await getPort({
-    port: getPort.makeRange(9071, 9999)
-  });
-
-  process.env.IGNITE_CLIENT_ADDRESS = `127.0.0.1:${port}`;
-
-  window = createWindow(port);
+  window = createWindow(false);
 
   window.webContents.once("did-finish-load", () => {
     splash.destroy();
@@ -309,44 +292,26 @@ app.whenReady().then(async () => {
   });
 
   ipcMain.handle("launch_dcc", async (e, cmd, args, env) => {
-    const proc = spawn(cmd, args, {env: env, detached: true});
+    console.log("Running", cmd, args);
+    console.log(env);
+    const proc = spawn(cmd, args, {env: {ALLUSERSPROFILE: process.env.ALLUSERSPROFILE, ...env}, detached: true});
     if (proc) return true;
   });
 
-  ipcMain.handle("check_server", async () => {
-    if (serverLock || isDev) return;
-    return checkServer(port);
+  ipcMain.handle("check_backend", async () => {
+    if (isDev) return;
+    return checkBackend();
   });
-
-  ipcMain.handle("check_client", async () => {
-    if (clientLock || isDev) return;
-    return checkClient(port);
-  });
-
-  if (!isDev) {
-    clientBackend = launchClient();
-    clientLock = false;
-    waitForClient(port).then(() => {
-      clientRequest(port, "is_local_server_running").then(resp => {
-        if (resp && resp.ok) {
-          console.log("Found local Ignite server!");
-          return;
-        }
-        console.log("Local Ignite server was not found, launching...");
-        serverBackend = launchServer();
-        serverLock = false;
-      });
-    });
-  }
 
   if (tray === null) tray = new Tray(`${public}/media/icon.png`);
   const contextMenu = Menu.buildFromTemplate([
     { label: "Show", click: () => window.show() },
     { label: "Exit", click: () => {
       if (!isDev) {
-        if (clientBackend) clientBackend.kill();
-        clientRequest(port, "quit");
-      }
+        console.log("Attempting to kill backend...");
+        if (backend) backend.kill("SIGINT");
+        clientRequest("quit");
+      } else console.log("not bye!");
       app.quit();
     } },
   ]);
@@ -355,6 +320,7 @@ app.whenReady().then(async () => {
   tray.on("click", () => window.show());
   tray.on("double-click", () => window.show());
 });
+
 app.on("ready", async () => {
   const protocolName = "ign";
   protocol.registerFileProtocol(protocolName, (request, callback) => {

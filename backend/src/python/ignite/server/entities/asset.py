@@ -16,15 +16,15 @@
 from pathlib import Path
 
 import yaml
+from ignite.utils import symlink_points_to
 from ignite.server.entities.directory import Directory
 
 
 class Asset(Directory):
     def __init__(self, path="") -> None:
         super().__init__(path, dir_kind="asset")
-        self.dict_attrs = ["path", "dir_kind", "anchor", "project", "name", "versions",
-            "latest_v", "best_v", "uri", "context", "next_path", "creation_time", "modification_time"]
-        self.nr_attrs = ["path"]
+        self.dict_attrs = ["versions", "latest_v", "best_v", "uri", "next_path",
+            "creation_time", "modification_time"]
         self._versions = []
         self._assetversions = []
         self._latest_v = None
@@ -59,9 +59,9 @@ class Asset(Directory):
     
     @property
     def best_v(self):
-        if not self._best_av:
+        if not self._best_v:
             self._get_best_version()
-        return self._best_av
+        return self._best_v
     
     @property
     def best_av(self):
@@ -121,7 +121,7 @@ class Asset(Directory):
                 best_av = av
         self._best_v = best_av.version
         self._best_av = best_av
-        # self.check_symlinks()
+        self.check_symlinks()
 
     @property
     def next_version(self):
@@ -140,14 +140,26 @@ class Asset(Directory):
     def post_write(self):
         pass
         # Disabled for now until there's a solution to Windows asking for UAC
-        # self.check_symlinks()
+        self.check_symlinks()
 
     def check_symlinks(self):
         path = Path(self.path)
         latest = path / "latest"
+        latest_target = path / self.latest_v
+        latest_exists = latest_target and latest.exists()
+        latest_ok = symlink_points_to(latest, latest_target) if latest_exists else False
         best = path / "best"
-        latest.symlink_to(path / self.latest_v, target_is_directory=True)
-        best.symlink_to(path / self.best_v, target_is_directory=True)
+        best_target = path / self.best_v
+        best_exists = best_target and best.exists()
+        best_ok = symlink_points_to(best, best_target) if best_exists else False
+        if latest_target and not latest_ok:
+            if latest_exists:
+                latest.unlink()
+            latest.symlink_to(latest_target, target_is_directory=True)
+        if best_target and not best_ok:
+            if best_exists:
+                best.unlink()
+            best.symlink_to(best_target, target_is_directory=True)
 
     def as_dict(self):
         d = super().as_dict()

@@ -134,7 +134,8 @@ function StyledTreeItem(props) {
   return (
     <div>
       <ContextMenu items={contextItems} contextMenu={contextMenu}
-        setContextMenu={setContextMenu}
+        setContextMenu={setContextMenu} title={props.labelText}
+        subtitle={props.dirkind}
       />
       <StyledTreeItemRoot
         label={

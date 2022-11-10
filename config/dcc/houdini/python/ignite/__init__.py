@@ -65,9 +65,11 @@ def ignite_request(server, method, data):
         method
     )
     if data:
-        return requests.post(url, json=data, timeout=5).json()
+        resp = requests.post(url, json=data, timeout=5)
+        return resp.json() if resp else {"ok": False}
     else:
-        return requests.get(url)
+        resp = requests.get(url)
+        return resp.json() if resp else {"ok": False}
 
 
 def server_request(method, data=None):
