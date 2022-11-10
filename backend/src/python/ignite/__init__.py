@@ -48,7 +48,7 @@ HOME = Path.home()
 
 ignite_root = Path(DIR)
 if __file__.endswith(".py"):
-    ignite_root = Path(DIR).parent.parent.parent.parent.parent
+    ignite_root = Path(DIR).parent.parent.parent.parent
 LOGGER.info(f"Setting IGNITE_ROOT to {ignite_root}")
 ENV["IGNITE_ROOT"] = str(ignite_root)
 

@@ -304,12 +304,13 @@ def launch_dcc(dcc, dcc_name, scene):
 
 
 def get_launch_cmd(dcc, task, scene):
-    if not task:
+    if not task and scene:
         task = scene.get("task", "")
     dcc_label = dcc["name"]
     dcc["name"] = get_dcc_name(dcc)
     env = get_env(task, dcc, scene)
-    scene = scene.get("scene")
+    if scene:
+        scene = scene.get("scene")
     for config in CONFIG.get("dcc_config", []):
         if config["name"] == dcc_label:
             dcc_config = config
