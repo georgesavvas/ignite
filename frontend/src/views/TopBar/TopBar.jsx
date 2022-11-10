@@ -25,12 +25,17 @@ import Vault from "../Vault/Vault";
 import styles from "./TopBar.module.css";
 import IgnButton from "../../components/IgnButton";
 import {ContextContext} from "../../contexts/ContextContext";
+import Modal from "../../components/Modal";
+import DccSelector from "../DccSelector";
+import Feedback from "../Feedback.jsx";
 
 
 export default function TopBar() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [projectBrowserOpen, setProjectBrowserOpen] = useState(false);
   const [vaultOpen, setVaultOpen] = useState(false);
+  const [dccOpen, setDccOpen] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [,, refreshContext] = useContext(ContextContext);
 
   const handleVaultClose = () => {
@@ -45,6 +50,11 @@ export default function TopBar() {
         open={projectBrowserOpen}
         onClose={() => setProjectBrowserOpen(false)}
       />
+      <Modal open={dccOpen} onClose={() => setDccOpen(false)} maxWidth="xs">
+        <DccSelector onClose={() => setDccOpen(false)}
+        />
+      </Modal>
+      <Feedback open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
       <Settings open={settingsOpen} onClose={() => setSettingsOpen(false)} />
       <div className={styles.container}>
         <div className={styles.leftSide}>
@@ -56,13 +66,28 @@ export default function TopBar() {
           >
             Project Browser
           </IgnButton>
-          <IgnButton variant="outlined" color="ignite" onClick={() => setVaultOpen(true)}>Vault</IgnButton>
+          <IgnButton
+            variant="outlined"
+            color="ignite"
+            onClick={() => setVaultOpen(true)}
+          >
+            Vault
+          </IgnButton>
+          <IgnButton
+            variant="outlined"
+            color="ignite"
+            onClick={() => setDccOpen(true)}
+          >
+            Launch App
+          </IgnButton>
         </div>
         <div className={styles.logoContainer}>
           <img src="media/ignite_logo.png" className={styles.logo} />
         </div>
         <div className={styles.rightSide}>
-          <IconButton size="small" style={{padding: 0}}>
+          <IconButton size="small" style={{padding: 0}}
+            onClick={() => setFeedbackOpen(true)}
+          >
             <div className={styles.feedbackIcon} />
           </IconButton>
           <IconButton size="small"

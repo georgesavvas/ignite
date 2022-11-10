@@ -1,0 +1,67 @@
+{
+  "pluginId": "default",
+  "version": "current",
+  "label": "Next",
+  "banner": null,
+  "badge": false,
+  "noIndex": false,
+  "className": "docs-version-current",
+  "isLast": true,
+  "docsSidebars": {
+    "tutorialSidebar": [
+      {
+        "type": "link",
+        "label": "Installation",
+        "href": "/docs/installation",
+        "docId": "installation"
+      },
+      {
+        "type": "category",
+        "label": "Getting Started",
+        "collapsible": true,
+        "collapsed": true,
+        "items": [
+          {
+            "type": "link",
+            "label": "Creating a project",
+            "href": "/docs/getting_started/creating_project",
+            "docId": "getting_started/creating_project"
+          },
+          {
+            "type": "link",
+            "label": "Launching software",
+            "href": "/docs/getting_started/launching_software",
+            "docId": "getting_started/launching_software"
+          }
+        ],
+        "href": "/docs/getting_started/"
+      }
+    ]
+  },
+  "docs": {
+    "getting_started/creating_project": {
+      "id": "getting_started/creating_project",
+      "title": "Creating a project",
+      "description": "1. Open up the Project Browser.",
+      "sidebar": "tutorialSidebar"
+    },
+    "getting_started/index": {
+      "id": "getting_started/index",
+      "title": "Getting Started",
+      "description": "",
+      "sidebar": "tutorialSidebar"
+    },
+    "getting_started/launching_software": {
+      "id": "getting_started/launching_software",
+      "title": "Launching software",
+      "description": "1. Browse to or create a task by using the Project Tree on the left side of the UI.",
+      "sidebar": "tutorialSidebar"
+    },
+    "installation": {
+      "id": "installation",
+      "title": "Installation",
+      "description": "Setting up ignite on a single workstation",
+      "sidebar": "tutorialSidebar"
+    }
+  }
+}

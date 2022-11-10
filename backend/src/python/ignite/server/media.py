@@ -20,7 +20,7 @@ import subprocess
 
 import clique
 from ignite.server.constants import OS_NAMES, TOOLS
-from ignite.utils import get_logger
+from ignite.logger import get_logger
 
 LOGGER = get_logger(__name__)
 OS_NAME = OS_NAMES[platform.system()]

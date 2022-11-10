@@ -1,3 +1,5 @@
 houdini: scene.hip
 maya: scene.ma
 nuke: scene.nk
+natron: scene.ntp
+blender: scene.blend

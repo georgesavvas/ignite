@@ -40,13 +40,6 @@ async function request(address, method, data, attempt=0) {
     return resp2;
   } catch (error) {
     return {ok: false, msg: "Could not connect to Ignite client..."};
-    // if (attempt == 0) {
-    //   // await window.services.check_client();
-    //   setTimeout(request, 2000, address, method, data, attempt += 1);
-    // }
-    // else if (attempt <= 2) {
-    //   setTimeout(request, 2000, address, method, data, attempt += 1);
-    // } else return {ok: false, msg: "Could not connect to Ignite client..."};
   }
 }
 

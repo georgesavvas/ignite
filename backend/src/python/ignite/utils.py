@@ -13,47 +13,14 @@
 # limitations under the License.
 
 
-import logging
 import os
-from pathlib import PurePath
+from pathlib import PurePath, Path
 from pprint import pprint
 
+from fastapi.staticfiles import StaticFiles
+from ignite.logger import get_logger
+
 ENV = os.environ
-
-
-class LogFormatter(logging.Formatter):
-
-    grey = "\x1b[38;21m"
-    yellow = "\x1b[33;21m"
-    red = "\x1b[31;21m"
-    bold_red = "\x1b[31;1m"
-    reset = "\x1b[0m"
-    format = "%(asctime)s - %(name)-s - %(levelname)-6s - %(funcName)s - %(message)s"
-
-    FORMATS = {
-        logging.DEBUG: grey + format + reset,
-        logging.INFO: grey + format + reset,
-        logging.WARNING: yellow + format + reset,
-        logging.ERROR: red + format + reset,
-        logging.CRITICAL: bold_red + format + reset,
-    }
-
-    def format(self, record):
-        log_fmt = self.FORMATS.get(record.levelno)
-        formatter = logging.Formatter(log_fmt, datefmt="%d/%m/%Y %H:%M:%S")
-        return formatter.format(record)
-
-
-def get_logger(name):
-    logger = logging.getLogger(name)
-    logger.setLevel(logging.DEBUG)
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.DEBUG)
-    ch.setFormatter(LogFormatter())
-    logger.handlers = []
-    logger.addHandler(ch)
-    logger.propagate = False
-    return logger
 
 
 LOGGER = get_logger(__name__)
@@ -102,3 +69,19 @@ def bytes_to_human_readable(size, suffix="B"):
             return f"{size:3.1f} {unit}{suffix}"
         size /= 1024.0
     return f"{size:.1f}Yi{suffix}"
+
+
+def mount_root(app, config):
+    projects_root = config["root"]
+    if not projects_root or not Path(projects_root).is_dir():
+        LOGGER.warning(f"Projects root {projects_root} does not exist, skipping mounting...")
+        return
+    LOGGER.debug(f"Attempting to mount {projects_root}")
+    app.mount(
+        "/files", StaticFiles(directory=projects_root), name="projects_root"
+    )
+    LOGGER.debug("Mounted on /files")
+
+
+def symlink_points_to(symlink, path):
+    return path == symlink.resolve()

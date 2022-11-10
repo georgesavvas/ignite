@@ -26,6 +26,7 @@ import ProjectTree from "../views/TreeView/ProjectTree";
 import TopBar from "../views/TopBar/TopBar";
 import styles from "./Home.module.css";
 import Explorer from "../views/Explorer/Explorer";
+import WaitingForBackendOverlay from "./WaitingForBackendOverlay";
 import LostConnectionOverlay from "./LostConnectionOverlay";
 import {ConfigContext} from "../contexts/ConfigContext";
 import Welcome from "./Welcome";
@@ -45,6 +46,7 @@ const defaultFlexRations = {
 
 export default function Home() {
   const [flexRatios, setFlexRatios] = useState(defaultFlexRations);
+  const [waitBackendOpen, setWaitBackendOpen] = useState(true);
   const [welcomeOpen, setWelcomeOpen] = useState(false);
   const [config] = useContext(ConfigContext);
 
@@ -71,16 +73,24 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    if (!config.ready) return;
+    setWaitBackendOpen(false);
+    openWelcomeDialogueIfNeeded();
+  }, [config.ready]);
+
+  const openWelcomeDialogueIfNeeded = () => {
     const noWelcome = localStorage.getItem("disable_welcome");
     if (noWelcome) return;
     serverRequest("get_projects").then(resp => {
-      if (resp.data) {
+      if (resp && resp.data) {
         localStorage.setItem("disable_welcome", true);
         return;
+      } else {
+        console.log("No projects found, displaying welcome dialogue!", resp);
       }
       setWelcomeOpen(true);
     });
-  }, []);
+  };
 
   const handleResized = data => {
     saveReflexLayout(data);
@@ -88,6 +98,7 @@ export default function Home() {
 
   return (
     <div className={styles.container}>
+      {waitBackendOpen ? <WaitingForBackendOverlay /> : null}
       {config.lostConnection ? <LostConnectionOverlay /> : null}
       <Welcome open={welcomeOpen} onClose={() => setWelcomeOpen(false)} />
       <div className={styles.topBar}>
