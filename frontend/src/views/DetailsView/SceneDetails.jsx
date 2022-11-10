@@ -34,6 +34,12 @@ function SceneDetails(props) {
         <DccSelector scene={props.entity} style={{maxHeight: "75vh"}} />
         <Divider style={{margin: "20px 0 20px 0"}} />
         <Typography variant="h5">Scene Details ({props.entity.dcc})</Typography>
+        {props.entity.comment ?
+          <Typography variant="body1">
+            Comment: {props.entity.comment}
+          </Typography>
+          : null
+        }
         <Path path={props.entity.path} />
         <Path path={props.entity.scene} />
       </div>

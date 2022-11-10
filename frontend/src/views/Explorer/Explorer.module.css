@@ -17,3 +17,9 @@
 .layoutHelper {
     flex-grow: 100;
 }
+
+.helperTextContainer {
+    display: flex;
+    padding-left: 10px;
+    /* padding-top: 5px; */
+}

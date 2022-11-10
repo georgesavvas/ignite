@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-from ignite.utils import get_logger
+from ignite.logger import get_logger
 
 LOGGER = get_logger(__name__)
 

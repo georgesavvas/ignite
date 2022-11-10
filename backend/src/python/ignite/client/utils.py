@@ -26,8 +26,10 @@ from pprint import pprint
 from pathlib import PurePath, Path
 
 from ..utils import get_logger
-from ignite.client.constants import GENERIC_ENV, DCC_ENVS, OS_NAMES, DCC_DISCOVERY
+from ignite.server import api as server_api
 from ignite.server.socket_manager import SocketManager
+from ignite.client.constants import GENERIC_ENV, DCC_ENVS, OS_NAMES
+from ignite.client.constants import DCC_DISCOVERY, DCC_VERSIONS
 from ignite.client.task_manager import TaskManager
 
 LOGGER = get_logger(__name__)
@@ -106,12 +108,52 @@ def set_config(data):
     return config, root_changed
 
 
-def replace_vars(d, projects_root=None):
+def is_server_local():
+    local = (
+        "0.0.0.0",
+        "localhost"
+    )
+    for s in local:
+        if IGNITE_SERVER_ADDRESS.startswith(s):
+            return True
+
+
+def get_dcc_name(dcc):
+    path = dcc["path"]
+    name = path.replace("\\", "/").split("/")[-1].split(".")[0].lower()
+    return name
+
+
+def get_dcc_version(dcc):
+    if not dcc:
+        return "default"
+    dcc_name = dcc["name"]
+    dcc_path = dcc["path"]
+    for data in DCC_VERSIONS:
+        if dcc_name != data["name"]:
+            continue
+        for actual_v, strings in data["versions"].items():
+            for v in strings:
+                if v in dcc_path:
+                    return actual_v
+    return "default"
+
+
+def replace_vars(d, projects_root=None, dcc={}):
+    fetched_projects_root = None
+    if not projects_root:
+        if is_server_local():
+            fetched_projects_root = server_api.get_projects_root()
+        else:
+            fetched_projects_root = server_request("get_projects_root").get(
+                "data", ""
+            )
     vars = {
         "os": OS_NAME,
         "dcc": str(DCC),
+        "version": get_dcc_version(dcc),
         "projects_root": (
-            projects_root or server_request("get_projects_root").get("data", "")
+            projects_root or fetched_projects_root
         )
     }
     env = {}
@@ -126,7 +168,7 @@ def replace_vars(d, projects_root=None):
 
 
 def get_generic_env(projects_root=None):
-    IGNITE_CLIENT_ADDRESS = ENV["IGNITE_CLIENT_ADDRESS"]
+    IGNITE_CLIENT_ADDRESS = ENV["IGNITE_ADDRESS"]
     env = {
         "IGNITE_SERVER_ADDRESS": IGNITE_SERVER_ADDRESS,
         "IGNITE_CLIENT_ADDRESS": IGNITE_CLIENT_ADDRESS,
@@ -138,7 +180,11 @@ def get_generic_env(projects_root=None):
 
 
 def get_task_env(path):
-    task = server_request("find", {"path": path}).get("data", {})
+    if is_server_local():
+        entity = server_api.find(path)
+        task = entity.as_dict() if hasattr(entity, "as_dict") else {}
+    else:
+        task = server_request("find", {"path": path}).get("data", {})
     if not task or not task.get("dir_kind") == "task":
         return {}
     env = {
@@ -170,14 +216,21 @@ def get_scene_env(scene):
 
 
 def get_dcc_env(dcc, projects_root=None):
-    if not dcc in DCC_ENVS.keys():
+    dcc_name = dcc["name"]
+    if not dcc_name in DCC_ENVS:
         return {}
-    return replace_vars(DCC_ENVS[dcc], projects_root=projects_root)
+    return replace_vars(
+        DCC_ENVS[dcc_name],
+        projects_root=projects_root,
+        dcc=dcc
+    )
 
 
-def get_env(task="", dcc="", scene={}):
-    # env = os.environ.copy()
-    projects_root = server_request("get_projects_root").get("data", "")
+def get_env(task="", dcc={}, scene={}):
+    if is_server_local():
+        projects_root = server_api.get_projects_root()
+    else:
+        projects_root = server_request("get_projects_root").get("data", "")
     env = {}
     env.update(get_generic_env(projects_root))
     if task:
@@ -221,7 +274,11 @@ def discover_dcc():
 
 
 def launch_dcc(dcc, dcc_name, scene):
-    scene = server_request("find", {"path": scene}).get("data", {})
+    if is_server_local():
+        entity = server_api.find(scene)
+        scene = entity.as_dict() if hasattr(entity, "as_dict") else {}
+    else:
+        scene = server_request("find", {"path": scene}).get("data", {})
     if not scene:
         return
     task = scene.get("task", "")
@@ -246,17 +303,16 @@ def launch_dcc(dcc, dcc_name, scene):
     return True
 
 
-def get_launch_cmd(dcc, dcc_name, task, scene):
-    # scene = server_request("find", {"query": scene}).get("data", {})
-    # if not scene:
-    #     return
-    if not task:
+def get_launch_cmd(dcc, task, scene):
+    if not task and scene:
         task = scene.get("task", "")
-    print("Getting env with (task, dcc, scene) -", task, "-", dcc, "-", scene)
+    dcc_label = dcc["name"]
+    dcc["name"] = get_dcc_name(dcc)
     env = get_env(task, dcc, scene)
-    scene = scene.get("scene")
+    if scene:
+        scene = scene.get("scene")
     for config in CONFIG.get("dcc_config", []):
-        if config["name"] == dcc_name:
+        if config["name"] == dcc_label:
             dcc_config = config
             break
     else:
@@ -280,7 +336,11 @@ def get_launch_cmd(dcc, dcc_name, task, scene):
 
 
 def copy_default_scene(task, dcc):
-    task = server_request("find", {"path": task}).get("data")
+    if is_server_local():
+        entity = server_api.find(task)
+        task = entity.as_dict() if hasattr(entity, "as_dict") else {}
+    else:
+        task = server_request("find", {"path": task}).get("data")
     if not task or not task["dir_kind"] == "task":
         LOGGER.error(f"Invalid task {task}")
         return
@@ -290,26 +350,29 @@ def copy_default_scene(task, dcc):
         return
     with open(filepath, "r") as f:
         data = yaml.safe_load(f)
-    if dcc not in data.keys():
+    dcc_name = get_dcc_name(dcc)
+    if dcc_name not in data:
         LOGGER.error(f"Default scenes config is empty {filepath}")
         return
-    src = DCC / "default_scenes" / data[dcc]
+    src = DCC / "default_scenes" / data[dcc_name]
     dest = Path(task.get("next_scene"))
     dest.mkdir(parents=True, exist_ok=True)
     LOGGER.info(f"Copying default scene {src} to {dest}")
     shutil.copy2(src, dest)
     data = {
-        "client_root": str(CONFIG["root"]),
         "path": str(dest),
         "dir_kind": "scene"
     }
-    server_request("register_directory", data)
+    if is_server_local():
+        server_api.register_directory(str(dest), "scene")
+    else:
+        server_request("register_directory", data)
     scene_path = dest / PurePath(src).name
-    data = {
-        "client_root": str(CONFIG["root"]),
-        "path": str(scene_path)
-    }
-    scene = server_request("find", data).get("data")
+    if is_server_local():
+        entity = server_api.find(str(scene_path))
+        scene = entity.as_dict() if hasattr(entity, "as_dict") else {}
+    else:
+        scene = server_request("find", {"path": str(scene_path)}).get("data")
     return scene
 
 

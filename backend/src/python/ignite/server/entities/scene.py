@@ -17,17 +17,18 @@ import os
 from datetime import datetime, timezone
 from pathlib import Path, PurePath
 
+import clique
 from ignite.server.constants import ANCHORS, DCC_EXTENSIONS
 from ignite.server.entities.directory import Directory
+from ignite.server.entities.component import Component
 from ignite.server.utils import CONFIG
 
 
 class Scene(Directory):
     def __init__(self, path="") -> None:
-        self.dict_attrs = ["path", "project", "name", "group" ,"dcc", "extension",
-            "version", "dir_kind", "scene", "context", "task", "version", "vsn", "tags",
-            "attributes", "creation_time", "modification_time", "comment"]
-        self.nr_attrs = ["path", "task", "scene"]
+        self.dict_attrs = ["group" ,"dcc", "version", "scene", "task",
+            "version", "vsn", "attributes", "comment", "thumbnail", "extension"]
+        self.nr_attrs = ["task", "scene"]
         self.project = ""
         self.group = ""
         self.context = ""
@@ -43,6 +44,7 @@ class Scene(Directory):
         self.path = path
         self.scene = PurePath()
         self.task = None
+        self.protected = False
         if self.path:
             path = Path(path)
             self.path = PurePath(self.path)
@@ -61,6 +63,7 @@ class Scene(Directory):
                     f"Invalid scene or missing anchor: {self.anchor}"
                 )
             self.load_from_path()
+            self.thumbnail = self.get_thumbnail()
 
     def __repr__(self):
         return f"{self.dcc} {self.name} ({self.path})"
@@ -99,6 +102,7 @@ class Scene(Directory):
         self.task = path=path.parent.parent
         self.dcc = ext_dcc.get(ext, "")
         self.context = self.get_context()
+        self.load_from_config()
     
     def is_valid(self):
         if not self.task or not self.version or not self.task or not self.extension:
@@ -112,6 +116,7 @@ class Scene(Directory):
 
     def set_comment(self, comment):
         self.comment = comment
+        self.update_config({"comment": comment})
 
     def next_version(self):
         version = int(self.version.lstrip("v"))
@@ -122,3 +127,29 @@ class Scene(Directory):
         next_v = self.next_version()
         filename = self.scene.name
         return self.path / next_v / filename
+    
+    def get_thumbnail(self):
+        exts = (".jpg", ".jpeg", ".png", ".tif", ".tiff")
+        thumb = None
+        path = Path(self.path)
+        preview_path = path / "preview"
+        if preview_path.is_dir():
+            collections, remainder = clique.assemble(
+                [str(d) for d in preview_path.iterdir()]
+            )
+            for c in collections:
+                if c.head.split("/")[-1].startswith("."):
+                    continue
+                if ".temp." in c.head:
+                    continue
+                if c.tail not in exts:
+                    continue
+                thumb = Component(c)
+                break
+        if not thumb:
+            for file in path.glob("thumbnail.*"):
+                if file.suffix not in exts:
+                    continue
+                thumb = Component(file)
+                break
+        return thumb.as_dict() if thumb else None

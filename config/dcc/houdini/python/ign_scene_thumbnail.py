@@ -1,14 +1,22 @@
 import os
+import logging
 from pathlib import Path
 
-current = Path(hou.hipFile.path())
-version = int(current.parts[-2].lstrip("v"))
-version += 1
-next_v = str(version).zfill(3)
-filename = current.name
-new_dir = current.parent.parent / f"v{next_v}"
-new_dir.mkdir(exist_ok=False)
-new_filepath = new_dir / filename
-hou.hipFile.save(str(new_filepath))
-anchor = new_dir / ".ign_scene.yaml"
-anchor.touch()
+hou.hipFile.save()
+path = Path(hou.hipFile.path()).parent
+output_path = path / "thumbnail.jpg"
+output_path.parent.mkdir(exist_ok=True, parents=True)
+
+viewer = hou.ui.paneTabOfType(hou.paneTabType.SceneViewer)
+viewport = viewer.selectedViewport()
+settings = viewer.flipbookSettings().stash()
+frame = hou.frame()
+settings.frameRange((frame, frame))
+settings.useResolution(False)
+settings.outputToMPlay(False)
+settings.output(str(output_path))
+viewer.flipbook(settings=settings)
+print(f"Exported to {output_path}")
+
+editor = hou.ui.paneTabOfType(hou.paneTabType.NetworkEditor)
+editor.flashMessage(image=None, message="Done", duration=3)

@@ -16,13 +16,12 @@
 import datetime
 import os
 import re
-from inspect import getcallargs
 from pathlib import Path, PurePath
 
 import parse
 import yaml
 from ignite.server.constants import ANCHORS
-from ignite.utils import get_logger
+from ignite.logger import get_logger
 
 LOGGER = get_logger(__name__)
 ENV = os.environ

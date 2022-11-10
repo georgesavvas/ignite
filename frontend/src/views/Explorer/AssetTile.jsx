@@ -26,7 +26,7 @@ import Tile from "../../components/Tile";
 
 function AssetTile(props) {
   const {enqueueSnackbar} = useSnackbar();
-  const [currentContext] = useContext(ContextContext);
+  const [currentContext, setCurrentContext] = useContext(ContextContext);
 
   const hasThumbnail = props.entity.thumbnail && props.entity.thumbnail.filename;
   const thumbnailWidth = hasThumbnail ? "100%" : "50%";
@@ -48,6 +48,11 @@ function AssetTile(props) {
     {
       label: "Copy path",
       fn: () =>  CopyToClipboard(props.entity.path, enqueueSnackbar),
+      divider: true
+    },
+    {
+      label: "Go to task",
+      fn: () =>  setCurrentContext(props.entity.task),
       divider: true
     },
     {
@@ -99,6 +104,30 @@ function AssetTile(props) {
         <Typography style={{position: "absolute", bottom: "5px", right: "10px"}}>
           {props.entity.version}
         </Typography>
+        {props.entity.protected ?
+          <img
+            alt="protected"
+            src="media/shield.png"
+            style={{
+              position: "absolute",
+              top: "5px",
+              right: "5px",
+              height: "20px",
+              width: "20px"
+            }}
+          /> :
+          <img
+            alt="unprotected"
+            src="media/shield_broken.png"
+            style={{
+              position: "absolute",
+              top: "5px",
+              right: "5px",
+              height: "20px",
+              width: "20px"
+            }}
+          />
+        }
       </>
     );
   }

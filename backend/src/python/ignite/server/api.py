@@ -21,7 +21,7 @@ import yaml
 from ignite.server import utils
 from ignite.server.constants import ANCHORS
 from ignite.server.utils import CONFIG
-from ignite.utils import get_logger
+from ignite.logger import get_logger
 from mongoquery import Query
 
 LOGGER = get_logger(__name__)
@@ -126,7 +126,7 @@ def get_context_info(path):
         )[1].lstrip("/").split("/")[0]
         data = {
             "root": CONFIG["root"].as_posix(),
-            "name": name,
+            "name": path.name,
             "path": str(path),
             "path_nr": utils.get_nr(path),
             "posix": path.as_posix(),
@@ -352,7 +352,7 @@ def get_task(path):
 def discover_tasks(path, task_types=[], sort=None, as_dict=False):
     from ignite.server.entities.task import Task
 
-    def discover(path, l=[]):
+    def discover(path, l=[], ignore=[]):
         name = path.name
         if path.is_dir():
             d = {}
@@ -379,12 +379,16 @@ def discover_tasks(path, task_types=[], sort=None, as_dict=False):
                         config = config or {}
                         d["task_type"] = config.get("task_type")
                 discover(x, l)
-            if d["dir_kind"] == "task":
+            if d["dir_kind"] == "task" and not path in ignore:
                 if not task_types or d["task_type"] in task_types:
                     l.append(d)
         return l
 
-    data = discover(Path(path))
+    if not path:
+        return []
+
+    p = Path(path)
+    data = discover(p, ignore=[p])
     tasks = [Task(path=task["path"]) for task in data]
     if as_dict:
         tasks = [t.as_dict() for t in tasks]
@@ -832,3 +836,25 @@ def vault_export(source, task_path, name):
             shutil.copy2(source_asset_anchor, dest_asset)
     shutil.copytree(source, dest)
     return True
+
+
+def set_scene_comment(path, text):
+    from ignite.server.entities.scene import Scene
+    path = Path(path)
+    if not path.exists():
+        LOGGER.error(f"Failed to set comment to {path} cause it doesn't exist.")
+        return
+    if path.is_file():
+        path = path.parent
+    scene = Scene(path)
+    if not scene:
+        return
+    scene.set_comment(text)
+    return True
+
+
+def set_directory_protected(path, protected):
+    entity = find(path)
+    if not entity:
+        return
+    return entity.set_protected(protected)

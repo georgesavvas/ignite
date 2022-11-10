@@ -1,0 +1,1 @@
+python("import ignite_maya;ignite_maya.init()");

@@ -45,7 +45,6 @@ const style = {
 };
 
 function ExplorerBar(props) {
-  const [newSceneOpen, setNewSceneOpen] = useState(false);
   const [ingestOpen, setIngestOpen] = useState(false);
   const [filterMenu, setFilterMenu] = useState(null);
   const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
@@ -68,34 +67,34 @@ function ExplorerBar(props) {
     props.onFilterChange(value);
   };
 
-  const handleSortChange = (field, reverse) => {
-    props.setQuery(prevState => ({...prevState, sort: {field: field, reverse: reverse}}));
+  const handleSortChange = (field, reverse, label) => {
+    props.setQuery(prevState => ({...prevState, sort: {field: field, reverse: reverse, label: label}}));
   };
 
   const filterOptions = [
     {
       label: "Name (A-Z)",
-      fn: () => handleSortChange("name", false),
+      fn: () => handleSortChange("name", false, "Name (A-Z)"),
     },
     {
       label: "Name (Z-A)",
-      fn: () => handleSortChange("name", true),
+      fn: () => handleSortChange("name", true, "Name (Z-A)"),
     },
     {
       label: "Date (Newest first)",
-      fn: () => handleSortChange("date", true),
+      fn: () => handleSortChange("modification_ts", true, "Date (Newest first)"),
     },
     {
       label: "Date (Oldest first)",
-      fn: () => handleSortChange("date", false),
+      fn: () => handleSortChange("modification_ts", false, "Date (Oldest first)"),
     },
     {
       label: "Version (Higher first)",
-      fn: () => handleSortChange("version", true),
+      fn: () => handleSortChange("version", true, "Version (Higher first)"),
     },
     {
       label: "Version (Lowest first)",
-      fn: () => handleSortChange("version", false),
+      fn: () => handleSortChange("version", false, "Version (Lowest first)"),
     }
   ];
 
@@ -109,11 +108,6 @@ function ExplorerBar(props) {
         setContextMenu={setFilterMenu}
       />
       <div style={style}>
-        <Modal open={newSceneOpen} onClose={() => setNewSceneOpen(false)} maxWidth="xs">
-          <DccSelector newScene={true} task={currentContext.path}
-            onClose={() => setNewSceneOpen(false)}
-          />
-        </Modal>
         <Ingest open={ingestOpen} onClose={() => setIngestOpen(false)}
           enqueueSnackbar={props.enqueueSnackbar}
         />
@@ -183,7 +177,7 @@ function ExplorerBar(props) {
           color="ignite"
           variant="outlined"
           disabled={currentContext.dir_kind !== "task"}
-          onClick={() => setNewSceneOpen(true)}
+          onClick={() => props.onNewScene()}
         >
           New Scene
         </IgnButton>

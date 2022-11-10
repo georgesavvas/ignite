@@ -33,10 +33,10 @@ class AssetVersion(Directory):
         self.score = 0
         self.tags = set()
         super().__init__(path, dir_kind="assetversion")
-        self.dict_attrs = ["path", "dir_kind", "anchor", "project", "name", 
-            "components", "asset", "task", "uri", "tags", "context", "version",
-            "thumbnail", "creation_time", "modification_time", "versions"]
-        self.nr_attrs = ["path", "asset", "task"]
+        self.dict_attrs = ["components", "asset", "task", "uri", "tags",
+            "version", "thumbnail", "creation_time", "modification_time",
+            "versions"]
+        self.nr_attrs = ["asset", "task"]
         self.asset = self.path.parent
         self.version = self.name
         self.version_int = 0

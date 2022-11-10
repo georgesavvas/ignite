@@ -24,7 +24,7 @@ import serverRequest from "../services/serverRequest";
 export const ConfigContext = createContext();
 
 const serverDetailsDefault = {
-  address: "",
+  address: "localhost",
   password: ""
 };
 
@@ -43,16 +43,32 @@ const placeholder_config = {
 export const ConfigProvider = props => {
   const {enqueueSnackbar} = useSnackbar();
   const [config, setConfig] = useState(
-    {serverDetails: {}, access: {}, dccConfig: []}
+    {serverDetails: {}, access: {}, dccConfig: [], ready: false}
   );
 
   useEffect(() => {
+    if (config.lostConnection) return;
     const clientData = clientRequest("get_config");
     const clientAddress = window.services.get_env("IGNITE_CLIENT_ADDRESS");
-    Promise.all([clientData, clientAddress]).then(resp => {
+    const serverPort = window.services.get_port();
+    Promise.all([clientData, clientAddress, serverPort]).then(resp => {
+      if (!resp[0]) return;
       const clientDataResults = resp[0].data;
       console.log("Config received:", clientDataResults);
       const savedServerDetails = clientDataResults.server_details;
+      let savedServerAddress = savedServerDetails.address;
+      const port = resp[2];
+      serverDetailsDefault.address += `:${port}`;
+      if (["localhost", "0.0.0.0"].includes(savedServerAddress)) {
+        console.log(`Local server port not defined, fetched ${port}`);
+        savedServerAddress += `:${port}`;
+      }
+      const finalServerDetails= {
+        ...serverDetailsDefault,
+        ...savedServerDetails,
+        address: savedServerAddress
+      };
+      console.log("finalServerDetails", finalServerDetails);
       const savedAccess = {
         projectsDir: clientDataResults.access.projects_root,
         serverProjectsDir: clientDataResults.access.server_projects_root,
@@ -60,26 +76,27 @@ export const ConfigProvider = props => {
       };
       const savedDccConfig = clientDataResults.dcc_config;
       window.services.set_envs({
-        IGNITE_SERVER_ADDRESS: savedServerDetails.address,
-        IGNITE_SERVER_PASSWORD: savedServerDetails.password
+        IGNITE_SERVER_ADDRESS: finalServerDetails.address,
+        IGNITE_SERVER_PASSWORD: finalServerDetails.password
       });
       setConfig({
-        serverDetails: {...serverDetailsDefault, ...savedServerDetails},
+        serverDetails: finalServerDetails,
         access: {
           ...accessDefault,
           ...savedAccess
         },
         dccConfig: savedDccConfig,
         clientAddress: resp[1],
-        write: false
+        write: false,
+        ready: true
       });
     });
-  }, []);
+  }, [config.lostConnection]);
 
   useEffect(() => {
     const interval = setInterval(() => {
       serverRequest("ping").then(resp => {
-        if (!resp.ok) {
+        if (!resp || !resp.ok) {
           if (config.lostConnection) return;
           console.log("Lost connection to server...");
           enqueueSnackbar("Lost connection to server...", {variant: "error"});
@@ -89,7 +106,6 @@ export const ConfigProvider = props => {
             prev["write"] = false;
             return prev;
           });
-          window.services.check_server();
         }
         else {
           if (!config.lostConnection) return;
@@ -98,15 +114,16 @@ export const ConfigProvider = props => {
           setConfig(prevState => {
             const prev = {...prevState};
             prev["lostConnection"] = false;
-            prev["write"] = false;
+            prev["write"] = true;
             return prev;
           });
         }
       });
       clientRequest("ping").then(resp => {
-        if (!resp.ok) {
+        if (!resp || !resp.ok) {
+          if (config.lostConnection) return;
           console.log("Lost connection to client...");
-          window.services.check_client();
+          window.services.check_backend();
         }
       });
     }, 3000);
@@ -117,29 +134,42 @@ export const ConfigProvider = props => {
 
   useEffect(() => {
     if (!config.write) return;
+    if (config.lostConnection) window.services.check_backend();
+    else handleConfigChange(config);
+  }, [config]);
+
+  const handleConfigChange = async c => {
+    let serverAddress = c.serverDetails.address;
+    if (serverAddress === "localhost" || serverAddress === "0.0.0.0") {
+      console.log("Local server port not defined, fetching from main process");
+      const port = await window.services.get_port();
+      serverAddress += `:${port}`;
+      console.log(`Port is ${port}, new address is ${serverAddress}`);
+    }
     window.services.set_envs({
-      IGNITE_SERVER_ADDRESS: config.serverDetails.address,
-      IGNITE_SERVER_PASSWORD: config.serverDetails.password
+      IGNITE_SERVER_ADDRESS: serverAddress,
+      IGNITE_SERVER_PASSWORD: c.serverDetails.password
     });
-    const isServerLocal = config.serverDetails.address.startsWith("localhost");
+    const isServerLocal = serverAddress.startsWith("localhost") ||
+      serverAddress.startsWith("0.0.0.0");
     const accessFormatted = {
-      projects_root: config.access.projectsDir,
-      server_projects_root: isServerLocal ? config.access.projectsDir :
-        config.access.serverProjectsDir,
-      remote: config.access.remote
+      projects_root: c.access.projectsDir,
+      server_projects_root: isServerLocal ? c.access.projectsDir :
+        c.access.serverProjectsDir,
+      remote: c.access.remote
     };
     const data = {
       access: accessFormatted,
-      dcc_config: config.dccConfig,
-      server_details: config.serverDetails
+      dcc_config: c.dccConfig,
+      server_details: c.serverDetails
     };
     console.log("Setting config:", data);
     clientRequest("set_config", {data: data});
-  }, [config]);
+  };
 
   const addToDCCConfig = (config, data) => {
-    if (!data) {
-      return [...config, ...placeholder_config];
+    if (!data || !data.length) {
+      return [placeholder_config, ...config];
     }
     let existing_paths = [];
     config.forEach(existing => {
@@ -187,7 +217,7 @@ export const ConfigProvider = props => {
         {
           ...prevState,
           write: true,
-          dccConfig: modifyDCCConfig(prevState.dccConfig, data)
+          dccConfig: data
         }
       ));
       break;
