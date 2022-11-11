@@ -101,7 +101,7 @@ export default function TaskManager() {
         }
       };
       const ws = createProcessesSocket(config, resp, websocketConfig);
-      clientRequest("get_tasks", {session_id: resp}).then(resp2 => {
+      clientRequest("get_local_tasks", {session_id: resp}).then(resp2 => {
         if (!resp2) return;
         setTasks(prevState => {
           const incoming = resp2.data || [];

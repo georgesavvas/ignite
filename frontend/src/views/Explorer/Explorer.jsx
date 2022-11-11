@@ -13,7 +13,7 @@
 // limitations under the License.
 
 
-import React, {useEffect, useState, useContext} from "react";
+import React, {useEffect, useState, useContext, useRef} from "react";
 
 import Divider from "@mui/material/Divider";
 import debounce from "lodash.debounce";
@@ -89,7 +89,10 @@ function Explorer() {
   const [loadedData, setLoadedData] = useState([]);
   const [pages, setPages] = useState({total: 1, current: 1});
   const [query, setQuery] = useState(defaultQuery);
-  const [explorerSettings, setExplorerSettings] = useState(defaultExplorerSettings);
+  const savedExplorerSettings = loadExplorerSettings();
+  const [explorerSettings, setExplorerSettings] = useState(
+    savedExplorerSettings || defaultExplorerSettings
+  );
   const [tiles, setTiles] = useState([]);
   const [modalData, setModalData] = useState({});
   const [selectedEntity, setSelectedEntity] = useContext(EntityContext);
@@ -114,12 +117,6 @@ function Explorer() {
     data[`${action}Open`] = true;
     setModalData(data);
   };
-
-  useEffect(() => {
-    const data = loadExplorerSettings();
-    if (!data) return;
-    setExplorerSettings(data);
-  }, []);
 
   useEffect(() => {
     saveExplorerSettings(explorerSettings);

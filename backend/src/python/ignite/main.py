@@ -73,7 +73,7 @@ def startup_event():
 
 @app.on_event("shutdown")
 def shutdown_event():
-    LOGGER.info(f"Cleaning up...")
+    LOGGER.info("Cleaning up...")
     port_file.unlink()
     pid_file.unlink()
 
@@ -87,6 +87,11 @@ async def force_quit():
     server.should_exit = True
     server.force_exit = True
     await server.shutdown()
+
+
+@app.get("/api/v1/ping")
+async def ping():
+    return {"ok": True}
 
 
 if __name__ == "__main__":

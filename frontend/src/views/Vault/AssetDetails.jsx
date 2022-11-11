@@ -135,10 +135,7 @@ function AssetDetails(props) {
   };
 
   const getComp = compName => {
-    for(const comp of props.entity.components) {
-      if (comp.filename === compName) return comp;
-    }
-    return {};
+    return props.entity.components.find(comp => comp.filename === compName);
   };
 
   const selectedComp = getComp(selectedCompName);

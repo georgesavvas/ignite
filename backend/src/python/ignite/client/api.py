@@ -347,6 +347,6 @@ def edit_task(task_id, edit):
         TASK_MANAGER.kill(task_id)
 
 
-def get_tasks(session_id):
+def get_local_tasks(session_id):
     data = TASK_MANAGER.report(session_id)
     return data
