@@ -208,7 +208,7 @@ function ComponentViewer(props) {
   const [config] = useContext(ConfigContext);
   
   const comp = props.comp;
-  if (!comp) return (
+  if (!comp || !Object.keys(comp).length) return (
     <DataPlaceholder text="No component selected" />
   );
 

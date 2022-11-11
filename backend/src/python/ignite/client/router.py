@@ -19,7 +19,7 @@ from pprint import pprint
 from fastapi import APIRouter, Request, WebSocket
 
 from ignite.logger import get_logger
-from ignite.utils import mount_root
+from ignite.utils import mount_root, log_request, error
 from ignite.server import api as server_api
 from ignite.client import utils, api
 from ignite.client.utils import TASK_MANAGER, PROCESSES_MANAGER, CONFIG
@@ -54,19 +54,6 @@ async def processes(websocket: WebSocket, session_id: str):
         except Exception as e:
             print("error:", e)
             break
-
-
-def log_request(request):
-    pprint(request)
-
-
-def error(s):
-    return {"ok": False, "error": s}
-
-
-@router.get("/ping")
-async def ping():
-    return {"ok": True}
 
 
 @router.get("/get_config")
@@ -213,12 +200,12 @@ async def edit_task(request: Request):
     return {"ok": True}
 
 
-@router.post("/get_tasks")
-async def get_tasks(request: Request):
+@router.post("/get_local_tasks")
+async def get_local_tasks(request: Request):
     result = await request.json()
     log_request(result)
     session_id = result.get("session_id")
-    data = api.get_tasks(session_id)
+    data = api.get_local_tasks(session_id)
     return {"ok": True, "data": data}
 
 

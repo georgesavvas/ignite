@@ -128,8 +128,19 @@ def create_anchor(path, name):
         data = {"creation_time": datetime.datetime.utcnow()}
         with open(full_path, "w+") as f:
             yaml.safe_dump(data, f)
-        # full_path.touch()
     return full_path
+
+
+def create_delayed_anchor(path=None, name=None, anchor=None):
+    if not anchor and (path and name):
+        ensure_directory(path)
+        anchor = Path(path) / ANCHORS.get(name)
+    anchor = Path(anchor)
+    if not anchor.exists():
+        creation_time = anchor.parent.stat().st_ctime
+        data = {"creation_time": datetime.datetime.fromtimestamp(creation_time)}
+        with open(anchor, "w+") as f:
+            yaml.safe_dump(data, f)
 
 
 def get_uri(path, version_override=None):
@@ -267,3 +278,9 @@ def query_filter(entities, query):
         return entities
 
     return filtered
+
+
+def is_dir_of_kind(path, kind):
+    path = Path(path)
+    anchor = ANCHORS[kind]
+    return (path / anchor).is_file()

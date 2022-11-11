@@ -23,8 +23,8 @@ from fastapi.responses import PlainTextResponse
 from ignite.server import api, utils
 from ignite.vault import api as vault_api
 from ignite.server.socket_manager import SocketManager
-from ignite.utils import error, get_logger, log_request, process_request
-from ignite.utils import mount_root
+from ignite.logger import get_logger
+from ignite.utils import error, mount_root, log_request, process_request
 
 
 LOGGER = get_logger(__name__)
@@ -61,11 +61,6 @@ async def set_projects_root(request: Request):
 async def get_vault_path():
     data = api.get_vault_path()
     return {"ok": True, "data": data}
-
-
-@router.get("/ping")
-async def ping():
-    return {"ok": True}
 
 
 @router.post("/get_context_info")

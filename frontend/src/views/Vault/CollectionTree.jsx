@@ -235,13 +235,11 @@ function CollectionTree(props) {
 
   const scope = props.user ? "user" : "studio";
 
-  // useEffect(() => {
-  //   setSelectedItems("/all");
-  // }, [])
-
   useEffect(() => {
     if (!props.selectedCollection || !props.selectedCollection.path) return;
-    const [selectedScope, selectedPath] = props.selectedCollection.path.split(":");
+    const [selectedScope, selectedPath] = [
+      "studio", props.selectedCollection.path
+    ];
     if (scope !== selectedScope) {
       setSelectedItems([]);
       return;
@@ -312,7 +310,6 @@ function CollectionTree(props) {
         nodeId={nodes.path}
         name={nodes.name}
         labelInfo={nodes.dir_kind}
-        dynamic={nodes.dynamic || true}
         path={nodes.path}
         expression={nodes.expression}
         onContextOpen={handleContextMenuSelection}
