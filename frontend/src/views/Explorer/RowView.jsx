@@ -23,13 +23,19 @@ import AssetTile from "./AssetTile";
 import URI from "../../components/URI";
 import DirectoryTile from "./DirectoryTile";
 import {ContextContext} from "../../contexts/ContextContext";
+import { useEffect } from "react";
 
 
 const RowView = props => {
   const [, setCurrentContext] = useContext(ContextContext);
+  const [selectionModel, setSelectionModel] = useState([]);
+
+  useEffect(() => {
+    setSelectionModel([]);
+  }, [props.resultType]);
 
   const renderEntity = params => {
-    switch (props.viewType) {
+    switch (props.resultType) {
     default:
       return useMemo(() =>
         <DirectoryTile
@@ -257,6 +263,8 @@ const RowView = props => {
         // getRowHeight={() => "auto"}
         headerHeight={0}
         hideFooter
+        selectionModel={selectionModel}
+        onSelectionModelChange={setSelectionModel}
         columns={addSpecificColumns(columns)}
         // isCellEditable={shouldBeEditable}
         // processRowUpdate={handleEdit}

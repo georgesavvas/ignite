@@ -80,7 +80,7 @@ function AssetDetails(props) {
   const [config] = useContext(ConfigContext);
   const [selectedCompName, setSelectedCompName] = useState("");
   const [,, refreshContext] = useContext(ContextContext);
-  const [, setSelectedEntity] = useContext(EntityContext);
+  const [selectedEntity, setSelectedEntity] = useContext(EntityContext);
   const {enqueueSnackbar} = useSnackbar();
   const [contextMenu, setContextMenu] = useState(null);
 
@@ -163,7 +163,7 @@ function AssetDetails(props) {
       if (!ok) enqueueSnackbar(
         "Failed to change permissions...", {variant: "error"}
       );
-      else refreshContext();
+      refreshContext();
     });
   };
 
@@ -177,7 +177,7 @@ function AssetDetails(props) {
       if (!ok) enqueueSnackbar(
         "Failed to change permissions...", {variant: "error"}
       );
-      else refreshContext();
+      refreshContext();
     });
   };
 
@@ -202,7 +202,7 @@ function AssetDetails(props) {
                       alt="protected"
                       src="media/shield.png"
                       className={styles.button}
-                      onClick={handleProtect}
+                      onClick={handleUnProtect}
                     />
                   </Tooltip> :
                   <Tooltip title="Protect">
@@ -210,7 +210,7 @@ function AssetDetails(props) {
                       alt="unprotected"
                       src="media/shield_broken.png"
                       className={styles.button}
-                      onClick={handleUnProtect}
+                      onClick={handleProtect}
                     />
                   </Tooltip>
                 }
