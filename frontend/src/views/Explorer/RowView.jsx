@@ -31,8 +31,11 @@ const RowView = props => {
   const [selectionModel, setSelectionModel] = useState([]);
 
   useEffect(() => {
-    setSelectionModel([]);
-  }, [props.resultType]);
+    const selectedIndex = props.data.findIndex(
+      entity => entity.path === props.selectedEntityPath
+    );
+    setSelectionModel(selectedIndex > -1 ? [selectedIndex] : []);
+  }, [props.data]);
 
   const renderEntity = params => {
     switch (props.resultType) {
@@ -77,6 +80,20 @@ const RowView = props => {
         index: 1,
         field: "name",
         headerName: "Name",
+        flex: 0.1,
+        renderCell: renderText
+      },
+      {
+        index: 2,
+        field: "dir_kind",
+        headerName: "Dir Kind",
+        flex: 0.1,
+        renderCell: renderText
+      },
+      {
+        index: 3,
+        field: "dcc",
+        headerName: "DCC",
         flex: 0.1,
         renderCell: renderText
       }
@@ -154,7 +171,7 @@ const RowView = props => {
   };
 
   const addSpecificColumns = columns => {
-    const toAdd = specificColumns[props.viewType];
+    const toAdd = specificColumns[props.resultType];
     if (!toAdd) return columns;
     toAdd.forEach(columnData => {
       columns.splice(columnData.index, 0, columnData);
@@ -188,6 +205,7 @@ const RowView = props => {
           id: index,
           thumbnail: entity,
           name: entity.name,
+          dir_kind: entity.dir_kind,
           dcc: entity.dcc,
           version: entity.version,
           uri: entity.uri,
