@@ -18,42 +18,67 @@
           "contentPathLocalized": "/Users/george/dev/ignite/docs/i18n/en/docusaurus-plugin-content-docs/current",
           "docs": [
             {
-              "unversionedId": "getting_started/creating_project",
-              "id": "getting_started/creating_project",
-              "title": "Creating a project",
-              "description": "1. Open up the Project Browser.",
-              "source": "@site/docs/getting_started/creating_project.md",
-              "sourceDirName": "getting_started",
-              "slug": "/getting_started/creating_project",
-              "permalink": "/docs/getting_started/creating_project",
+              "unversionedId": "Developer/python_api",
+              "id": "Developer/python_api",
+              "title": "Python API",
+              "description": "",
+              "source": "@site/docs/Developer/python_api.md",
+              "sourceDirName": "Developer",
+              "slug": "/Developer/python_api",
+              "permalink": "/docs/Developer/python_api",
               "draft": false,
               "tags": [],
               "version": "current",
               "frontMatter": {},
               "sidebar": "tutorialSidebar",
               "previous": {
-                "title": "Getting Started",
-                "permalink": "/docs/getting_started/"
+                "title": "Tutorials",
+                "permalink": "/docs/tutorials/"
               },
               "next": {
-                "title": "Launching software",
-                "permalink": "/docs/getting_started/launching_software"
+                "title": "REST API",
+                "permalink": "/docs/Developer/rest_api"
               }
             },
             {
-              "unversionedId": "getting_started/index",
-              "id": "getting_started/index",
-              "title": "Getting Started",
+              "unversionedId": "Developer/rest_api",
+              "id": "Developer/rest_api",
+              "title": "REST API",
               "description": "",
-              "source": "@site/docs/getting_started/index.md",
-              "sourceDirName": "getting_started",
-              "slug": "/getting_started/",
-              "permalink": "/docs/getting_started/",
+              "source": "@site/docs/Developer/rest_api.md",
+              "sourceDirName": "Developer",
+              "slug": "/Developer/rest_api",
+              "permalink": "/docs/Developer/rest_api",
               "draft": false,
               "tags": [],
               "version": "current",
+              "frontMatter": {},
+              "sidebar": "tutorialSidebar",
+              "previous": {
+                "title": "Python API",
+                "permalink": "/docs/Developer/python_api"
+              },
+              "next": {
+                "title": "Glossary",
+                "permalink": "/docs/glossary"
+              }
+            },
+            {
+              "unversionedId": "getting_started",
+              "id": "getting_started",
+              "title": "Getting Started",
+              "description": "Creating a project",
+              "source": "@site/docs/getting_started.md",
+              "sourceDirName": ".",
+              "slug": "/getting_started",
+              "permalink": "/docs/getting_started",
+              "draft": false,
+              "tags": [],
+              "version": "current",
+              "sidebarPosition": 1,
               "frontMatter": {
-                "title": "Getting Started"
+                "title": "Getting Started",
+                "sidebar_position": 1
               },
               "sidebar": "tutorialSidebar",
               "previous": {
@@ -61,27 +86,27 @@
                 "permalink": "/docs/installation"
               },
               "next": {
-                "title": "Creating a project",
-                "permalink": "/docs/getting_started/creating_project"
+                "title": "Tutorials",
+                "permalink": "/docs/tutorials/"
               }
             },
             {
-              "unversionedId": "getting_started/launching_software",
-              "id": "getting_started/launching_software",
-              "title": "Launching software",
-              "description": "1. Browse to or create a task by using the Project Tree on the left side of the UI.",
-              "source": "@site/docs/getting_started/launching_software.md",
-              "sourceDirName": "getting_started",
-              "slug": "/getting_started/launching_software",
-              "permalink": "/docs/getting_started/launching_software",
+              "unversionedId": "glossary",
+              "id": "glossary",
+              "title": "Glossary",
+              "description": "Project",
+              "source": "@site/docs/glossary.md",
+              "sourceDirName": ".",
+              "slug": "/glossary",
+              "permalink": "/docs/glossary",
               "draft": false,
               "tags": [],
               "version": "current",
               "frontMatter": {},
               "sidebar": "tutorialSidebar",
               "previous": {
-                "title": "Creating a project",
-                "permalink": "/docs/getting_started/creating_project"
+                "title": "REST API",
+                "permalink": "/docs/Developer/rest_api"
               }
             },
             {
@@ -96,14 +121,41 @@
               "draft": false,
               "tags": [],
               "version": "current",
-              "sidebarPosition": 1,
+              "sidebarPosition": 0,
               "frontMatter": {
-                "sidebar_position": 1
+                "sidebar_position": 0
               },
               "sidebar": "tutorialSidebar",
               "next": {
                 "title": "Getting Started",
-                "permalink": "/docs/getting_started/"
+                "permalink": "/docs/getting_started"
+              }
+            },
+            {
+              "unversionedId": "tutorials/index",
+              "id": "tutorials/index",
+              "title": "Tutorials",
+              "description": "",
+              "source": "@site/docs/tutorials/index.md",
+              "sourceDirName": "tutorials",
+              "slug": "/tutorials/",
+              "permalink": "/docs/tutorials/",
+              "draft": false,
+              "tags": [],
+              "version": "current",
+              "sidebarPosition": 2,
+              "frontMatter": {
+                "title": "Tutorials",
+                "sidebar_position": 2
+              },
+              "sidebar": "tutorialSidebar",
+              "previous": {
+                "title": "Getting Started",
+                "permalink": "/docs/getting_started"
+              },
+              "next": {
+                "title": "Python API",
+                "permalink": "/docs/Developer/python_api"
               }
             }
           ],
@@ -115,24 +167,33 @@
                 "id": "installation"
               },
               {
+                "type": "doc",
+                "id": "getting_started"
+              },
+              {
+                "type": "doc",
+                "label": "Tutorials",
+                "id": "tutorials/index"
+              },
+              {
                 "type": "category",
-                "label": "Getting Started",
+                "label": "Developer",
                 "collapsible": true,
                 "collapsed": true,
                 "items": [
                   {
                     "type": "doc",
-                    "id": "getting_started/creating_project"
+                    "id": "Developer/python_api"
                   },
                   {
                     "type": "doc",
-                    "id": "getting_started/launching_software"
+                    "id": "Developer/rest_api"
                   }
-                ],
-                "link": {
-                  "type": "doc",
-                  "id": "getting_started/index"
-                }
+                ]
+              },
+              {
+                "type": "doc",
+                "id": "glossary"
               }
             ]
           }

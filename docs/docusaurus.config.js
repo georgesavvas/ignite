@@ -57,7 +57,7 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       navbar: {
-        title: 'Ignite',
+        title: 'Main site',
         logo: {
           alt: 'Ignite Logo',
           src: 'img/ignite_logo.png',
@@ -65,6 +65,11 @@ const config = {
         },
         hideOnScroll: true,
         items: [
+          {
+            href: '/',
+            position: 'left',
+            label: 'Home',
+          },
           {
             type: 'doc',
             docId: 'installation',

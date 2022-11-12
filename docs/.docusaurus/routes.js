@@ -39,29 +39,41 @@ export default [
   },
   {
     path: '/docs',
-    component: ComponentCreator('/docs', 'a73'),
+    component: ComponentCreator('/docs', '1b1'),
     routes: [
       {
-        path: '/docs/getting_started/',
-        component: ComponentCreator('/docs/getting_started/', '36b'),
+        path: '/docs/Developer/python_api',
+        component: ComponentCreator('/docs/Developer/python_api', '9d5'),
         exact: true,
         sidebar: "tutorialSidebar"
       },
       {
-        path: '/docs/getting_started/creating_project',
-        component: ComponentCreator('/docs/getting_started/creating_project', '49a'),
+        path: '/docs/Developer/rest_api',
+        component: ComponentCreator('/docs/Developer/rest_api', '82f'),
         exact: true,
         sidebar: "tutorialSidebar"
       },
       {
-        path: '/docs/getting_started/launching_software',
-        component: ComponentCreator('/docs/getting_started/launching_software', '815'),
+        path: '/docs/getting_started',
+        component: ComponentCreator('/docs/getting_started', 'fdc'),
+        exact: true,
+        sidebar: "tutorialSidebar"
+      },
+      {
+        path: '/docs/glossary',
+        component: ComponentCreator('/docs/glossary', 'be2'),
         exact: true,
         sidebar: "tutorialSidebar"
       },
       {
         path: '/docs/installation',
         component: ComponentCreator('/docs/installation', '001'),
+        exact: true,
+        sidebar: "tutorialSidebar"
+      },
+      {
+        path: '/docs/tutorials/',
+        component: ComponentCreator('/docs/tutorials/', '159'),
         exact: true,
         sidebar: "tutorialSidebar"
       }

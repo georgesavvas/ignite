@@ -39,7 +39,7 @@ export default {
   ],
   "themeConfig": {
     "navbar": {
-      "title": "Ignite",
+      "title": "Main site",
       "logo": {
         "alt": "Ignite Logo",
         "src": "img/ignite_logo.png",
@@ -47,6 +47,11 @@ export default {
       },
       "hideOnScroll": true,
       "items": [
+        {
+          "href": "/",
+          "position": "left",
+          "label": "Home"
+        },
         {
           "type": "doc",
           "docId": "installation",

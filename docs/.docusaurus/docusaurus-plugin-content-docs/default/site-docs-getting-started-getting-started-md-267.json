@@ -1,9 +1,9 @@
 {
-  "unversionedId": "getting_started/index",
-  "id": "getting_started/index",
+  "unversionedId": "getting_started/getting_started",
+  "id": "getting_started/getting_started",
   "title": "Getting Started",
-  "description": "",
-  "source": "@site/docs/getting_started/index.md",
+  "description": "1. Open up the Project Browser.",
+  "source": "@site/docs/getting_started/getting_started.md",
   "sourceDirName": "getting_started",
   "slug": "/getting_started/",
   "permalink": "/docs/getting_started/",
@@ -21,7 +21,7 @@
     "permalink": "/docs/installation"
   },
   "next": {
-    "title": "Creating a project",
-    "permalink": "/docs/getting_started/creating_project"
+    "title": "Getting Started",
+    "permalink": "/docs/getting_started"
   }
 }
