@@ -13,6 +13,7 @@
 # limitations under the License.
 
 
+import os
 import asyncio
 import importlib
 import threading
@@ -27,7 +28,8 @@ LOGGER = get_logger(__name__)
 
 
 def start_worker(loop):
-    LOGGER.warning("WORKER INIT")
+    PID = str(os.getpid())
+    LOGGER.warning(f"WORKER INIT - PID {PID}")
     asyncio.set_event_loop(loop)
     loop.run_forever()
     LOGGER.warning("WORKER END")

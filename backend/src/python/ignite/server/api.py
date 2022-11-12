@@ -869,4 +869,4 @@ def set_directory_protected(path, protected):
     entity = AssetVersion(path)
     if not entity:
         return
-    entity.set_protected(protected)
+    return entity.set_protected(protected)
