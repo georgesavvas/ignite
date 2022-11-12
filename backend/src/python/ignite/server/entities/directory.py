@@ -281,6 +281,7 @@ class Directory():
         return existing
 
     def set_protected(self, protected):
+        ok = True
         mode = 0o444 if protected else 0o777
         for file in self.path.iterdir():
             LOGGER.info(f"Changing {file} mode to {mode}")
@@ -288,9 +289,13 @@ class Directory():
                 file.chmod(mode)
             except Exception as e:
                 LOGGER.error(e)
+                ok = False
                 break
-        else:
-            return True
+        if ok:
+            can_access = os.access(self.anchor, os.W_OK)
+            LOGGER.debug(f"Anchor access: {can_access}")
+            if can_access != protected:
+                return True
         # Something went wrong, revert changes
         LOGGER.warning("Reverting permission changes...")
         mode = 0o444 if not protected else 0o777

@@ -8,6 +8,15 @@ from pathlib import Path
 ENV = os.environ
 
 
+class EndpointFilter(logging.Filter):
+    def __init__(self, path, *args, **kwargs,):
+        super().__init__(*args, **kwargs)
+        self._path = path
+
+    def filter(self, record: logging.LogRecord):
+        return record.getMessage().find(self._path) == -1
+
+
 class LogFormatter(logging.Formatter):
 
     grey = "\x1b[38;21m"
@@ -31,25 +40,34 @@ class LogFormatter(logging.Formatter):
         return formatter.format(record)
 
 
+path = Path.home() / ".ignite/logs/ignite.log"
+path.parent.mkdir(exist_ok=True, parents=True)
+file_handler = TimedRotatingFileHandler(
+    path, when="h", interval=1, backupCount=20
+)
+formatter = logging.Formatter(
+    "%(asctime)s - %(levelname)-8s - %(name)s - %(funcName)s: %(message)s",
+    datefmt="%d/%m/%Y %H:%M:%S"
+)
+file_handler.setFormatter(formatter)
+
+
+console_handler = logging.StreamHandler()
+console_handler.setFormatter(LogFormatter())
+
+
+def setup_logger(logger):
+    logger.handlers = []
+    logger.addHandler(console_handler)
+    logger.addHandler(file_handler)
+
+
 def get_logger(name):
     logger = logging.getLogger(name)
-    logger.setLevel(logging.INFO)
-    ch = logging.StreamHandler()
-    ch.setFormatter(LogFormatter())
     logger.handlers = []
-    logger.addHandler(ch)
+    logger.setLevel(logging.DEBUG)
 
-    path = Path.home() / ".ignite/logs/ignite.log"
-    path.parent.mkdir(exist_ok=True, parents=True)
-    handler = TimedRotatingFileHandler(
-        path, when="h", interval=1, backupCount=20
-    )
-    formatter = logging.Formatter(
-        "%(asctime)s - %(levelname)-8s - %(funcName)s: %(message)s",
-        datefmt="%d/%m/%Y %H:%M:%S"
-    )
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
+    setup_logger(logger)
 
     logger.propagate = False
     return logger

@@ -23,6 +23,7 @@ from ignite.logger import get_logger
 
 
 LOGGER = get_logger(__name__)
+LOGGER.info("\n\n\n****************\nLAUNCHING IGNITE\n****************")
 
 
 if getattr(sys, "frozen", False):
