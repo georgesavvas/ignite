@@ -13,7 +13,7 @@
 // limitations under the License.
 
 
-import React, {useState, createContext, useEffect} from "react";
+import React, {useState, createContext, useEffect, useRef} from "react";
 
 import {useSnackbar} from "notistack";
 
@@ -41,6 +41,7 @@ const placeholder_config = {
 };
 
 export const ConfigProvider = props => {
+  const serverIsLocal = useRef(true);
   const {enqueueSnackbar} = useSnackbar();
   const [config, setConfig] = useState(
     {serverDetails: {}, access: {}, dccConfig: [], ready: false}
@@ -68,6 +69,9 @@ export const ConfigProvider = props => {
         ...savedServerDetails,
         address: savedServerAddress
       };
+      const serverIsLocal_ = savedServerAddress.startsWith("localhost") ||
+      savedServerAddress.startsWith("0.0.0.0");
+      serverIsLocal.current = serverIsLocal_;
       console.log("finalServerDetails", finalServerDetails);
       const savedAccess = {
         projectsDir: clientDataResults.access.projects_root,
@@ -95,10 +99,11 @@ export const ConfigProvider = props => {
 
   useEffect(() => {
     const interval = setInterval(() => {
+      const serverName = serverIsLocal.current ? "server/client" : "server";
       serverRequest("ping").then(resp => {
         if (!resp || !resp.ok) {
           if (config.lostConnection) return;
-          console.log("Lost connection to server...");
+          console.log(`Lost connection to ${serverName}...`);
           enqueueSnackbar("Lost connection to server...", {variant: "error"});
           setConfig(prevState => {
             const prev = {...prevState};
@@ -109,7 +114,7 @@ export const ConfigProvider = props => {
         }
         else {
           if (!config.lostConnection) return;
-          console.log("Server connection restored...");
+          console.log(`${serverName} connection restored...`);
           enqueueSnackbar("Connection restored!", {variant: "success"});
           setConfig(prevState => {
             const prev = {...prevState};
@@ -119,6 +124,7 @@ export const ConfigProvider = props => {
           });
         }
       });
+      if (serverIsLocal.current) return;
       clientRequest("ping").then(resp => {
         if (!resp || !resp.ok) {
           if (config.lostConnection) return;
@@ -130,7 +136,7 @@ export const ConfigProvider = props => {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [config.lostConnection]);
+  }, [config.lostConnection, serverIsLocal.current]);
 
   useEffect(() => {
     if (!config.write) return;
@@ -150,11 +156,12 @@ export const ConfigProvider = props => {
       IGNITE_SERVER_ADDRESS: serverAddress,
       IGNITE_SERVER_PASSWORD: c.serverDetails.password
     });
-    const isServerLocal = serverAddress.startsWith("localhost") ||
+    const serverIsLocal_ = serverAddress.startsWith("localhost") ||
       serverAddress.startsWith("0.0.0.0");
+    serverIsLocal.current = serverIsLocal_;
     const accessFormatted = {
       projects_root: c.access.projectsDir,
-      server_projects_root: isServerLocal ? c.access.projectsDir :
+      server_projects_root: serverIsLocal_ ? c.access.projectsDir :
         c.access.serverProjectsDir,
       remote: c.access.remote
     };
