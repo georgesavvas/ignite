@@ -72,9 +72,12 @@ function Modal(props) {
             {props.text ? <DialogContentText>{props.text}</DialogContentText> : null}
             {props.children}
           </DialogContent>
-          <DialogActions>
-            {props.buttons}
-          </DialogActions>
+          {props.buttons ?
+            <DialogActions>
+              {props.buttons}
+            </DialogActions>
+            : null
+          }
         </>
       )}
     </Dialog>

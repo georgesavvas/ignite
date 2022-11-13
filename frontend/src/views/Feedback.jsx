@@ -108,9 +108,7 @@ const Feedback = props => {
             new features, report bugs or just give your opinion!"
           }
         </Typography>
-        <Divider className={styles.divider}>
-          Use one of the following ways to get in touch
-        </Divider>
+        <Divider className={styles.divider} />
         <div className={styles.section}>
           <div className={styles.row}>
             <img
@@ -125,14 +123,14 @@ const Feedback = props => {
                 src="media/github_mark.png"
                 className={styles.github}
                 onClick={() => window.services.open_url(
-                  "https://github.com/georgesavvas/ignite/issues"
+                  "https://github.com/georgesavvas/ignite/discussions"
                 )}
               />
               <img
                 src="media/github_logo.png"
                 className={styles.github}
                 onClick={() => window.services.open_url(
-                  "https://github.com/georgesavvas/ignite/issues"
+                  "https://github.com/georgesavvas/ignite/discussions"
                 )}
               />
             </div>
