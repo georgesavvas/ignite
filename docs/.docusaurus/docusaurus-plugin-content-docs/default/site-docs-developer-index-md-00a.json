@@ -1,0 +1,25 @@
+{
+  "unversionedId": "Developer/index",
+  "id": "Developer/index",
+  "title": "Developer",
+  "description": "Coming soon!",
+  "source": "@site/docs/Developer/index.md",
+  "sourceDirName": "Developer",
+  "slug": "/Developer/",
+  "permalink": "/docs/Developer/",
+  "draft": false,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "Developer"
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Getting Started",
+    "permalink": "/docs/getting_started"
+  },
+  "next": {
+    "title": "Python API",
+    "permalink": "/docs/Developer/python_api"
+  }
+}

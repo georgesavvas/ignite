@@ -2,7 +2,7 @@
   "unversionedId": "Developer/python_api",
   "id": "Developer/python_api",
   "title": "Python API",
-  "description": "",
+  "description": "Coming soon!",
   "source": "@site/docs/Developer/python_api.md",
   "sourceDirName": "Developer",
   "slug": "/Developer/python_api",
@@ -13,8 +13,8 @@
   "frontMatter": {},
   "sidebar": "tutorialSidebar",
   "previous": {
-    "title": "Tutorials",
-    "permalink": "/docs/tutorials/"
+    "title": "Developer",
+    "permalink": "/docs/Developer/"
   },
   "next": {
     "title": "REST API",

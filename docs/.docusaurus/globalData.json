@@ -11,6 +11,11 @@
           "mainDocId": "installation",
           "docs": [
             {
+              "id": "Developer/index",
+              "path": "/docs/Developer/",
+              "sidebar": "tutorialSidebar"
+            },
+            {
               "id": "Developer/python_api",
               "path": "/docs/Developer/python_api",
               "sidebar": "tutorialSidebar"
@@ -33,11 +38,6 @@
             {
               "id": "installation",
               "path": "/docs/installation",
-              "sidebar": "tutorialSidebar"
-            },
-            {
-              "id": "tutorials/index",
-              "path": "/docs/tutorials/",
               "sidebar": "tutorialSidebar"
             }
           ],

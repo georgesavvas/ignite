@@ -39,8 +39,14 @@ export default [
   },
   {
     path: '/docs',
-    component: ComponentCreator('/docs', '1b1'),
+    component: ComponentCreator('/docs', '38c'),
     routes: [
+      {
+        path: '/docs/Developer/',
+        component: ComponentCreator('/docs/Developer/', '2cd'),
+        exact: true,
+        sidebar: "tutorialSidebar"
+      },
       {
         path: '/docs/Developer/python_api',
         component: ComponentCreator('/docs/Developer/python_api', '9d5'),
@@ -68,12 +74,6 @@ export default [
       {
         path: '/docs/installation',
         component: ComponentCreator('/docs/installation', '001'),
-        exact: true,
-        sidebar: "tutorialSidebar"
-      },
-      {
-        path: '/docs/tutorials/',
-        component: ComponentCreator('/docs/tutorials/', '159'),
         exact: true,
         sidebar: "tutorialSidebar"
       }

@@ -2,7 +2,7 @@
   "unversionedId": "glossary",
   "id": "glossary",
   "title": "Glossary",
-  "description": "Project",
+  "description": "Anchor",
   "source": "@site/docs/glossary.md",
   "sourceDirName": ".",
   "slug": "/glossary",

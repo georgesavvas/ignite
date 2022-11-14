@@ -22,12 +22,6 @@
         "docId": "getting_started"
       },
       {
-        "type": "link",
-        "label": "Tutorials",
-        "href": "/docs/tutorials/",
-        "docId": "tutorials/index"
-      },
-      {
         "type": "category",
         "label": "Developer",
         "collapsible": true,
@@ -45,7 +39,8 @@
             "href": "/docs/Developer/rest_api",
             "docId": "Developer/rest_api"
           }
-        ]
+        ],
+        "href": "/docs/Developer/"
       },
       {
         "type": "link",
@@ -56,16 +51,22 @@
     ]
   },
   "docs": {
+    "Developer/index": {
+      "id": "Developer/index",
+      "title": "Developer",
+      "description": "Coming soon!",
+      "sidebar": "tutorialSidebar"
+    },
     "Developer/python_api": {
       "id": "Developer/python_api",
       "title": "Python API",
-      "description": "",
+      "description": "Coming soon!",
       "sidebar": "tutorialSidebar"
     },
     "Developer/rest_api": {
       "id": "Developer/rest_api",
       "title": "REST API",
-      "description": "",
+      "description": "Coming soon!",
       "sidebar": "tutorialSidebar"
     },
     "getting_started": {
@@ -77,19 +78,13 @@
     "glossary": {
       "id": "glossary",
       "title": "Glossary",
-      "description": "Project",
+      "description": "Anchor",
       "sidebar": "tutorialSidebar"
     },
     "installation": {
       "id": "installation",
       "title": "Installation",
       "description": "Setting up ignite on a single workstation",
-      "sidebar": "tutorialSidebar"
-    },
-    "tutorials/index": {
-      "id": "tutorials/index",
-      "title": "Tutorials",
-      "description": "",
       "sidebar": "tutorialSidebar"
     }
   }

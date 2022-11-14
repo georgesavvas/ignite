@@ -18,10 +18,35 @@
           "contentPathLocalized": "/Users/george/dev/ignite/docs/i18n/en/docusaurus-plugin-content-docs/current",
           "docs": [
             {
+              "unversionedId": "Developer/index",
+              "id": "Developer/index",
+              "title": "Developer",
+              "description": "Coming soon!",
+              "source": "@site/docs/Developer/index.md",
+              "sourceDirName": "Developer",
+              "slug": "/Developer/",
+              "permalink": "/docs/Developer/",
+              "draft": false,
+              "tags": [],
+              "version": "current",
+              "frontMatter": {
+                "title": "Developer"
+              },
+              "sidebar": "tutorialSidebar",
+              "previous": {
+                "title": "Getting Started",
+                "permalink": "/docs/getting_started"
+              },
+              "next": {
+                "title": "Python API",
+                "permalink": "/docs/Developer/python_api"
+              }
+            },
+            {
               "unversionedId": "Developer/python_api",
               "id": "Developer/python_api",
               "title": "Python API",
-              "description": "",
+              "description": "Coming soon!",
               "source": "@site/docs/Developer/python_api.md",
               "sourceDirName": "Developer",
               "slug": "/Developer/python_api",
@@ -32,8 +57,8 @@
               "frontMatter": {},
               "sidebar": "tutorialSidebar",
               "previous": {
-                "title": "Tutorials",
-                "permalink": "/docs/tutorials/"
+                "title": "Developer",
+                "permalink": "/docs/Developer/"
               },
               "next": {
                 "title": "REST API",
@@ -44,7 +69,7 @@
               "unversionedId": "Developer/rest_api",
               "id": "Developer/rest_api",
               "title": "REST API",
-              "description": "",
+              "description": "Coming soon!",
               "source": "@site/docs/Developer/rest_api.md",
               "sourceDirName": "Developer",
               "slug": "/Developer/rest_api",
@@ -86,15 +111,15 @@
                 "permalink": "/docs/installation"
               },
               "next": {
-                "title": "Tutorials",
-                "permalink": "/docs/tutorials/"
+                "title": "Developer",
+                "permalink": "/docs/Developer/"
               }
             },
             {
               "unversionedId": "glossary",
               "id": "glossary",
               "title": "Glossary",
-              "description": "Project",
+              "description": "Anchor",
               "source": "@site/docs/glossary.md",
               "sourceDirName": ".",
               "slug": "/glossary",
@@ -130,33 +155,6 @@
                 "title": "Getting Started",
                 "permalink": "/docs/getting_started"
               }
-            },
-            {
-              "unversionedId": "tutorials/index",
-              "id": "tutorials/index",
-              "title": "Tutorials",
-              "description": "",
-              "source": "@site/docs/tutorials/index.md",
-              "sourceDirName": "tutorials",
-              "slug": "/tutorials/",
-              "permalink": "/docs/tutorials/",
-              "draft": false,
-              "tags": [],
-              "version": "current",
-              "sidebarPosition": 2,
-              "frontMatter": {
-                "title": "Tutorials",
-                "sidebar_position": 2
-              },
-              "sidebar": "tutorialSidebar",
-              "previous": {
-                "title": "Getting Started",
-                "permalink": "/docs/getting_started"
-              },
-              "next": {
-                "title": "Python API",
-                "permalink": "/docs/Developer/python_api"
-              }
             }
           ],
           "drafts": [],
@@ -169,11 +167,6 @@
               {
                 "type": "doc",
                 "id": "getting_started"
-              },
-              {
-                "type": "doc",
-                "label": "Tutorials",
-                "id": "tutorials/index"
               },
               {
                 "type": "category",
@@ -189,7 +182,11 @@
                     "type": "doc",
                     "id": "Developer/rest_api"
                   }
-                ]
+                ],
+                "link": {
+                  "type": "doc",
+                  "id": "Developer/index"
+                }
               },
               {
                 "type": "doc",
