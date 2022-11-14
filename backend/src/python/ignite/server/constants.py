@@ -19,7 +19,7 @@ OS_NAMES = {
 
 TAG_WEIGHTS = {
     "approved": 1,
-    "deprecated": -100
+    "deprecated": -1000
 }
 
 MP4_CONFIG = (
