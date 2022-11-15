@@ -23,9 +23,8 @@ from string import Formatter
 
 import parse
 from ignite.server import api as server_api
-from ignite.server import utils as server_utils
 from ignite.client import utils
-from ignite.client.utils import TASK_MANAGER, CONFIG, server_request, is_server_local
+from ignite.client.utils import PROCESS_MANAGER, is_server_local
 
 from ..utils import get_logger
 
@@ -321,7 +320,7 @@ def run_action(entity, kind, action, session_id):
     for _action in actions:
         if _action["label"] != action:
             continue
-        TASK_MANAGER.create_task(
+        PROCESS_MANAGER.create_process(
             action=_action,
             entity=entity,
             session_id=session_id
@@ -334,19 +333,19 @@ def run_action(entity, kind, action, session_id):
         return
 
 
-def edit_task(task_id, edit):
+def edit_process(process_id, edit):
     if edit == "pause":
-        TASK_MANAGER.pause(task_id)
+        PROCESS_MANAGER.pause(process_id)
     elif edit == "unpause":
-        TASK_MANAGER.unpause(task_id)
+        PROCESS_MANAGER.unpause(process_id)
     elif edit == "retry":
-        TASK_MANAGER.retry(task_id)
+        PROCESS_MANAGER.retry(process_id)
     elif edit == "clear":
-        TASK_MANAGER.clear(task_id)
+        PROCESS_MANAGER.clear(process_id)
     elif edit == "kill":
-        TASK_MANAGER.kill(task_id)
+        PROCESS_MANAGER.kill(process_id)
 
 
-def get_local_tasks(session_id):
-    data = TASK_MANAGER.report(session_id)
+def get_processes(session_id):
+    data = PROCESS_MANAGER.report(session_id)
     return data

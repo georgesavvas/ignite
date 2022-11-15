@@ -22,7 +22,6 @@ import requests
 import importlib
 import shutil
 from copy import deepcopy
-from pprint import pprint
 from pathlib import PurePath, Path
 
 from ..utils import get_logger
@@ -30,7 +29,7 @@ from ignite.server import api as server_api
 from ignite.server.socket_manager import SocketManager
 from ignite.client.constants import GENERIC_ENV, DCC_ENVS, OS_NAMES
 from ignite.client.constants import DCC_DISCOVERY, DCC_VERSIONS
-from ignite.client.task_manager import TaskManager
+from ignite.client.process_manager import ProcessManager
 
 LOGGER = get_logger(__name__)
 OS_NAME = OS_NAMES[platform.system()]
@@ -42,8 +41,11 @@ CLIENT_CONFIG_PATH = Path(ENV["IGNITE_CLIENT_CONFIG_PATH"])
 DCC = Path(ENV["IGNITE_DCC"])
 CONFIG_PATH = Path(ENV["IGNITE_CONFIG_PATH"])
 
-PROCESSES_MANAGER = SocketManager()
-TASK_MANAGER = TaskManager(PROCESSES_MANAGER, USER_CONFIG_PATH / "tasks.json")
+SOCKET_MANAGER = SocketManager()
+PROCESS_MANAGER = ProcessManager(
+    SOCKET_MANAGER,
+    USER_CONFIG_PATH / "processes.json"
+)
 
 
 def get_config(formatted=True) -> dict:

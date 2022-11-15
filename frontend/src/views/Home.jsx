@@ -19,7 +19,7 @@ import Divider from "@mui/material/Divider";
 import {ReflexContainer, ReflexSplitter, ReflexElement} from "react-reflex";
 
 import Details from "../views/DetailsView/Details";
-import TaskManager from "../views/TaskManager/TaskManager";
+import ProcessManager from "../views/ProcessManager/ProcessManager";
 import saveReflexLayout from "../utils/saveReflexLayout";
 import loadReflexLayout from "../utils/loadReflexLayout";
 import ProjectTree from "../views/TreeView/ProjectTree";
@@ -116,7 +116,7 @@ export default function Home() {
               </ReflexElement>
               <ReflexSplitter style={splitterStyle} />
               <ReflexElement flex={0.25}>
-                <TaskManager />
+                <ProcessManager />
               </ReflexElement>
             </ReflexContainer>
           </ReflexElement>
