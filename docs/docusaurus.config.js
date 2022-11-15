@@ -8,7 +8,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 const config = {
   title: "Ignite",
   tagline: "Open Source VFX Pipeline",
-  url: "https://ignitevfx.co.uk",
+  url: "https://docs.ignitevfx.co.uk/",
   baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
