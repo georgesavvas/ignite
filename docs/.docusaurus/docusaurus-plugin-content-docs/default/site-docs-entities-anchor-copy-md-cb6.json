@@ -1,0 +1,25 @@
+{
+  "unversionedId": "Entities/anchor copy",
+  "id": "Entities/anchor copy",
+  "title": "Attribute",
+  "description": "Named values stored on any directory that get translated into environment",
+  "source": "@site/docs/Entities/anchor copy.md",
+  "sourceDirName": "Entities",
+  "slug": "/Entities/anchor copy",
+  "permalink": "/docs/Entities/anchor copy",
+  "draft": false,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "Attribute"
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Basic Concepts",
+    "permalink": "/docs/basic_concepts"
+  },
+  "next": {
+    "title": "Attribute",
+    "permalink": "/docs/Entities/anchor"
+  }
+}

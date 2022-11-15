@@ -1,0 +1,23 @@
+{
+  "unversionedId": "Developer/python_api",
+  "id": "Developer/python_api",
+  "title": "Python API",
+  "description": "Coming soon!",
+  "source": "@site/docs/Developer/python_api.md",
+  "sourceDirName": "Developer",
+  "slug": "/Developer/python_api",
+  "permalink": "/docs/Developer/python_api",
+  "draft": false,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Basic Concepts",
+    "permalink": "/docs/basic_concepts"
+  },
+  "next": {
+    "title": "REST API",
+    "permalink": "/docs/Developer/rest_api"
+  }
+}

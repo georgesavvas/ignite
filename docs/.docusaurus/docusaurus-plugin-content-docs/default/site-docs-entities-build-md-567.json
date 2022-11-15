@@ -1,0 +1,25 @@
+{
+  "unversionedId": "Entities/build",
+  "id": "Entities/build",
+  "title": "Build",
+  "description": "A directory that defines an asset build. Usually contains a set of tasks, with",
+  "source": "@site/docs/Entities/build.md",
+  "sourceDirName": "Entities",
+  "slug": "/Entities/build",
+  "permalink": "/docs/Entities/build",
+  "draft": false,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "Build"
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "AssetVersion",
+    "permalink": "/docs/Entities/attribute"
+  },
+  "next": {
+    "title": "Component",
+    "permalink": "/docs/Entities/component"
+  }
+}
