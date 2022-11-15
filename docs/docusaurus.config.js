@@ -10,6 +10,7 @@ const config = {
   tagline: "Open Source VFX Pipeline",
   url: "https://docs.ignitevfx.co.uk/",
   baseUrl: '/',
+  trailingSlash: false,
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
@@ -18,6 +19,7 @@ const config = {
   // If you aren't using GitHub pages, you don't need these.
   organizationName: 'georgesavvas', // Usually your GitHub org/user name.
   projectName: 'ignite', // Usually your repo name.
+  deploymentBranch: "gh-pages",
 
   // Even if you don't use internalization, you can use this field to set useful
   // metadata like html lang. For example, if your site is Chinese, you may want

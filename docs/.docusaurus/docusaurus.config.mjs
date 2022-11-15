@@ -8,11 +8,13 @@ export default {
   "tagline": "Open Source VFX Pipeline",
   "url": "https://docs.ignitevfx.co.uk/",
   "baseUrl": "/",
+  "trailingSlash": false,
   "onBrokenLinks": "throw",
   "onBrokenMarkdownLinks": "warn",
   "favicon": "img/favicon.ico",
   "organizationName": "georgesavvas",
   "projectName": "ignite",
+  "deploymentBranch": "gh-pages",
   "i18n": {
     "defaultLocale": "en",
     "locales": [
