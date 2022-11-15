@@ -85,11 +85,13 @@ def mount_root(app, config):
 def symlink_points_to(symlink, path):
     return path == symlink.resolve()
 
-def get_config_paths(suffix, base=True, user=True, project=None):
+
+def get_config_paths(suffix, project_path=None, base=True, user=True):
     paths = []
     if base:
-        paths.append(CONFIG_PATH / "actions")
+        paths.append(CONFIG_PATH / suffix)
     if user:
-        paths.append(USER_CONFIG_PATH / "actions")
-    if project:
-        paths.append(CONFIG_PATH / "actions")
+        paths.append(USER_CONFIG_PATH / suffix)
+    if project_path:
+        paths.append(project_path / ".config" / suffix)
+    return paths

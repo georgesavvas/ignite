@@ -24,7 +24,7 @@ import shutil
 from copy import deepcopy
 from pathlib import PurePath, Path
 
-from ..utils import get_logger
+from ignite.utils import get_logger, get_config_paths
 from ignite.server import api as server_api
 from ignite.server.socket_manager import SocketManager
 from ignite.client.constants import GENERIC_ENV, DCC_ENVS, OS_NAMES
@@ -428,22 +428,23 @@ def server_request(method, data=None):
     return resp
 
 
-def get_action_files():
+def get_action_files(project_path=None):
     path = CONFIG_PATH / "actions"
-    print(path)
+    paths = get_config_paths("actions", project_path=project_path)
     files = {}
-    for entity in ("scene", "asset", "assetversion", "component"):
-        entity_path = path / entity
-        if not entity_path.exists():
-            continue
-        files[entity] = entity_path.glob("*.py")
+    for path in paths:
+        for entity in ("scene", "asset", "assetversion", "component"):
+            entity_path = path / entity
+            if not entity_path.exists():
+                continue
+            files[entity] += entity_path.glob("*.py")
     return files
 
 
 def discover_actions():
     actions = {}
     for entity, files in get_action_files().items():
-        actions[entity] = []
+        actions[entity] = {}
         for file in files:
             if file.name == "__init__.py":
                 continue
@@ -457,5 +458,5 @@ def discover_actions():
                 # "fn": module.main,
                 "module_path": module.__file__
             }
-            actions[entity].append(entity_action)
+            actions[entity][file.name] = entity_action
     return actions
