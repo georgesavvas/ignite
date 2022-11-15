@@ -25,11 +25,11 @@ const FeatureList = [
     ),
   },
   {
-    title: "Developer",
-    url: "/docs/developer",
+    title: "Basic Concepts",
+    url: "/docs/basic_concepts",
     description: (
       <>
-        Useful information as well as reference for Ignite's APIs.
+        An explanation of Ignite's basic terms and concepts.
       </>
     ),
   },
