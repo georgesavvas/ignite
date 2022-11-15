@@ -26,13 +26,13 @@ export default {
       "classic",
       {
         "docs": {
-          "sidebarPath": "C:\\dev\\ignite\\docs\\sidebars.js"
+          "sidebarPath": "/Users/george/dev/ignite/docs/sidebars.js"
         },
         "blog": {
           "showReadingTime": true
         },
         "theme": {
-          "customCss": "C:\\dev\\ignite\\docs\\src\\css\\custom.css"
+          "customCss": "/Users/george/dev/ignite/docs/src/css/custom.css"
         }
       }
     ]
