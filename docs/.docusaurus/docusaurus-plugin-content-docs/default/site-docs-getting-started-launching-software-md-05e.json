@@ -15,5 +15,9 @@
   "previous": {
     "title": "Creating a project",
     "permalink": "/docs/getting_started/creating_project"
+  },
+  "next": {
+    "title": "Tutorials",
+    "permalink": "/docs/tutorials/"
   }
 }

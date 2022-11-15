@@ -16,45 +16,74 @@
         "docId": "installation"
       },
       {
-        "type": "category",
+        "type": "link",
         "label": "Getting Started",
+        "href": "/docs/getting_started",
+        "docId": "getting_started"
+      },
+      {
+        "type": "link",
+        "label": "Basic Concepts",
+        "href": "/docs/basic_concepts",
+        "docId": "basic_concepts"
+      },
+      {
+        "type": "category",
+        "label": "Developer",
         "collapsible": true,
         "collapsed": true,
         "items": [
           {
             "type": "link",
-            "label": "Creating a project",
-            "href": "/docs/getting_started/creating_project",
-            "docId": "getting_started/creating_project"
+            "label": "Python API",
+            "href": "/docs/Developer/python_api",
+            "docId": "Developer/python_api"
           },
           {
             "type": "link",
-            "label": "Launching software",
-            "href": "/docs/getting_started/launching_software",
-            "docId": "getting_started/launching_software"
+            "label": "REST API",
+            "href": "/docs/Developer/rest_api",
+            "docId": "Developer/rest_api"
           }
-        ],
-        "href": "/docs/getting_started/"
+        ]
+      },
+      {
+        "type": "link",
+        "label": "Glossary",
+        "href": "/docs/glossary",
+        "docId": "glossary"
       }
     ]
   },
   "docs": {
-    "getting_started/creating_project": {
-      "id": "getting_started/creating_project",
-      "title": "Creating a project",
-      "description": "1. Open up the Project Browser.",
+    "basic_concepts": {
+      "id": "basic_concepts",
+      "title": "Basic Concepts",
+      "description": "Introduction",
       "sidebar": "tutorialSidebar"
     },
-    "getting_started/index": {
-      "id": "getting_started/index",
+    "Developer/python_api": {
+      "id": "Developer/python_api",
+      "title": "Python API",
+      "description": "Coming soon!",
+      "sidebar": "tutorialSidebar"
+    },
+    "Developer/rest_api": {
+      "id": "Developer/rest_api",
+      "title": "REST API",
+      "description": "Coming soon!",
+      "sidebar": "tutorialSidebar"
+    },
+    "getting_started": {
+      "id": "getting_started",
       "title": "Getting Started",
-      "description": "",
+      "description": "Creating a project",
       "sidebar": "tutorialSidebar"
     },
-    "getting_started/launching_software": {
-      "id": "getting_started/launching_software",
-      "title": "Launching software",
-      "description": "1. Browse to or create a task by using the Project Tree on the left side of the UI.",
+    "glossary": {
+      "id": "glossary",
+      "title": "Glossary",
+      "description": "Anchor",
       "sidebar": "tutorialSidebar"
     },
     "installation": {

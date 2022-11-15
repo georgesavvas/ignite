@@ -1,0 +1,25 @@
+{
+  "unversionedId": "Entities/assetversion copy",
+  "id": "Entities/assetversion copy",
+  "title": "AssetVersion",
+  "description": "A directory containing exported files (Components in Ignite). This could be a",
+  "source": "@site/docs/Entities/assetversion copy.md",
+  "sourceDirName": "Entities",
+  "slug": "/Entities/assetversion copy",
+  "permalink": "/docs/Entities/assetversion copy",
+  "draft": false,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "AssetVersion"
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Asset",
+    "permalink": "/docs/Entities/asset"
+  },
+  "next": {
+    "title": "AssetVersion",
+    "permalink": "/docs/Entities/assetversion"
+  }
+}

@@ -200,7 +200,8 @@ def get_task_env(path):
         "SCENES": task.get("scenes", "")
     }
     for attrib in task.get("attributes", []):
-        env[f"IGNITE_ATTRIB_{attrib['name']}"] = attrib["override"] or attrib["inherited"]
+        name = attrib['name'].upper().replace(" ", "")
+        env[f"IGNITE_ATTRIB_{name}"] = attrib["override"] or attrib["inherited"]
     return env
 
 

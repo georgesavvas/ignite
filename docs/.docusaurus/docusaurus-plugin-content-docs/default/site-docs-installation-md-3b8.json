@@ -10,13 +10,13 @@
   "draft": false,
   "tags": [],
   "version": "current",
-  "sidebarPosition": 1,
+  "sidebarPosition": 0,
   "frontMatter": {
-    "sidebar_position": 1
+    "sidebar_position": 0
   },
   "sidebar": "tutorialSidebar",
   "next": {
     "title": "Getting Started",
-    "permalink": "/docs/getting_started/"
+    "permalink": "/docs/getting_started"
   }
 }

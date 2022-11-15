@@ -1,0 +1,19 @@
+{
+  "unversionedId": "glossary",
+  "id": "glossary",
+  "title": "Glossary",
+  "description": "Anchor",
+  "source": "@site/docs/glossary.md",
+  "sourceDirName": ".",
+  "slug": "/glossary",
+  "permalink": "/docs/glossary",
+  "draft": false,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "REST API",
+    "permalink": "/docs/Developer/rest_api"
+  }
+}

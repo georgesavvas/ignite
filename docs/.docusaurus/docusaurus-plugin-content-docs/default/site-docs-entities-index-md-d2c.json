@@ -1,0 +1,25 @@
+{
+  "unversionedId": "Entities/index",
+  "id": "Entities/index",
+  "title": "Entities",
+  "description": "",
+  "source": "@site/docs/Entities/index.md",
+  "sourceDirName": "Entities",
+  "slug": "/Entities/",
+  "permalink": "/docs/Entities/",
+  "draft": false,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "Entities"
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Basic Concepts",
+    "permalink": "/docs/basic_concepts"
+  },
+  "next": {
+    "title": "Developer",
+    "permalink": "/docs/developer/"
+  }
+}

@@ -11,18 +11,28 @@
           "mainDocId": "installation",
           "docs": [
             {
-              "id": "getting_started/creating_project",
-              "path": "/docs/getting_started/creating_project",
+              "id": "basic_concepts",
+              "path": "/docs/basic_concepts",
               "sidebar": "tutorialSidebar"
             },
             {
-              "id": "getting_started/index",
-              "path": "/docs/getting_started/",
+              "id": "Developer/python_api",
+              "path": "/docs/Developer/python_api",
               "sidebar": "tutorialSidebar"
             },
             {
-              "id": "getting_started/launching_software",
-              "path": "/docs/getting_started/launching_software",
+              "id": "Developer/rest_api",
+              "path": "/docs/Developer/rest_api",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "getting_started",
+              "path": "/docs/getting_started",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "glossary",
+              "path": "/docs/glossary",
               "sidebar": "tutorialSidebar"
             },
             {
