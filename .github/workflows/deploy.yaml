@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
        run:
-         working-directory: ./docs/
+         working-directory: ./docs
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v3
@@ -34,7 +34,7 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          destination_dir: ./docs
+          # destination_dir: ./docs
           # Build output to publish to the `gh-pages` branch:
           publish_dir: ./build
           # The following lines assign commit authorship to the official
