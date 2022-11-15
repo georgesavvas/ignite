@@ -1,0 +1,25 @@
+{
+  "unversionedId": "Entities/asset",
+  "id": "Entities/asset",
+  "title": "Asset",
+  "description": "A directory containing all the versions (AssetVersions in Ignite) of a",
+  "source": "@site/docs/Entities/asset.md",
+  "sourceDirName": "Entities",
+  "slug": "/Entities/asset",
+  "permalink": "/docs/Entities/asset",
+  "draft": false,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "Asset"
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Attribute",
+    "permalink": "/docs/Entities/anchor"
+  },
+  "next": {
+    "title": "AssetVersion",
+    "permalink": "/docs/Entities/assetversion"
+  }
+}

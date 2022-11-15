@@ -15,8 +15,8 @@
   },
   "sidebar": "tutorialSidebar",
   "previous": {
-    "title": "Getting Started",
-    "permalink": "/docs/getting_started"
+    "title": "Basic Concepts",
+    "permalink": "/docs/basic_concepts"
   },
   "next": {
     "title": "Python API",

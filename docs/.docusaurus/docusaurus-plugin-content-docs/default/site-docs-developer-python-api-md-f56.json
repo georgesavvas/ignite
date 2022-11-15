@@ -13,8 +13,8 @@
   "frontMatter": {},
   "sidebar": "tutorialSidebar",
   "previous": {
-    "title": "Developer",
-    "permalink": "/docs/Developer/"
+    "title": "Basic Concepts",
+    "permalink": "/docs/basic_concepts"
   },
   "next": {
     "title": "REST API",

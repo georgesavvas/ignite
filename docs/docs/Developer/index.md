@@ -1,5 +1,0 @@
----
-title: Developer
----
-
-## Coming soon!

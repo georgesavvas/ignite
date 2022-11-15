@@ -11,8 +11,8 @@
           "mainDocId": "installation",
           "docs": [
             {
-              "id": "Developer/index",
-              "path": "/docs/Developer/",
+              "id": "basic_concepts",
+              "path": "/docs/basic_concepts",
               "sidebar": "tutorialSidebar"
             },
             {

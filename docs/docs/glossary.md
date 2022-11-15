@@ -1,5 +1,13 @@
 # Glossary
 
+### Anchor
+A file in a directory that tells Ignite the type of the directory within the
+structure of a VFX project. This is strictly formatted as `.ign_[type].yaml`
+and shouldn't be needed to be created or edited manually unless you need to
+repair or change the type of a directory (ideally done through the UI though).
+This file often contains useful metadata about this directory.
+Examples: `.ign_task.yaml`, `.ign_asset.yaml`, `.ign_scene.yaml`
+
 ### Asset
 A directory containing all the versions (AssetVersions in Ignite) of a
 specific export.
@@ -18,14 +26,6 @@ directory containing the source (Scene) of the export.
 AssetVersions are numbered (v001, v002, v003 being 1, 2 and 3) but there
 is also a "latest" and "best" AssetVersion.
 Marked by a file named `.ign_assetversion.yaml`
-
-### Anchor
-A file in a directory that tells Ignite the type of the directory within the
-structure of a VFX project. This is strictly formatted as `.ign_[type].yaml`
-and shouldn't be needed to be created or edited manually unless you need to
-repair or change the type of a directory (ideally done through the UI though).
-This file often contains useful metadata about this directory.
-Examples: `.ign_task.yaml`, `.ign_asset.yaml`, `.ign_scene.yaml`
 
 ### Attribute
 Named values stored on any directory that get translated into environment
@@ -53,6 +53,9 @@ The parent path to a directory or file relative to its Group.
 ### Directory
 A directory that can contain any other directory.
 Marked by a file named `.ign_directory.yaml`
+
+### Exports
+Coming soon!
 
 ### Group
 A directory at the root of a project used to separate different parts of it such

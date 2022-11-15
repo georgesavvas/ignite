@@ -22,6 +22,12 @@
         "docId": "getting_started"
       },
       {
+        "type": "link",
+        "label": "Basic Concepts",
+        "href": "/docs/basic_concepts",
+        "docId": "basic_concepts"
+      },
+      {
         "type": "category",
         "label": "Developer",
         "collapsible": true,
@@ -39,8 +45,7 @@
             "href": "/docs/Developer/rest_api",
             "docId": "Developer/rest_api"
           }
-        ],
-        "href": "/docs/Developer/"
+        ]
       },
       {
         "type": "link",
@@ -51,10 +56,10 @@
     ]
   },
   "docs": {
-    "Developer/index": {
-      "id": "Developer/index",
-      "title": "Developer",
-      "description": "Coming soon!",
+    "basic_concepts": {
+      "id": "basic_concepts",
+      "title": "Basic Concepts",
+      "description": "Introduction",
       "sidebar": "tutorialSidebar"
     },
     "Developer/python_api": {
@@ -78,7 +83,7 @@
     "glossary": {
       "id": "glossary",
       "title": "Glossary",
-      "description": "Asset",
+      "description": "Anchor",
       "sidebar": "tutorialSidebar"
     },
     "installation": {

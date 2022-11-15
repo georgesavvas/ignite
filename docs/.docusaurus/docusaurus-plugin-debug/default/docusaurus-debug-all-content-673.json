@@ -13,24 +13,26 @@
           "tagsPath": "/docs/tags",
           "isLast": true,
           "routePriority": -1,
-          "sidebarFilePath": "/Users/george/dev/ignite/docs/sidebars.js",
-          "contentPath": "/Users/george/dev/ignite/docs/docs",
-          "contentPathLocalized": "/Users/george/dev/ignite/docs/i18n/en/docusaurus-plugin-content-docs/current",
+          "sidebarFilePath": "C:\\dev\\ignite\\docs\\sidebars.js",
+          "contentPath": "C:\\dev\\ignite\\docs\\docs",
+          "contentPathLocalized": "C:\\dev\\ignite\\docs\\i18n\\en\\docusaurus-plugin-content-docs\\current",
           "docs": [
             {
-              "unversionedId": "Developer/index",
-              "id": "Developer/index",
-              "title": "Developer",
-              "description": "Coming soon!",
-              "source": "@site/docs/Developer/index.md",
-              "sourceDirName": "Developer",
-              "slug": "/Developer/",
-              "permalink": "/docs/Developer/",
+              "unversionedId": "basic_concepts",
+              "id": "basic_concepts",
+              "title": "Basic Concepts",
+              "description": "Introduction",
+              "source": "@site/docs/basic_concepts.md",
+              "sourceDirName": ".",
+              "slug": "/basic_concepts",
+              "permalink": "/docs/basic_concepts",
               "draft": false,
               "tags": [],
               "version": "current",
+              "sidebarPosition": 2,
               "frontMatter": {
-                "title": "Developer"
+                "title": "Basic Concepts",
+                "sidebar_position": 2
               },
               "sidebar": "tutorialSidebar",
               "previous": {
@@ -57,8 +59,8 @@
               "frontMatter": {},
               "sidebar": "tutorialSidebar",
               "previous": {
-                "title": "Developer",
-                "permalink": "/docs/Developer/"
+                "title": "Basic Concepts",
+                "permalink": "/docs/basic_concepts"
               },
               "next": {
                 "title": "REST API",
@@ -111,15 +113,15 @@
                 "permalink": "/docs/installation"
               },
               "next": {
-                "title": "Developer",
-                "permalink": "/docs/Developer/"
+                "title": "Basic Concepts",
+                "permalink": "/docs/basic_concepts"
               }
             },
             {
               "unversionedId": "glossary",
               "id": "glossary",
               "title": "Glossary",
-              "description": "Asset",
+              "description": "Anchor",
               "source": "@site/docs/glossary.md",
               "sourceDirName": ".",
               "slug": "/glossary",
@@ -169,6 +171,10 @@
                 "id": "getting_started"
               },
               {
+                "type": "doc",
+                "id": "basic_concepts"
+              },
+              {
                 "type": "category",
                 "label": "Developer",
                 "collapsible": true,
@@ -182,11 +188,7 @@
                     "type": "doc",
                     "id": "Developer/rest_api"
                   }
-                ],
-                "link": {
-                  "type": "doc",
-                  "id": "Developer/index"
-                }
+                ]
               },
               {
                 "type": "doc",
