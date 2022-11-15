@@ -58,7 +58,8 @@ const General = () => {
   }, [settings]);
 
   const isServerLocal = settings.serverDetails.address &&
-    settings.serverDetails.address.startsWith("localhost");
+    (settings.serverDetails.address.startsWith("localhost") ||
+    settings.serverDetails.address.startsWith("0.0.0.0"));
 
   const handleServerDetailsChange = (field, value) => {
     setSettings(prevState => {

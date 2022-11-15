@@ -22,8 +22,9 @@ import timeago
 import yaml
 from ignite.server import api, utils
 from ignite.server.constants import ANCHORS
-from ignite.server.utils import CONFIG
+from ignite.server.utils import CONFIG, is_dir_of_kind
 from ignite.utils import bytes_to_human_readable, get_logger
+
 
 LOGGER = get_logger(__name__)
 
@@ -57,12 +58,21 @@ class Directory():
                 self.size = 0 #stat.st_size
             anchor = ANCHORS[dir_kind]
             self.anchor = path / anchor
-            if not self.anchor.is_file():
+            self.check_anchor()
+
+        if self.path:
+            self.load_from_path()
+
+    def check_anchor(self):
+        if not self.anchor.is_file():
+            if self.__class__.__name__ not in ("Asset", "AssetVersion"):
                 raise Exception(
                     f"Invalid directory kind or missing anchor: {self.anchor}"
                 )
-        if self.path:
-            self.load_from_path()
+            else:
+                LOGGER.warning(f"Assuming {self.path} is a {self.dir_kind}")
+                LOGGER.info(f"Creating anchor {self.anchor}")
+                utils.create_delayed_anchor(anchor=self.anchor)
 
     def __repr__(self):
         return f"{self.name} ({self.dir_kind})"
@@ -75,26 +85,31 @@ class Directory():
         if not Path(path).is_dir():
             raise Exception(f"Invalid path: {path}")
         split = path.split(root)
-        if split == 1:
+        if len(split) == 1:
             raise Exception(f"Error parsing path: {path}")
         split2 = split[1].lstrip("/").split("/")
         project = split2[0]
         self.project = project
+        self.group = ""
+        if is_dir_of_kind(CONFIG["root"] / project / split2[1], "group"):
+            self.group = split2[1]
         self.name = split2[-1]
         self.uri = utils.get_uri(path)
-        self.protected = not os.access(path, os.W_OK)
+        self.protected = not os.access(self.anchor, os.W_OK)
         self.context = self.get_context()
         self.load_from_config()
 
     def get_context(self):
         if self.dir_kind == "group":
             return ""
-        project_path = CONFIG["root"] / self.project
+        static_path = CONFIG["root"] / self.project
+        if self.group:
+            static_path /= self.group
         if hasattr(self, "task"):
             context = self.task
         else:
             context = self.path.parent
-        return context.relative_to(project_path).as_posix() if context else ""
+        return context.relative_to(static_path).as_posix() if context else ""
 
     def load_from_config(self):
         with open(self.anchor, "r") as f:
@@ -110,7 +125,7 @@ class Directory():
 
     def as_dict(self):
         default = ["path", "protected", "dir_kind", "anchor", "project", "tags",
-            "name", "context"]
+            "name", "context", "group"]
         default_nr = ["path"]
         d = {}
         for s in default:
@@ -266,13 +281,31 @@ class Directory():
         return existing
 
     def set_protected(self, protected):
+        ok = True
         mode = 0o444 if protected else 0o777
-        try:
-            self.path.chmod(mode)
-        except Exception as e:
-            LOGGER.error(e)
-            return
-        return True
+        for file in self.path.iterdir():
+            LOGGER.info(f"Changing {file} mode to {mode}")
+            try:
+                file.chmod(mode)
+            except Exception as e:
+                LOGGER.error(e)
+                ok = False
+                break
+        if ok:
+            can_access = os.access(self.anchor, os.W_OK)
+            LOGGER.debug(f"Anchor access: {can_access}")
+            if can_access != protected:
+                return True
+        # Something went wrong, revert changes
+        LOGGER.warning("Reverting permission changes...")
+        mode = 0o444 if not protected else 0o777
+        for file in self.path.iterdir():
+            LOGGER.info(f"Changing {file} mode to {mode}")
+            try:
+                file.chmod(mode)
+            except Exception as e:
+                LOGGER.error(e)
+
 
     @property
     def attributes(self):

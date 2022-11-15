@@ -16,11 +16,7 @@
 import os
 from pathlib import Path
 
-import sys
-import asyncio
-import contextlib
-import time
-import threading
+import logging
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -31,9 +27,10 @@ from ignite.client import router as client_router
 from ignite.server.socket_manager import SocketManager
 from ignite.client.utils import CONFIG
 from ignite.utils import mount_root
-from ignite.logger import get_logger
+from ignite.logger import get_logger, setup_logger, EndpointFilter
 
 
+PID = str(os.getpid())
 ENV = os.environ
 LOGGER = get_logger(__name__)
 SERVER_HOST = "0.0.0.0"
@@ -63,30 +60,39 @@ pid_file = path / "ignite.pid"
 if port_file.exists() or pid_file.exists():
     LOGGER.warning(f"Last shutdown was not clean")
 port_file.write_text(SERVER_PORT)
-pid_file.write_text(str(os.getpid()))
+pid_file.write_text(PID)
 
 
 @app.on_event("startup")
 def startup_event():
+    uvicorn_error_logger = logging.getLogger("uvicorn.error")
+    uvicorn_access_logger = logging.getLogger("uvicorn.access")
+    setup_logger(uvicorn_error_logger)
+    setup_logger(uvicorn_access_logger)
+    uvicorn_access_logger.addFilter(EndpointFilter(path="/api/v1/ping"))
     mount_root(app, CONFIG)
 
 
 @app.on_event("shutdown")
 def shutdown_event():
-    LOGGER.info(f"Cleaning up...")
+    LOGGER.info("Cleaning up...")
     port_file.unlink()
     pid_file.unlink()
 
 
 @app.get("/api/v1/quit")
 async def force_quit():
-    print("Asked to quit, cya!")
+    LOGGER.info("Asked to quit, cya!")
     global server
     global loop
-    # loop.stop()
     server.should_exit = True
     server.force_exit = True
     await server.shutdown()
+
+
+@app.get("/api/v1/ping")
+async def ping():
+    return {"ok": True}
 
 
 if __name__ == "__main__":
@@ -97,5 +103,6 @@ if __name__ == "__main__":
         log_level="info"
     )
     server = uvicorn.Server(config=config)
-    LOGGER.info(f"Launching server at {SERVER_HOST}:{SERVER_PORT}")
+    LOGGER.info(f"*** Launching server at {SERVER_HOST}:{SERVER_PORT}")
+    LOGGER.info(f"PID {PID}")
     server.run()

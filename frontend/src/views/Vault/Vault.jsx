@@ -84,7 +84,8 @@ function Vault(props) {
 
   useEffect(() => {
     const selectedCollection = localStorage.getItem("selectedCollection");
-    handleCollectionChange(selectedCollection || undefined);
+    if (!selectedCollection) return;
+    setSelectedCollection(selectedCollection);
   }, []);
 
   useEffect(() => {

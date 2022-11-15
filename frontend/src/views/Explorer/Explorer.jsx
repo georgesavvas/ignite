@@ -13,7 +13,7 @@
 // limitations under the License.
 
 
-import React, {useEffect, useState, useContext} from "react";
+import React, {useEffect, useState, useContext, useRef} from "react";
 
 import Divider from "@mui/material/Divider";
 import debounce from "lodash.debounce";
@@ -89,7 +89,10 @@ function Explorer() {
   const [loadedData, setLoadedData] = useState([]);
   const [pages, setPages] = useState({total: 1, current: 1});
   const [query, setQuery] = useState(defaultQuery);
-  const [explorerSettings, setExplorerSettings] = useState(defaultExplorerSettings);
+  const savedExplorerSettings = loadExplorerSettings();
+  const [explorerSettings, setExplorerSettings] = useState(
+    savedExplorerSettings || defaultExplorerSettings
+  );
   const [tiles, setTiles] = useState([]);
   const [modalData, setModalData] = useState({});
   const [selectedEntity, setSelectedEntity] = useContext(EntityContext);
@@ -116,12 +119,6 @@ function Explorer() {
   };
 
   useEffect(() => {
-    const data = loadExplorerSettings();
-    if (!data) return;
-    setExplorerSettings(data);
-  }, []);
-
-  useEffect(() => {
     saveExplorerSettings(explorerSettings);
   }, [explorerSettings]);
 
@@ -144,9 +141,12 @@ function Explorer() {
 
   useEffect(() => {
     if (!loadedData) return;
+    const fetchedSelected = loadedData.find(
+      entity => entity.path === selectedEntity.path
+    );
+    if (fetchedSelected) setSelectedEntity(fetchedSelected);
     if (explorerSettings.currentViewType !== "grid") return;
     const _tiles = loadedData.reduce(function(obj, entity) {
-      if (entity.path === selectedEntity.path) setSelectedEntity(entity);
       entity.path = BuildFileURL(entity.path, config, {pathOnly: true});
       if (entity.components) {
         entity.components.forEach(comp => {
@@ -156,13 +156,13 @@ function Explorer() {
       if (entity.task) entity.task = BuildFileURL(entity.task, config, {pathOnly: true});
       if (entity.scene) entity.scene = BuildFileURL(entity.scene, config, {pathOnly: true});
       if (entity.dir_kind === "assetversion") {
-        obj[entity.result_id] = <AssetTile key={entity.result_id} entity={entity}
+        obj[entity.result_id] = <AssetTile key={entity.path} entity={entity}
           onSelected={handleEntitySelection} size={explorerSettings.currentTileSize * 40} viewType={explorerSettings.currentViewType}
           selected={selectedEntity.path === entity.path} refreshContext={refreshContext}
           onContextMenu={handleContextMenuSelection}
         />;
       } else {
-        obj[entity.result_id] = <DirectoryTile key={entity.result_id} entity={entity}
+        obj[entity.result_id] = <DirectoryTile key={entity.path} entity={entity}
           onSelected={handleEntitySelection} size={explorerSettings.currentTileSize * 40} viewType={explorerSettings.currentViewType}
           selected={selectedEntity.path === entity.path} refreshContext={refreshContext}
           onContextMenu={handleContextMenuSelection}
@@ -331,7 +331,8 @@ function Explorer() {
       <RowView data={loadedData} page={pages.current}
         tileSize={explorerSettings.currentTileSize}
         pageSize={explorerSettings.tilesPerPage}
-        viewType={explorerSettings.currentResultType}
+        resultType={explorerSettings.currentResultType}
+        selectedEntityPath={selectedEntity.path}
         onSelected={handleEntitySelection}
         onContextMenu={e => handleContextMenu(e, contextMenu, setContextMenu)}
       />

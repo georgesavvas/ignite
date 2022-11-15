@@ -52,7 +52,6 @@ class AssetVersion(Directory):
         self.fetch_components()
         self._get_score()
         self.tags = self.get_tags()
-        
         self.thumbnail = self.get_thumbnail()
 
     def __lt__(self, other):
@@ -147,11 +146,11 @@ class AssetVersion(Directory):
         asset = Asset(self.asset)
         asset.set_tags(self.version, tags)
         self.tags = sorted(tags)
-    
+
     def add_tags(self, tags):
         asset = Asset(self.asset)
         self.tags = sorted(asset.add_tags(self.version, tags))
-    
+
     def remove_tags(self, tags=[], all=False):
         asset = Asset(self.asset)
         self.tags = sorted(asset.remove_tags(self.version, tags=tags, all=all))

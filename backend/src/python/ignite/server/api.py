@@ -21,7 +21,7 @@ import yaml
 from ignite.server import utils
 from ignite.server.constants import ANCHORS
 from ignite.server.utils import CONFIG
-from ignite.logger import get_logger
+from ignite.utils import get_logger
 from mongoquery import Query
 
 LOGGER = get_logger(__name__)
@@ -126,7 +126,7 @@ def get_context_info(path):
         )[1].lstrip("/").split("/")[0]
         data = {
             "root": CONFIG["root"].as_posix(),
-            "name": path.name,
+            "name": name,
             "path": str(path),
             "path_nr": utils.get_nr(path),
             "posix": path.as_posix(),
@@ -227,7 +227,18 @@ def _find_from_path(path):
             entity = entities[kinds[name]]
             break
     else:
-        return
+        parent1 = path.parent
+        parent2 = parent1.parent
+        if parent2.name == "exports":
+            # Probably an assetversion
+            d["dir_kind"] = "assetversion"
+            utils.create_delayed_anchor(path, "assetversion")
+        elif parent1.name == "exports":
+            # Probably an asset
+            d["dir_kind"] = "asset"
+            utils.create_delayed_anchor(path, "asset")
+        else:
+            return
     obj = None
     try:
         obj = entity(path=path)
@@ -352,7 +363,7 @@ def get_task(path):
 def discover_tasks(path, task_types=[], sort=None, as_dict=False):
     from ignite.server.entities.task import Task
 
-    def discover(path, l=[], ignore=[]):
+    def discover(path, l=[]):
         name = path.name
         if path.is_dir():
             d = {}
@@ -379,16 +390,12 @@ def discover_tasks(path, task_types=[], sort=None, as_dict=False):
                         config = config or {}
                         d["task_type"] = config.get("task_type")
                 discover(x, l)
-            if d["dir_kind"] == "task" and not path in ignore:
+            if d["dir_kind"] == "task":
                 if not task_types or d["task_type"] in task_types:
                     l.append(d)
         return l
 
-    if not path:
-        return []
-
-    p = Path(path)
-    data = discover(p, ignore=[p])
+    data = discover(Path(path))
     tasks = [Task(path=task["path"]) for task in data]
     if as_dict:
         tasks = [t.as_dict() for t in tasks]
@@ -418,8 +425,20 @@ def discover_assets(path, asset_kinds=[], sort=None, as_dict=False, filters={}, 
                     continue
                 if name.startswith("."):
                     continue
-                elif not d["dir_kind"] and d["name"] not in ("exports", "scenes"):
-                    return []
+                elif not d["dir_kind"]:
+                    parent1 = path.parent
+                    parent2 = parent1.parent
+                    if parent2.name == "exports":
+                        # Probably an assetversion
+                        d["dir_kind"] = "assetversion"
+                        utils.create_delayed_anchor(path, "assetversion")
+                    elif parent1.name == "exports":
+                        # Probably an asset
+                        d["dir_kind"] = "asset"
+                        utils.create_delayed_anchor(path, "asset")
+                    elif d["name"] not in ("exports", "scenes"):
+                        # We should ignore
+                        return []
                 if d["dir_kind"] == "asset" and d["anchor"]:
                     with open(d["anchor"], "r") as f:
                         config = yaml.safe_load(f)
@@ -838,23 +857,16 @@ def vault_export(source, task_path, name):
     return True
 
 
-def set_scene_comment(path, text):
-    from ignite.server.entities.scene import Scene
-    path = Path(path)
-    if not path.exists():
-        LOGGER.error(f"Failed to set comment to {path} cause it doesn't exist.")
+def set_scene_comment(path, comment):
+    entity = find(path)
+    if not entity.dir_kind == "scene":
         return
-    if path.is_file():
-        path = path.parent
-    scene = Scene(path)
-    if not scene:
-        return
-    scene.set_comment(text)
-    return True
+    entity.set_comment(comment)
 
 
 def set_directory_protected(path, protected):
-    entity = find(path)
+    from ignite.server.entities.assetversion import AssetVersion
+    entity = AssetVersion(path)
     if not entity:
         return
     return entity.set_protected(protected)

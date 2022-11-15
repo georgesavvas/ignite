@@ -15,7 +15,7 @@
 
 import os
 from pathlib import PurePath, Path
-from pprint import pprint
+import pprint
 
 from fastapi.staticfiles import StaticFiles
 from ignite.logger import get_logger
@@ -27,8 +27,7 @@ LOGGER = get_logger(__name__)
 
 
 def log_request(request):
-    print("Request data:")
-    pprint(request)
+    LOGGER.debug(f"Request data:\n{pprint.pformat(request)}")
 
 
 def process_request(req):
