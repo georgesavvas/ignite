@@ -6,7 +6,7 @@
 export default {
   "title": "Ignite",
   "tagline": "Open Source VFX Pipeline",
-  "url": "https://docs.ignitevfx.co.uk/",
+  "url": "https://docs.ignitevfx.co.uk",
   "baseUrl": "/",
   "trailingSlash": false,
   "onBrokenLinks": "throw",
@@ -303,8 +303,12 @@ export default {
   "plugins": [],
   "themes": [],
   "scripts": [],
+  "headTags": [],
   "stylesheets": [],
   "clientModules": [],
   "titleDelimiter": "|",
-  "noIndex": false
+  "noIndex": false,
+  "markdown": {
+    "mermaid": false
+  }
 };

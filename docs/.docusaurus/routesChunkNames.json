@@ -1,10 +1,4 @@
 {
-<<<<<<< HEAD
-  "/docs-4dd": {
-    "__comp": "1be78505",
-    "__context": {
-      "plugin": "d25f097e"
-=======
   "/__docusaurus/debug-862": {
     "__comp": "__comp---theme-debug-config-23-a-2ff",
     "__context": {
@@ -21,31 +15,9 @@
     "__comp": "__comp---theme-debug-contentba-8-ce7",
     "__context": {
       "plugin": "plugin---docusaurus-debug-310-56f"
->>>>>>> main
     },
-    "versionMetadata": "935f2afb"
+    "allContent": "allContent---docusaurus-debug-content-246-9aa"
   },
-<<<<<<< HEAD
-  "/docs/basic_concepts-1e0": {
-    "__comp": "17896441",
-    "content": "74a803a9"
-  },
-  "/docs/Developer/python_api-9d5": {
-    "__comp": "17896441",
-    "content": "f56d8649"
-  },
-  "/docs/Developer/rest_api-82f": {
-    "__comp": "17896441",
-    "content": "a3cbdead"
-  },
-  "/docs/getting_started-fdc": {
-    "__comp": "17896441",
-    "content": "92bb876c"
-  },
-  "/docs/glossary-be2": {
-    "__comp": "17896441",
-    "content": "e747ec83"
-=======
   "/__docusaurus/debug/globalData-b62": {
     "__comp": "__comp---theme-debug-global-dataede-0fa",
     "__context": {
@@ -96,23 +68,16 @@
   "/docs/glossary-be2": {
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---docs-glossarye-74-cec"
->>>>>>> main
   },
   "/docs/installation-001": {
-    "__comp": "17896441",
-    "content": "3b8c55ea"
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---docs-installation-3-b-8-7c6"
   },
   "/-bea": {
-<<<<<<< HEAD
-    "__comp": "c4f5d8e4",
-    "__context": {
-      "plugin": "4ead559e"
-=======
     "__comp": "__comp---site-src-pages-index-jsc-4-f-f99",
     "__context": {
       "plugin": "plugin---4-ea-6a0"
->>>>>>> main
     },
-    "config": "5e9f5e1a"
+    "config": "config---5-e-9-4f3"
   }
 }
