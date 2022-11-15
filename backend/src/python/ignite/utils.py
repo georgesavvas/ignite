@@ -21,8 +21,8 @@ from fastapi.staticfiles import StaticFiles
 from ignite.logger import get_logger
 
 ENV = os.environ
-
-
+CONFIG_PATH = Path(ENV["IGNITE_CONFIG_PATH"])
+USER_CONFIG_PATH = Path(ENV["IGNITE_USER_CONFIG_PATH"])
 LOGGER = get_logger(__name__)
 
 
@@ -84,3 +84,14 @@ def mount_root(app, config):
 
 def symlink_points_to(symlink, path):
     return path == symlink.resolve()
+
+
+def get_config_paths(suffix, project_path=None, base=True, user=True):
+    paths = []
+    if base:
+        paths.append(CONFIG_PATH / suffix)
+    if user:
+        paths.append(USER_CONFIG_PATH / suffix)
+    if project_path:
+        paths.append(project_path / ".config" / suffix)
+    return paths
