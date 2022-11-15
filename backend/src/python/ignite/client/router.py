@@ -22,7 +22,7 @@ from ignite.logger import get_logger
 from ignite.utils import mount_root, log_request, error
 from ignite.server import api as server_api
 from ignite.client import utils, api
-from ignite.client.utils import TASK_MANAGER, PROCESSES_MANAGER, CONFIG
+from ignite.client.utils import PROCESS_MANAGER, SOCKET_MANAGER
 from ignite.client.utils import is_server_local
 
 
@@ -38,19 +38,19 @@ router = APIRouter(
 
 @router.on_event("startup")
 async def startup_event():
-    TASK_MANAGER.start()
-    TASK_MANAGER.restore_tasks()
+    PROCESS_MANAGER.start()
+    PROCESS_MANAGER.restore_processes()
 
 
 @router.websocket("/ws/processes/{session_id}")
 async def processes(websocket: WebSocket, session_id: str):
     if session_id:
         LOGGER.warning(f"Request to open socket from {session_id}")
-        await PROCESSES_MANAGER.connect(websocket, session_id)
+        await SOCKET_MANAGER.connect(websocket, session_id)
     while True:
         try:
             received = await websocket.receive_text()
-            await websocket.send_json({"data": TASK_MANAGER.report()})
+            await websocket.send_json({"data": PROCESS_MANAGER.report()})
         except Exception as e:
             print("error:", e)
             break
@@ -190,22 +190,22 @@ async def run_action(request: Request):
     return {"ok": True}
 
 
-@router.post("/edit_task")
-async def edit_task(request: Request):
+@router.post("/edit_process")
+async def edit_process(request: Request):
     result = await request.json()
     log_request(result)
-    task_id = result.get("task_id")
+    process_id = result.get("process_id")
     edit = result.get("edit")
-    api.edit_task(task_id, edit)
+    api.edit_process(process_id, edit)
     return {"ok": True}
 
 
-@router.post("/get_local_tasks")
-async def get_local_tasks(request: Request):
+@router.post("/get_processes")
+async def get_processes(request: Request):
     result = await request.json()
     log_request(result)
     session_id = result.get("session_id")
-    data = api.get_local_tasks(session_id)
+    data = api.get_processes(session_id)
     return {"ok": True, "data": data}
 
 
