@@ -455,7 +455,6 @@ def discover_actions():
                 "label": module.LABEL,
                 "source": file.as_posix(),
                 "exts": module.EXTENSIONS,
-                # "fn": module.main,
                 "module_path": module.__file__
             }
             actions[entity][file.name] = entity_action
