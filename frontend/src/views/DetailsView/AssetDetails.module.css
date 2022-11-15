@@ -1,8 +1,0 @@
-.button {
-    cursor: pointer;
-    height: 100%;
-}
-
-.button:hover {
-    filter: brightness(150%);
-}
