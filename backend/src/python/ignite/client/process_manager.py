@@ -35,11 +35,11 @@ def start_worker(loop):
     LOGGER.warning("WORKER END")
 
 
-class Task():
-    def __init__(self, action, entity, task_id, processes_manager, on_finish, session_id, **kwargs):
+class Process():
+    def __init__(self, action, entity, process_id, processes_manager, on_finish, session_id, **kwargs):
         self.action = action
         self.entity = entity
-        self.id = task_id
+        self.id = process_id
         self.session_id = session_id
         self.processes_manager = processes_manager
         self.state = {"paused": False, "killed": False, "active": "waiting"}
@@ -82,7 +82,7 @@ class Task():
         return {
             "action": self.action,
             "entity": self.entity,
-            "task_id": self.id,
+            "process_id": self.id,
             "session_id": self.session_id
         }
 
@@ -96,10 +96,10 @@ class Task():
         self.state["killed"] = True
 
 
-class TaskManager():
+class ProcessManager():
     def __init__(self, processes_manager, db_path):
         self.db = TinyDB(db_path)
-        self.tasks = []
+        self.processes = []
         self.processes_manager = processes_manager
 
     def start(self):
@@ -113,130 +113,130 @@ class TaskManager():
         )
         self.thread.start()
 
-    def create_task(self, action, entity, session_id, task_id=None):
-        task_id = task_id or str(uuid4())
-        task = Task(
+    def create_process(self, action, entity, session_id, process_id=None):
+        process_id = process_id or str(uuid4())
+        process = Process(
             action=action,
             entity=entity,
-            task_id=task_id,
+            process_id=process_id,
             session_id=session_id,
             processes_manager=self.processes_manager,
-            on_finish=self.handle_task_finished
+            on_finish=self.handle_process_finished
         )
-        self.run_task(task)
+        self.run_process(process)
     
-    def run_task(self, task):
-        asyncio.create_task(self.send(task))
-        future = asyncio.run_coroutine_threadsafe(task.run(), self.loop)
-        self.remove(Query().task.id)
-        self.db.insert(task.as_dict())
-        self.tasks.append({
-            "id": task.id,
-            "task": task,
+    def run_process(self, process):
+        asyncio.create_task(self.send(process))
+        future = asyncio.run_coroutine_threadsafe(process.run(), self.loop)
+        self.remove(Query().process.id)
+        self.db.insert(process.as_dict())
+        self.processes.append({
+            "id": process.id,
+            "process": process,
             "future": future,
         })
 
-    def remove(self, task_id):
-        for i, task_data in enumerate(self.tasks):
-            if task_data["id"] == task_id:
-                self.tasks.pop(i)
+    def remove(self, process_id):
+        for i, process_data in enumerate(self.processes):
+            if process_data["id"] == process_id:
+                self.processes.pop(i)
                 break
-        self.db.remove(Query().task_id == task_id)
+        self.db.remove(Query().process_id == process_id)
     
-    def restore_tasks(self):
+    def restore_processes(self):
         for kwargs in self.db:
-            LOGGER.warning(f"Restoring task from db {kwargs['task_id']}")
-            self.create_task(
+            LOGGER.warning(f"Restoring process from db {kwargs['process_id']}")
+            self.create_process(
                 action=kwargs["action"],
                 entity=kwargs["entity"],
-                task_id=kwargs["task_id"],
+                process_id=kwargs["process_id"],
                 session_id=kwargs["session_id"]
             )
 
-    def tasks(self):
-        return self.tasks
+    def processes(self):
+        return self.processes
     
     def amount(self):
-        return len(self.tasks)
+        return len(self.processes)
     
-    def handle_task_finished(self, task_id, result):
-        task = self.get_task(task_id)
-        asyncio.create_task(self.send(task, state="finished" if not task.state["killed"] else "error"))
-        print(f"Removing {task_id} from db...")
-        self.db.remove(Query().task_id == task_id)
+    def handle_process_finished(self, process_id, result):
+        process = self.get_process(process_id)
+        asyncio.create_process(self.send(process, state="finished" if not process.state["killed"] else "error"))
+        print(f"Removing {process_id} from db...")
+        self.db.remove(Query().process_id == process_id)
         print("Done.")
     
-    def get_task(self, task_id):
-        for task_data in self.tasks:
-            if task_data["id"] == task_id:
-                return task_data["task"]
+    def get_process(self, process_id):
+        for process_data in self.processes:
+            if process_data["id"] == process_id:
+                return process_data["process"]
     
     def report(self, session_id=""):
         data = []
-        for task_data in self.tasks:
-            task = task_data["task"]
-            if session_id and session_id != task.session_id:
+        for process_data in self.processes:
+            process = process_data["process"]
+            if session_id and session_id != process.session_id:
                 continue
             data.append({
-                "state": task.state["active"],
-                "progress": task.progress,
-                "name": task.action["label"],
-                "entity": task.entity,
-                "id": task.id
+                "state": process.state["active"],
+                "progress": process.progress,
+                "name": process.action["label"],
+                "entity": process.entity,
+                "id": process.id
             })
         return data
 
-    def get_future(self, task_id):
-        for task_data in self.tasks:
-            if task_data["id"] == task_id:
-                return task_data["future"]
+    def get_future(self, process_id):
+        for process_data in self.processes:
+            if process_data["id"] == process_id:
+                return process_data["future"]
     
-    def pause(self, task_id):
-        task = self.get_task(task_id)
-        print(f"Pausing {task}")
-        if task:
-            task.pause()
+    def pause(self, process_id):
+        process = self.get_process(process_id)
+        print(f"Pausing {process}")
+        if process:
+            process.pause()
     
-    def unpause(self, task_id):
-        task = self.get_task(task_id)
-        print(f"Unpausing {task}")
-        if task:
-            task.unpause()
+    def unpause(self, process_id):
+        process = self.get_process(process_id)
+        print(f"Unpausing {process}")
+        if process:
+            process.unpause()
     
-    def retry(self, task_id):
-        task = self.get_task(task_id)
-        print(f"Retrying {task}")
-        if task:
-            self.run_task(task)
+    def retry(self, process_id):
+        process = self.get_process(process_id)
+        print(f"Retrying {process}")
+        if process:
+            self.run_process(process)
     
-    def kill(self, task_id):
-        task = self.get_task(task_id)
-        print(f"Killing {task}")
-        if task:
-            task.kill()
+    def kill(self, process_id):
+        process = self.get_process(process_id)
+        print(f"Killing {process}")
+        if process:
+            process.kill()
     
-    def clear(self, task_id):
-        for i, task_data in enumerate(self.tasks):
-            if task_data["id"] == task_id:
-                print(f"Clearing {task_data['task']}")
-                self.db.remove(Query().task_id == task_id)
-                self.tasks.pop(i)
+    def clear(self, process_id):
+        for i, process_data in enumerate(self.processes):
+            if process_data["id"] == process_id:
+                print(f"Clearing {process_data['process']}")
+                self.db.remove(Query().process_id == process_id)
+                self.processes.pop(i)
                 break
         else:
-            print(f"Couldn't find task to clear with {task_id}")
+            print(f"Couldn't find process to clear with {process_id}")
 
-    async def send(self, task, progress=-1, state=""):
-        ws = self.processes_manager.get(task.session_id)
+    async def send(self, process, progress=-1, state=""):
+        ws = self.processes_manager.get(process.session_id)
         if not ws and self.processes_manager.connections:
             ws, ws_id = self.processes_manager.connections[0]
-            LOGGER.error(f"Websocket was not found for {task} {task.session_id} but ended up using {ws_id}")
+            LOGGER.error(f"Websocket was not found for {process} {process.session_id} but ended up using {ws_id}")
         elif not ws:
-            LOGGER.error(f"Websocket was not found for {task} {task.session_id}")
+            LOGGER.error(f"Websocket was not found for {process} {process.session_id}")
             return
         data = {
-            "name": task.action["label"],
-            "entity": task.entity,
-            "id": task.id
+            "name": process.action["label"],
+            "entity": process.entity,
+            "id": process.id
         }
         if progress >= 0:
             data["progress"] = progress

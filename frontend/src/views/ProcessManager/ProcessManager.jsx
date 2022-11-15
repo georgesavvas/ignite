@@ -20,8 +20,8 @@ import Switch from "@mui/material/Switch";
 
 import clientRequest from "../../services/clientRequest";
 import FilterField from "../../components/FilterField";
-import styles from "./TaskManager.module.css";
-import Task from "./Task";
+import styles from "./ProcessManager.module.css";
+import Process from "./Process";
 import {clientSocket} from "../../services/clientWebSocket";
 import {ConfigContext} from "../../contexts/ConfigContext";
 import DataPlaceholder from "../../components/DataPlaceholder";
@@ -36,7 +36,7 @@ const destroySocket = socket => {
   socket.close();
 };
 
-// const defaultTasks = [
+// const defaultProcesses = [
 //   {
 //     state: "running",
 //     progress: 40,
@@ -66,21 +66,21 @@ const destroySocket = socket => {
 //   }
 // ];
 
-const taskStateOrder = ["running", "error", "paused", "waiting", "finished"];
-const sortTasks = tasks => {
-  const _tasks = [...tasks];
-  _tasks.sort((a, b) => {
-    const indexA = taskStateOrder.indexOf(a.state);
-    const indexB = taskStateOrder.indexOf(b.state);
+const processStateOrder = ["running", "error", "paused", "waiting", "finished"];
+const sortProcesses = processes => {
+  const _processes = [...processes];
+  _processes.sort((a, b) => {
+    const indexA = processStateOrder.indexOf(a.state);
+    const indexB = processStateOrder.indexOf(b.state);
     return indexA - indexB;
   });
-  return _tasks;
+  return _processes;
 };
 
-export default function TaskManager() {
+export default function ProcessManager() {
   const [socket, setSocket] = useState();
   const [config] = useContext(ConfigContext);
-  const [tasks, setTasks] = useState([]);
+  const [processes, setProcesses] = useState([]);
   const [autoClear, setAutoClear] = useState(false);
   const [filterValue, setFilterValue] = useState("");
 
@@ -91,23 +91,23 @@ export default function TaskManager() {
       const websocketConfig = {
         onmessage: e => {
           const data = JSON.parse(e.data).data;
-          setTasks(prevState => {
+          setProcesses(prevState => {
             const existing = [...prevState];
-            const index = existing.findIndex(task => task.id === data.id);
+            const index = existing.findIndex(process => process.id === data.id);
             if (index >= 0) existing[index] = {...existing[index], ...data};
             else if (data.name && data.entity) existing.push(data);
-            return sortTasks(existing);
+            return sortProcesses(existing);
           });
         }
       };
       const ws = createProcessesSocket(config, resp, websocketConfig);
-      clientRequest("get_local_tasks", {session_id: resp}).then(resp2 => {
+      clientRequest("get_local_processes", {session_id: resp}).then(resp2 => {
         if (!resp2) return;
-        setTasks(prevState => {
+        setProcesses(prevState => {
           const incoming = resp2.data || [];
           const incomingIds = incoming.map(t => t.id);
           const existing = prevState.filter(t => !incomingIds.includes(t.id));
-          return sortTasks([...existing, ...incoming]);
+          return sortProcesses([...existing, ...incoming]);
         });
       });
       if (!ws) return;
@@ -121,20 +121,20 @@ export default function TaskManager() {
 
   useEffect(() => {
     if (!autoClear) return;
-    setTasks(prevState => prevState.filter(task => task.state !== "finished"));
+    setProcesses(prevState => prevState.filter(process => process.state !== "finished"));
   }, [autoClear]);
 
-  const handleClear = taskID => {
-    setTasks(prevState => prevState.filter(task => task.id !== taskID));
+  const handleClear = processID => {
+    setProcesses(prevState => prevState.filter(process => process.id !== processID));
   };
 
-  const handleKill = taskID => {
-    setTasks(prevState => {
+  const handleKill = processID => {
+    setProcesses(prevState => {
       const existing = [...prevState];
-      const index = existing.findIndex(task => task.id === taskID);
+      const index = existing.findIndex(process => process.id === processID);
       if (index < 0) return prevState;
       existing[index] = {...existing[index], state: "error"};
-      return sortTasks(existing);
+      return sortProcesses(existing);
     });
   };
 
@@ -154,18 +154,18 @@ export default function TaskManager() {
           style={{minWidth: "150px", marginRight: "0px"}}
         />
       </FilterField>
-      {!tasks.length ? <DataPlaceholder text="No Tasks" /> :
-        <div className={styles.tasksContainer}>
-          {tasks.map(task => {
+      {!processes.length ? <DataPlaceholder text="No Processes" /> :
+        <div className={styles.processesContainer}>
+          {processes.map(process => {
             const filterString = `
-              ${task.name}
-              ${task.entity.name}
-              ${task.entity.path}
-              ${task.entity.dir_kind}
-              ${task.entity.tags}
+              ${process.name}
+              ${process.entity.name}
+              ${process.entity.path}
+              ${process.entity.dir_kind}
+              ${process.entity.tags}
             `;
             const hide = filterValue && !filterString.includes(filterValue);
-            return <Task key={task.id} task={task} onClear={handleClear}
+            return <Process key={process.id} process={process} onClear={handleClear}
               forceKill={handleKill} style={hide ? {display: "none"} : null}
             />;
           })}

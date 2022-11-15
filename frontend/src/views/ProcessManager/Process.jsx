@@ -27,7 +27,7 @@ import CheckIcon from "@mui/icons-material/Check";
 import ErrorIcon from "@mui/icons-material/Error";
 
 import clientRequest from "../../services/clientRequest";
-import styles from "./Task.module.css";
+import styles from "./Process.module.css";
 
 
 const COLOURS = {
@@ -38,26 +38,26 @@ const COLOURS = {
   running: "rgb(0, 50, 120)"
 };
 
-const Task = props => {
-  const state = props.task.state || "waiting";
+const Process = props => {
+  const state = props.process.state || "waiting";
 
   const handleAction = action => {
     const data = {
-      task_id: props.task.id,
+      process_id: props.process.id,
       edit: action
     };
-    clientRequest("edit_task", data);
+    clientRequest("edit_process", data);
   };
 
   const handleClear = () => {
     const shouldKill = ["running", "paused"].includes(state);
-    if (!shouldKill) props.onClear(props.task.id);
-    else props.forceKill(props.task.id);
+    if (!shouldKill) props.onClear(props.process.id);
+    else props.forceKill(props.process.id);
     const data = {
-      task_id: props.task.id,
+      process_id: props.process.id,
       edit: shouldKill ? "kill" : "clear"
     };
-    clientRequest("edit_task", data);
+    clientRequest("edit_process", data);
   };
 
   const getStatusIcon = () => {
@@ -89,7 +89,7 @@ const Task = props => {
   };
 
   const getProgressBarStyle = () => {
-    const progress = props.task.progress;
+    const progress = props.process.progress;
     switch (state) {
     case "waiting": return {
       backgroundColor: "rgb(120, 120, 0)",
@@ -119,17 +119,17 @@ const Task = props => {
   return (
     <div className={styles.container} style={props.style}>
       <div className={styles.topBar}>
-        {/* <Typography className={styles.title} align="center">{props.task.name}</Typography> */}
+        {/* <Typography className={styles.title} align="center">{props.process.name}</Typography> */}
         <div className={`${styles.progressBar} ${styles[state]}`} style={{...getProgressBarStyle(), backgroundColor: COLOURS[state]}} />
       </div>
       <div className={styles.details}>
         {getStatusIcon()}
         <Divider orientation="vertical" flexItem />
         <div className={styles.detailsText}>
-          <Typography noWrap>{props.task.name}</Typography>
-          <Typography noWrap style={{direction: "rtl", textAlign: "left"}}>{props.task.entity.path}</Typography>
-          {/* <Typography noWrap>{props.task.asset.name} - {props.task.asset.context}</Typography>
-          <Typography>{props.task.component.name}</Typography> */}
+          <Typography noWrap>{props.process.name}</Typography>
+          <Typography noWrap style={{direction: "rtl", textAlign: "left"}}>{props.process.entity.path}</Typography>
+          {/* <Typography noWrap>{props.process.asset.name} - {props.process.asset.context}</Typography>
+          <Typography>{props.process.component.name}</Typography> */}
         </div>
         {/* <div className={styles.spacer} /> */}
         {/* <Divider orientation="vertical" flexItem /> */}
@@ -140,4 +140,4 @@ const Task = props => {
   );
 };
 
-export default Task;
+export default Process;
