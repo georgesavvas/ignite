@@ -34,18 +34,20 @@ const Crate = props => {
   };
 
   const getEntityCrate = entity => {
+    console.log("Creating crate entity with", entity);
     return (
       <div key={entity.uri} className={styles.crateEntity}>
-        {entity.dir_kind === "assetversion" ?
-          <AssetTile entity={entity} />
-          : <DirectoryTile entity={entity} />
+        {("asset", "assetversion").includes(entity.dir_kind) ?
+          <AssetTile entity={entity} noOverlay noInfo />
+          : <DirectoryTile entity={entity} noOverlay noInfo />
         }
       </div>
     );
   };
 
   const handleNewCrateClick = () => {
-    floating ? dropFloating("") : addCrate();
+    if (floating.length) dropFloating("");
+    else addCrate();
   };
 
   if (props.index < 0) return (

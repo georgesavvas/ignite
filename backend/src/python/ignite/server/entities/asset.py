@@ -25,6 +25,7 @@ class Asset(Directory):
         super().__init__(path, dir_kind="asset")
         self.dict_attrs = ["versions", "latest_v", "best_v", "next_path",
             "creation_time", "modification_time", "uri"]
+        self.nr_attrs = ["path"]
         self._versions = []
         self._assetversions = []
         self._latest_v = None

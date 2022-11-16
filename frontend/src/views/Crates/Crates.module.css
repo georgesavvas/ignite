@@ -7,6 +7,7 @@
   right: 0;
   justify-content: center;
   overflow-x: auto;
+  padding-bottom: 5px;
 }
 
 .crate {
@@ -70,7 +71,7 @@
 }
 
 .crateEntity {
-  border: 1px solid whitesmoke;
+  /* border: 1px solid whitesmoke; */
   border-radius: 3px;
   width: 100%;
   overflow: clip;

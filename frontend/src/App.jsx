@@ -73,15 +73,15 @@ function App() {
         <ErrorBoundary FallbackComponent={ErrorFallback}>
           <SnackbarProvider maxSnack={3} autoHideDuration={2500}>
             <ConfigProvider>
-              <CrateProvider>
-                <ContextProvider>
+              <ContextProvider>
+                <CrateProvider>
                   <EntityProvider>
                     <VaultProvider>
                       <Home />
                     </VaultProvider>
                   </EntityProvider>
-                </ContextProvider>
-              </CrateProvider>
+                </CrateProvider>
+              </ContextProvider>
             </ConfigProvider>
           </SnackbarProvider>
         </ErrorBoundary>

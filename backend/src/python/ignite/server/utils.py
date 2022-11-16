@@ -264,10 +264,8 @@ def uri_to_path(uri):
         data["task"] += "/exports"
     if data.get("version"):
         version = data.get("version")
-        if version.startswith("v"):
+        if not version.startswith("v"):
             data["version"] = format_int_version(data["version"])
-        else:
-            del data["version"]
     path = CONFIG["root"]
     for step in ("project", "group", "context", "task", "name", "version"):
         if not data.get(step):

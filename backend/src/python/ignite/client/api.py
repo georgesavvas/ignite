@@ -370,6 +370,7 @@ def get_crates():
             for k, entity in uris_entities.items()
             if hasattr(entity, "as_dict")
         }
+        print(uris_entities)
     else:
         uris_entities = utils.server_request(
             "find_multiple", {"data": data}

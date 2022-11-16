@@ -22,17 +22,15 @@ import {CopyToClipboard, ShowInExplorer} from "../ContextActions";
 import {setReprForProject, setReprForParent} from "../ContextActions";
 import {ContextContext} from "../../contexts/ContextContext";
 import Tile from "../../components/Tile";
-import {CrateContext} from "../../contexts/CrateContext";
 
 
-function AssetTile(props) {
+function ComponentTile(props) {
   const {enqueueSnackbar} = useSnackbar();
-  const {addToCrate} = useContext(CrateContext);
   const [currentContext, setCurrentContext] = useContext(ContextContext);
 
   const hasThumbnail = props.entity.thumbnail && props.entity.thumbnail.filename;
   const thumbnailWidth = hasThumbnail ? "100%" : "50%";
-  const currentPath = currentContext.path_nr?.replace(currentContext.project + "/", "");
+  const currentPath = currentContext.path_nr.replace(currentContext.project + "/", "");
   let contextPath = props.entity.context.replace(currentPath, "");
   if (contextPath.startsWith("/")) contextPath = contextPath.slice(1);
 
@@ -78,11 +76,6 @@ function AssetTile(props) {
     {
       label: "Open in file explorer",
       fn: () => ShowInExplorer(props.entity.path, enqueueSnackbar),
-      divider: true
-    },
-    {
-      label: "Add to crate",
-      fn: () => addToCrate([props.entity]),
       divider: true
     },
     {
@@ -151,4 +144,4 @@ function AssetTile(props) {
   );
 }
 
-export default AssetTile;
+export default ComponentTile;
