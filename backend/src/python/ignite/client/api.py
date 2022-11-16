@@ -16,6 +16,7 @@
 import glob
 import os
 import shutil
+import yaml
 from fnmatch import fnmatch
 from pathlib import Path, PurePath
 from pprint import pprint
@@ -31,6 +32,7 @@ from ..utils import get_logger
 LOGGER = get_logger(__name__)
 ENV = os.environ
 DCC = Path(ENV["IGNITE_DCC"])
+USER_CONFIG_PATH = Path(ENV["IGNITE_USER_CONFIG_PATH"])
 
 
 def ingest(data):
@@ -306,8 +308,8 @@ def ingest_asset(data):
             return
 
 
-def get_actions():
-    return utils.discover_actions()
+def get_actions(project=None):
+    return utils.discover_actions(project)
 
 
 def run_action(entity, kind, action, session_id):
@@ -317,7 +319,7 @@ def run_action(entity, kind, action, session_id):
         print("Available are:")
         pprint(actions)
         return
-    for _action in actions:
+    for _action in actions.values():
         if _action["label"] != action:
             continue
         PROCESS_MANAGER.create_process(
@@ -349,3 +351,19 @@ def edit_process(process_id, edit):
 def get_processes(session_id):
     data = PROCESS_MANAGER.report(session_id)
     return data
+
+
+def get_crates():
+    path = USER_CONFIG_PATH / "crates.yaml"
+    if not path.is_file():
+        return []
+    with open(path, "r") as f:
+        data = yaml.safe_load(f)
+    return data
+
+
+def set_crates(data):
+    path = USER_CONFIG_PATH / "crates.yaml"
+    with open(path, "w") as f:
+        yaml.safe_dump(data, f)
+    return True

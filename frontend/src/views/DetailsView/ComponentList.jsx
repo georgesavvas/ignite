@@ -13,7 +13,7 @@
 // limitations under the License.
 
 
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, useContext} from "react";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import {useSnackbar} from "notistack";
@@ -25,6 +25,7 @@ import openExplorer from "../../utils/openExplorer";
 import clientRequest from "../../services/clientRequest";
 import FilterField from "../../components/FilterField";
 import CopyIcon from "../../icons/CopyIcon";
+import {CrateContext} from "../../contexts/CrateContext";
 
 
 function Component(props) {
@@ -55,6 +56,11 @@ function Component(props) {
       fn: () => openExplorer(props.comp.path, enqueueSnackbar),
       divider: true
     },
+    {
+      label: "Add to crate",
+      fn: () => props.addToCrate([props.comp]),
+      divider: true
+    },
   ];
 
   const data = {
@@ -72,12 +78,14 @@ function Component(props) {
     });
   };
 
-  contextItems = contextItems.concat(props.actions.map(action => (
-    {
-      label: action.label,
-      fn: () => handleAction(action)
-    }
-  )));
+  contextItems = contextItems.concat(
+    Object.values(props.actions).map(action => (
+      {
+        label: action.label,
+        fn: () => handleAction(action)
+      }
+    ))
+  );
 
   return (
     <div onContextMenu={e => handleContextMenu(e, contextMenu, setContextMenu)}
@@ -106,12 +114,13 @@ function Component(props) {
 }
 
 function ComponentList(props) {
-  const [actions, setActions] = useState([]);
+  const [actions, setActions] = useState({});
   const [filterValue, setFilterValue] = useState("");
+  const {addToCrate} = useContext(CrateContext);
 
   useEffect(() => {
-    clientRequest("get_actions").then(resp => {
-      setActions(resp.data.component || []);
+    clientRequest("get_actions", {data: props.project}).then(resp => {
+      setActions(resp.data.component || {});
     });
   }, [props.components]);
 
@@ -122,7 +131,7 @@ function ComponentList(props) {
         {props.components.map((comp, index) => {
           const filterString = `${comp.name}${comp.file}`;
           const hide = filterValue && !filterString.includes(filterValue);
-          return <Component key={index} comp={comp}
+          return <Component key={index} comp={comp} addToCrate={addToCrate}
             onSelect={props.onSelect} selectedComp={props.selectedComp}
             actions={actions} style={hide ? {display: "none"} : null}
           />;

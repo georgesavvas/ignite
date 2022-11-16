@@ -79,8 +79,8 @@ function AssetDetails(props) {
   const [flexRatios, setFlexRatios] = useState(defaultFlexRations);
   const [config] = useContext(ConfigContext);
   const [selectedCompName, setSelectedCompName] = useState("");
-  const [,, refreshContext] = useContext(ContextContext);
-  const [selectedEntity, setSelectedEntity] = useContext(EntityContext);
+  const [currentContext,, refreshContext] = useContext(ContextContext);
+  const [, setSelectedEntity] = useContext(EntityContext);
   const {enqueueSnackbar} = useSnackbar();
   const [contextMenu, setContextMenu] = useState(null);
 
@@ -187,13 +187,28 @@ function AssetDetails(props) {
         setContextMenu={setContextMenu}
       />
       <ReflexContainer orientation="horizontal">
-        <ReflexElement flex={flexRatios["asset.viewer"]} name={"asset.viewer"} onStopResize={handleResized}>
+        <ReflexElement
+          flex={flexRatios["asset.viewer"]}
+          name={"asset.viewer"}
+          onStopResize={handleResized}
+        >
           <ComponentViewer comp={selectedComp} />
         </ReflexElement>
         <ReflexSplitter style={splitterStyle} />
-        <ReflexElement flex={flexRatios["asset.details"]} name={"asset.details"} onStopResize={handleResized}>
+        <ReflexElement
+          flex={flexRatios["asset.details"]}
+          name={"asset.details"}
+          onStopResize={handleResized}
+        >
           <div style={{margin: "10px", overflow: "hidden"}}>
-            <div style={{height: "40px", margin: "6px 0px", display: "flex", justifyContent: "space-between"}}>
+            <div
+              style={{
+                height: "40px",
+                margin: "6px 0px",
+                display: "flex",
+                justifyContent: "space-between"
+              }}
+            >
               <div style={{display: "flex", gap: "10px", alignItems: "center"}}>
                 <Typography variant="h5">{props.entity.name}</Typography>
                 {props.entity.protected ?
@@ -232,11 +247,24 @@ function AssetDetails(props) {
             <URI uri={props.entity.uri} />
             <Path path={props.entity.path} />
           </div>
-          <TagContainer entityPath={props.entity.path} tags={props.entity.tags} onRefresh={refreshContext} />
+          <TagContainer
+            entityPath={props.entity.path}
+            tags={props.entity.tags}
+            onRefresh={refreshContext}
+          />
         </ReflexElement>
         <ReflexSplitter style={splitterStyle} />
-        <ReflexElement flex={flexRatios["asset.comps"]} name={"asset.comps"} onStopResize={handleResized}>
-          <ComponentList components={props.entity.components} selectedComp={selectedComp} onSelect={setSelectedCompName} />
+        <ReflexElement
+          flex={flexRatios["asset.comps"]}
+          name={"asset.comps"}
+          onStopResize={handleResized}
+        >
+          <ComponentList
+            project={currentContext.project}
+            components={props.entity.components}
+            selectedComp={selectedComp}
+            onSelect={setSelectedCompName}
+          />
         </ReflexElement>
       </ReflexContainer>
     </div>

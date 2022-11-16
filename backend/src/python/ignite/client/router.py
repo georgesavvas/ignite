@@ -164,9 +164,12 @@ async def ingest(request: Request):
     return {"ok": True, "data": resp}
 
 
-@router.get("/get_actions")
-async def get_actions():
-    data = api.get_actions()
+@router.post("/get_actions")
+async def get_actions(request: Request):
+    result = await request.json()
+    log_request(result)
+    project = result.get("project")
+    data = api.get_actions(project)
     return {"ok": True, "data": data}
 
 
@@ -213,3 +216,18 @@ async def get_processes(request: Request):
 async def is_local_server_running():
     data = api.is_local_server_running()
     return {"ok": data}
+
+
+@router.get("/get_crates")
+async def get_crates():
+    data = api.get_crates()
+    return {"ok": data}
+
+
+@router.post("/set_crates")
+async def set_crates(request: Request):
+    result = await request.json()
+    log_request(result)
+    data = result.get("data")
+    ok = api.set_crates(data)
+    return {"ok": ok}

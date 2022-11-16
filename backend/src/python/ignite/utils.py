@@ -86,12 +86,22 @@ def symlink_points_to(symlink, path):
     return path == symlink.resolve()
 
 
-def get_config_paths(suffix, project_path=None, base=True, user=True):
+def get_config_paths(suffix, root=None, project=None, base=True, user=True):
     paths = []
     if base:
-        paths.append(CONFIG_PATH / suffix)
+        p = Path(CONFIG_PATH) / suffix
+        if p.is_dir():
+            paths.append(p)
     if user:
-        paths.append(USER_CONFIG_PATH / suffix)
-    if project_path:
-        paths.append(project_path / ".config" / suffix)
+        p = Path(USER_CONFIG_PATH) / suffix
+        if p.is_dir():
+            paths.append(p)
+    if root:
+        p = Path(root) / ".config" / suffix
+        if p.is_dir():
+            paths.append(p)
+    if root and project:
+        p = Path(root) / project / ".config" / suffix
+        if p.is_dir():
+            paths.append(p)
     return paths

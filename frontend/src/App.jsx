@@ -29,6 +29,7 @@ import BuildFileURL from "./services/BuildFileURL";
 import {ContextProvider} from "./contexts/ContextContext";
 import {ConfigProvider} from "./contexts/ConfigContext";
 import {VaultProvider} from "./contexts/VaultContext";
+import {CrateProvider} from "./contexts/CrateContext";
 import {EntityProvider} from "./contexts/EntityContext";
 import Home from "./views/Home";
 
@@ -72,13 +73,15 @@ function App() {
         <ErrorBoundary FallbackComponent={ErrorFallback}>
           <SnackbarProvider maxSnack={3} autoHideDuration={2500}>
             <ConfigProvider>
-              <ContextProvider>
-                <EntityProvider>
-                  <VaultProvider>
-                    <Home />
-                  </VaultProvider>
-                </EntityProvider>
-              </ContextProvider>
+              <CrateProvider>
+                <ContextProvider>
+                  <EntityProvider>
+                    <VaultProvider>
+                      <Home />
+                    </VaultProvider>
+                  </EntityProvider>
+                </ContextProvider>
+              </CrateProvider>
             </ConfigProvider>
           </SnackbarProvider>
         </ErrorBoundary>

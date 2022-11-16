@@ -240,6 +240,10 @@ function createWindow (show=true) {
     return process.env[env_name];
   });
 
+  ipcMain.handle("uuid", () => {
+    return uuid4();
+  });
+
   ipcMain.handle("set_env", (e, env_name, env_value) => {
     const prev = process.env[env_name];
     // console.log("Setting", env_name, "from", prev, "to", env_value);
