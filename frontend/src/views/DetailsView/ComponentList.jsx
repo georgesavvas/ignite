@@ -48,7 +48,11 @@ function Component(props) {
   let contextItems = [
     {
       label: "Copy path",
-      fn: () => handleCopy(undefined, props.comp.path),
+      fn: () => handleCopy(undefined, props.comp.path)
+    },
+    {
+      label: "Copy URI",
+      fn: () => handleCopy(undefined, props.comp.uri),
       divider: true
     },
     {

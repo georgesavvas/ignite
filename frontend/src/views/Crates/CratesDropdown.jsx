@@ -7,7 +7,7 @@ import {CrateContext} from "../../contexts/CrateContext";
 
 const CratesDropdown = () => {
   const {floating} = useContext(CrateContext);
-  const [pinned, setPinned] = useState(false);
+  const [pinned, setPinned] = useState(true);
 
   const getContainerStyle = () => {
     if (pinned) return {transform: "translateY(0%)"};

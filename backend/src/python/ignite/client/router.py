@@ -221,7 +221,7 @@ async def is_local_server_running():
 @router.get("/get_crates")
 async def get_crates():
     data = api.get_crates()
-    return {"ok": data}
+    return {"ok": True, "data": data}
 
 
 @router.post("/set_crates")

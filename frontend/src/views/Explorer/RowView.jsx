@@ -38,7 +38,7 @@ const RowView = props => {
   }, [props.data]);
 
   const renderEntity = params => {
-    switch (props.resultType) {
+    switch (params.value.dir_kind) {
     default:
       return useMemo(() =>
         <DirectoryTile
@@ -49,7 +49,7 @@ const RowView = props => {
           noOverlay
         />, [params.value]
       );
-    case "assets":
+    case "assetversion":
       return useMemo(() =>
         <AssetTile
           onContextMenu={props.onContextMenu}
@@ -85,13 +85,20 @@ const RowView = props => {
       },
       {
         index: 2,
+        field: "version",
+        headerName: "Version",
+        flex: 0.1,
+        renderCell: renderText
+      },
+      {
+        index: 3,
         field: "dir_kind",
         headerName: "Dir Kind",
         flex: 0.1,
         renderCell: renderText
       },
       {
-        index: 3,
+        index: 4,
         field: "dcc",
         headerName: "DCC",
         flex: 0.1,

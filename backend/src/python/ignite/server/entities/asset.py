@@ -23,8 +23,8 @@ from ignite.server.entities.directory import Directory
 class Asset(Directory):
     def __init__(self, path="") -> None:
         super().__init__(path, dir_kind="asset")
-        self.dict_attrs = ["versions", "latest_v", "best_v", "uri", "next_path",
-            "creation_time", "modification_time"]
+        self.dict_attrs = ["versions", "latest_v", "best_v", "next_path",
+            "creation_time", "modification_time", "uri"]
         self._versions = []
         self._assetversions = []
         self._latest_v = None

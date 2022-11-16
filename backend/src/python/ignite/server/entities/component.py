@@ -22,12 +22,13 @@ from ignite.server import utils
 class Component():
     def __init__(self, path=None) -> None:
         self.dict_attrs = ["name", "filename", "path", "ext", "static",
-            "first_frame", "last_frame", "frames"]
+            "first_frame", "last_frame", "frames", "uri"]
         self.nr_attrs = ["path"]
         self.name = ""
         self.filename = ""
         self.path = ""
         self.ext = ""
+        self.uri = ""
         self.static = False
         self.first_frame = 0
         self.last_frame = 0
@@ -46,6 +47,7 @@ class Component():
         self.name = path.stem
         self.filename = path.name
         self.path = path.as_posix()
+        self.uri = utils.get_uri(self.path)
         self.path_nr = utils.get_nr(path)
         self.ext = path.suffix
         self.static = True
@@ -61,7 +63,8 @@ class Component():
         ext = c.tail
         self.name = path.stem.replace(".####", "")
         self.filename = name
-        self.path = str(path)
+        self.path = path.as_posix()
+        self.uri = utils.get_uri(self.path)
         self.path_nr = utils.get_nr(path)
         self.ext = ext
         self.static = False

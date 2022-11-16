@@ -149,6 +149,8 @@ def find(path):
     path = str(path).strip()
 
     if utils.is_uri(path):
+        if "#" in path:
+            path, comp = path.split("#", 1)
         if not "@" in path:
             path = utils.uri_to_path(path)
             return _find_from_path(path)
@@ -363,7 +365,7 @@ def get_task(path):
 def discover_tasks(path, task_types=[], sort=None, as_dict=False):
     from ignite.server.entities.task import Task
 
-    def discover(path, l=[]):
+    def discover(path, l=[], ignore=[]):
         name = path.name
         if path.is_dir():
             d = {}
@@ -390,12 +392,13 @@ def discover_tasks(path, task_types=[], sort=None, as_dict=False):
                         config = config or {}
                         d["task_type"] = config.get("task_type")
                 discover(x, l)
-            if d["dir_kind"] == "task":
+            if d["dir_kind"] == "task" and not path in ignore:
                 if not task_types or d["task_type"] in task_types:
                     l.append(d)
         return l
 
-    data = discover(Path(path))
+    path = Path(path)
+    data = discover(path, ignore=[path])
     tasks = [Task(path=task["path"]) for task in data]
     if as_dict:
         tasks = [t.as_dict() for t in tasks]
@@ -529,8 +532,14 @@ def discover_scenes(path, dcc=[], latest=False, sort=None, as_dict=False):
                     continue
                 if name.startswith("."):
                     continue
-                elif not d["dir_kind"] and d["name"] != "scenes":
-                    return []
+                elif not d["dir_kind"]:
+                    if path.parent == "scenes":
+                        # Probably a scene
+                        d["dir_kind"] = "scene"
+                        utils.create_delayed_anchor(path, "scene")
+                    elif d["name"] != "scenes":
+                        # We should ignore
+                        return []
                 if d["dir_kind"] == "scene" and d["anchor"]:
                     with open(d["anchor"], "r") as f:
                         config = yaml.safe_load(f)

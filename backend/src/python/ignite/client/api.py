@@ -358,7 +358,26 @@ def get_crates():
     if not path.is_file():
         return []
     with open(path, "r") as f:
-        data = yaml.safe_load(f)
+        data = yaml.safe_load(f) or []
+    uris_entities = {}
+    for crate in data:
+        for uri in crate.get("entities", []):
+            uris_entities[uri] = ""
+    if is_server_local():
+        uris_entities = {k: server_api.find(k) for k in uris_entities.keys()}
+        uris_entities = {
+            k: entity.as_dict()
+            for k, entity in uris_entities.items()
+            if hasattr(entity, "as_dict")
+        }
+    else:
+        uris_entities = utils.server_request(
+            "find_multiple", {"data": data}
+        ).get("data")
+    for crate in data:
+        crate["entities"] = [
+            uris_entities[uri] for uri in crate.get("entities", [])
+        ]
     return data
 
 

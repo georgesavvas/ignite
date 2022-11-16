@@ -6,9 +6,17 @@ import AddIcon from "@mui/icons-material/Add";
 import { useEffect } from "react";
 import IgnButton from "../../components/IgnButton";
 import ClearIcon from "@mui/icons-material/Clear";
+import AssetTile from "../Explorer/AssetTile";
+import URI from "../../components/URI";
+import DirectoryTile from "../Explorer/DirectoryTile";
 
 const Crate = props => {
-  const {floating, dropFloating, removeCrate} = useContext(CrateContext);
+  const {
+    floating,
+    dropFloating,
+    removeCrate,
+    addCrate
+  } = useContext(CrateContext);
   const [crate, setCrate] = useState(
     {id: props.id, entities: props.entities, label: `Crate ${props.index + 1}`}
   );
@@ -27,14 +35,21 @@ const Crate = props => {
 
   const getEntityCrate = entity => {
     return (
-      <div>
-        <Typography variant="subtitle2">{entity.path}</Typography>
+      <div key={entity.uri} className={styles.crateEntity}>
+        {entity.dir_kind === "assetversion" ?
+          <AssetTile entity={entity} />
+          : <DirectoryTile entity={entity} />
+        }
       </div>
     );
   };
 
+  const handleNewCrateClick = () => {
+    floating ? dropFloating("") : addCrate();
+  };
+
   if (props.index < 0) return (
-    <div className={styles.newCrate} onClick={props.onClick}>
+    <div className={styles.newCrate} onClick={handleNewCrateClick}>
       <AddIcon style={{fontSize: "48px", color: "rgb(252, 140, 3)"}} />
     </div>
   );
@@ -61,18 +76,16 @@ const Crate = props => {
 };
 
 const Crates = () => {
-  const {crates, addCrate} = useContext(CrateContext);
-
-  const handleAddCrate = () => {
-    addCrate();
-  };
+  const {crates} = useContext(CrateContext);
 
   return (
     <div className={styles.container}>
       {crates.map((crate, index) =>
-        <Crate key={crate.id} index={index} entities={crate.entities} />)
-      }
-      <Crate index={-1} onClick={handleAddCrate} />
+        <Crate key={crate.id} index={index} id={crate.id}
+          entities={crate.entities}
+        />
+      )}
+      <Crate index={-1} key="new" />
     </div>
   );
 };

@@ -146,26 +146,36 @@ def create_delayed_anchor(path=None, name=None, anchor=None):
 def get_uri(path, version_override=None):
     if not path:
         return ""
-    dir_kind = get_dir_kind(path)
-    splt = PurePath(path).as_posix().split(
+    path = Path(path)
+    if path.is_file() or "#" in path.name:
+        entity_kind = "component"
+    else:
+        entity_kind = get_dir_kind(path)
+    splt = path.as_posix().split(
         CONFIG["root"].as_posix(), 1
     )[1].replace("/exports", "").split("/")[1:]
     i = len(splt)
     project = splt[0]
     group = splt[1] if i > 1 else None
-    context = task = name = version = None
-    if dir_kind == "assetversion":
+    context = task = name = version = comp = None
+    if entity_kind == "assetversion":
         context = "/".join(splt[2:-3])
         task = splt[-3]
         name = splt[-2]
         version = splt[-1]
-    elif dir_kind == "asset":
+    elif entity_kind == "asset":
         context = "/".join(splt[2:-2])
         task = splt[-2]
         name = splt[-1]
-    elif dir_kind.startswith("task"):
+    elif entity_kind.startswith("task"):
         context = "/".join(splt[2:-1])
         task = splt[-1]
+    elif entity_kind == "component":
+        context = "/".join(splt[2:-4])
+        task = splt[-4]
+        name = splt[-3]
+        version = splt[-2]
+        comp = splt[-1]
     else:
         context = "/".join(splt[2:])
 
@@ -183,6 +193,8 @@ def get_uri(path, version_override=None):
         if isinstance(version, str):
             version = int(version.replace("v", ""))
         uri += f"@{version}"
+    if comp:
+        uri += f"#{comp}"
     return uri
 
 

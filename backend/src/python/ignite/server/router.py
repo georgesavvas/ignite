@@ -126,6 +126,27 @@ async def find(request: Request):
     return {"ok": True, "data": data}
 
 
+@router.post("/find_multiple")
+async def find_multiple(request: Request):
+    result = await request.json()
+    log_request(result)
+    result = process_request(result)
+    data = result.get(data)
+    if type(data) == "list":
+        entities = [api.find(path) for path in data]
+        data = [
+            entity.as_dict() for entity in entities if hasattr(entity, "as_dict")
+        ]
+    elif type(data) == "dict":
+        entities = {path: api.find(path) for path in data.keys()}
+        data = {
+            k: entity.as_dict()
+            for k, entity in entities
+            if hasattr(entity, "as_dict")
+        }
+    return {"ok": True, "data": data}
+
+
 # This is used by the C++ USD resolver, expects raw strings as response
 @router.post("/resolve", response_class=PlainTextResponse)
 async def resolve(request: Request):

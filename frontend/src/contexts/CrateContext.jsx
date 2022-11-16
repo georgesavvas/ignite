@@ -20,19 +20,24 @@ import clientRequest from "../services/clientRequest";
 export const CrateContext = createContext();
 
 export const CrateProvider = props => {
-  const fetched = useRef(false);
+  const fetch = useRef(true);
   const [crates, setCrates] = useState([]);
   const [floating, setFloating] = useState([]);
 
   useEffect(() => {
-    if (!fetched.current) {
+    if (fetch.current) {
       clientRequest("get_crates").then(resp => {
+        console.log(resp);
         setCrates(resp.data || []);
-        fetched.current = true;
-        return;
+        fetch.current = false;
       });
+      return;
     }
-    clientRequest("set_crates", {data: crates}).then(resp => {
+    const data = crates.map(crate => {
+      const entities = crate.entities.map(entity => entity.uri);
+      return {id: crate.id, entities: entities};
+    });
+    clientRequest("set_crates", {data: data}).then(resp => {
       if (!resp.ok) console.log("There was an issue setting crates");
     });
   }, [crates]);
@@ -64,7 +69,7 @@ export const CrateProvider = props => {
     setCrates(prev => {
       const existing = [...prev];
       const crate = existing.find(crate => crate.id === crateID);
-      crate.entities.push(entities);
+      crate.entities.push(...entities);
       return existing;
     });
   };
