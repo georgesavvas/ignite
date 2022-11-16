@@ -28,7 +28,7 @@ const Crate = props => {
   const getEntityCrate = entity => {
     return (
       <div>
-        <Typography>{entity.path}</Typography>
+        <Typography variant="subtitle2">{entity.path}</Typography>
       </div>
     );
   };
