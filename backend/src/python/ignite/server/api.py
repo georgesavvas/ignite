@@ -143,18 +143,18 @@ def get_context_info(path):
 
 def find(path):
     from ignite.server.entities.asset import Asset
+    from ignite.server.entities.component import Component
 
     if not path:
         return
     path = str(path).strip()
 
     if utils.is_uri(path):
-        if "#" in path:
-            path, comp = path.split("#", 1)
         if not "@" in path:
             path = utils.uri_to_path(path)
             return _find_from_path(path)
         asset_uri, version = path.split("@")
+        version, comp = version.split("#", 1)
         if version.isnumeric():
             path = utils.uri_to_path(path)
             return _find_from_path(path)
@@ -169,10 +169,18 @@ def find(path):
             if not asset:
                 LOGGER.error(f"Couldn't find path at {asset_path}")
                 return None
-            if version == "best":
-                return asset.best_av
-            elif version == "latest":
-                return asset.latest_av
+            if not comp:
+                if version == "best":
+                    return asset.best_av
+                elif version == "latest":
+                    return asset.latest_av
+            else:
+                if version == "best":
+                    comp_path = asset.path / asset.best_v / comp
+                    return Component(comp_path)
+                elif version == "latest":
+                    comp_path = asset.path / asset.latest_v / comp
+                    return Component(comp_path)
     else:
         return _find_from_path(path)
 

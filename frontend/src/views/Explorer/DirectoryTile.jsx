@@ -29,7 +29,6 @@ function DirectoryTile(props) {
   const {enqueueSnackbar} = useSnackbar();
   const {addToCrate} = useContext(CrateContext);
   const [currentContext, setCurrentContext] = useContext(ContextContext);
-  console.log(currentContext);
   const hasThumbnail = props.entity.thumbnail && props.entity.thumbnail.filename;
   const isScene = props.entity.dir_kind === "scene";
   const thumbnailWidth = isScene || hasThumbnail ? "100%" : "30%";

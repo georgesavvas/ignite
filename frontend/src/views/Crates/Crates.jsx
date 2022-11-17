@@ -6,16 +6,21 @@ import AddIcon from "@mui/icons-material/Add";
 import { useEffect } from "react";
 import IgnButton from "../../components/IgnButton";
 import ClearIcon from "@mui/icons-material/Clear";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 import AssetTile from "../Explorer/AssetTile";
 import URI from "../../components/URI";
 import DirectoryTile from "../Explorer/DirectoryTile";
+import ContextMenu, { handleContextMenu } from "../../components/ContextMenu";
+import clientRequest from "../../services/clientRequest";
 
 const Crate = props => {
+  const [contextMenu, setContextMenu] = useState(null);
   const {
     floating,
     dropFloating,
     removeCrate,
-    addCrate
+    addCrate,
+    emptyCrate
   } = useContext(CrateContext);
   const [crate, setCrate] = useState(
     {id: props.id, entities: props.entities, label: `Crate ${props.index + 1}`}
@@ -33,15 +38,15 @@ const Crate = props => {
     removeCrate(crate.id);
   };
 
+  const handleEmptyCrate = () => {
+    emptyCrate(crate.id);
+  };
+
   const getEntityCrate = entity => {
-    console.log("Creating crate entity with", entity);
     return (
-      <div key={entity.uri} className={styles.crateEntity}>
-        {("asset", "assetversion").includes(entity.dir_kind) ?
-          <AssetTile entity={entity} noOverlay noInfo />
-          : <DirectoryTile entity={entity} noOverlay noInfo />
-        }
-      </div>
+      ("asset", "assetversion").includes(entity.dir_kind) ?
+        <AssetTile key={entity.uri} entity={entity} noOverlay noInfo noBorder />
+        : <DirectoryTile key={entity.uri} entity={entity} noOverlay noInfo noBorder />
     );
   };
 
@@ -50,14 +55,45 @@ const Crate = props => {
     else addCrate();
   };
 
+  const handleMakeZip = async () => {
+    const resp = await window.api.dirInput();
+    if (resp.cancelled) return;
+    const dest = resp.filePaths[0];
+    const sessionID = await window.services.get_env("IGNITE_SESSION_ID");
+    clientRequest(
+      "zip_crate",
+      {data: {id: crate.id, dest: dest, session_id: sessionID}}
+    );
+  };
+
   if (props.index < 0) return (
     <div className={styles.newCrate} onClick={handleNewCrateClick}>
       <AddIcon style={{fontSize: "48px", color: "rgb(252, 140, 3)"}} />
     </div>
   );
 
+  const contextItems = [
+    {
+      label: "Delete",
+      fn: handleRemoveCrate
+    },
+    {
+      label: "Empty",
+      fn: handleEmptyCrate,
+    },
+    {
+      label: "Make zip",
+      fn: handleMakeZip
+    },
+  ];
+
   return (
-    <div className={styles.crate}>
+    <div className={styles.crate}
+      onContextMenu={e => handleContextMenu(e, contextMenu, setContextMenu)}
+    >
+      <ContextMenu items={contextItems} contextMenu={contextMenu}
+        setContextMenu={setContextMenu} title={crate.label} subtitle="crate"
+      />
       {floating.length ?
         <div className={styles.overlay}>
           <IgnButton color="ignite" onClick={handleDrop}>Drop in {crate.label}</IgnButton>
@@ -68,11 +104,13 @@ const Crate = props => {
         <OutlinedInput size="small" fullWidth placeholder="Crate Label"
           value={crate.label} onChange={handleLabelChange}
         />
-        <ClearIcon className={styles.removeButton}
-          onClick={handleRemoveCrate}
+        <MoreVertIcon className={styles.menuButton}
+          onClick={e => handleContextMenu(e, contextMenu, setContextMenu)}
         />
       </div>
-      {crate.entities.map(entity => getEntityCrate(entity))}
+      <div className={styles.tileContainer}>
+        {crate.entities.map(entity => getEntityCrate(entity))}
+      </div>
     </div>
   );
 };

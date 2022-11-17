@@ -83,6 +83,15 @@ export const CrateProvider = props => {
     });
   };
 
+  const emptyCrate = async crateID => {
+    setCrates(prev => {
+      const existing = [...prev];
+      const crate = existing.find(crate => crate.id === crateID);
+      crate.entities = [];
+      return existing;
+    });
+  };
+
   const dropFloating = async crateID => {
     setFloating(prev => {
       crateID ? handleAddToCrate(crateID, prev) : addCrate(prev);
@@ -97,6 +106,7 @@ export const CrateProvider = props => {
       addToCrate: addToCrate,
       removeFromCrate: removeFromCrate,
       dropFloating: dropFloating,
+      emptyCrate: emptyCrate,
       floating: floating,
       crates: crates
     }}>

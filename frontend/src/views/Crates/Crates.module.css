@@ -59,21 +59,29 @@
   margin-bottom: 5px;
 }
 
-.removeButton {
-  font-size: 30px !important;
-  margin-left: 5px;
+.menuButton {
+  font-size: 25px !important;
+  transform: translateX(2px);
   cursor: pointer;
   color: grey;
 }
 
-.removeButton:hover {
+.menuButton:hover {
   color: lightgrey;
+}
+
+.tileContainer {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(40%, 1fr));
+  gap: 5px;
 }
 
 .crateEntity {
   /* border: 1px solid whitesmoke; */
   border-radius: 3px;
-  width: 100%;
+  /* width: 100%; */
   overflow: clip;
   padding: 5px;
   box-sizing: border-box;

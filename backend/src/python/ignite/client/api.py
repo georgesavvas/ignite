@@ -13,10 +13,12 @@
 # limitations under the License.
 
 
+from genericpath import exists
 import glob
 import os
 import shutil
 import yaml
+import tempfile
 from fnmatch import fnmatch
 from pathlib import Path, PurePath
 from pprint import pprint
@@ -353,7 +355,7 @@ def get_processes(session_id):
     return data
 
 
-def get_crates():
+def get_crates(crate_filter=[]):
     path = USER_CONFIG_PATH / "crates.yaml"
     if not path.is_file():
         return []
@@ -361,6 +363,8 @@ def get_crates():
         data = yaml.safe_load(f) or []
     uris_entities = {}
     for crate in data:
+        if crate_filter and crate["id"] not in crate_filter:
+            continue
         for uri in crate.get("entities", []):
             uris_entities[uri] = ""
     if is_server_local():
@@ -370,7 +374,6 @@ def get_crates():
             for k, entity in uris_entities.items()
             if hasattr(entity, "as_dict")
         }
-        print(uris_entities)
     else:
         uris_entities = utils.server_request(
             "find_multiple", {"data": data}
@@ -387,3 +390,38 @@ def set_crates(data):
     with open(path, "w") as f:
         yaml.safe_dump(data, f)
     return True
+
+
+def zip_entity(path, dest, session_id):
+    if is_server_local():
+        entity = server_api.find(path)
+        entity = entity.as_dict() if hasattr(entity, "as_dict") else {}
+    else:
+        entity = utils.server_request("find", {"path": path}).get("data")
+    if not entity:
+        LOGGER.error(f"Failed to get entity with {path}")
+        return
+    entity["zip_dest"] = dest
+    run_action(entity, "common", "zip", session_id)
+
+def zip_crate(crate_id, dest, session_id):
+    temp_dir = tempfile.gettempdir()
+    crates = get_crates([crate_id])
+    if not crates:
+        LOGGER.error(f"Crate {crate_id} not found.")
+        return
+    crate = crates[0]
+    entities = crate["entities"]
+    if not entities:
+        LOGGER.warning(f"Attempted to zip crate {crate_id} without entities.")
+        return
+    crate_dir = Path(temp_dir) / crate_id
+    crate_dir.mkdir(exist_ok=True, parents=True)
+    for entity in entities:
+        path = entity["path"]
+        shutil.copy2(path, crate_dir)
+    data = {
+        "path": crate_dir,
+        "zip_dest": dest
+    }
+    run_action(data, "common", "zip", session_id)

@@ -432,8 +432,10 @@ def get_action_files(root=None, project=None):
     path = CONFIG_PATH / "actions"
     paths = get_config_paths("actions", root=root, project=project)
     files = {}
+    entities = ("common", "crate", "task", "build" "group", "scene", "asset",
+    "assetversion", "component")
     for path in paths:
-        for entity in ("scene", "asset", "assetversion", "component"):
+        for entity in entities:
             entity_path = path / entity
             if not entity_path.exists():
                 continue

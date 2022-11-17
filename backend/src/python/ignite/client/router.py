@@ -231,3 +231,25 @@ async def set_crates(request: Request):
     data = result.get("data")
     ok = api.set_crates(data)
     return {"ok": ok}
+
+
+@router.post("/zip_entity")
+async def zip_entity(request: Request):
+    result = await request.json()
+    log_request(result)
+    path = result.get("path")
+    dest = result.get("dest")
+    session_id = result.get("session_id")
+    ok = api.zip_entity(path, dest, session_id)
+    return {"ok": ok}
+
+
+@router.post("/zip_crate")
+async def zip_crate(request: Request):
+    result = await request.json()
+    log_request(result)
+    crate_id = result.get("id")
+    dest = result.get("dest")
+    session_id = result.get("session_id")
+    ok = api.zip_crate(crate_id, dest, session_id)
+    return {"ok": ok}

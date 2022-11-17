@@ -16,7 +16,11 @@
 from pathlib import PurePath
 
 import clique
+from ignite.logger import get_logger
 from ignite.server import utils
+
+
+LOGGER = get_logger(__name__)
 
 
 class Component():
@@ -39,8 +43,22 @@ class Component():
     def load_from_path(self, path):
         if type(path) == clique.collection.Collection:
             self.load_from_clique_collection(path)
-        else:
-            self.load_from_string(path)
+            return
+        if not type(path) == "str":
+            path = path.as_posix()
+        if "####" in path or "*" in path:
+            path = path.replace("####", "*")
+            collections, remainder = clique.assemble(
+                [str(d) for d in path.parent.glob(path.name)]
+            )
+            if collections:
+                self.load_from_clique_collection(collections[0])
+            elif remainder:
+                self.load_from_string(remainder[0])
+            else:
+                LOGGER.error(f"Couldn't create component from {path}")
+            return
+        self.load_from_string(path)
     
     def load_from_string(self, s):
         path = PurePath(s)
