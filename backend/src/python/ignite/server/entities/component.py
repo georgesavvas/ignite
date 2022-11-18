@@ -31,6 +31,7 @@ class Component():
         self.name = ""
         self.filename = ""
         self.path = ""
+        self.dir_kind = "component"
         self.ext = ""
         self.uri = ""
         self.static = False

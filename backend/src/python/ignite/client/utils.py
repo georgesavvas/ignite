@@ -458,7 +458,8 @@ def discover_actions(project=None):
             entity_action = {
                 "label": module.LABEL,
                 "source": file.as_posix(),
-                "exts": module.EXTENSIONS,
+                "exts": module.EXTENSIONS
+                    if hasattr(module, "EXTENSIONS") else None,
                 "module_path": module.__file__
             }
             actions[entity][file.name] = entity_action

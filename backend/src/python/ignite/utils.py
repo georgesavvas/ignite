@@ -14,6 +14,7 @@
 
 
 import os
+import shutil
 from pathlib import PurePath, Path
 import pprint
 
@@ -105,3 +106,45 @@ def get_config_paths(suffix, root=None, project=None, base=True, user=True):
         if p.is_dir():
             paths.append(p)
     return paths
+
+
+def replace_frame_in_path(path, s):
+    path = PurePath(path)
+    path_str = path.as_posix()
+    chars = ("*", "#", "%")
+    error = f"Could not find frame section in {path}"
+    for s in chars:
+        if s not in path_str:
+            continue
+        filename_parts = path.name.split(".")
+        for index, part in enumerate(filename_parts):
+            if part[0] in chars:
+                filename_parts[index] = s
+                break
+        else:
+            LOGGER.error(error)
+            return
+        return ".".join(filename_parts)
+    LOGGER.error(error)
+    return
+
+
+def copy_dir_or_files(source, dest):
+    source = Path(source)
+    dest = PurePath(dest)
+    source_str = source.as_posix()
+    dest_str = dest.as_posix()
+    if source.is_dir():
+        shutil.copytree(source, dest / source.name)
+        return
+    if source.is_file():
+        shutil.copy(source, dest)
+        return
+    if not source.parent.exists():
+        LOGGER.error(f"Attempted to copy {source_str} but doesn't exist...")
+    seq_path = replace_frame_in_path(source, "*")
+    if not seq_path:
+        LOGGER.error(f"Could not parse {source_str} for copying")
+        return
+    for file in seq_path.parent.glob(seq_path.name):
+        shutil.copy(file, dest)

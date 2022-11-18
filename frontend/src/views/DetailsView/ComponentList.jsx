@@ -26,6 +26,7 @@ import clientRequest from "../../services/clientRequest";
 import FilterField from "../../components/FilterField";
 import CopyIcon from "../../icons/CopyIcon";
 import {CrateContext} from "../../contexts/CrateContext";
+import {EXTENSIONTYPES} from "../../constants";
 
 
 function Component(props) {
@@ -91,6 +92,16 @@ function Component(props) {
     ))
   );
 
+  const getIconStyle = () => {
+    const style = {};
+    const extType = EXTENSIONTYPES.find(ext =>
+      ext.extensions.includes(props.comp.ext)
+    );
+    const iconName = extType?.name || "file";
+    style.backgroundImage = `url(media/components/${iconName})`;
+    return style;
+  };
+
   return (
     <div onContextMenu={e => handleContextMenu(e, contextMenu, setContextMenu)}
       style={props.style}
@@ -102,7 +113,7 @@ function Component(props) {
       <div className={styles.compContainer} id={props.comp.filename}
         onClick={handleClick} style={containerStyle}
       >
-        <div className={styles.compIcon} />
+        <div className={styles.compIcon} style={getIconStyle()} />
         <div className={styles.textContainer}>
           <Typography variant="subtitle1" className={styles.label}>
             {props.comp.filename}

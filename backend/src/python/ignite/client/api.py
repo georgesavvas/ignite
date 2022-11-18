@@ -29,7 +29,8 @@ from ignite.server import api as server_api
 from ignite.client import utils
 from ignite.client.utils import PROCESS_MANAGER, is_server_local
 
-from ..utils import get_logger
+from ignite.logger import get_logger
+from ignite.utils import copy_dir_or_files
 
 LOGGER = get_logger(__name__)
 ENV = os.environ
@@ -361,10 +362,11 @@ def get_crates(crate_filter=[]):
         return []
     with open(path, "r") as f:
         data = yaml.safe_load(f) or []
+    crates = data
+    if crate_filter:
+        crates = list(filter(lambda c: c["id"] in crate_filter, crates))
     uris_entities = {}
-    for crate in data:
-        if crate_filter and crate["id"] not in crate_filter:
-            continue
+    for crate in crates:
         for uri in crate.get("entities", []):
             uris_entities[uri] = ""
     if is_server_local():
@@ -378,11 +380,11 @@ def get_crates(crate_filter=[]):
         uris_entities = utils.server_request(
             "find_multiple", {"data": data}
         ).get("data")
-    for crate in data:
+    for crate in crates:
         crate["entities"] = [
             uris_entities[uri] for uri in crate.get("entities", [])
         ]
-    return data
+    return crates
 
 
 def set_crates(data):
@@ -416,12 +418,14 @@ def zip_crate(crate_id, dest, session_id):
         LOGGER.warning(f"Attempted to zip crate {crate_id} without entities.")
         return
     crate_dir = Path(temp_dir) / crate_id
-    crate_dir.mkdir(exist_ok=True, parents=True)
+    if crate_dir.exists():
+        shutil.rmtree(crate_dir)
+    crate_dir.mkdir(parents=True)
     for entity in entities:
         path = entity["path"]
-        shutil.copy2(path, crate_dir)
+        copy_dir_or_files(path, crate_dir)
     data = {
-        "path": crate_dir,
+        "path": crate_dir.as_posix(),
         "zip_dest": dest
     }
     run_action(data, "common", "zip", session_id)

@@ -154,7 +154,9 @@ def find(path):
             path = utils.uri_to_path(path)
             return _find_from_path(path)
         asset_uri, version = path.split("@")
-        version, comp = version.split("#", 1)
+        comp = ""
+        if "#" in version:
+            version, comp = version.split("#", 1)
         if version.isnumeric():
             path = utils.uri_to_path(path)
             return _find_from_path(path)

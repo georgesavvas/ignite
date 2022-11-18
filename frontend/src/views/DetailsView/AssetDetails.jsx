@@ -38,7 +38,7 @@ import {EntityContext} from "../../contexts/EntityContext";
 import BuildFileURL from "../../services/BuildFileURL";
 import {ConfigContext} from "../../contexts/ConfigContext";
 import styles from "./AssetDetails.module.css";
-import { Tooltip } from "@mui/material";
+import { CircularProgress, Tooltip } from "@mui/material";
 
 
 const splitterStyle = {
@@ -83,6 +83,7 @@ function AssetDetails(props) {
   const [, setSelectedEntity] = useContext(EntityContext);
   const {enqueueSnackbar} = useSnackbar();
   const [contextMenu, setContextMenu] = useState(null);
+  const [protectLoading, setProtectLoading] = useState(false);
 
   useEffect(() => {
     const data = loadReflexLayout();
@@ -154,6 +155,7 @@ function AssetDetails(props) {
   ];
 
   const handleProtect = () => {
+    setProtectLoading(true);
     const data = {
       path: props.entity.path,
       protected: true
@@ -164,10 +166,12 @@ function AssetDetails(props) {
         "Failed to change permissions...", {variant: "error"}
       );
       refreshContext();
+      setProtectLoading(false);
     });
   };
 
   const handleUnProtect = () => {
+    setProtectLoading(true);
     const data = {
       path: props.entity.path,
       protected: false
@@ -178,6 +182,7 @@ function AssetDetails(props) {
         "Failed to change permissions...", {variant: "error"}
       );
       refreshContext();
+      setProtectLoading(false);
     });
   };
 
@@ -211,23 +216,25 @@ function AssetDetails(props) {
             >
               <div style={{display: "flex", gap: "10px", alignItems: "center"}}>
                 <Typography variant="h5">{props.entity.name}</Typography>
-                {props.entity.protected ?
-                  <Tooltip title="Un-protect">
-                    <img
-                      alt="protected"
-                      src="media/shield.png"
-                      className={styles.button}
-                      onClick={handleUnProtect}
-                    />
-                  </Tooltip> :
-                  <Tooltip title="Protect">
-                    <img
-                      alt="unprotected"
-                      src="media/shield_broken.png"
-                      className={styles.button}
-                      onClick={handleProtect}
-                    />
-                  </Tooltip>
+                {!protectLoading ?
+                  props.entity.protected ?
+                    <Tooltip title="Un-protect">
+                      <img
+                        alt="protected"
+                        src="media/shield.png"
+                        className={styles.button}
+                        onClick={handleUnProtect}
+                      />
+                    </Tooltip> :
+                    <Tooltip title="Protect">
+                      <img
+                        alt="unprotected"
+                        src="media/shield_broken.png"
+                        className={styles.button}
+                        onClick={handleProtect}
+                      />
+                    </Tooltip> :
+                  <CircularProgress color="ignite" />
                 }
               </div>
               <FormControl size="small">
