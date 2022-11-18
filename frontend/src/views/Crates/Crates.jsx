@@ -12,7 +12,6 @@ import URI from "../../components/URI";
 import DirectoryTile from "../Explorer/DirectoryTile";
 
 const Crate = props => {
-  const [contextMenu, setContextMenu] = useState(null);
   const {
     floating,
     dropFloating,

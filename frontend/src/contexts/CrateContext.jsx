@@ -13,9 +13,10 @@
 // limitations under the License.
 
 
-import React, {useState, createContext, useEffect} from "react";
+import React, {useState, createContext, useEffect, useContext} from "react";
 import { useRef } from "react";
 import clientRequest from "../services/clientRequest";
+import { ConfigContext } from "./ConfigContext";
 
 export const CrateContext = createContext();
 
@@ -23,11 +24,12 @@ export const CrateProvider = props => {
   const fetch = useRef(true);
   const [crates, setCrates] = useState([]);
   const [floating, setFloating] = useState([]);
+  const [config] = useContext(ConfigContext);
 
   useEffect(() => {
+    if (!config.ready) return;
     if (fetch.current) {
       clientRequest("get_crates").then(resp => {
-        console.log(resp);
         setCrates(resp.data || []);
         fetch.current = false;
       });

@@ -27,6 +27,7 @@ import FilterField from "../../components/FilterField";
 import CopyIcon from "../../icons/CopyIcon";
 import {CrateContext} from "../../contexts/CrateContext";
 import {EXTENSIONTYPES} from "../../constants";
+import serverRequest from "../../services/serverRequest";
 
 
 function Component(props) {
@@ -66,6 +67,10 @@ function Component(props) {
       fn: () => props.addToCrate([props.comp]),
       divider: true
     },
+    {
+      label: "Delete",
+      fn: () => handleDelete
+    }
   ];
 
   const data = {
@@ -83,6 +88,13 @@ function Component(props) {
     });
   };
 
+  const handleDelete = () => {
+    serverRequest("delete_entity", {
+      path: props.comp.path,
+      entity: "component"
+    });
+  };
+
   contextItems = contextItems.concat(
     Object.values(props.actions).map(action => (
       {
@@ -97,8 +109,9 @@ function Component(props) {
     const extType = EXTENSIONTYPES.find(ext =>
       ext.extensions.includes(props.comp.ext)
     );
-    const iconName = extType?.name || "file";
+    const iconName = extType?.name || "file.png";
     style.backgroundImage = `url(media/components/${iconName})`;
+    console.log(style);
     return style;
   };
 

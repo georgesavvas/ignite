@@ -4,7 +4,7 @@ export const EXTENSIONTYPES = [
     extensions: [".jpg", ".jpeg", ".png", ".tif", ".tiff", ".tga", ".exr"]
   },
   {
-    name: "video",
+    name: "video.png",
     extensions: [".mp4", ".mov", ".avi"]
   },
   {
@@ -16,11 +16,11 @@ export const EXTENSIONTYPES = [
     extensions: [".bgeo", ".bgeo.sc", ".pic", ".rat", ".hip", ".hipnc"]
   },
   {
-    name: "geo.svg",
+    name: "geometry.png",
     extensions: [".obj", ".abc", ".fbx"]
   },
   {
-    name: "text",
+    name: "file.png",
     extensions: [".txt"]
   },
   {
