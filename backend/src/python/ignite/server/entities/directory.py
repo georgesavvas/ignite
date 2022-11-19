@@ -240,6 +240,12 @@ class Directory():
     def repr(self, value):
         self._repr = value
 
+    def rename(self, new_name):
+        path = Path(self.path)
+        path.rename(path.parent / new_name)
+        self.__init__(path, self.dir_kind)
+        return path.name == new_name
+
     def delete(self):
         print("About to delete", self.path)
         try:

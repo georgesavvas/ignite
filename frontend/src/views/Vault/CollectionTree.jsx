@@ -163,7 +163,7 @@ const StyledTreeItem = memo(function StyledTreeItem(props) {
   } = props;
 
   const handleClick = (action, data) => {
-    props.onContextOpen(action, data);
+    props.handleContextMenuSelection(action, data);
     handleClose();
   };
 
@@ -312,7 +312,7 @@ function CollectionTree(props) {
         labelInfo={nodes.dir_kind}
         path={nodes.path}
         expression={nodes.expression}
-        onContextOpen={handleContextMenuSelection}
+        handleContextMenuSelection={handleContextMenuSelection}
         style={hide ? {display: "none"} : null}
         onFocusCapture={e => e.stopPropagation()}
         custom={{setdroppreviewdata: setDropPreviewData, onreorder: handleReOrder}}

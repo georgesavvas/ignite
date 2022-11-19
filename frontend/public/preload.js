@@ -28,6 +28,9 @@ contextBridge.exposeInMainWorld("api", {
   fileInput: async default_dir => {
     return await ipcRenderer.invoke("file_input", default_dir);
   },
+  dirInput: async default_dir => {
+    return await ipcRenderer.invoke("dir_input", default_dir);
+  },
   launch_dcc: async (cmd, args, env) => {
     return await ipcRenderer.invoke("launch_dcc", cmd, args, env);
   },
@@ -41,9 +44,12 @@ contextBridge.exposeInMainWorld("services", {
   },
   check_backend: () => {
     return ipcRenderer.invoke("check_backend");
-  }, 
+  },
   get_env: env_name => {
     return ipcRenderer.invoke("get_env", env_name);
+  },
+  uuid: () => {
+    return ipcRenderer.invoke("uuid");
   },
   open_url: url => {
     return ipcRenderer.invoke("open_url", url);

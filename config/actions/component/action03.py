@@ -5,7 +5,6 @@ LABEL = "Very heavy task"
 EXTENSIONS = [".exr", ".jpg"]
 
 async def main(entity, state, progress_fn=None):
-    print("Starting very heavy task...")
     if progress_fn:
         await progress_fn(state="running")
     for i in range(1, 11):
@@ -22,6 +21,4 @@ async def main(entity, state, progress_fn=None):
             return
         if progress_fn:
             await progress_fn(i / 10 * 100)
-        # print(f"Progress - {i / 10 * 100}%")
-    print("Finished very heavy task!")
     return "yep!"

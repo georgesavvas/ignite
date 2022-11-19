@@ -29,6 +29,7 @@ import BuildFileURL from "./services/BuildFileURL";
 import {ContextProvider} from "./contexts/ContextContext";
 import {ConfigProvider} from "./contexts/ConfigContext";
 import {VaultProvider} from "./contexts/VaultContext";
+import {CrateProvider} from "./contexts/CrateContext";
 import {EntityProvider} from "./contexts/EntityContext";
 import Home from "./views/Home";
 
@@ -73,11 +74,13 @@ function App() {
           <SnackbarProvider maxSnack={3} autoHideDuration={2500}>
             <ConfigProvider>
               <ContextProvider>
-                <EntityProvider>
-                  <VaultProvider>
-                    <Home />
-                  </VaultProvider>
-                </EntityProvider>
+                <CrateProvider>
+                  <EntityProvider>
+                    <VaultProvider>
+                      <Home />
+                    </VaultProvider>
+                  </EntityProvider>
+                </CrateProvider>
               </ContextProvider>
             </ConfigProvider>
           </SnackbarProvider>

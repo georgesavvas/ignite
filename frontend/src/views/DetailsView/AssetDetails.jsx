@@ -38,7 +38,7 @@ import {EntityContext} from "../../contexts/EntityContext";
 import BuildFileURL from "../../services/BuildFileURL";
 import {ConfigContext} from "../../contexts/ConfigContext";
 import styles from "./AssetDetails.module.css";
-import { Tooltip } from "@mui/material";
+import { CircularProgress, Tooltip } from "@mui/material";
 
 
 const splitterStyle = {
@@ -79,10 +79,11 @@ function AssetDetails(props) {
   const [flexRatios, setFlexRatios] = useState(defaultFlexRations);
   const [config] = useContext(ConfigContext);
   const [selectedCompName, setSelectedCompName] = useState("");
-  const [,, refreshContext] = useContext(ContextContext);
-  const [selectedEntity, setSelectedEntity] = useContext(EntityContext);
+  const [currentContext,, refreshContext] = useContext(ContextContext);
+  const [, setSelectedEntity] = useContext(EntityContext);
   const {enqueueSnackbar} = useSnackbar();
   const [contextMenu, setContextMenu] = useState(null);
+  const [protectLoading, setProtectLoading] = useState(false);
 
   useEffect(() => {
     const data = loadReflexLayout();
@@ -154,6 +155,7 @@ function AssetDetails(props) {
   ];
 
   const handleProtect = () => {
+    setProtectLoading(true);
     const data = {
       path: props.entity.path,
       protected: true
@@ -164,10 +166,12 @@ function AssetDetails(props) {
         "Failed to change permissions...", {variant: "error"}
       );
       refreshContext();
+      setProtectLoading(false);
     });
   };
 
   const handleUnProtect = () => {
+    setProtectLoading(true);
     const data = {
       path: props.entity.path,
       protected: false
@@ -178,6 +182,7 @@ function AssetDetails(props) {
         "Failed to change permissions...", {variant: "error"}
       );
       refreshContext();
+      setProtectLoading(false);
     });
   };
 
@@ -187,32 +192,49 @@ function AssetDetails(props) {
         setContextMenu={setContextMenu}
       />
       <ReflexContainer orientation="horizontal">
-        <ReflexElement flex={flexRatios["asset.viewer"]} name={"asset.viewer"} onStopResize={handleResized}>
+        <ReflexElement
+          flex={flexRatios["asset.viewer"]}
+          name={"asset.viewer"}
+          onStopResize={handleResized}
+        >
           <ComponentViewer comp={selectedComp} />
         </ReflexElement>
         <ReflexSplitter style={splitterStyle} />
-        <ReflexElement flex={flexRatios["asset.details"]} name={"asset.details"} onStopResize={handleResized}>
+        <ReflexElement
+          flex={flexRatios["asset.details"]}
+          name={"asset.details"}
+          onStopResize={handleResized}
+        >
           <div style={{margin: "10px", overflow: "hidden"}}>
-            <div style={{height: "40px", margin: "6px 0px", display: "flex", justifyContent: "space-between"}}>
+            <div
+              style={{
+                height: "40px",
+                margin: "6px 0px",
+                display: "flex",
+                justifyContent: "space-between"
+              }}
+            >
               <div style={{display: "flex", gap: "10px", alignItems: "center"}}>
                 <Typography variant="h5">{props.entity.name}</Typography>
-                {props.entity.protected ?
-                  <Tooltip title="Un-protect">
-                    <img
-                      alt="protected"
-                      src="media/shield.png"
-                      className={styles.button}
-                      onClick={handleUnProtect}
-                    />
-                  </Tooltip> :
-                  <Tooltip title="Protect">
-                    <img
-                      alt="unprotected"
-                      src="media/shield_broken.png"
-                      className={styles.button}
-                      onClick={handleProtect}
-                    />
-                  </Tooltip>
+                {!protectLoading ?
+                  props.entity.protected ?
+                    <Tooltip title="Un-protect">
+                      <img
+                        alt="protected"
+                        src="media/shield.png"
+                        className={styles.button}
+                        onClick={handleUnProtect}
+                      />
+                    </Tooltip> :
+                    <Tooltip title="Protect">
+                      <img
+                        alt="unprotected"
+                        src="media/shield_broken.png"
+                        className={styles.button}
+                        onClick={handleProtect}
+                      />
+                    </Tooltip> :
+                  <CircularProgress color="ignite" />
                 }
               </div>
               <FormControl size="small">
@@ -232,11 +254,24 @@ function AssetDetails(props) {
             <URI uri={props.entity.uri} />
             <Path path={props.entity.path} />
           </div>
-          <TagContainer entityPath={props.entity.path} tags={props.entity.tags} onRefresh={refreshContext} />
+          <TagContainer
+            entityPath={props.entity.path}
+            tags={props.entity.tags}
+            onRefresh={refreshContext}
+          />
         </ReflexElement>
         <ReflexSplitter style={splitterStyle} />
-        <ReflexElement flex={flexRatios["asset.comps"]} name={"asset.comps"} onStopResize={handleResized}>
-          <ComponentList components={props.entity.components} selectedComp={selectedComp} onSelect={setSelectedCompName} />
+        <ReflexElement
+          flex={flexRatios["asset.comps"]}
+          name={"asset.comps"}
+          onStopResize={handleResized}
+        >
+          <ComponentList
+            project={currentContext.project}
+            components={props.entity.components}
+            selectedComp={selectedComp}
+            onSelect={setSelectedCompName}
+          />
         </ReflexElement>
       </ReflexContainer>
     </div>

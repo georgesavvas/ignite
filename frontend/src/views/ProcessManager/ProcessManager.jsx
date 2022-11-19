@@ -101,7 +101,7 @@ export default function ProcessManager() {
         }
       };
       const ws = createProcessesSocket(config, resp, websocketConfig);
-      clientRequest("get_local_processes", {session_id: resp}).then(resp2 => {
+      clientRequest("get_processes", {session_id: resp}).then(resp2 => {
         if (!resp2) return;
         setProcesses(prevState => {
           const incoming = resp2.data || [];

@@ -39,7 +39,7 @@ export const ContextProvider = props => {
   const [socket, setSocket] = useState();
 
   useEffect(() => {
-    if (!config.serverDetails.address) return;
+    if (!config.ready) return;
     const data = localStorage.getItem("context");
     const context = JSON.parse(data);
     if (!context || !context.path) return;

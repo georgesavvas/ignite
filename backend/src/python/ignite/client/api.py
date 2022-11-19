@@ -13,9 +13,12 @@
 # limitations under the License.
 
 
+from genericpath import exists
 import glob
 import os
 import shutil
+import yaml
+import tempfile
 from fnmatch import fnmatch
 from pathlib import Path, PurePath
 from pprint import pprint
@@ -26,11 +29,13 @@ from ignite.server import api as server_api
 from ignite.client import utils
 from ignite.client.utils import PROCESS_MANAGER, is_server_local
 
-from ..utils import get_logger
+from ignite.logger import get_logger
+from ignite.utils import copy_dir_or_files
 
 LOGGER = get_logger(__name__)
 ENV = os.environ
 DCC = Path(ENV["IGNITE_DCC"])
+USER_CONFIG_PATH = Path(ENV["IGNITE_USER_CONFIG_PATH"])
 
 
 def ingest(data):
@@ -306,8 +311,8 @@ def ingest_asset(data):
             return
 
 
-def get_actions():
-    return utils.discover_actions()
+def get_actions(project=None):
+    return utils.discover_actions(project)
 
 
 def run_action(entity, kind, action, session_id):
@@ -317,7 +322,7 @@ def run_action(entity, kind, action, session_id):
         print("Available are:")
         pprint(actions)
         return
-    for _action in actions:
+    for _action in actions.values():
         if _action["label"] != action:
             continue
         PROCESS_MANAGER.create_process(
@@ -349,3 +354,78 @@ def edit_process(process_id, edit):
 def get_processes(session_id):
     data = PROCESS_MANAGER.report(session_id)
     return data
+
+
+def get_crates(crate_filter=[]):
+    path = USER_CONFIG_PATH / "crates.yaml"
+    if not path.is_file():
+        return []
+    with open(path, "r") as f:
+        data = yaml.safe_load(f) or []
+    crates = data
+    if crate_filter:
+        crates = list(filter(lambda c: c["id"] in crate_filter, crates))
+    uris_entities = {}
+    for crate in crates:
+        for uri in crate.get("entities", []):
+            uris_entities[uri] = ""
+    if is_server_local():
+        uris_entities = {k: server_api.find(k) for k in uris_entities.keys()}
+        uris_entities = {
+            k: entity.as_dict()
+            for k, entity in uris_entities.items()
+            if hasattr(entity, "as_dict")
+        }
+    else:
+        uris_entities = utils.server_request(
+            "find_multiple", {"data": data}
+        ).get("data")
+    for crate in crates:
+        crate["entities"] = [
+            uris_entities[uri] for uri in crate.get("entities", [])
+        ]
+    return crates
+
+
+def set_crates(data):
+    path = USER_CONFIG_PATH / "crates.yaml"
+    with open(path, "w") as f:
+        yaml.safe_dump(data, f)
+    return True
+
+
+def zip_entity(path, dest, session_id):
+    if is_server_local():
+        entity = server_api.find(path)
+        entity = entity.as_dict() if hasattr(entity, "as_dict") else {}
+    else:
+        entity = utils.server_request("find", {"path": path}).get("data")
+    if not entity:
+        LOGGER.error(f"Failed to get entity with {path}")
+        return
+    entity["zip_dest"] = dest
+    run_action(entity, "common", "zip", session_id)
+
+def zip_crate(crate_id, dest, session_id):
+    temp_dir = tempfile.gettempdir()
+    crates = get_crates([crate_id])
+    if not crates:
+        LOGGER.error(f"Crate {crate_id} not found.")
+        return
+    crate = crates[0]
+    entities = crate["entities"]
+    if not entities:
+        LOGGER.warning(f"Attempted to zip crate {crate_id} without entities.")
+        return
+    crate_dir = Path(temp_dir) / crate_id
+    if crate_dir.exists():
+        shutil.rmtree(crate_dir)
+    crate_dir.mkdir(parents=True)
+    for entity in entities:
+        path = entity["path"]
+        copy_dir_or_files(path, crate_dir)
+    data = {
+        "path": crate_dir.as_posix(),
+        "zip_dest": dest
+    }
+    run_action(data, "common", "zip", session_id)

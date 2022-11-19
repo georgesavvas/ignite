@@ -25,11 +25,11 @@ const style = {
   gap: "5px",
   justifyContent: "center",
   backgroundColor: "rgb(30, 30, 30)",
-  padding: "2px",
+  padding: "2px 5px",
   marginBottom: "2px"
 };
 
-export function handleContextMenu(event, contextMenu, setContextMenu) {
+export function handleContextMenu(event, contextMenu, setContextMenu, data) {
   event.preventDefault();
   event.stopPropagation();
   setContextMenu(
@@ -37,6 +37,7 @@ export function handleContextMenu(event, contextMenu, setContextMenu) {
       ? {
         mouseX: event.clientX - 2,
         mouseY: event.clientY - 4,
+        data: data
       }
       : null,
   );

@@ -428,22 +428,26 @@ def server_request(method, data=None):
     return resp
 
 
-def get_action_files(project_path=None):
+def get_action_files(root=None, project=None):
     path = CONFIG_PATH / "actions"
-    paths = get_config_paths("actions", project_path=project_path)
+    paths = get_config_paths("actions", root=root, project=project)
     files = {}
+    entities = ("common", "crate", "task", "build" "group", "scene", "asset",
+    "assetversion", "component")
     for path in paths:
-        for entity in ("scene", "asset", "assetversion", "component"):
+        for entity in entities:
             entity_path = path / entity
             if not entity_path.exists():
                 continue
+            if not files.get(entity):
+                files[entity] = []
             files[entity] += entity_path.glob("*.py")
     return files
 
 
-def discover_actions():
+def discover_actions(project=None):
     actions = {}
-    for entity, files in get_action_files().items():
+    for entity, files in get_action_files(CONFIG["root"], project).items():
         actions[entity] = {}
         for file in files:
             if file.name == "__init__.py":
@@ -454,8 +458,8 @@ def discover_actions():
             entity_action = {
                 "label": module.LABEL,
                 "source": file.as_posix(),
-                "exts": module.EXTENSIONS,
-                # "fn": module.main,
+                "exts": module.EXTENSIONS
+                    if hasattr(module, "EXTENSIONS") else None,
                 "module_path": module.__file__
             }
             actions[entity][file.name] = entity_action
