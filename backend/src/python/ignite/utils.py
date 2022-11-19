@@ -19,6 +19,7 @@ from pathlib import PurePath, Path
 import pprint
 
 from fastapi.staticfiles import StaticFiles
+from ignite.constants import SEQUENCE_CHARS
 from ignite.logger import get_logger
 
 ENV = os.environ
@@ -108,23 +109,29 @@ def get_config_paths(suffix, root=None, project=None, base=True, user=True):
     return paths
 
 
+def is_sequence(path):
+    path = PurePath(path)
+    for char in SEQUENCE_CHARS:
+        if char in path.name:
+            return True
+
+
 def replace_frame_in_path(path, s):
     path = PurePath(path)
     path_str = path.as_posix()
-    chars = ("*", "#", "%")
     error = f"Could not find frame section in {path}"
-    for s in chars:
-        if s not in path_str:
+    for char in SEQUENCE_CHARS:
+        if char not in path_str:
             continue
         filename_parts = path.name.split(".")
         for index, part in enumerate(filename_parts):
-            if part[0] in chars:
+            if part[0] in SEQUENCE_CHARS:
                 filename_parts[index] = s
                 break
         else:
             LOGGER.error(error)
             return
-        return ".".join(filename_parts)
+        return path.parent / ".".join(filename_parts)
     LOGGER.error(error)
     return
 

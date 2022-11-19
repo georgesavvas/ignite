@@ -108,12 +108,12 @@ function StyledTreeItem(props) {
     labelIcon: LabelIcon,
     labelInfo,
     labelText,
-    onContextOpen,
+    handleContextMenuSelection,
     ...other
   } = props;
 
   const handleClick = (action, data) => {
-    onContextOpen(action, data);
+    handleContextMenuSelection(action, data);
     handleClose();
   };
 
@@ -261,7 +261,7 @@ function ProjectTreeView(props) {
         labelInfo={nodes.dir_kind}
         dirkind={nodes.dir_kind}
         dirpath={path}
-        onContextOpen={handleContextMenuSelection}
+        handleContextMenuSelection={handleContextMenuSelection}
         style={hide ? {display: "none"} : null}
       >
         {Array.isArray(nodes.children)

@@ -59,11 +59,11 @@ function AssetTile(props) {
     },
     {
       label: "Add to Vault",
-      fn: () =>  props.onContextMenu("vaultImport", dirData)
+      fn: () =>  props.handleContextMenuSelection("vaultImport", dirData)
     },
     // {
     //   label: "Import new version from Vault",
-    //   fn: () =>  props.onContextMenu("vaultExport", dirData),
+    //   fn: () =>  props.handleContextMenuSelection("vaultExport", dirData),
     //   divider: true
     // },
     {
@@ -87,7 +87,15 @@ function AssetTile(props) {
     },
     {
       label: "Rename asset",
-      fn: () => props.onContextMenu("rename", {
+      fn: () => props.handleContextMenuSelection("rename", {
+        name: props.entity.name,
+        kind: "asset",
+        path: props.entity.asset
+      })
+    },
+    {
+      label: "Delete asset (all versions)",
+      fn: () => props.handleContextMenuSelection("delete", {
         name: props.entity.name,
         kind: "asset",
         path: props.entity.asset
@@ -95,7 +103,7 @@ function AssetTile(props) {
     },
     {
       label: "Delete asset version",
-      fn: () => props.onContextMenu("delete", dirData)
+      fn: () => props.handleContextMenuSelection("delete", dirData)
     }
   ];
 

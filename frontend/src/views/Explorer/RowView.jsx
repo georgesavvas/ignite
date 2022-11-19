@@ -43,6 +43,7 @@ const RowView = props => {
       return useMemo(() =>
         <DirectoryTile
           onContextMenu={props.onContextMenu}
+          handleContextMenuSelection={props.handleContextMenuSelection}
           entity={params.value}
           noInfo
           noBorder
@@ -53,6 +54,7 @@ const RowView = props => {
       return useMemo(() =>
         <AssetTile
           onContextMenu={props.onContextMenu}
+          handleContextMenuSelection={props.handleContextMenuSelection}
           entity={params.value}
           noInfo
           noBorder

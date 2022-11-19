@@ -44,6 +44,12 @@ function Component(props) {
     CopyToClipboard(path, enqueueSnackbar);
   };
 
+  const dirData = {
+    kind: props.entity.dir_kind,
+    path: props.entity.path,
+    name: props.entity.name
+  };
+
   let contextItems = [
     {
       label: "Copy path",
@@ -65,8 +71,13 @@ function Component(props) {
       divider: true
     },
     {
+      label: "Rename",
+      fn: () => props.handleContextMenuSelection("rename", dirData)
+    },
+    {
       label: "Delete",
-      fn: () => handleDelete
+      fn: () => props.handleContextMenuSelection("delete", dirData),
+      divider: true
     }
   ];
 
@@ -82,13 +93,6 @@ function Component(props) {
         action: action.label,
         session_id: resp
       });
-    });
-  };
-
-  const handleDelete = () => {
-    serverRequest("delete_entity", {
-      path: props.entity.path,
-      entity: "component"
     });
   };
 

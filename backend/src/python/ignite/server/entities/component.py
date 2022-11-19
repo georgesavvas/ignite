@@ -13,9 +13,11 @@
 # limitations under the License.
 
 
-from pathlib import PurePath
+from pathlib import Path, PurePath
 
 import clique
+from ignite.constants import SEQUENCE_CHARS
+from ignite.utils import replace_frame_in_path, is_sequence
 from ignite.logger import get_logger
 from ignite.server import utils
 
@@ -38,6 +40,7 @@ class Component():
         self.first_frame = 0
         self.last_frame = 0
         self.frames = []
+        self.clique_collection = None
         if path:
             self.load_from_path(path)
         
@@ -49,11 +52,13 @@ class Component():
             path = path.as_posix()
         if "####" in path or "*" in path:
             path = path.replace("####", "*")
+            path = Path(path)
             collections, remainder = clique.assemble(
                 [str(d) for d in path.parent.glob(path.name)]
             )
             if collections:
-                self.load_from_clique_collection(collections[0])
+                self.clique_collection = collections[0]
+                self.load_from_clique_collection(self.clique_collection)
             elif remainder:
                 self.load_from_string(remainder[0])
             else:
@@ -99,3 +104,41 @@ class Component():
             if s in self.nr_attrs:
                 d[f"{s}_nr"] = utils.get_nr(value)
         return d
+
+    def rename(self, new_name):
+        path = Path(self.path)
+        if not is_sequence(path):
+            path = path.rename(path.with_stem(new_name))
+            self.__init__(path)
+            return path.stem == new_name
+        path = replace_frame_in_path(self.path, "*")
+        path = Path(path)
+        sequence_files = list(path.parent.glob(path.name))
+        if not sequence_files:
+            LOGGER.error(f"Component has no files or was already deleted.")
+            return
+        for file in sequence_files:
+            frame = file.stem.split(".")[-1]
+            new_path = file.with_stem(f"{new_name}.{frame}")
+            if new_path.exists():
+                # TODO Reverse rename changes
+                return
+            file.rename(new_path)
+        first = sequence_files[0]
+        frame = first.stem.split(".")[-1]
+        return not first.stem == f"{new_name}.{frame}"
+    
+    def delete(self):
+        path = Path(self.path)
+        if not is_sequence(path):
+            path.unlink()
+            return not path.exists()
+        path = replace_frame_in_path(self.path, "*")
+        path = Path(path)
+        sequence_files = list(path.parent.glob(path.name))
+        if not sequence_files:
+            LOGGER.error(f"Component has no files or was already deleted.")
+            return
+        for file in sequence_files:
+            file.unlink()
+        return not sequence_files[0].exists()

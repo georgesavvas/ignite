@@ -21,7 +21,7 @@ import yaml
 from ignite.server import utils
 from ignite.server.constants import ANCHORS
 from ignite.server.utils import CONFIG
-from ignite.utils import get_logger
+from ignite.utils import get_logger, is_sequence
 from mongoquery import Query
 
 LOGGER = get_logger(__name__)
@@ -126,7 +126,7 @@ def get_context_info(path):
         )[1].lstrip("/").split("/")[0]
         data = {
             "root": CONFIG["root"].as_posix(),
-            "name": name,
+            "name": path.name,
             "path": str(path),
             "path_nr": utils.get_nr(path),
             "posix": path.as_posix(),
@@ -204,6 +204,7 @@ def resolve(uri):
 def _find_from_path(path):
     from ignite.server.entities.asset import Asset
     from ignite.server.entities.assetversion import AssetVersion
+    from ignite.server.entities.component import Component
     from ignite.server.entities.build import Build
     from ignite.server.entities.directory import Directory
     from ignite.server.entities.group import Group
@@ -225,10 +226,24 @@ def _find_from_path(path):
         "task": Task,
         "asset": Asset,
         "assetversion": AssetVersion,
+        "component": Component,
         "scene": Scene
     }
     path = Path(path)
-    if path.is_file():
+    is_file = path.is_file()
+    if is_file or is_sequence(path):
+        # Probably a component
+        parent = path.parent.parent.parent
+        if parent.name == "exports":
+            entity = Component(path)
+            obj = None
+            try:
+                obj = Component(path)
+            except Exception as e:
+                LOGGER.error(e)
+            return obj
+    if is_file:
+        # Failed to parse a possible component, resolve to parent entity.
         path = path.parent
     if not path.is_dir():
         LOGGER.error(f"Invalid path: {path}")
@@ -749,18 +764,19 @@ def delete_entity(path, entity_type):
 
 def rename_entity(path, entity_type, new_name):
     entity = find(path)
+    if not entity:
+        LOGGER.error(f"Entity {path} not found.")
+        return False, "entity not found"
     if entity.dir_kind != entity_type:
-        print(
+        LOGGER.error(" ".join(
             "Attempted to rename", entity.dir_kind,
             "but the entity was supposed to be", entity_type
-        )
+        ))
         return False, "wrong entity type"
-    # contents = get_contents(path)
-    # if contents and entity_type != "project":
-    #     return False, f"{entity_type} not empty"
-    path = Path(path)
-    path.rename(path.parent / new_name)
-    return True, ""
+    if not hasattr(entity, "rename"):
+        return False
+    ok = entity.rename(new_name)
+    return ok, ""
 
 
 def add_tags(path, tags):

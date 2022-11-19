@@ -187,6 +187,7 @@ function createWindow (show=true) {
     win.loadURL("http://localhost:3000");
     win.webContents.openDevTools();
   } else {
+    win.removeMenu();
     win.loadFile("build/index.html");
   }
 

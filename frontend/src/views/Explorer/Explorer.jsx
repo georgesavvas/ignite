@@ -159,13 +159,13 @@ function Explorer() {
         obj[entity.result_id] = <AssetTile key={entity.path} entity={entity}
           onSelected={handleEntitySelection} size={explorerSettings.currentTileSize * 40} viewType={explorerSettings.currentViewType}
           selected={selectedEntity.path === entity.path} refreshContext={refreshContext}
-          onContextMenu={handleContextMenuSelection}
+          handleContextMenuSelection={handleContextMenuSelection}
         />;
       } else {
         obj[entity.result_id] = <DirectoryTile key={entity.path} entity={entity}
           onSelected={handleEntitySelection} size={explorerSettings.currentTileSize * 40} viewType={explorerSettings.currentViewType}
           selected={selectedEntity.path === entity.path} refreshContext={refreshContext}
-          onContextMenu={handleContextMenuSelection}
+          handleContextMenuSelection={handleContextMenuSelection}
         />;
       }
       return obj;
@@ -302,6 +302,7 @@ function Explorer() {
   const itemData = {
     path: currentContext.path,
     kind: currentContext.dir_kind,
+    name: currentContext.name,
     handleClick: handleClick
   };
 
@@ -335,6 +336,7 @@ function Explorer() {
         selectedEntityPath={selectedEntity.path}
         onSelected={handleEntitySelection}
         onContextMenu={e => handleContextMenu(e, contextMenu, setContextMenu)}
+        handleContextMenuSelection={handleContextMenuSelection}
       />
     );
     return (

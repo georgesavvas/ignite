@@ -20,12 +20,18 @@ import clientRequest from "../../services/clientRequest";
 import FilterField from "../../components/FilterField";
 import {CrateContext} from "../../contexts/CrateContext";
 import Component from "./Component";
+import {ContextContext} from "../../contexts/ContextContext";
+import {useSnackbar} from "notistack";
+import {DeleteDir, RenameDir} from "../ContextActions";
 
 
 function ComponentList(props) {
   const [actions, setActions] = useState({});
   const [filterValue, setFilterValue] = useState("");
   const {addToCrate} = useContext(CrateContext);
+  const [,, refreshContext] = useContext(ContextContext);
+  const {enqueueSnackbar} = useSnackbar();
+  const [modalData, setModalData] = useState({});
 
   useEffect(() => {
     clientRequest("get_actions", {data: props.project}).then(resp => {
@@ -33,8 +39,22 @@ function ComponentList(props) {
     });
   }, [props.components]);
 
+  const handleContextMenuSelection = (action, _data) => {
+    const data = {..._data};
+    data[`${action}Open`] = true;
+    setModalData(data);
+  };
+
   return (
     <div className={styles.container}>
+      <DeleteDir open={modalData.deleteOpen} enqueueSnackbar={enqueueSnackbar}
+        onClose={() => setModalData(prevState => ({...prevState, deleteOpen: false}))}
+        data={modalData} fn={refreshContext}
+      />
+      <RenameDir open={modalData.renameOpen} enqueueSnackbar={enqueueSnackbar}
+        onClose={() => setModalData(prevState => ({...prevState, renameOpen: false}))}
+        data={modalData} fn={refreshContext}
+      />
       <FilterField filterValue={filterValue} setFilterValue={setFilterValue} />
       <div className={styles.compList}>
         {props.components.map((comp, index) => {
@@ -43,6 +63,7 @@ function ComponentList(props) {
           return <Component key={index} entity={comp} addToCrate={addToCrate}
             onSelect={props.onSelect} selectedComp={props.selectedComp}
             actions={actions} style={hide ? {display: "none"} : null}
+            handleContextMenuSelection={handleContextMenuSelection}
           />;
         })}
       </div>

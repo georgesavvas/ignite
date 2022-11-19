@@ -60,7 +60,7 @@ function DirectoryTile(props) {
       },
       // {
       //   label: "Import asset from Vault",
-      //   fn: () =>  props.onContextMenu("vaultExport", dirData),
+      //   fn: () =>  props.handleContextMenuSelection("vaultExport", dirData),
       //   divider: true
       // },
       {
@@ -78,11 +78,11 @@ function DirectoryTile(props) {
       },
       {
         label: `Rename ${entity.dir_kind}`,
-        fn: () => props.onContextMenu("rename", dirData)
+        fn: () => props.handleContextMenuSelection("rename", dirData)
       },
       {
         label: `Delete ${entity.dir_kind}`,
-        fn: () => props.onContextMenu("delete", dirData),
+        fn: () => props.handleContextMenuSelection("delete", dirData),
         divider: true
       }
     ];
@@ -96,7 +96,7 @@ function DirectoryTile(props) {
       label: contextOption.label,
       value: contextOption.name,
       dir_path: entity.path,
-      fn: () => props.onContextMenu(
+      fn: () => props.handleContextMenuSelection(
         "create", {...entity, method: contextOption.name, kind: contextOption.dir_kind}
       )
     }));
