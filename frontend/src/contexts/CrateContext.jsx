@@ -25,6 +25,7 @@ export const CrateProvider = props => {
   const [crates, setCrates] = useState([]);
   const [floating, setFloating] = useState([]);
   const [config] = useContext(ConfigContext);
+  const [forceOpen, setForceOpen] = useState(false);
 
   useEffect(() => {
     if (!config.ready) return;
@@ -110,7 +111,9 @@ export const CrateProvider = props => {
       dropFloating: dropFloating,
       emptyCrate: emptyCrate,
       floating: floating,
-      crates: crates
+      crates: crates,
+      forceOpen: forceOpen,
+      setForceOpen: setForceOpen
     }}>
       {props.children}
     </CrateContext.Provider>

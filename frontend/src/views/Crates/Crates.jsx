@@ -1,3 +1,18 @@
+// Copyright 2022 George Savvas
+
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+
+//     https://www.apache.org/licenses/LICENSE-2.0
+
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+
 import { OutlinedInput, Typography } from "@mui/material";
 import React, {useState, useContext} from "react";
 import styles from "./Crates.module.css";
@@ -10,6 +25,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import AssetTile from "../Explorer/AssetTile";
 import URI from "../../components/URI";
 import DirectoryTile from "../Explorer/DirectoryTile";
+import Component from "../DetailsView/Component";
 
 const Crate = props => {
   const {
@@ -30,11 +46,13 @@ const Crate = props => {
   };
 
   const getEntityCrate = entity => {
-    return (
-      ("asset", "assetversion").includes(entity.dir_kind) ?
-        <AssetTile key={entity.uri} entity={entity} noOverlay noInfo />
-        : <DirectoryTile key={entity.uri} entity={entity} noOverlay noInfo />
-    );
+    if (("asset", "assetversion").includes(entity.dir_kind)) {
+      return <AssetTile key={entity.uri} entity={entity} noOverlay noInfo />;
+    }
+    else if (entity.dir_kind === "component") {
+      return <Component key={entity.uri} entity={entity} noOverlay noInfo />;
+    }
+    return <DirectoryTile key={entity.uri} entity={entity} noOverlay noInfo />;
   };
 
   const handleNewCrateClick = () => {

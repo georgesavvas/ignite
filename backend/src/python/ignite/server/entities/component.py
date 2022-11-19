@@ -26,7 +26,7 @@ LOGGER = get_logger(__name__)
 class Component():
     def __init__(self, path=None) -> None:
         self.dict_attrs = ["name", "filename", "path", "ext", "static",
-            "first_frame", "last_frame", "frames", "uri"]
+            "first_frame", "last_frame", "frames", "uri", "dir_kind"]
         self.nr_attrs = ["path"]
         self.name = ""
         self.filename = ""
