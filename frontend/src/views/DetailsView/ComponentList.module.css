@@ -15,6 +15,7 @@
     box-sizing: border-box;
     overflow: clip;
     cursor: pointer;
+    padding: 2px;
 }
 
 .filterBar {
@@ -36,11 +37,11 @@
 
 .compIcon {
     aspect-ratio: 1;
-    min-width: 35px;
+    height: 100%;
     background-size: cover;
     background-position: center;
-    background-image: "media/folder_icon.png";
     box-sizing: border-box;
+    margin-right: 3px;
 }
 
 .spacer {

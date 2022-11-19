@@ -126,6 +126,27 @@ async def find(request: Request):
     return {"ok": True, "data": data}
 
 
+@router.post("/find_multiple")
+async def find_multiple(request: Request):
+    result = await request.json()
+    log_request(result)
+    result = process_request(result)
+    data = result.get(data)
+    if type(data) == "list":
+        entities = [api.find(path) for path in data]
+        data = [
+            entity.as_dict() for entity in entities if hasattr(entity, "as_dict")
+        ]
+    elif type(data) == "dict":
+        entities = {path: api.find(path) for path in data.keys()}
+        data = {
+            k: entity.as_dict()
+            for k, entity in entities
+            if hasattr(entity, "as_dict")
+        }
+    return {"ok": True, "data": data}
+
+
 # This is used by the C++ USD resolver, expects raw strings as response
 @router.post("/resolve", response_class=PlainTextResponse)
 async def resolve(request: Request):
@@ -352,7 +373,7 @@ async def register_directory(request: Request):
     ok = api.register_directory(path, dir_kind)
     if not ok:
         return error("generic_error")
-    return {"ok": True}
+    return {"ok": ok}
 
 
 @router.post("/register_task")
@@ -365,7 +386,7 @@ async def register_task(request: Request):
     ok = api.register_task(path, task_type)
     if not ok:
         return error("generic_error")
-    return {"ok": True}
+    return {"ok": ok}
 
 
 @router.post("/register_scene")
@@ -377,7 +398,7 @@ async def register_scene(request: Request):
     ok = api.register_scene(path)
     if not ok:
         return error("generic_error")
-    return {"ok": True}
+    return {"ok": ok}
 
 
 @router.post("/register_asset")
@@ -389,7 +410,7 @@ async def register_asset(request: Request):
     ok = api.register_asset(path)
     if not ok:
         return error("generic_error")
-    return {"ok": True}
+    return {"ok": ok}
 
 
 @router.post("/set_repr")
@@ -401,7 +422,7 @@ async def set_repr(request: Request):
     ok = api.set_repr(target, repr)
     if not ok:
         return error("generic_error")
-    return {"ok": True}
+    return {"ok": ok}
 
 
 @router.post("/set_repr_for_project")
@@ -431,7 +452,7 @@ async def register_assetversion(request: Request):
     ok = api.register_assetversion(path)
     if not ok:
         return error("generic_error")
-    return {"ok": True}
+    return {"ok": ok}
 
 
 @router.post("/delete_entity")
@@ -443,7 +464,7 @@ async def delete_entity(request: Request):
     ok = api.delete_entity(path, entity)
     if not ok:
         return error("generic_error")
-    return {"ok": True}
+    return {"ok": ok}
 
 
 @router.post("/rename_entity")
@@ -458,7 +479,7 @@ async def rename_entity(request: Request):
     ok, msg = api.rename_entity(path, entity, new_name)
     if not ok:
         return error("invalid_data", msg)
-    return {"ok": True}
+    return {"ok": ok}
 
 
 @router.post("/add_tags")
@@ -472,7 +493,7 @@ async def add_tags(request: Request):
     ok = api.add_tags(path, tags)
     if not ok:
         return error("generic_error")
-    return {"ok": True}
+    return {"ok": ok}
 
 
 @router.post("/remove_tags")
@@ -487,7 +508,7 @@ async def remove_tags(request: Request):
     ok = api.remove_tags(path, tags=tags, all=all)
     if not ok:
         return error("generic_error")
-    return {"ok": True}
+    return {"ok": ok}
 
 
 @router.post("/set_attributes")
@@ -501,7 +522,7 @@ async def set_attributes(request: Request):
     ok = api.set_attributes(path, attributes)
     if not ok:
         return error("generic_error")
-    return {"ok": True}
+    return {"ok": ok}
 
 
 @router.websocket("/ws/asset_updates/{session_id}")

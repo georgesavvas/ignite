@@ -28,6 +28,7 @@ import {ContextContext} from "../../contexts/ContextContext";
 import Modal from "../../components/Modal";
 import DccSelector from "../DccSelector";
 import Feedback from "../Feedback.jsx";
+import CratesDropdown from "../Crates/CratesDropdown.jsx";
 
 
 export default function TopBar() {
@@ -76,6 +77,7 @@ export default function TopBar() {
           <IgnButton
             variant="outlined"
             color="ignite"
+            style={{minWidth: "120px"}}
             onClick={() => setDccOpen(true)}
           >
             Launch App
@@ -85,6 +87,8 @@ export default function TopBar() {
           <img src="media/ignite_logo.png" className={styles.logo} />
         </div>
         <div className={styles.rightSide}>
+          <CratesDropdown />
+          <div style={{flexGrow: 1}} />
           <IconButton size="small" style={{padding: 0}}
             onClick={() => setFeedbackOpen(true)}
           >

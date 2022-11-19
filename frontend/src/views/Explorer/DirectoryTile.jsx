@@ -23,15 +23,16 @@ import {setReprForProject, setReprForParent} from "../ContextActions";
 import {DIRECTORYICONS, DIRCONTEXTOPTIONS} from "../../constants";
 import Tile from "../../components/Tile";
 import {ContextContext} from "../../contexts/ContextContext";
+import {CrateContext} from "../../contexts/CrateContext";
 
 function DirectoryTile(props) {
   const {enqueueSnackbar} = useSnackbar();
+  const {addToCrate} = useContext(CrateContext);
   const [currentContext, setCurrentContext] = useContext(ContextContext);
-
   const hasThumbnail = props.entity.thumbnail && props.entity.thumbnail.filename;
   const isScene = props.entity.dir_kind === "scene";
   const thumbnailWidth = isScene || hasThumbnail ? "100%" : "30%";
-  const currentPath = currentContext.path_nr.replace(currentContext.project + "/", "");
+  const currentPath = currentContext.path_nr?.replace(currentContext.project + "/", "");
   let contextPath = props.entity.context.replace(currentPath, "");
   if (contextPath.startsWith("/")) contextPath = contextPath.slice(1);
 
@@ -52,9 +53,14 @@ function DirectoryTile(props) {
         fn: () => ShowInExplorer(entity.path, enqueueSnackbar),
         divider: true
       },
+      {
+        label: "Add to crate",
+        fn: () => addToCrate([entity]),
+        divider: true
+      },
       // {
       //   label: "Import asset from Vault",
-      //   fn: () =>  props.onContextMenu("vaultExport", dirData),
+      //   fn: () =>  props.handleContextMenuSelection("vaultExport", dirData),
       //   divider: true
       // },
       {
@@ -72,11 +78,11 @@ function DirectoryTile(props) {
       },
       {
         label: `Rename ${entity.dir_kind}`,
-        fn: () => props.onContextMenu("rename", dirData)
+        fn: () => props.handleContextMenuSelection("rename", dirData)
       },
       {
         label: `Delete ${entity.dir_kind}`,
-        fn: () => props.onContextMenu("delete", dirData),
+        fn: () => props.handleContextMenuSelection("delete", dirData),
         divider: true
       }
     ];
@@ -90,7 +96,7 @@ function DirectoryTile(props) {
       label: contextOption.label,
       value: contextOption.name,
       dir_path: entity.path,
-      fn: () => props.onContextMenu(
+      fn: () => props.handleContextMenuSelection(
         "create", {...entity, method: contextOption.name, kind: contextOption.dir_kind}
       )
     }));

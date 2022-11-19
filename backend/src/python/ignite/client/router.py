@@ -164,9 +164,12 @@ async def ingest(request: Request):
     return {"ok": True, "data": resp}
 
 
-@router.get("/get_actions")
-async def get_actions():
-    data = api.get_actions()
+@router.post("/get_actions")
+async def get_actions(request: Request):
+    result = await request.json()
+    log_request(result)
+    project = result.get("project")
+    data = api.get_actions(project)
     return {"ok": True, "data": data}
 
 
@@ -213,3 +216,40 @@ async def get_processes(request: Request):
 async def is_local_server_running():
     data = api.is_local_server_running()
     return {"ok": data}
+
+
+@router.get("/get_crates")
+async def get_crates():
+    data = api.get_crates()
+    return {"ok": True, "data": data}
+
+
+@router.post("/set_crates")
+async def set_crates(request: Request):
+    result = await request.json()
+    log_request(result)
+    data = result.get("data")
+    ok = api.set_crates(data)
+    return {"ok": ok}
+
+
+@router.post("/zip_entity")
+async def zip_entity(request: Request):
+    result = await request.json()
+    log_request(result)
+    path = result.get("path")
+    dest = result.get("dest")
+    session_id = result.get("session_id")
+    ok = api.zip_entity(path, dest, session_id)
+    return {"ok": ok}
+
+
+@router.post("/zip_crate")
+async def zip_crate(request: Request):
+    result = await request.json()
+    log_request(result)
+    crate_id = result.get("id")
+    dest = result.get("dest")
+    session_id = result.get("session_id")
+    ok = api.zip_crate(crate_id, dest, session_id)
+    return {"ok": ok}

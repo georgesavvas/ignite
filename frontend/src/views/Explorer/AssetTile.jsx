@@ -22,15 +22,17 @@ import {CopyToClipboard, ShowInExplorer} from "../ContextActions";
 import {setReprForProject, setReprForParent} from "../ContextActions";
 import {ContextContext} from "../../contexts/ContextContext";
 import Tile from "../../components/Tile";
+import {CrateContext} from "../../contexts/CrateContext";
 
 
 function AssetTile(props) {
   const {enqueueSnackbar} = useSnackbar();
+  const {addToCrate} = useContext(CrateContext);
   const [currentContext, setCurrentContext] = useContext(ContextContext);
 
   const hasThumbnail = props.entity.thumbnail && props.entity.thumbnail.filename;
   const thumbnailWidth = hasThumbnail ? "100%" : "50%";
-  const currentPath = currentContext.path_nr.replace(currentContext.project + "/", "");
+  const currentPath = currentContext.path_nr?.replace(currentContext.project + "/", "");
   let contextPath = props.entity.context.replace(currentPath, "");
   if (contextPath.startsWith("/")) contextPath = contextPath.slice(1);
 
@@ -57,11 +59,11 @@ function AssetTile(props) {
     },
     {
       label: "Add to Vault",
-      fn: () =>  props.onContextMenu("vaultImport", dirData)
+      fn: () =>  props.handleContextMenuSelection("vaultImport", dirData)
     },
     // {
     //   label: "Import new version from Vault",
-    //   fn: () =>  props.onContextMenu("vaultExport", dirData),
+    //   fn: () =>  props.handleContextMenuSelection("vaultExport", dirData),
     //   divider: true
     // },
     {
@@ -79,8 +81,21 @@ function AssetTile(props) {
       divider: true
     },
     {
+      label: "Add to crate",
+      fn: () => addToCrate([props.entity]),
+      divider: true
+    },
+    {
       label: "Rename asset",
-      fn: () => props.onContextMenu("rename", {
+      fn: () => props.handleContextMenuSelection("rename", {
+        name: props.entity.name,
+        kind: "asset",
+        path: props.entity.asset
+      })
+    },
+    {
+      label: "Delete asset (all versions)",
+      fn: () => props.handleContextMenuSelection("delete", {
         name: props.entity.name,
         kind: "asset",
         path: props.entity.asset
@@ -88,7 +103,7 @@ function AssetTile(props) {
     },
     {
       label: "Delete asset version",
-      fn: () => props.onContextMenu("delete", dirData)
+      fn: () => props.handleContextMenuSelection("delete", dirData)
     }
   ];
 

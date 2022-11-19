@@ -1,0 +1,2 @@
+pyinstaller src/python/ignite/main.py --noconfirm --onefile --name=IgniteBackend --icon=../icon.icns
+cp dist/Ignite* ../frontend

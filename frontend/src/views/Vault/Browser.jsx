@@ -63,7 +63,7 @@ function Browser(props) {
         viewType="grid"
         selected={props.selectedEntity.path === entity.path}
         refreshContext={props.onRefresh}
-        onContextMenu={handleContextMenuSelection}
+        handleContextMenuSelection={handleContextMenuSelection}
       />;
       return obj;
     }, {});

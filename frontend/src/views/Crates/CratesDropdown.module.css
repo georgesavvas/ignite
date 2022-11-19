@@ -1,0 +1,60 @@
+.container {
+  /* border: 1px solid lightgrey; */
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  height: 25vh;
+  width: 80vw;
+  left: 0;
+  right: 0;
+  top: 0;
+  padding: 5px;
+  margin-left: auto; 
+  margin-right: auto; 
+  z-index: 101;
+  transform: translateY(-100%);
+  transition: transform 0.5s;
+  transition-delay: 0.5s;
+  filter: drop-shadow(5px 5px 10px rgba(0, 0, 0, 0.5));
+}
+
+.container:hover {
+  transform: translateY(0%);
+  transition-delay: 0s;
+}
+
+.arrowIcon {
+  font-size: 40px !important;
+  color: lightgrey;
+  transform: translateX(8px);
+}
+
+.crateIcon {
+  width: 18px;
+  height: 18px;
+  margin-left: 3px;
+}
+
+.content {
+  width: 100%;
+  height: 100%;
+}
+
+.dropdown {
+  height: 20px;
+  width: 80px;
+  padding: 10px;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-top: none;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  position: absolute;
+  left: 60vw;
+  top: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}

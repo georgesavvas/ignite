@@ -14,10 +14,12 @@
 
 
 import os
+import shutil
 from pathlib import PurePath, Path
 import pprint
 
 from fastapi.staticfiles import StaticFiles
+from ignite.constants import SEQUENCE_CHARS
 from ignite.logger import get_logger
 
 ENV = os.environ
@@ -86,12 +88,70 @@ def symlink_points_to(symlink, path):
     return path == symlink.resolve()
 
 
-def get_config_paths(suffix, project_path=None, base=True, user=True):
+def get_config_paths(suffix, root=None, project=None, base=True, user=True):
     paths = []
     if base:
-        paths.append(CONFIG_PATH / suffix)
+        p = Path(CONFIG_PATH) / suffix
+        if p.is_dir():
+            paths.append(p)
     if user:
-        paths.append(USER_CONFIG_PATH / suffix)
-    if project_path:
-        paths.append(project_path / ".config" / suffix)
+        p = Path(USER_CONFIG_PATH) / suffix
+        if p.is_dir():
+            paths.append(p)
+    if root:
+        p = Path(root) / ".config" / suffix
+        if p.is_dir():
+            paths.append(p)
+    if root and project:
+        p = Path(root) / project / ".config" / suffix
+        if p.is_dir():
+            paths.append(p)
     return paths
+
+
+def is_sequence(path):
+    path = PurePath(path)
+    for char in SEQUENCE_CHARS:
+        if char in path.name:
+            return True
+
+
+def replace_frame_in_path(path, s):
+    path = PurePath(path)
+    path_str = path.as_posix()
+    error = f"Could not find frame section in {path}"
+    for char in SEQUENCE_CHARS:
+        if char not in path_str:
+            continue
+        filename_parts = path.name.split(".")
+        for index, part in enumerate(filename_parts):
+            if part[0] in SEQUENCE_CHARS:
+                filename_parts[index] = s
+                break
+        else:
+            LOGGER.error(error)
+            return
+        return path.parent / ".".join(filename_parts)
+    LOGGER.error(error)
+    return
+
+
+def copy_dir_or_files(source, dest):
+    source = Path(source)
+    dest = PurePath(dest)
+    source_str = source.as_posix()
+    dest_str = dest.as_posix()
+    if source.is_dir():
+        shutil.copytree(source, dest / source.name)
+        return
+    if source.is_file():
+        shutil.copy(source, dest)
+        return
+    if not source.parent.exists():
+        LOGGER.error(f"Attempted to copy {source_str} but doesn't exist...")
+    seq_path = replace_frame_in_path(source, "*")
+    if not seq_path:
+        LOGGER.error(f"Could not parse {source_str} for copying")
+        return
+    for file in seq_path.parent.glob(seq_path.name):
+        shutil.copy(file, dest)

@@ -36,7 +36,7 @@ class AssetVersion(Directory):
         self.dict_attrs = ["components", "asset", "task", "uri", "tags",
             "version", "thumbnail", "creation_time", "modification_time",
             "versions"]
-        self.nr_attrs = ["asset", "task"]
+        self.nr_attrs = ["asset", "task", "path"]
         self.asset = self.path.parent
         self.version = self.name
         self.version_int = 0
