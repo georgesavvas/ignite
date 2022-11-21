@@ -28,14 +28,17 @@ import DirectoryTile from "../Explorer/DirectoryTile";
 import Component from "../DetailsView/Component";
 
 const Crate = props => {
-  const {
-    floating,
-    dropFloating,
-    addCrate,
-  } = useContext(CrateContext);
-  const [crate, setCrate] = useState(
-    {id: props.id, entities: props.entities, label: `Crate ${props.index + 1}`}
-  );
+  const crateFromProps = () => {
+    return {
+      id: props.id, entities: props.entities, label: `Crate ${props.index + 1}`
+    };
+  };
+  const {floating, dropFloating, addCrate} = useContext(CrateContext);
+  const [crate, setCrate] = useState(crateFromProps());
+
+  useEffect(() => {
+    setCrate(crateFromProps());
+  }, [props]);
 
   const handleLabelChange = e => {
     setCrate(prev => ({...prev, label: e.target.value}));
@@ -85,7 +88,7 @@ const Crate = props => {
         />
       </div>
       <div className={styles.tileContainer}>
-        {crate.entities.map(entity => getEntityCrate(entity))}
+        {crate.entities?.map(entity => getEntityCrate(entity))}
       </div>
     </div>
   );

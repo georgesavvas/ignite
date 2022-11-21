@@ -31,7 +31,7 @@ export default function ProjectTree() {
   const [currentContext] = useContext(ContextContext);
 
   useEffect(() => {
-    if (!config.access) return;
+    if (!config.ready) return;
     if (!Object.entries(config.access).length) return;
     const data = {
       project: currentContext.project

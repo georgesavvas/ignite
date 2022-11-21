@@ -35,6 +35,7 @@ import Modal from "../../components/Modal";
 import styles from "./Rules.module.css";
 import DynamicList from "../../components/DynamicList";
 import {Rule} from "./Rule";
+import IgnTextField from "../../components/IgnTextField";
 
 
 const RuleNameInputModal = ({onSubmit, open, onClose}) => {
@@ -55,7 +56,7 @@ const RuleNameInputModal = ({onSubmit, open, onClose}) => {
       onClose={onClose}
       buttons={[<Button key="Confirm" type="submit">Create</Button>]}
     >
-      <TextField fullWidth value={name} onChange={e => setName(e.target.value)} />
+      <IgnTextField placeholder="Template Name" fullWidth value={name} onChange={e => setName(e.target.value)} />
     </Modal>
   );
 };
@@ -140,8 +141,16 @@ const RuleTemplates = props => {
             ) : null}
           </Select>
         </FormControl>
-        <Button variant="outlined" onClick={() => setManagerOpen(true)}>Manage</Button>
-        <Button variant="outlined" onClick={() => setRuleNameInputModalOpen(true)}>Save current</Button>
+        <Button variant="outlined" onClick={() => setManagerOpen(true)}>
+          Manage
+        </Button>
+        <Button
+          variant="outlined"
+          style={{minWidth: "130px"}}
+          onClick={() => setRuleNameInputModalOpen(true)}
+        >
+          Save current
+        </Button>
       </div>
     </>
   );

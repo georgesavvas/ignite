@@ -21,7 +21,7 @@ import { ConfigContext } from "./ConfigContext";
 export const CrateContext = createContext();
 
 export const CrateProvider = props => {
-  const fetch = useRef(true);
+  const [fetched, setFetched] = useState(false);
   const [crates, setCrates] = useState([]);
   const [floating, setFloating] = useState([]);
   const [config] = useContext(ConfigContext);
@@ -29,10 +29,10 @@ export const CrateProvider = props => {
 
   useEffect(() => {
     if (!config.ready) return;
-    if (fetch.current) {
+    if (!fetched) {
       clientRequest("get_crates").then(resp => {
         setCrates(resp.data || []);
-        fetch.current = false;
+        setFetched(true);
       });
       return;
     }
@@ -43,7 +43,7 @@ export const CrateProvider = props => {
     clientRequest("set_crates", {data: data}).then(resp => {
       if (!resp.ok) console.log("There was an issue setting crates");
     });
-  }, [crates]);
+  }, [crates, config.ready]);
 
   const addCrate = async (entities=[]) => {
     const crateID = await window.services.uuid();
