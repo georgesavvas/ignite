@@ -44,9 +44,12 @@ function Files(props) {
 
   const handleSourceChange = value => {
     const list = value.split("\n");
-    return list.join("\n");
+    const last_index = list.length - 1;
+    // list = list.filter(
+    //   (value, index) => value != "" || index < last_index
+    // ).join("\n");
     // const unique = Array.from(new Set(list)).join("\n");
-    // setSources(unique);
+    setSources(list.join("\n"));
   };
 
   const handleAddFiles = async dir => {
@@ -56,7 +59,8 @@ function Files(props) {
     const filePaths = resp.filePaths;
     if (!filePaths?.length) return;
     setSources(prev => {
-      const existing = prev.split("\n").concat(filePaths);
+      let existing = prev ? prev.split("\n") : [];
+      existing = existing.concat(filePaths);
       const unique = Array.from(new Set(existing)).join("\n");
       return unique;
     });
