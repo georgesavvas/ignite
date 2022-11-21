@@ -44,11 +44,6 @@ function Files(props) {
 
   const handleSourceChange = value => {
     const list = value.split("\n");
-    const last_index = list.length - 1;
-    // list = list.filter(
-    //   (value, index) => value != "" || index < last_index
-    // ).join("\n");
-    // const unique = Array.from(new Set(list)).join("\n");
     setSources(list.join("\n"));
   };
 
@@ -95,8 +90,9 @@ function Files(props) {
       <DynamicList dense noButtons onScroll={updateXarrow}>
         {
           props.files ?
-            props.files.map((child, index) => <File filepath={child} key={index} id={"file-" + index} />) :
-            null
+            props.files.map((child, index) =>
+              <File filepath={child} key={index} id={"file-" + index} />)
+            : null
         }
       </DynamicList>
     </div>
