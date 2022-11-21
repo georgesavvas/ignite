@@ -30,6 +30,7 @@ SERVER_CONFIG_PATH = os.environ["IGNITE_SERVER_USER_CONFIG_PATH"]
 
 KINDS = {v: k for k, v in ANCHORS.items()}
 URI_TEMPLATE = parse.compile("ign:{project}:{group}:{context}:{task}:{name}@{version}")
+URI_TEMPLATE_COMP = parse.compile("ign:{project}:{group}:{context}:{task}:{name}@{version}#{comp}")
 URI_TEMPLATE_UNVERSIONED = parse.compile("ign:{project}:{group}:{context}:{task}:{name}")
 
 
@@ -248,7 +249,10 @@ def get_dir_kind(path):
 
 def uri_to_path(uri):
     uri = str(uri)
-    result = URI_TEMPLATE.parse(uri)
+    if "#" in uri:
+        result = URI_TEMPLATE_COMP.parse(uri)
+    else:
+        result = URI_TEMPLATE.parse(uri)
     if not result:
         result = URI_TEMPLATE_UNVERSIONED.parse(uri)
     if not result:
@@ -266,11 +270,14 @@ def uri_to_path(uri):
         version = data.get("version")
         if not version.startswith("v"):
             data["version"] = format_int_version(data["version"])
+    if data.get("comp"):
+        data["comp"] = data["comp"].replace("#", "")
     path = CONFIG["root"]
-    for step in ("project", "group", "context", "task", "name", "version"):
-        if not data.get(step):
+    parts = ("project", "group", "context", "task", "name", "version", "comp")
+    for part in parts:
+        if not data.get(part):
             return path
-        path = path / data[step]
+        path = path / data[part]
     return path
 
 

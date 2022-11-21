@@ -610,9 +610,9 @@ async def write_collections(request: Request):
     }
 
 
-@router.get("/get_rule_templates")
-async def get_rule_templates():
-    data = vault_api.get_rule_templates()
+@router.get("/get_filter_templates")
+async def get_filter_templates():
+    data = vault_api.get_filter_templates()
     return {
         "ok": True,
         "data": data
