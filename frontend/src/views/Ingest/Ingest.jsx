@@ -103,7 +103,8 @@ function Ingest(props) {
     comp: "",
     rule: "",
     replace_target: "",
-    replace_value: ""
+    replace_value: "",
+    show_connections: true
   };
 
   useEffect(() => {
@@ -157,7 +158,7 @@ function Ingest(props) {
     getFilesDebounced(
       {"dirs": ingestDirs},
       resp => {
-        setIngestFiles(resp.data.trimmed);
+        setIngestFiles(resp.data?.trimmed || []);
         setLoading(false);
       }
     );
@@ -173,8 +174,8 @@ function Ingest(props) {
     getOutputDebounced(
       {data: data},
       resp => {
-        setIngestAssets(resp.data.assets);
-        setConnections(resp.data.connections);
+        setIngestAssets(resp.data?.assets || []);
+        setConnections(resp.data?.connections || []);
         setLoading(false);
       }
     );
@@ -185,8 +186,14 @@ function Ingest(props) {
   };
 
   const handleRulesChange = (e, action, index=-1, index2=-1) => {
-    const [field, id] = e.target.name.split("-");
-    const value = e.target.value;
+    let field;
+    let id;
+    let value;
+    if (e && e !== null) {
+      ([field, id] = e.target.name.split("-"));
+      value = e.target.checked !== undefined ?
+        e.target.checked : e.target.value;
+    }
     switch (action) {
     case "add":
       setIngestRules(prevState => {
@@ -259,12 +266,15 @@ function Ingest(props) {
                     {
                       !loading && ingestRules && connections && connections.rules_files ?
                         connections.rules_files.map(
-                          (rule, index) => <Xarrow end={"file-" + rule[1]} start={"rule-" + rule[0]}
-                            key={index} strokeWidth={2} curveness={0.5} color={ingestRules[rule[0]].colour}
-                            showHead={true} animateDrawing={0.25} headShape="circle" headSize={3}
+                          (rule, index) => ingestRules[rule[1]]?.show_connections ?  <Xarrow
+                            end={"file-" + rule[1]} start={"rule-" + rule[0]}
+                            key={index} strokeWidth={2} curveness={0.5}
+                            color={ingestRules[rule[0]].colour} headSize={3}
+                            showHead={true} animateDrawing={0.25}
                             endAnchor={{position: "right", offset: {x: 40}}}
                             startAnchor={{position: "left", offset: {x: 0}}}
-                          />
+                            headShape="circle"
+                          /> : null
                         )
                         : null
                     }
@@ -283,12 +293,15 @@ function Ingest(props) {
                     {
                       !loading && connections && connections.rules_assets ?
                         connections.rules_assets.map(
-                          (rule, index) => <Xarrow start={"rule-" + rule[0]} end={"asset-" + rule[1]}
-                            key={index} strokeWidth={2} curveness={0.5} color={ingestRules[rule[0]].colour}
-                            showHead={true} animateDrawing={0.25} headShape="circle" headSize={3}
+                          (rule, index) =>  ingestRules[rule[0]].show_connections ?  <Xarrow
+                            start={"rule-" + rule[0]} end={"asset-" + rule[1]}
+                            key={index} strokeWidth={2} curveness={0.5}
+                            color={ingestRules[rule[0]].colour} headSize={3}
+                            showHead={true} animateDrawing={0.25}
                             startAnchor={{position: "right", offset: {x: 15}}}
                             endAnchor={{position: "left", offset: {x: -25}}}
-                          />
+                            headShape="circle" 
+                          /> : null
                         )
                         : null
                     }

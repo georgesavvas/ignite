@@ -104,6 +104,7 @@ function Vault(props) {
 
   useEffect(() => {
     if (!props.open) return;
+    if (!config.ready) return;
     const data = {
       path: BuildFileURL("__vault__", config, {reverse: true, pathOnly: true}),
       page: pages.current,
@@ -111,13 +112,12 @@ function Vault(props) {
       query: {...query, latest: true}
     };
     setIsLoading(true);
-    if (!Object.entries(config.access).length) return;
     serverRequest("get_assetversions", data).then(resp => {
       setIsLoading(false);
       setLoadedData(resp.data);
       setPages(prevState => ({...prevState, total: resp.pages?.total, results: resp.pages?.results}));
     });
-  }, [pages.current, vaultContext, query, tilesPerPage, selectedCollection, refreshValue, props.open]);
+  }, [pages.current, vaultContext, query, tilesPerPage, selectedCollection, refreshValue, props.open, config.ready]);
 
   const handleEntitySelected = entity => {
     setSelectedEntity(entity);

@@ -153,7 +153,9 @@ def find(path):
         if not "@" in path:
             path = utils.uri_to_path(path)
             return _find_from_path(path)
-        asset_uri, version = path.split("@")
+        version = ""
+        if "@" in path:
+            asset_uri, version = path.split("@", 1)
         comp = ""
         if "#" in version:
             version, comp = version.split("#", 1)

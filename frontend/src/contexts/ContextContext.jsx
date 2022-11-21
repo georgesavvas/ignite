@@ -39,11 +39,11 @@ export const ContextProvider = props => {
   const [socket, setSocket] = useState();
 
   useEffect(() => {
-    if (!config.ready) return;
     const data = localStorage.getItem("context");
     const context = JSON.parse(data);
     if (!context || !context.path) return;
     setCurrentContext(context);
+    if (!config.ready) return;
     if (socket) return;
     const sessionID = window.services.get_env("IGNITE_SESSION_ID");
     const serverAddress = window.services.get_env("IGNITE_SERVER_ADDRESS");
@@ -56,12 +56,12 @@ export const ContextProvider = props => {
       destroySocket(socket);
       setSocket();
     });
-  }, [config.serverDetails]);
+  }, [config.serverDetails, config.ready]);
 
-  useEffect(() => {
-    if (currentContext ?? true) return;
-    setCurrentContext(currentContext.project);
-  }, [config.access]);
+  // useEffect(() => {
+  //   if (currentContext ?? true) return;
+  //   setCurrentContext(currentContext.project);
+  // }, [config.ready]);
 
   useEffect(() => {
     if (!config.lostConnection) refresh();

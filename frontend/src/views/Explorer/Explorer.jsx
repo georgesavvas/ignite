@@ -123,6 +123,7 @@ function Explorer() {
   }, [explorerSettings]);
 
   useEffect(() => {
+    if (!config.ready) return;
     const data = {
       page: pages.current,
       limit: explorerSettings.tilesPerPage,
@@ -131,13 +132,12 @@ function Explorer() {
     };
     const method = methods[explorerSettings.currentResultType];
     setIsLoading(true);
-    if (!Object.entries(config.access).length) return;
     serverRequest(method, data).then(resp => {
       setIsLoading(false);
       setLoadedData(resp.data);
       setPages(prevPages => ({...prevPages, total: resp.pages?.total}));
     });
-  }, [pages.current, explorerSettings.currentResultType, explorerSettings.tilesPerPage, currentContext, config.access, query]);
+  }, [pages.current, explorerSettings.currentResultType, explorerSettings.tilesPerPage, currentContext, config.ready, query]);
 
   useEffect(() => {
     if (!loadedData) return;
