@@ -101,7 +101,8 @@ export const Rule = memo(function Rule(props) {
           <IconButton
             className={styles.button}
             size="small"
-            onClick={e => props.onRulesChange(e, "remove", origIndex)}
+            name="delete"
+            onClick={e => props.onRulesChange(null, "remove", origIndex)}
             color="lightgrey"
           >
             <ClearIcon />
