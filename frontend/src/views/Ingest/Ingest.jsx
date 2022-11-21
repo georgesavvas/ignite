@@ -191,7 +191,7 @@ function Ingest(props) {
     let value;
     if (e && e !== null) {
       ([field, id] = e.target.name.split("-"));
-      value = e.target.checked !== undefined ?
+      value = e.target.type === "checkbox" ?
         e.target.checked : e.target.value;
     }
     switch (action) {
