@@ -20,7 +20,6 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
-import TextField from "@mui/material/TextField";
 import {useXarrow} from "react-xarrows";
 import Button from "@mui/material/Button";
 import {DndProvider} from "react-dnd";
@@ -187,7 +186,7 @@ function RuleList(props) {
       });
     }, [tempRules]);
 
-  const renderRule = useCallback((rule, index) => {
+  const renderRule = (rule, index) => {
     return(
       <Rule
         key={"rule-" + rule.origIndex}
@@ -196,18 +195,23 @@ function RuleList(props) {
         onRulesChange={props.onRulesChange}
         id={"rule-" + rule.origIndex}
         moveRule={moveRule}
+        setRules={props.setRules}
       />);
-  }, []);
+  };
 
   return (
-    <DynamicList innerRef={drop} onAdd={() => props.onRulesChange(null, "add")} onScroll={updateXarrow} onRemove={() => props.onRulesChange(null, "remove", -1)}>
-      {tempRules.rules ? tempRules.rules.map((rule, index) => renderRule(rule, index)) : null}
+    <DynamicList innerRef={drop} onAdd={() => props.onRulesChange(null, "add")}
+      onScroll={updateXarrow}
+      onRemove={() => props.onRulesChange(null, "remove", -1)}
+    >
+      {tempRules.rules ?
+        tempRules.rules.map((rule, index) => renderRule(rule, index)) : null
+      }
     </DynamicList>
   );
 }
 
 function Rules(props) {
-
   const handleTemplateSelect = data => {
     props.onAddRules(data);
   };
