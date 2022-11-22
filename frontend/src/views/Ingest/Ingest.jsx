@@ -97,9 +97,9 @@ function Ingest(props) {
     file_target: "*",
     file_target_type: "filename",
     task: currentContext.path,
-    name: "",
-    comp: "",
-    rule: "",
+    name: "{name}",
+    comp: "{comp}",
+    rule: "{name}/{comp}.{ext}",
     replace_target: "",
     replace_value: "",
     show_connections: true
@@ -110,6 +110,7 @@ function Ingest(props) {
   useEffect(() => {
     if (props.open) return;
     setIngestDirs("");
+    setIngestFiles([]);
     setIngestRules(getNewRule());
     setIngestAssets([]);
   }, [props.open]);
@@ -260,18 +261,19 @@ function Ingest(props) {
     if (!ruleConnections || !ruleConnections.length) {
       return [];
     }
-    const ruleIndex = isFiles ? 0 : 1;
+    // const ruleIndex = isFiles ? 0 : 1;
     const startAnchorStyle = isFiles ? {position: "left", offset: {x: 0}}
       : {position: "right", offset: {x: 15}};
     const endAnchorStyle = isFiles ? {position: "right", offset: {x: 40}}
       : {position: "left", offset: {x: -25}};
     const filtered = ruleConnections.filter(conn => {
-      return ingestRules[conn[ruleIndex]]?.show_connections;
+      return ingestRules[conn[0]]?.show_connections;
     });
     return filtered.map((conn, index) => {
-      const rule = ingestRules[conn[ruleIndex]];
-      const startId = "rule-" + conn[ruleIndex];
-      const endId = `${isFiles ? "file" : "asset"}-${conn[1 - ruleIndex]}`;
+      const rule = ingestRules[conn[0]];
+      const startId = "rule-" + conn[0];
+      const endId = `${isFiles ? "file" : "asset"}-${conn[1]}`;
+      if (!isFiles) console.log(rule, startId, endId);
       return <Xarrow
         start={startId} end={endId} color={rule.colour} key={index}
         strokeWidth={2} curveness={0.5} headSize={3} headShape="circle"

@@ -168,6 +168,7 @@ function ExplorerBar(props) {
           style={{minWidth: "80px"}}
           color="ignite" 
           variant="outlined"
+          disabled={currentContext.dir_kind !== "task"}
           onClick={() => setIngestOpen(true)}
         >
           Ingest

@@ -91,7 +91,9 @@ def ingest(data):
                 file_target = directory
             elif rule["file_target_type"] == "filename":
                 file_target = filename
-            pattern = f"*{rule['file_target']}*"
+            pattern = rule["file_target"]
+            if "*" not in pattern:
+                pattern = f"*{pattern}*"
             if not fnmatch(file_target, pattern):
                 continue
 
