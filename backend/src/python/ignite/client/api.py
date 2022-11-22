@@ -14,11 +14,12 @@
 
 
 from genericpath import exists
-import glob
+import re
 import os
-import shutil
-import yaml
+import glob
 import tempfile
+import yaml
+import shutil
 from fnmatch import fnmatch
 from pathlib import Path, PurePath
 from pprint import pprint
@@ -36,6 +37,18 @@ LOGGER = get_logger(__name__)
 ENV = os.environ
 DCC = Path(ENV["IGNITE_DCC"])
 USER_CONFIG_PATH = Path(ENV["IGNITE_USER_CONFIG_PATH"])
+
+
+def validate_ingest_asset(asset):
+    _w = re.compile("^\w+$", re.A)
+    name = asset["name"]
+    if not re.match(_w, name):
+        return False
+    for comp in asset["comps"]:
+        if not re.match(_w, comp["name"]):
+            return False
+        if not re.match(_w, comp["file"]):
+            return False
 
 
 def ingest(data):
@@ -97,7 +110,7 @@ def ingest(data):
             if rule["replace_target"]:
                 result["replace_values"][rule["replace_target"]] = rule["replace_value"]
                 result["rules"].append(i)
-            
+
             # Set values
             for field in ("task", "name", "comp"):
                 if not rule.get(field):
@@ -107,7 +120,6 @@ def ingest(data):
 
             connections["rules_files"].append([i, result["index"]])
 
-    # fields = ("task", "name", "comp")
     for result in results:
         extracted_fields = result["extract_info"]
         if not extracted_fields:
@@ -166,7 +178,12 @@ def ingest(data):
         name = format_values(name, extracted_fields)
         name = replace_values(name, _replace_values)
         if not assets.get(name):
-            assets[name] = {"task": "", "name": name, "comps": [], "rules": result["rules"]}
+            assets[name] = {
+                "task": "",
+                "name": name,
+                "comps": [],
+                "rules": result["rules"]
+            }
 
         task = _set_values.get("task", "")
         task = format_values(task, extracted_fields)
@@ -179,7 +196,8 @@ def ingest(data):
         comp = {
             "name": comp_name,
             "file": result["file"].as_posix().split("/")[-1],
-            "source": result["file"].as_posix()
+            "source": result["file"].as_posix(),
+            "trimmed": result["trimmed"]
         }
         assets[name]["comps"].append(comp)
         assets[name]["rules"] += result["rules"]
@@ -189,6 +207,7 @@ def ingest(data):
         rules = set(asset["rules"])
         connections["rules_assets"] += [[rule, i] for rule in rules]
         del asset["rules"]
+        asset["valid"] = validate_ingest_asset(asset)
 
     if dry:
         data = {
@@ -252,13 +271,9 @@ def ingest_get_files(dirs):
 
 def ingest_asset(data):
     name = data.get("name")
-    if not name or not data.get("task"):
-        print("Missing comp name or task")
-        return
+    if not validate_ingest_asset(data):
+        LOGGER.warning(f"Ignoring {name}, invalid asset.")
     comps = data.get("comps")
-    if not comps or not len(comps):
-        print("Missing comps")
-        return
     task = Path(data["task"])
     asset = task / "exports" / name
     asset_dict = None

@@ -25,10 +25,11 @@ import IgnButton from "../../components/IgnButton";
 import { useEffect } from "react";
 
 
-function File({filepath, id}) {
+function File({filepath, id, number}) {
+  const fileId = `[${number}] `;
   return (
     <div className={styles.fileContainer}>
-      <Typography variant="caption">{filepath}</Typography>
+      <Typography variant="caption">{fileId}{filepath}</Typography>
       <div className={styles.connector} id={id} />
     </div>
   );
@@ -91,7 +92,13 @@ function Files(props) {
         {
           props.files ?
             props.files.map((child, index) =>
-              <File filepath={child} key={index} id={"file-" + index} />)
+              <File
+                filepath={child}
+                key={index}
+                number={index}
+                id={"file-" + index}
+              />
+            )
             : null
         }
       </DynamicList>
