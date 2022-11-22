@@ -54,8 +54,8 @@ function rand(min, max) {
 
 function getRandomColour() {
   var h = rand(1, 36) * 10;
-  var s = rand(40, 40);
-  var l = rand(20, 20);
+  var s = rand(20, 50);
+  var l = rand(10, 30);
   return `hsl(${h},${s}%,${l}%)`;
 }
 
@@ -88,13 +88,11 @@ function Ingest(props) {
   const [flexRatios, setFlexRatios] = useState(defaultFlexRations);
   const [ingestDirs, setIngestDirs] = useState("");
   const [ingestFiles, setIngestFiles] = useState([]);
-  const [ingestRules, setIngestRules] = useState([{}]);
   const [ingestAssets, setIngestAssets] = useState([]);
   const [connections, setConnections] = useState({});
   const [loading, setLoading] = useState(false);
   const updateXarrow = useXarrow();
   const [currentContext,, refreshContext] = useContext(ContextContext);
-
   const RULETEMPLATE = {
     file_target: "*",
     file_target_type: "filename",
@@ -106,12 +104,13 @@ function Ingest(props) {
     replace_value: "",
     show_connections: true
   };
+  const getNewRule = () => [{...RULETEMPLATE, colour: getRandomColour()}];
+  const [ingestRules, setIngestRules] = useState(getNewRule());
 
   useEffect(() => {
-    if (!props.open) return;
-    
+    if (props.open) return;
     setIngestDirs("");
-    setIngestRules([{...RULETEMPLATE, colour: getRandomColour()}]);
+    setIngestRules(getNewRule());
     setIngestAssets([]);
   }, [props.open]);
 
@@ -211,8 +210,9 @@ function Ingest(props) {
       break;
     case "modify":
       setIngestRules(prevState => {
-        prevState[id][field] = value;
-        return [...prevState];
+        const existing = [...prevState];
+        existing[id][field] = value;
+        return existing;
       });
       break;
     case "swap":
