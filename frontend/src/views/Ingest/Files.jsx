@@ -25,10 +25,11 @@ import IgnButton from "../../components/IgnButton";
 import { useEffect } from "react";
 
 
-function File({filepath, id}) {
+function File({filepath, id, number}) {
+  const fileId = `[${number}] `;
   return (
     <div className={styles.fileContainer}>
-      <Typography variant="caption">{filepath}</Typography>
+      <Typography variant="caption">{fileId}{filepath}</Typography>
       <div className={styles.connector} id={id} />
     </div>
   );
@@ -44,9 +45,7 @@ function Files(props) {
 
   const handleSourceChange = value => {
     const list = value.split("\n");
-    return list.join("\n");
-    // const unique = Array.from(new Set(list)).join("\n");
-    // setSources(unique);
+    setSources(list.join("\n"));
   };
 
   const handleAddFiles = async dir => {
@@ -56,7 +55,8 @@ function Files(props) {
     const filePaths = resp.filePaths;
     if (!filePaths?.length) return;
     setSources(prev => {
-      const existing = prev.split("\n").concat(filePaths);
+      let existing = prev ? prev.split("\n") : [];
+      existing = existing.concat(filePaths);
       const unique = Array.from(new Set(existing)).join("\n");
       return unique;
     });
@@ -91,8 +91,15 @@ function Files(props) {
       <DynamicList dense noButtons onScroll={updateXarrow}>
         {
           props.files ?
-            props.files.map((child, index) => <File filepath={child} key={index} id={"file-" + index} />) :
-            null
+            props.files.map((child, index) =>
+              <File
+                filepath={child}
+                key={index}
+                number={index}
+                id={"file-" + index}
+              />
+            )
+            : null
         }
       </DynamicList>
     </div>

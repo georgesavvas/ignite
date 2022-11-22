@@ -13,7 +13,7 @@
 // limitations under the License.
 
 
-import React, {memo, useRef} from "react";
+import React, {memo, useRef, useState} from "react";
 
 import Typography from "@mui/material/Typography";
 import Select from "@mui/material/Select";
@@ -27,12 +27,14 @@ import ClearIcon from "@mui/icons-material/Clear";
 import FormControlLabel from "@mui/material/FormControlLabel";
 
 import styles from "./Rules.module.css";
+import { useEffect } from "react";
 
 
-export const Rule = memo(function Rule(props) {
+export const Rule = props => {
+  const [rule, setRule] = useState(props.rule || {});
+
   const ref = useRef(null);
   const index = props.index;
-  const rule = props.rule;
   const id = props.id;
   const origIndex = rule.origIndex;
   const [{ isDragging }, drag] = useDrag({
@@ -71,7 +73,25 @@ export const Rule = memo(function Rule(props) {
     })
   );
   
-  const handleChanged = e => props.onRulesChange(e, "modify");
+  useEffect(() => {
+    props.setRules(prev => {
+      const existing = [...prev];
+      existing[props.index] = rule;
+      return existing;
+    });
+  }, [rule]);
+
+  // const handleChanged = e => props.onRulesChange(e, "modify");
+  const handleChanged = e => {
+    const [field] = e.target.name.split("-");
+    const value = e.target.type === "checkbox" ?
+      e.target.checked : e.target.value;
+    setRule(prevState => {
+      const existing = {...prevState};
+      existing[field] = value;
+      return existing;
+    });
+  };
 
   const style = {
     backgroundColor: rule.colour,
@@ -101,7 +121,8 @@ export const Rule = memo(function Rule(props) {
           <IconButton
             className={styles.button}
             size="small"
-            onClick={e => props.onRulesChange(e, "remove", origIndex)}
+            name="delete"
+            onClick={e => props.onRulesChange(null, "remove", origIndex)}
             color="lightgrey"
           >
             <ClearIcon />
@@ -161,4 +182,4 @@ export const Rule = memo(function Rule(props) {
       </div>
     </div>
   );
-});
+};
