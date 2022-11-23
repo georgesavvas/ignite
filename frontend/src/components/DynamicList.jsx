@@ -21,6 +21,7 @@ import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 
 import styles from "./DynamicList.module.css";
+import { Typography } from "@mui/material";
 
 
 const style = {
@@ -43,6 +44,12 @@ function createListItem(child, index, dense) {
 function buttons(props) {
   return (
     <div className={styles.buttonContainer}>
+      {props.title ? 
+        <Typography variant="h5" className={styles.title}>
+          {props.title}
+        </Typography>
+        :null
+      }
       <AddIcon className={styles.button} onClick={props.onAdd || null}/>
       <RemoveIcon className={styles.button} onClick={props.onRemove || null}/>
     </div>

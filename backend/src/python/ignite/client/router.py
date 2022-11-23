@@ -164,6 +164,15 @@ async def ingest(request: Request):
     return {"ok": True, "data": resp}
 
 
+@router.post("/ingest_asset")
+async def ingest_asset(request: Request):
+    result = await request.json()
+    log_request(result)
+    data = result.get("data", {})
+    ok = api.ingest_asset(data)
+    return {"ok": ok}
+
+
 @router.post("/get_actions")
 async def get_actions(request: Request):
     result = await request.json()
@@ -253,3 +262,13 @@ async def zip_crate(request: Request):
     session_id = result.get("session_id")
     ok = api.zip_crate(crate_id, dest, session_id)
     return {"ok": ok}
+
+
+@router.post("/process_filepath")
+async def process_filepath(request: Request):
+    result = await request.json()
+    log_request(result)
+    path = result.get("path")
+    process_config = result.get("process_config")
+    data = api.process_filepath(path, process_config)
+    return {"ok": True, "data": data}
