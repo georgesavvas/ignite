@@ -31,7 +31,7 @@ from ignite.client import utils
 from ignite.client.utils import PROCESS_MANAGER, is_server_local
 
 from ignite.logger import get_logger
-from ignite.utils import copy_dir_or_files
+from ignite.utils import copy_dir_or_files, is_sequence
 
 LOGGER = get_logger(__name__)
 ENV = os.environ
@@ -276,6 +276,7 @@ def ingest_asset(data):
     if not validate_ingest_asset(data):
         LOGGER.warning(f"Ignoring {name}, invalid asset.")
     comps = data.get("comps")
+    tags = data.get("tags")
     task = Path(data["task"])
     asset = task / "exports" / name
     asset_dict = None
@@ -315,14 +316,16 @@ def ingest_asset(data):
         print(f"Copying {comp_path} to {dest}")
         shutil.copyfile(comp_path, dest)
     if is_server_local():
-        ok = server_api.register_assetversion(new_version_path.as_posix())
+        ok = server_api.register_assetversion(new_version_path, tags)
         if not ok:
             print("Failed.")
             return
     else:
-        resp = utils.server_request(
-            "register_assetversion", {"path": new_version_path.as_posix()}
-        )
+        data = {
+            "path": new_version_path.as_posix(),
+            "tags": tags
+        }
+        resp = utils.server_request("register_assetversion", data)
         if not resp.get("ok"):
             print("Failed.")
             return
@@ -446,3 +449,13 @@ def zip_crate(crate_id, dest, session_id):
         "zip_dest": dest
     }
     run_action(data, "common", "zip", session_id)
+
+
+def process_filepath(path, process_config):
+    path = Path(path)
+    isSequence = is_sequence(path)
+    output = {}
+    if process_config.get("exists"):
+        output["is_sequence"] = isSequence
+        output["exists"] = path.exists()
+        
