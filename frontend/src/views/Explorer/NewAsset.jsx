@@ -27,6 +27,7 @@ import Button from "@mui/material/Button";
 import clientRequest from "../../services/clientRequest";
 import IgnButton from "../../components/IgnButton";
 import TagContainer from "../DetailsView/TagContainer";
+import serverRequest from "../../services/serverRequest";
 
 
 const NewAsset = props => {
@@ -79,6 +80,12 @@ const NewAsset = props => {
     setComps(prev => {
       const existing = [...prev];
       existing[index][field] = value;
+      if (field == "file" && value) {
+        clientRequest("process_filepath", {path: value}).then(resp => {
+          const data = resp.data;
+          existing[index].info = data;
+        });
+      }
       return existing;
     });
   };
@@ -86,7 +93,11 @@ const NewAsset = props => {
   const handleSequenceChange = (index, value) => {
     setComps(prev => {
       const existing = [...prev];
-      existing[index].sequence = value;
+      const comp = existing[index];
+      comp.sequence = value;
+      if (!comp.info) return existing;
+      if (value) comp.file = comp.info.sequence_expr;
+      else comp.file = comp.info.path;
       return existing;
     });
   };

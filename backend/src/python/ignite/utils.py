@@ -14,12 +14,13 @@
 
 
 import os
+import re
 import shutil
 from pathlib import PurePath, Path
 import pprint
 
 from fastapi.staticfiles import StaticFiles
-from ignite.constants import SEQUENCE_CHARS
+from ignite.constants import SEQUENCE_CHARS, FILEPATH_FRAME_REGEX
 from ignite.logger import get_logger
 
 ENV = os.environ
@@ -116,6 +117,12 @@ def is_sequence(path):
             return True
 
 
+def path_has_frame(path):
+    match = re.search(FILEPATH_FRAME_REGEX, path.as_posix())
+    if match:
+        return True
+
+
 def replace_frame_in_path(path, s):
     path = PurePath(path)
     path_str = path.as_posix()
@@ -132,8 +139,11 @@ def replace_frame_in_path(path, s):
             LOGGER.error(error)
             return
         return path.parent / ".".join(filename_parts)
-    LOGGER.error(error)
-    return
+    result = re.sub(FILEPATH_FRAME_REGEX, f".{s}.", path_str)
+    if not result:
+        LOGGER.error(error)
+        return
+    return result
 
 
 def copy_dir_or_files(source, dest):

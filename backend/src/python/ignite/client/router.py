@@ -269,6 +269,5 @@ async def process_filepath(request: Request):
     result = await request.json()
     log_request(result)
     path = result.get("path")
-    process_config = result.get("process_config")
-    data = api.process_filepath(path, process_config)
+    data = api.process_filepath(path)
     return {"ok": True, "data": data}

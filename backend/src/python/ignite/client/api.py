@@ -20,6 +20,7 @@ import glob
 import tempfile
 import yaml
 import shutil
+import clique
 from fnmatch import fnmatch
 from pathlib import Path, PurePath
 from pprint import pprint
@@ -31,7 +32,8 @@ from ignite.client import utils
 from ignite.client.utils import PROCESS_MANAGER, is_server_local
 
 from ignite.logger import get_logger
-from ignite.utils import copy_dir_or_files, is_sequence
+from ignite.utils import copy_dir_or_files, is_sequence, path_has_frame
+from ignite.utils import replace_frame_in_path
 
 LOGGER = get_logger(__name__)
 ENV = os.environ
@@ -451,11 +453,26 @@ def zip_crate(crate_id, dest, session_id):
     run_action(data, "common", "zip", session_id)
 
 
-def process_filepath(path, process_config):
+def process_filepath(path):
     path = Path(path)
-    isSequence = is_sequence(path)
+
+    sequence = is_sequence(path)
+    if not sequence:
+        exists = path.exists()
+    else:
+        pattern = replace_frame_in_path(path, "*")
+        collections, remainder = clique.assembly(pattern)
+        exists = collections or remainder
+
+    sequence_expr = ""
+    if sequence or path_has_frame(path):
+        sequence_expr = replace_frame_in_path(path, "####")
+        sequence_expr = PurePath(sequence_expr)
+
     output = {}
-    if process_config.get("exists"):
-        output["is_sequence"] = isSequence
-        output["exists"] = path.exists()
+    output["is_sequence_expr"] = sequence
+    output["exists"] = exists
+    output["sequence_expr"] = str(sequence_expr)
+    output["path"] = str(path)
+    return output
         
