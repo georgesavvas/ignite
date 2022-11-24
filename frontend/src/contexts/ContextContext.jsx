@@ -58,11 +58,6 @@ export const ContextProvider = props => {
     });
   }, [config.serverDetails, config.ready]);
 
-  // useEffect(() => {
-  //   if (currentContext ?? true) return;
-  //   setCurrentContext(currentContext.project);
-  // }, [config.ready]);
-
   useEffect(() => {
     if (!config.lostConnection) refresh();
   }, [config.lostConnection]);
@@ -76,7 +71,10 @@ export const ContextProvider = props => {
       {reverse: true, pathOnly: true}
     );
     let success = false;
-    const resp = await serverRequest("get_context_info", {path: path_processed});
+    const resp = await serverRequest(
+      "get_context_info",
+      {path: path_processed}
+    );
     let data = resp.data;
     if (!data) return false;
     if (!Object.keys(data).length) return false;
@@ -93,11 +91,15 @@ export const ContextProvider = props => {
   }
 
   function refresh() {
-    setCurrentContext(prevState => ({...prevState, update: prevState.update + 1}));
+    setCurrentContext(prevState =>
+      ({...prevState, update: prevState.update + 1})
+    );
   }
 
   return (
-    <ContextContext.Provider value={[currentContext, handleContextChange, refresh]}>
+    <ContextContext.Provider
+      value={[currentContext, handleContextChange, refresh]}
+    >
       {props.children}
     </ContextContext.Provider>
   );
