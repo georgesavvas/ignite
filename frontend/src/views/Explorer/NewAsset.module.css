@@ -1,0 +1,38 @@
+
+.container {
+  height: 50vh;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  /* align-items: center; */
+}
+
+.compContainer {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 10px;
+}
+
+.compRow {
+  display: flex;
+  gap: 5px;
+}
+
+.compColumn {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.removeIcon {
+  color: red;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+}
+
+.removeIcon:hover {
+  background-color: rgb(50, 50, 50);
+}

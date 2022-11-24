@@ -204,8 +204,11 @@ function CreateDirModal(props) {
   return (
     <Modal open={props.open} maxWidth="sm" onClose={props.onClose}
       title={`Create ${props.data.kind}`}
-      buttons={[<Button key="create" onClick={handleCreate}>Create</Button>]}
-      buttonProps={{color: "ignite"}}
+      buttons={[
+        <Button key="create" color="ignite" onClick={handleCreate}>
+          Create
+        </Button>
+      ]}
     >
       {props.data.kind === "shot" ?
         <ShotRange setDirList={setDirList} /> :
