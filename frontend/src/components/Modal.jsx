@@ -61,7 +61,8 @@ function Modal(props) {
   };
 
   return (
-    <Dialog open={props.open} onClose={props.onClose} fullWidth={props.fullWidth !== undefined ? props.fullWidth : true}
+    <Dialog open={props.open} onClose={props.onClose}
+      fullWidth={props.fullWidth !== undefined ? props.fullWidth : true}
       maxWidth={props.maxWidth || "sx"} sx={dialogStyle} 
     >
       {formWrapper(props.onFormSubmit, 
