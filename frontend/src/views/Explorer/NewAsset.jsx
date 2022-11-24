@@ -32,8 +32,15 @@ import serverRequest from "../../services/serverRequest";
 
 const NewAsset = props => {
   const [name, setName] = useState("");
+  const [nameError, setNameError] = useState(false);
   const [comps, setComps] = useState([{}, {}]);
   const [tags, setTags] = useState([]);
+  const [currentContext,, refreshContext] = useContext(ContextContext);
+
+  useEffect(() => {
+    if (!nameError || !name) return;
+    setNameError(false);
+  }, [name]);
 
   const reset = () => {
     setName("");
@@ -60,19 +67,26 @@ const NewAsset = props => {
   };
 
   const handleCreate = () => {
+    if (!name) {
+      setNameError(true);
+      props.enqueueSnackbar("Asset name is required.", {variant: "error"});
+      return;
+    }
     const data = {
       name: name,
       comps: comps,
-      tags: tags
+      tags: tags,
+      task: currentContext.path
     };
-    clientRequest("ingest_asset", data).then(resp => {
+    clientRequest("ingest_asset", {data: data}).then(resp => {
       if (resp.ok) {
         props.enqueueSnackbar("Asset created!", {variant: "success"});
+        props.onClose();
+        refreshContext();
+        reset();
       } else {
         props.enqueueSnackbar("Failed to create asset.", {variant: "error"});
       }
-      props.onClose();
-      reset();
     });
   };
 
@@ -80,7 +94,7 @@ const NewAsset = props => {
     setComps(prev => {
       const existing = [...prev];
       existing[index][field] = value;
-      if (field == "file" && value) {
+      if (field == "source" && value) {
         clientRequest("process_filepath", {path: value}).then(resp => {
           const data = resp.data;
           existing[index].info = data;
@@ -96,8 +110,8 @@ const NewAsset = props => {
       const comp = existing[index];
       comp.sequence = value;
       if (!comp.info) return existing;
-      if (value) comp.file = comp.info.sequence_expr;
-      else comp.file = comp.info.path;
+      if (value) comp.source = comp.info.sequence_expr;
+      else comp.source = comp.info.path;
       return existing;
     });
   };
@@ -118,7 +132,7 @@ const NewAsset = props => {
     if (!filePaths?.length) return;
     setComps(prev => {
       const existing = [...prev];
-      existing[index]["file"] = filePaths[0];
+      existing[index]["source"] = filePaths[0];
       return existing;
     });
   };
@@ -137,6 +151,7 @@ const NewAsset = props => {
         <IgnTextField
           label="Asset name"
           value={name}
+          error={nameError}
           onChange={e => setName(e.target.value)}
           style={{minWidth: "300px", alignSelf: "flex-start"}}
         />
@@ -185,9 +200,9 @@ const NewAsset = props => {
                     placeholder="Source file"
                     style={{minWidth: "300px"}}
                     fullWidth
-                    value={comp.file || ""}
+                    value={comp.source || ""}
                     onChange={
-                      e => handleCompChange(index, "file", e.target.value)
+                      e => handleCompChange(index, "source", e.target.value)
                     }
                   />
                   <IgnButton onClick={() => handleSelectFile(index)}>

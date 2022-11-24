@@ -165,3 +165,8 @@ def copy_dir_or_files(source, dest):
         return
     for file in seq_path.parent.glob(seq_path.name):
         shutil.copy(file, dest)
+
+
+def ensure_clean_name(name):
+    name = name.strip()
+    return re.sub(r"[^\w]", name, "_")
