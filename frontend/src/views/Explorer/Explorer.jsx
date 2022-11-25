@@ -155,7 +155,6 @@ function Explorer() {
       entity => entity.path === selectedEntity.path
     );
     if (fetchedSelected) setSelectedEntity(fetchedSelected);
-    else setSelectedEntity({});
     if (explorerSettings.currentViewType !== "grid") return;
     const _tiles = loadedData.reduce(function(obj, entity) {
       entity.path = BuildFileURL(entity.path, config, {pathOnly: true});
@@ -379,6 +378,11 @@ function Explorer() {
 
   const handleNewScene = () => setNewSceneOpen(true);
 
+  const handleDeleteDir = deletedEntityPath => {
+    if (deletedEntityPath === selectedEntity.path) setSelectedEntity({});
+    refreshContext();
+  };
+
   return (
     <div className={classes.container}>
       <Modal
@@ -400,7 +404,7 @@ function Explorer() {
         onClose={() => setModalData(prevState =>
           ({...prevState, deleteOpen: false}))
         }
-        data={modalData} fn={refreshContext}
+        data={modalData} fn={() => handleDeleteDir(modalData.path)}
       />
       <RenameDir open={modalData.renameOpen} enqueueSnackbar={enqueueSnackbar}
         onClose={() => setModalData(prevState =>

@@ -170,3 +170,7 @@ def copy_dir_or_files(source, dest):
 def ensure_clean_name(name):
     name = name.strip()
     return re.sub(r"[^\w]", name, "_")
+
+
+def is_read_only(path):
+    return not os.access(path, os.W_OK)

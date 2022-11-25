@@ -59,6 +59,7 @@ function ContextMenu(props) {
           handleClose();
         }}
         divider={item.divider || false}
+        disabled={item.disabled}
         style={{
           paddingTop: "2px",
           paddingBottom: "2px",
@@ -69,7 +70,6 @@ function ContextMenu(props) {
       </MenuItem>
     );
   }
-
   return (
     <Menu
       open={props.contextMenu !== null}
