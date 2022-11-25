@@ -23,7 +23,7 @@ import yaml
 from ignite.server import api, utils
 from ignite.server.constants import ANCHORS
 from ignite.server.utils import CONFIG, is_dir_of_kind
-from ignite.utils import bytes_to_human_readable, get_logger
+from ignite.utils import bytes_to_human_readable, get_logger, is_read_only
 
 
 LOGGER = get_logger(__name__)
@@ -95,7 +95,7 @@ class Directory():
             self.group = split2[1]
         self.name = split2[-1]
         self.uri = utils.get_uri(path)
-        self.protected = not os.access(self.anchor, os.W_OK)
+        self.protected = is_read_only(self.anchor)
         self.context = self.get_context()
         self.load_from_config()
 
@@ -247,15 +247,15 @@ class Directory():
         return path.name == new_name
 
     def delete(self):
-        print("About to delete", self.path)
+        LOGGER.warning(f"About to delete {self.path}")
         try:
             shutil.rmtree(self.path)
         except Exception as e:
-            print("Failed.")
-            print(e)
+            LOGGER.error("Failed.")
+            LOGGER.error(e)
             return False
-        print("Success.")
-        return True
+        LOGGER.warning("Success.")
+        return not self.path.exists()
 
     def get_tags(self):
         return self.tags
@@ -298,6 +298,13 @@ class Directory():
                 ok = False
                 break
         if ok:
+            LOGGER.info(f"Changing {self.path} mode to {mode}")
+            try:
+                self.path.chmod(mode)
+            except Exception as e:
+                LOGGER.error(e)
+                ok = False
+        if ok:
             can_access = os.access(self.anchor, os.W_OK)
             LOGGER.debug(f"Anchor access: {can_access}")
             if can_access != protected:
@@ -305,6 +312,8 @@ class Directory():
         # Something went wrong, revert changes
         LOGGER.warning("Reverting permission changes...")
         mode = 0o444 if not protected else 0o777
+        LOGGER.info(f"Changing {self.path} mode to {mode}")
+        self.path.chmod(mode)
         for file in self.path.iterdir():
             LOGGER.info(f"Changing {file} mode to {mode}")
             try:

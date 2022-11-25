@@ -72,11 +72,13 @@ function Component(props) {
     },
     {
       label: "Rename",
-      fn: () => props.handleContextMenuSelection("rename", dirData)
+      fn: () => props.handleContextMenuSelection("rename", dirData),
+      disabled: props.asset.protected
     },
     {
       label: "Delete",
       fn: () => props.handleContextMenuSelection("delete", dirData),
+      disabled: props.asset.protected,
       divider: true
     }
   ];
