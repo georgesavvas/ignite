@@ -87,6 +87,7 @@ function AssetTile(props) {
     },
     {
       label: "Rename asset",
+      disabled: props.entity.protected,
       fn: () => props.handleContextMenuSelection("rename", {
         name: props.entity.name,
         kind: "asset",
@@ -95,6 +96,7 @@ function AssetTile(props) {
     },
     {
       label: "Delete asset (all versions)",
+      disabled: props.entity.protected,
       fn: () => props.handleContextMenuSelection("delete", {
         name: props.entity.name,
         kind: "asset",
@@ -103,6 +105,7 @@ function AssetTile(props) {
     },
     {
       label: "Delete asset version",
+      disabled: props.entity.protected,
       fn: () => props.handleContextMenuSelection("delete", dirData)
     }
   ];

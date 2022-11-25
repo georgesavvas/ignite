@@ -294,6 +294,7 @@ function AssetDetails(props) {
             components={props.entity.components}
             selectedComp={selectedComp}
             onSelect={setSelectedCompName}
+            asset={props.entity}
           />
         </ReflexElement>
       </ReflexContainer>
