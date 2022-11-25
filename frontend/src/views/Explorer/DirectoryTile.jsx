@@ -24,12 +24,15 @@ import {DIRECTORYICONS, DIRCONTEXTOPTIONS} from "../../constants";
 import Tile from "../../components/Tile";
 import {ContextContext} from "../../contexts/ContextContext";
 import {CrateContext} from "../../contexts/CrateContext";
+import { Box } from "@mui/material";
+
 
 function DirectoryTile(props) {
   const {enqueueSnackbar} = useSnackbar();
   const {addToCrate} = useContext(CrateContext);
   const [currentContext, setCurrentContext] = useContext(ContextContext);
-  const hasThumbnail = props.entity.thumbnail && props.entity.thumbnail.filename;
+  const hasThumbnail = props.entity.thumbnail &&
+    props.entity.thumbnail.filename;
   const isScene = props.entity.dir_kind === "scene";
   const thumbnailWidth = isScene || hasThumbnail ? "100%" : "30%";
   const currentPath = currentContext.path_nr?.replace(currentContext.project + "/", "");
@@ -127,11 +130,23 @@ function DirectoryTile(props) {
 
   const name = isScene ? props.entity.dcc : props.entity.name;
 
-  let icon = undefined;
-  if (!props.entity.thumbnail) {
-    icon = props.entity.icon && props.entity.icon in DIRECTORYICONS ?
-      DIRECTORYICONS[props.entity.icon] : undefined;
-  }
+  let Icon = props.entity.icon && props.entity.icon in DIRECTORYICONS ?
+    DIRECTORYICONS[props.entity.icon] : undefined;
+
+  const getBadge = () => {
+    if (!hasThumbnail && !props.entity.thumbnail) return null;
+    const style = {
+      position: "absolute",
+      top: "10px",
+      right: "10px",
+      height: "25px",
+      width: "25px",
+      borderRadius: "2px",
+      color: "rgb(150, 150, 150)"
+    };
+    if (isScene) return <img src={thumbnailPath()} style={style} />;
+    return <Box component={Icon} style={style} />;
+  };
 
   function details() {
     return (
@@ -145,21 +160,7 @@ function DirectoryTile(props) {
         <Typography style={{position: "absolute", bottom: "5px", right: "10px"}}>
           {props.entity.version}
         </Typography>
-        {isScene && props.entity.thumbnail ?
-          <img
-            src={thumbnailPath()}
-            style={{
-              position: "absolute",
-              top: "10px",
-              right: "10px",
-              height: "25px",
-              width: "25px",
-              borderRadius: "2px"
-
-            }}
-          />
-          : null
-        }
+        {getBadge()}
       </>
     );
   }
@@ -187,7 +188,7 @@ function DirectoryTile(props) {
       <Tile
         {...props}
         thumbnail={hasThumbnail ? undefined : thumbnailPath()}
-        thumbnailComp={icon}
+        thumbnailComp={!hasThumbnail ? Icon : null}
         thumbnailWidth={thumbnailWidth}
         onClick={handleClick}
         contextItems={contextItems}
