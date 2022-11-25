@@ -64,6 +64,7 @@ function ComponentList(props) {
             onSelect={props.onSelect} selectedComp={props.selectedComp}
             actions={actions} style={hide ? {display: "none"} : null}
             handleContextMenuSelection={handleContextMenuSelection}
+            asset={props.asset}
           />;
         })}
       </div>

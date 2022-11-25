@@ -129,16 +129,21 @@ class Component():
         return not first.stem == f"{new_name}.{frame}"
     
     def delete(self):
-        path = Path(self.path)
-        if not is_sequence(path):
-            path.unlink()
-            return not path.exists()
-        path = replace_frame_in_path(self.path, "*")
-        path = Path(path)
-        sequence_files = list(path.parent.glob(path.name))
-        if not sequence_files:
-            LOGGER.error(f"Component has no files or was already deleted.")
-            return
-        for file in sequence_files:
-            file.unlink()
-        return not sequence_files[0].exists()
+        LOGGER.warning(f"Attempting to delete {self.path}")
+        try:
+            path = Path(self.path)
+            if not is_sequence(path):
+                path.unlink()
+                return not path.exists()
+            path = replace_frame_in_path(self.path, "*")
+            path = Path(path)
+            sequence_files = list(path.parent.glob(path.name))
+            if not sequence_files:
+                LOGGER.error(f"Component has no files or was already deleted.")
+                return
+            for file in sequence_files:
+                file.unlink()
+            return not sequence_files[0].exists()
+        except Exception as e:
+            LOGGER.error("Failed.")
+            LOGGER.error(e)
