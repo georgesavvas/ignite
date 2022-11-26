@@ -129,6 +129,8 @@ class ProcessManager():
     def run_process(self, process):
         if not self.thread or self.thread.is_alive():
             self.start()
+        if not self.loop:
+            self.loop = asyncio.new_event_loop()
         asyncio.create_task(self.send(process))
         future = asyncio.run_coroutine_threadsafe(process.run(), self.loop)
         self.remove(Query().process.id)
