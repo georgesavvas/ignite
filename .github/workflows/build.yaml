@@ -19,11 +19,12 @@ jobs:
         with:
           python-version: "3.9"
 
-      - run: cd backend
       - name: Install backend requirements
-        run: cd backend && pip install -r requirements.txt
+        working-directory: ./backend
+        run: pip install -r requirements.txt
       
       - name: Build and copy backend
+        working-directory: ./backend
         run: python build_and_copy.py
 
       - name: Install Node.js, NPM and Yarn
