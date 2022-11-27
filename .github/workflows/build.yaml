@@ -14,10 +14,17 @@ jobs:
       - name: Check out Git repository
         uses: actions/checkout@v1
 
+      - name: Install backend requirements
+        run: cd backend
+        run: pip install -r requirements.txt
+      
+      - name: Build backend
+        run: 
+
       - name: Install Node.js, NPM and Yarn
         uses: actions/setup-node@v1
         with:
-          node-version: 10
+          node-version: 16
 
       - name: Build/release Electron app
         uses: samuelmeuli/action-electron-builder@v1
