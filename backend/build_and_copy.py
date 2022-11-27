@@ -23,5 +23,7 @@ target = backend_root / "../frontend"
 for file in source.iterdir():
     if not file.name.startswith("IgniteBackend"):
         continue
+    if not file.is_file():
+        continue
     print(f"Copying {file} to {target}")
     shutil.copy2(file, target)
