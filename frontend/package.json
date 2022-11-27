@@ -51,7 +51,7 @@
     "electron": "cross-env NODE_ENV=dev electron .",
     "electron-dev": "npm run sanitize && concurrently \"npm start\" \"wait-on http://localhost:3000 && cross-env NODE_ENV=dev electron .\"",
     "package": "npm run build && electron-builder",
-    "release": "npm run electron-builder"
+    "release": "electron-builder"
   },
   "eslintConfig": {
     "extends": [
