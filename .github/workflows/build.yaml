@@ -19,9 +19,9 @@ jobs:
         with:
           python-version: "3.9"
 
+      - run: cd backend
       - name: Install backend requirements
-        run: cd backend
-        run: pip install -r requirements.txt
+        run: cd backend && pip install -r requirements.txt
       
       - name: Build and copy backend
         run: python build_and_copy.py
