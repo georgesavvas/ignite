@@ -46,6 +46,7 @@ jobs:
           CI: false
     
       - name: Deploy
+        working-directory: ./frontend
         run: npm run release
         env:
           GITHUB_TOKEN: ${{ github.token }}
