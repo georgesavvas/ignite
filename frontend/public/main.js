@@ -23,9 +23,10 @@ const getPort = require("get-port");
 const axios = require("axios");
 require("v8-compile-cache");
 const uuid4 = require("uuid4");
-require("update-electron-app")();
+const {autoUpdater} = require("electron-updater");
 // const osu = require("node-os-utils");
 
+autoUpdater.channel = "alpha";
 const sessionID = uuid4();
 let platformName = process.platform;
 let appPath = app.getAppPath();
