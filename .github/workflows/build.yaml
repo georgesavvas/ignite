@@ -15,39 +15,42 @@ jobs:
 
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@v1
+        uses: actions/checkout@v3
 
       - name: Install Python 3.9
         uses: actions/setup-python@v4
         with:
           python-version: "3.9"
+          cache: "pip"
 
       - name: Install backend requirements
         working-directory: ./backend
         run: pip install -r requirements.txt
-      
+
       - name: Tools cleanup
         run: python tools_cleanup.py
-      
+
       - name: Build and copy backend
         working-directory: ./backend
         run: python build_and_copy.py
 
       - name: Install Node.js, NPM and Yarn
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: 16
+          cache: "npm"
+          cache-dependency-path: ./frontend/package-lock.json
 
       - name: Install frontend dependencies
         working-directory: ./frontend
-        run: npm install
+        run: npm ci
 
       - name: Build frontend
         working-directory: ./frontend
         run: npm run build
         env: 
           CI: false
-    
+
       - name: Deploy
         working-directory: ./frontend
         run: npm run release
