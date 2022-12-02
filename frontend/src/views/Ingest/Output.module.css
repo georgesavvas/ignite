@@ -18,6 +18,11 @@
     position: relative;
 }
 
+.invalid {
+    border: solid 1px rgb(200, 0, 0);
+    background-color: rgb(40, 0, 0);
+}
+
 .connector {
     /* border: solid; */
     position: absolute;

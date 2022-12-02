@@ -26,6 +26,8 @@ const containerStyle = {
   height: "100%",
   flexGrow: "100",
   position: "absolute",
+  left: 0,
+  top: 0,
   width: "100%",
   boxSizing: "border-box",
   pointerEvents: "none"
@@ -38,7 +40,7 @@ const typeStyle = {
 const DataPlaceholder = props => {
   return (
     <div style={{...containerStyle, ...props.style}}>
-      <Typography variant="h4" style={typeStyle}>{props.text || "Fetching data..."}</Typography>
+      <Typography variant={props.variant || "h4"} style={typeStyle}>{props.text || "Fetching data..."}</Typography>
     </div>
   );
 };

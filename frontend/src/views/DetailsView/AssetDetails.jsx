@@ -186,6 +186,27 @@ function AssetDetails(props) {
     });
   };
 
+  const handleAddTags = tags => {
+    const data = {
+      path: BuildFileURL(
+        props.entity.path, config,
+        {pathOnly: true, reverse: true}
+      ),
+      tags: tags
+    };
+    serverRequest("add_tags", data).then(() => refreshContext());
+  };
+
+  const handleRemoveTag = tag => {
+    const data = {
+      path: BuildFileURL(
+        props.entity.path, config, {pathOnly: true, reverse: true}
+      ),
+      tags: tag
+    };
+    serverRequest("remove_tags", data).then(() => refreshContext());
+  };
+
   return (
     <div style={style}>
       <ContextMenu items={contextItems} contextMenu={contextMenu}
@@ -254,11 +275,13 @@ function AssetDetails(props) {
             <URI uri={props.entity.uri} />
             <Path path={props.entity.path} />
           </div>
-          <TagContainer
-            entityPath={props.entity.path}
-            tags={props.entity.tags}
-            onRefresh={refreshContext}
-          />
+          <div style={{padding: "5px"}}>
+            <TagContainer
+              tags={props.entity.tags}
+              onAdd={handleAddTags}
+              onRemove={handleRemoveTag}
+            />
+          </div>
         </ReflexElement>
         <ReflexSplitter style={splitterStyle} />
         <ReflexElement
@@ -271,6 +294,7 @@ function AssetDetails(props) {
             components={props.entity.components}
             selectedComp={selectedComp}
             onSelect={setSelectedCompName}
+            asset={props.entity}
           />
         </ReflexElement>
       </ReflexContainer>

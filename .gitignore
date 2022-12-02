@@ -1,6 +1,7 @@
 *.DS_Store
 
 *.code-workspace
+.vscode/
 .DS_Store
 
 *.secret*

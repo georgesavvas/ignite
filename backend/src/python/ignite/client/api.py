@@ -14,11 +14,13 @@
 
 
 from genericpath import exists
-import glob
+import re
 import os
-import shutil
-import yaml
+import glob
 import tempfile
+import yaml
+import shutil
+import clique
 from fnmatch import fnmatch
 from pathlib import Path, PurePath
 from pprint import pprint
@@ -30,12 +32,25 @@ from ignite.client import utils
 from ignite.client.utils import PROCESS_MANAGER, is_server_local
 
 from ignite.logger import get_logger
-from ignite.utils import copy_dir_or_files
+from ignite.utils import copy_dir_or_files, is_sequence, path_has_frame
+from ignite.utils import replace_frame_in_path, ensure_clean_name
 
 LOGGER = get_logger(__name__)
 ENV = os.environ
 DCC = Path(ENV["IGNITE_DCC"])
 USER_CONFIG_PATH = Path(ENV["IGNITE_USER_CONFIG_PATH"])
+
+
+def validate_ingest_asset(asset):
+    name = asset["name"]
+    if not name:
+        return
+    task = asset.get("task")
+    if not task:
+        return
+    if not Path(task).exists():
+        return
+    return True
 
 
 def ingest(data):
@@ -47,7 +62,6 @@ def ingest(data):
     if not file_data:
         return {}
     files = file_data["files"]
-    files_posix = file_data["posix"]
     files_trimmed = file_data["trimmed"]
     rules = data.get("rules", [])
     results = [
@@ -78,7 +92,9 @@ def ingest(data):
                 file_target = directory
             elif rule["file_target_type"] == "filename":
                 file_target = filename
-            pattern = f"*{rule['file_target']}*"
+            pattern = rule["file_target"]
+            if "*" not in pattern:
+                pattern = f"*{pattern}*"
             if not fnmatch(file_target, pattern):
                 continue
 
@@ -97,7 +113,7 @@ def ingest(data):
             if rule["replace_target"]:
                 result["replace_values"][rule["replace_target"]] = rule["replace_value"]
                 result["rules"].append(i)
-            
+
             # Set values
             for field in ("task", "name", "comp"):
                 if not rule.get(field):
@@ -107,7 +123,6 @@ def ingest(data):
 
             connections["rules_files"].append([i, result["index"]])
 
-    # fields = ("task", "name", "comp")
     for result in results:
         extracted_fields = result["extract_info"]
         if not extracted_fields:
@@ -166,7 +181,12 @@ def ingest(data):
         name = format_values(name, extracted_fields)
         name = replace_values(name, _replace_values)
         if not assets.get(name):
-            assets[name] = {"task": "", "name": name, "comps": [], "rules": result["rules"]}
+            assets[name] = {
+                "task": "",
+                "name": name,
+                "comps": [],
+                "rules": result["rules"]
+            }
 
         task = _set_values.get("task", "")
         task = format_values(task, extracted_fields)
@@ -179,7 +199,8 @@ def ingest(data):
         comp = {
             "name": comp_name,
             "file": result["file"].as_posix().split("/")[-1],
-            "source": result["file"].as_posix()
+            "source": result["file"].as_posix(),
+            "trimmed": result["trimmed"]
         }
         assets[name]["comps"].append(comp)
         assets[name]["rules"] += result["rules"]
@@ -189,6 +210,7 @@ def ingest(data):
         rules = set(asset["rules"])
         connections["rules_assets"] += [[rule, i] for rule in rules]
         del asset["rules"]
+        asset["valid"] = validate_ingest_asset(asset)
 
     if dry:
         data = {
@@ -252,13 +274,12 @@ def ingest_get_files(dirs):
 
 def ingest_asset(data):
     name = data.get("name")
-    if not name or not data.get("task"):
-        print("Missing comp name or task")
+    name = ensure_clean_name(name)
+    if not validate_ingest_asset(data):
+        LOGGER.error(f"Ignoring {name}, invalid asset.")
         return
     comps = data.get("comps")
-    if not comps or not len(comps):
-        print("Missing comps")
-        return
+    tags = data.get("tags")
     task = Path(data["task"])
     asset = task / "exports" / name
     asset_dict = None
@@ -292,23 +313,29 @@ def ingest_asset(data):
         new_version_path = asset / "v001"
     new_version_path.mkdir(parents=True)
     for comp in comps:
-        comp_path = Path(comp.get("source"))
-        comp_name = comp.get("name") or comp_path.stem
+        comp_path = comp.get("source")
+        comp_name = comp.get("name")
+        if not comp_path or not comp_name:
+            continue
+        comp_path = Path(comp_path)
         dest = new_version_path / (comp_name + comp_path.suffix)
         print(f"Copying {comp_path} to {dest}")
         shutil.copyfile(comp_path, dest)
     if is_server_local():
-        ok = server_api.register_assetversion(new_version_path.as_posix())
+        ok = server_api.register_assetversion(new_version_path, tags)
         if not ok:
             print("Failed.")
             return
     else:
-        resp = utils.server_request(
-            "register_assetversion", {"path": new_version_path.as_posix()}
-        )
+        data = {
+            "path": new_version_path.as_posix(),
+            "tags": tags
+        }
+        resp = utils.server_request("register_assetversion", data)
         if not resp.get("ok"):
             print("Failed.")
             return
+    return True
 
 
 def get_actions(project=None):
@@ -406,6 +433,7 @@ def zip_entity(path, dest, session_id):
     entity["zip_dest"] = dest
     run_action(entity, "common", "zip", session_id)
 
+
 def zip_crate(crate_id, dest, session_id):
     temp_dir = tempfile.gettempdir()
     crates = get_crates([crate_id])
@@ -429,3 +457,28 @@ def zip_crate(crate_id, dest, session_id):
         "zip_dest": dest
     }
     run_action(data, "common", "zip", session_id)
+
+
+def process_filepath(path):
+    path = Path(path)
+
+    sequence = is_sequence(path)
+    if not sequence:
+        exists = path.exists()
+    else:
+        pattern = replace_frame_in_path(path, "*")
+        collections, remainder = clique.assembly(pattern)
+        exists = collections or remainder
+
+    sequence_expr = ""
+    if sequence or path_has_frame(path):
+        sequence_expr = replace_frame_in_path(path, "####")
+        sequence_expr = PurePath(sequence_expr)
+
+    output = {}
+    output["is_sequence_expr"] = sequence
+    output["exists"] = exists
+    output["sequence_expr"] = str(sequence_expr)
+    output["path"] = str(path)
+    return output
+        
