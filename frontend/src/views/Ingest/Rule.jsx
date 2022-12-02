@@ -13,24 +13,28 @@
 // limitations under the License.
 
 
-import React, {memo, useRef} from "react";
+import React, {memo, useRef, useState} from "react";
 
 import Typography from "@mui/material/Typography";
 import Select from "@mui/material/Select";
 import TextField from "@mui/material/TextField";
-import { Button, Divider } from "@mui/material";
+import { Button, Divider, IconButton, Switch } from "@mui/material";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import {useDrag, useDrop} from "react-dnd";
+import ClearIcon from "@mui/icons-material/Clear";
+import FormControlLabel from "@mui/material/FormControlLabel";
 
 import styles from "./Rules.module.css";
+import { useEffect } from "react";
 
 
-export const Rule = memo(function Rule(props) {
+export const Rule = props => {
+  const [rule, setRule] = useState(props.rule || {});
+
   const ref = useRef(null);
   const index = props.index;
-  const rule = props.rule;
   const id = props.id;
   const origIndex = rule.origIndex;
   const [{ isDragging }, drag] = useDrag({
@@ -69,12 +73,30 @@ export const Rule = memo(function Rule(props) {
     })
   );
   
-  const handleChanged = e => props.onRulesChange(e, "modify");
+  useEffect(() => {
+    props.setRules(prev => {
+      const existing = [...prev];
+      existing[props.index] = rule;
+      return existing;
+    });
+  }, [rule]);
+
+  // const handleChanged = e => props.onRulesChange(e, "modify");
+  const handleChanged = e => {
+    const [field] = e.target.name.split("-");
+    const value = e.target.type === "checkbox" ?
+      e.target.checked : e.target.value;
+    setRule(prevState => {
+      const existing = {...prevState};
+      existing[field] = value;
+      return existing;
+    });
+  };
 
   const style = {
     backgroundColor: rule.colour,
     opacity: isDragging ? 0 : 1,
-    // border: isDragging ? "solid red 2px" : "none"
+    overflow: "clip"
   };
 
   drag(drop(ref));
@@ -83,10 +105,28 @@ export const Rule = memo(function Rule(props) {
     <div ref={ref} className={styles.expand}>
       <div className={styles.ruleContainer} style={style}>
         <div className={styles.topBar}>
+          <FormControlLabel 
+            control={
+              <Switch
+                checked={rule.show_connections ?? true}
+                name={"show_connections-" + origIndex}
+                onChange={handleChanged}
+                color="ignite"
+              />
+            }
+            label="Show connections"
+            labelPlacement="end"
+          />
           <Typography variant="h6" style={{margin: "auto"}}>{"Rule " + (origIndex + 1)}</Typography>
-          <Button className={styles.button}
-            onClick={e => props.onRulesChange(e, "remove", origIndex)} color="lightgrey"
-          >Remove</Button>
+          <IconButton
+            className={styles.button}
+            size="small"
+            name="delete"
+            onClick={e => props.onRulesChange(null, "remove", origIndex)}
+            color="lightgrey"
+          >
+            <ClearIcon />
+          </IconButton>
         </div>
         <div className={styles.ruleRow}>
           <FormControl sx={{ m: "5px", minWidth: 120 }} size="small">
@@ -142,4 +182,4 @@ export const Rule = memo(function Rule(props) {
       </div>
     </div>
   );
-});
+};

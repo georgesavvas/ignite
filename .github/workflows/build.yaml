@@ -1,0 +1,56 @@
+name: Build/release
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+jobs:
+  release:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v1
+
+      - name: Install Python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+
+      - name: Install backend requirements
+        working-directory: ./backend
+        run: pip install -r requirements.txt
+      
+      - name: Tools cleanup
+        run: python tools_cleanup.py
+      
+      - name: Build and copy backend
+        working-directory: ./backend
+        run: python build_and_copy.py
+
+      - name: Install Node.js, NPM and Yarn
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16
+
+      - name: Install frontend dependencies
+        working-directory: ./frontend
+        run: npm install
+
+      - name: Build frontend
+        working-directory: ./frontend
+        run: npm run build
+        env: 
+          CI: false
+    
+      - name: Deploy
+        working-directory: ./frontend
+        run: npm run release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}

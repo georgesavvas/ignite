@@ -54,8 +54,8 @@ function rand(min, max) {
 
 function getRandomColour() {
   var h = rand(1, 36) * 10;
-  var s = rand(30, 30);
-  var l = rand(10, 10);
+  var s = rand(20, 50);
+  var l = rand(10, 30);
   return `hsl(${h},${s}%,${l}%)`;
 }
 
@@ -88,29 +88,30 @@ function Ingest(props) {
   const [flexRatios, setFlexRatios] = useState(defaultFlexRations);
   const [ingestDirs, setIngestDirs] = useState("");
   const [ingestFiles, setIngestFiles] = useState([]);
-  const [ingestRules, setIngestRules] = useState([{}]);
   const [ingestAssets, setIngestAssets] = useState([]);
   const [connections, setConnections] = useState({});
   const [loading, setLoading] = useState(false);
   const updateXarrow = useXarrow();
   const [currentContext,, refreshContext] = useContext(ContextContext);
-
   const RULETEMPLATE = {
     file_target: "*",
     file_target_type: "filename",
     task: currentContext.path,
-    name: "",
-    comp: "",
-    rule: "",
+    name: "{name}",
+    comp: "{comp}",
+    rule: "{name}/{comp}.{ext}",
     replace_target: "",
-    replace_value: ""
+    replace_value: "",
+    show_connections: true
   };
+  const getNewRule = () => [{...RULETEMPLATE, colour: getRandomColour()}];
+  const [ingestRules, setIngestRules] = useState(getNewRule());
 
   useEffect(() => {
-    if (!props.open) return;
-    
+    if (props.open) return;
     setIngestDirs("");
-    setIngestRules([{...RULETEMPLATE, colour: getRandomColour()}]);
+    setIngestFiles([]);
+    setIngestRules(getNewRule());
     setIngestAssets([]);
   }, [props.open]);
 
@@ -157,7 +158,7 @@ function Ingest(props) {
     getFilesDebounced(
       {"dirs": ingestDirs},
       resp => {
-        setIngestFiles(resp.data.trimmed);
+        setIngestFiles(resp.data?.trimmed || []);
         setLoading(false);
       }
     );
@@ -173,8 +174,8 @@ function Ingest(props) {
     getOutputDebounced(
       {data: data},
       resp => {
-        setIngestAssets(resp.data.assets);
-        setConnections(resp.data.connections);
+        setIngestAssets(resp.data?.assets || []);
+        setConnections(resp.data?.connections || []);
         setLoading(false);
       }
     );
@@ -185,8 +186,14 @@ function Ingest(props) {
   };
 
   const handleRulesChange = (e, action, index=-1, index2=-1) => {
-    const [field, id] = e.target.name.split("-");
-    const value = e.target.value;
+    let field;
+    let id;
+    let value;
+    if (e && e !== null) {
+      ([field, id] = e.target.name.split("-"));
+      value = e.target.type === "checkbox" ?
+        e.target.checked : e.target.value;
+    }
     switch (action) {
     case "add":
       setIngestRules(prevState => {
@@ -204,8 +211,9 @@ function Ingest(props) {
       break;
     case "modify":
       setIngestRules(prevState => {
-        prevState[id][field] = value;
-        return [...prevState];
+        const existing = [...prevState];
+        existing[id][field] = value;
+        return existing;
       });
       break;
     case "swap":
@@ -245,6 +253,36 @@ function Ingest(props) {
     });
   }
 
+  const getConnectionArrows = side => {
+    if (loading) return [];
+    const isFiles = side == "files";
+    const ruleConnections = isFiles ?
+      connections?.rules_files : connections?.rules_assets;
+    if (!ruleConnections || !ruleConnections.length) {
+      return [];
+    }
+    // const ruleIndex = isFiles ? 0 : 1;
+    const startAnchorStyle = isFiles ? {position: "left", offset: {x: 0}}
+      : {position: "right", offset: {x: 15}};
+    const endAnchorStyle = isFiles ? {position: "right", offset: {x: 40}}
+      : {position: "left", offset: {x: -25}};
+    const filtered = ruleConnections.filter(conn => {
+      return ingestRules[conn[0]]?.show_connections;
+    });
+    return filtered.map((conn, index) => {
+      const rule = ingestRules[conn[0]];
+      const startId = "rule-" + conn[0];
+      const endId = `${isFiles ? "file" : "asset"}-${conn[1]}`;
+      if (!isFiles) console.log(rule, startId, endId);
+      return <Xarrow
+        start={startId} end={endId} color={rule.colour} key={index}
+        strokeWidth={2} curveness={0.5} headSize={3} headShape="circle"
+        showHead={true} animateDrawing={0.25}
+        startAnchor={startAnchorStyle} endAnchor={endAnchorStyle}
+      />;
+    });
+  };
+
   return (
     <Dialog open={props.open} onClose={props.onClose} sx={ingestDialogStyle}>
       <ClearIcon onClick={props.onClose} className={styles.closeButtonStyle} />
@@ -252,46 +290,32 @@ function Ingest(props) {
         <div className={styles.container}>
           <Xwrapper>
             <ReflexContainer orientation="vertical">
-              <ReflexElement flex={flexRatios["ingest.files"]} name="ingest.files" onStopResize={handleResize}>
+              <ReflexElement flex={flexRatios["ingest.files"]}
+                name="ingest.files" onStopResize={handleResize}
+              >
                 <div className={styles.row}>
                   <Files files={ingestFiles} onDirsChange={handleDirsChange} />
                   <div className={styles.connectionContainer}>
-                    {
-                      !loading && ingestRules && connections && connections.rules_files ?
-                        connections.rules_files.map(
-                          (rule, index) => <Xarrow end={"file-" + rule[1]} start={"rule-" + rule[0]}
-                            key={index} strokeWidth={2} curveness={0.5} color={ingestRules[rule[0]].colour}
-                            showHead={true} animateDrawing={0.25} headShape="circle" headSize={3}
-                            endAnchor={{position: "right", offset: {x: 40}}}
-                            startAnchor={{position: "left", offset: {x: 0}}}
-                          />
-                        )
-                        : null
-                    }
+                    {getConnectionArrows("files")}
                     <div className={styles.fade} />
                   </div>
                 </div>
               </ReflexElement>
               <ReflexSplitter style={splitterStyle} onResize={updateXarrow} />
-              <ReflexElement flex={flexRatios["ingest.rules"]} name="ingest.rules" onStopResize={handleResize}>
-                <Rules rules={ingestRules} onRulesChange={handleRulesChange} setRules={setIngestRules} setLoading={setLoading} />
+              <ReflexElement flex={flexRatios["ingest.rules"]}
+                name="ingest.rules" onStopResize={handleResize}
+              >
+                <Rules rules={ingestRules} onRulesChange={handleRulesChange}
+                  setRules={setIngestRules} setLoading={setLoading}
+                />
               </ReflexElement>
               <ReflexSplitter style={splitterStyle} onResize={updateXarrow} />
-              <ReflexElement flex={flexRatios["ingest.output"]} name="ingest.output" onStopResize={handleResize}>
+              <ReflexElement flex={flexRatios["ingest.output"]}
+                name="ingest.output" onStopResize={handleResize}
+              >
                 <div className={styles.row}>
                   <div className={styles.connectionContainer}>
-                    {
-                      !loading && connections && connections.rules_assets ?
-                        connections.rules_assets.map(
-                          (rule, index) => <Xarrow start={"rule-" + rule[0]} end={"asset-" + rule[1]}
-                            key={index} strokeWidth={2} curveness={0.5} color={ingestRules[rule[0]].colour}
-                            showHead={true} animateDrawing={0.25} headShape="circle" headSize={3}
-                            startAnchor={{position: "right", offset: {x: 15}}}
-                            endAnchor={{position: "left", offset: {x: -25}}}
-                          />
-                        )
-                        : null
-                    }
+                    {getConnectionArrows("assets")}
                     <div className={styles.fade} />
                   </div>
                   <Output assets={ingestAssets} />
@@ -300,7 +324,11 @@ function Ingest(props) {
             </ReflexContainer>
           </Xwrapper>
         </div>
-        <LinearProgress color="ignite" style={{width: "100%", marginTop: "10px", visibility: loading ? "visible" : "hidden"}} />
+        <LinearProgress color="ignite" style={{
+          width: "100%",
+          marginTop: "10px",
+          visibility: loading ? "visible" : "hidden"
+        }} />
       </DialogContent>
       <DialogActions>
         <Button onClick={handleCreate} color="ignite" variant="outlined">Create</Button>

@@ -20,7 +20,6 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
-import TextField from "@mui/material/TextField";
 import {useXarrow} from "react-xarrows";
 import Button from "@mui/material/Button";
 import {DndProvider} from "react-dnd";
@@ -35,6 +34,7 @@ import Modal from "../../components/Modal";
 import styles from "./Rules.module.css";
 import DynamicList from "../../components/DynamicList";
 import {Rule} from "./Rule";
+import IgnTextField from "../../components/IgnTextField";
 
 
 const RuleNameInputModal = ({onSubmit, open, onClose}) => {
@@ -55,7 +55,7 @@ const RuleNameInputModal = ({onSubmit, open, onClose}) => {
       onClose={onClose}
       buttons={[<Button key="Confirm" type="submit">Create</Button>]}
     >
-      <TextField fullWidth value={name} onChange={e => setName(e.target.value)} />
+      <IgnTextField placeholder="Template Name" fullWidth value={name} onChange={e => setName(e.target.value)} />
     </Modal>
   );
 };
@@ -140,8 +140,16 @@ const RuleTemplates = props => {
             ) : null}
           </Select>
         </FormControl>
-        <Button variant="outlined" onClick={() => setManagerOpen(true)}>Manage</Button>
-        <Button variant="outlined" onClick={() => setRuleNameInputModalOpen(true)}>Save current</Button>
+        <Button variant="outlined" onClick={() => setManagerOpen(true)}>
+          Manage
+        </Button>
+        <Button
+          variant="outlined"
+          style={{minWidth: "130px"}}
+          onClick={() => setRuleNameInputModalOpen(true)}
+        >
+          Save current
+        </Button>
       </div>
     </>
   );
@@ -178,7 +186,7 @@ function RuleList(props) {
       });
     }, [tempRules]);
 
-  const renderRule = useCallback((rule, index) => {
+  const renderRule = (rule, index) => {
     return(
       <Rule
         key={"rule-" + rule.origIndex}
@@ -187,18 +195,23 @@ function RuleList(props) {
         onRulesChange={props.onRulesChange}
         id={"rule-" + rule.origIndex}
         moveRule={moveRule}
+        setRules={props.setRules}
       />);
-  }, []);
+  };
 
   return (
-    <DynamicList innerRef={drop} onAdd={() => props.onRulesChange(null, "add")} onScroll={updateXarrow} onRemove={() => props.onRulesChange(null, "remove", -1)}>
-      {tempRules.rules ? tempRules.rules.map((rule, index) => renderRule(rule, index)) : null}
+    <DynamicList innerRef={drop} onAdd={() => props.onRulesChange(null, "add")}
+      onScroll={updateXarrow}
+      onRemove={() => props.onRulesChange(null, "remove", -1)}
+    >
+      {tempRules.rules ?
+        tempRules.rules.map((rule, index) => renderRule(rule, index)) : null
+      }
     </DynamicList>
   );
 }
 
 function Rules(props) {
-
   const handleTemplateSelect = data => {
     props.onAddRules(data);
   };

@@ -370,7 +370,8 @@ async def register_directory(request: Request):
     result = process_request(result)
     path = result.get("path", "")
     dir_kind = result.get("dir_kind", "")
-    ok = api.register_directory(path, dir_kind)
+    tags = result.get("tags")
+    ok = api.register_directory(path, dir_kind, tags)
     if not ok:
         return error("generic_error")
     return {"ok": ok}
@@ -383,7 +384,8 @@ async def register_task(request: Request):
     result = process_request(result)
     path = result.get("path", "")
     task_type = result.get("task_type", "")
-    ok = api.register_task(path, task_type)
+    tags = result.get("tags")
+    ok = api.register_task(path, task_type, tags)
     if not ok:
         return error("generic_error")
     return {"ok": ok}
@@ -407,7 +409,8 @@ async def register_asset(request: Request):
     log_request(result)
     result = process_request(result)
     path = result.get("path", "")
-    ok = api.register_asset(path)
+    tags = result.get("tags")
+    ok = api.register_asset(path, tags)
     if not ok:
         return error("generic_error")
     return {"ok": ok}
@@ -449,7 +452,8 @@ async def register_assetversion(request: Request):
     log_request(result)
     result = process_request(result)
     path = result.get("path", "")
-    ok = api.register_assetversion(path)
+    tags = result.get("tags")
+    ok = api.register_assetversion(path, tags)
     if not ok:
         return error("generic_error")
     return {"ok": ok}
@@ -610,9 +614,9 @@ async def write_collections(request: Request):
     }
 
 
-@router.get("/get_rule_templates")
-async def get_rule_templates():
-    data = vault_api.get_rule_templates()
+@router.get("/get_filter_templates")
+async def get_filter_templates():
+    data = vault_api.get_filter_templates()
     return {
         "ok": True,
         "data": data

@@ -25,14 +25,20 @@ import DynamicList from "../../components/DynamicList";
 
 function Asset({data, id}) {
   return (
-    <div className={styles.assetContainer}>
+    <div
+      className={`${styles.assetContainer} ${data.valid ? "" : styles.invalid}`}
+    >
       <Typography variant="h6">{data.name}</Typography>
-      <Typography variant="caption">Ingest in: {data.task}</Typography>
+      <Typography variant="caption">Ingest in Task: {data.task}</Typography>
       <Divider textAlign="left" sx={{margin: "5px 0 5px 0"}}>Components</Divider>
       {data.comps.map((comp, index) => 
         <div className={styles.compContainer} key={index}>
-          <Typography variant="caption">{comp.name}</Typography>
-          <Typography variant="caption">{comp.file}</Typography>
+          <Typography variant="caption">
+            {comp.name || "[No component name]"}
+          </Typography>
+          <Typography variant="caption" style={{color: "rgb(150, 150, 150)"}}>
+            ({comp.trimmed})
+          </Typography>
         </div>
       )}
       <div className={styles.connector} id={id} />
@@ -49,8 +55,9 @@ function Output(props) {
       <DynamicList noButtons onScroll={updateXarrow} style={{marginTop: "34px"}}>
         {
           props.assets ?
-            props.assets.map((child, index) => <Asset data={child} key={index} id={"asset-" + index} />) :
-            null
+            props.assets.map((child, index) =>
+              <Asset data={child} key={index}id={"asset-" + index} />)
+            : null
         }
       </DynamicList>
     </div>

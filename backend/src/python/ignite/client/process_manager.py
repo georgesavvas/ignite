@@ -101,10 +101,11 @@ class ProcessManager():
         self.db = TinyDB(db_path)
         self.processes = []
         self.processes_manager = processes_manager
+        self.loop = None
 
     def start(self):
-        pass
-        self.loop = asyncio.new_event_loop()
+        if not self.loop:
+            self.loop = asyncio.new_event_loop()
         self.thread = threading.Thread(
             name="IgniteWorker",
             target=start_worker,
@@ -126,6 +127,10 @@ class ProcessManager():
         self.run_process(process)
     
     def run_process(self, process):
+        if not self.thread or self.thread.is_alive():
+            self.start()
+        if not self.loop:
+            self.loop = asyncio.new_event_loop()
         asyncio.create_task(self.send(process))
         future = asyncio.run_coroutine_threadsafe(process.run(), self.loop)
         self.remove(Query().process.id)

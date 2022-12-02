@@ -1,6 +1,6 @@
 {
   "name": "ignite",
-  "version": "0.0.0",
+  "version": "0.0.1-alpha.1",
   "license": "Apache-2.0",
   "description": "Ignite UI",
   "author": "George Savvas <ignite@georgesavvas.co.uk>",
@@ -51,8 +51,7 @@
     "electron": "cross-env NODE_ENV=dev electron .",
     "electron-dev": "npm run sanitize && concurrently \"npm start\" \"wait-on http://localhost:3000 && cross-env NODE_ENV=dev electron .\"",
     "package": "npm run build && electron-builder",
-    "deploy-win": "..\\.secret && electron-builder --publish always",
-    "deploy-unix": "source ../.secret && electron-builder --publish always"
+    "release": "electron-builder"
   },
   "eslintConfig": {
     "extends": [

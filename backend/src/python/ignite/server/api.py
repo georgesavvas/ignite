@@ -153,12 +153,15 @@ def find(path):
         if not "@" in path:
             path = utils.uri_to_path(path)
             return _find_from_path(path)
-        asset_uri, version = path.split("@")
+        version = ""
+        if "@" in path:
+            asset_uri, version = path.split("@", 1)
         comp = ""
         if "#" in version:
             version, comp = version.split("#", 1)
         if version.isnumeric():
             path = utils.uri_to_path(path)
+            print("------", path)
             return _find_from_path(path)
         else:
             if version not in ("best", "latest"):
@@ -613,18 +616,23 @@ def copy_default_scene(task, dcc):
     return dest / PurePath(src).name
 
 
-def register_directory(path, dir_kind):
+def register_directory(path, dir_kind, tags=None):
     utils.create_anchor(path, dir_kind)
+    if tags:
+        entity = find(path)
+        entity.add_tags(tags)
     return True
 
 
-def register_task(path, task_type):
+def register_task(path, task_type, tags=None):
     utils.create_anchor(path, "task")
     task = find(path)
     if not task:
         LOGGER.error(f"Failed to register task at {path}")
         return
     task.set_task_type(task_type)
+    if tags:
+        task.add_tags(tags)
     return True
 
 
@@ -633,16 +641,18 @@ def register_scene(path):
     return True
 
 
-def register_asset(path):
+def register_asset(path, tags=None):
     utils.create_anchor(path, "asset")
-    av = find(path)
-    if not av or not av.dir_kind == "asset":
+    entity = find(path)
+    if not entity or not entity.dir_kind == "asset":
         LOGGER.error(f"Failed to register asset at {path}")
         return
+    if tags:
+        entity.add_tags(tags)
     return True
 
 
-def register_assetversion(path):
+def register_assetversion(path, tags=None):
     asset_path = PurePath(path).parent
     asset = find(asset_path)
     if not asset:
@@ -653,6 +663,8 @@ def register_assetversion(path):
     if not av or not av.dir_kind == "assetversion":
         LOGGER.error(f"Failed to register assetversion at {path}")
         return
+    if tags:
+        av.add_tags(tags)
     return True
 
 

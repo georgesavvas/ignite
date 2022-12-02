@@ -13,7 +13,7 @@
 // limitations under the License.
 
 
-import React, {useEffect, useState, useContext, useRef} from "react";
+import React, {useEffect, useState, useContext} from "react";
 
 import Divider from "@mui/material/Divider";
 import debounce from "lodash.debounce";
@@ -25,7 +25,12 @@ import BuildFileURL from "../../services/BuildFileURL";
 import {ConfigContext} from "../../contexts/ConfigContext";
 import DataPlaceholder from "../../components/DataPlaceholder";
 import {DIRCONTEXTOPTIONS} from "../../constants";
-import {CopyToClipboard, ShowInExplorer, VaultExport, VaultImport} from "../ContextActions";
+import {
+  CopyToClipboard,
+  ShowInExplorer,
+  VaultExport,
+  VaultImport
+} from "../ContextActions";
 import loadExplorerSettings from "../../utils/loadExplorerSettings";
 import saveExplorerSettings from "../../utils/saveExplorerSettings";
 import ContextMenu, {handleContextMenu} from "../../components/ContextMenu";
@@ -123,21 +128,26 @@ function Explorer() {
   }, [explorerSettings]);
 
   useEffect(() => {
+    if (!config.ready) return;
     const data = {
       page: pages.current,
       limit: explorerSettings.tilesPerPage,
-      path: BuildFileURL(currentContext.path, config, {reverse: true, pathOnly: true}),
+      path: BuildFileURL(
+        currentContext.path, config, {reverse: true, pathOnly: true}
+      ),
       query: query
     };
     const method = methods[explorerSettings.currentResultType];
     setIsLoading(true);
-    if (!Object.entries(config.access).length) return;
     serverRequest(method, data).then(resp => {
       setIsLoading(false);
       setLoadedData(resp.data);
       setPages(prevPages => ({...prevPages, total: resp.pages?.total}));
     });
-  }, [pages.current, explorerSettings.currentResultType, explorerSettings.tilesPerPage, currentContext, config.access, query]);
+  }, [
+    pages.current, explorerSettings.currentResultType,
+    explorerSettings.tilesPerPage, currentContext, config.ready, query
+  ]);
 
   useEffect(() => {
     if (!loadedData) return;
@@ -153,25 +163,37 @@ function Explorer() {
           comp.path = BuildFileURL(comp.path, config, {pathOnly: true});
         });
       }
-      if (entity.task) entity.task = BuildFileURL(entity.task, config, {pathOnly: true});
-      if (entity.scene) entity.scene = BuildFileURL(entity.scene, config, {pathOnly: true});
+      if (entity.task) {
+        entity.task = BuildFileURL(entity.task, config, {pathOnly: true});
+      }
+      if (entity.scene) {
+        entity.scene = BuildFileURL(entity.scene, config, {pathOnly: true});
+      }
       if (entity.dir_kind === "assetversion") {
         obj[entity.result_id] = <AssetTile key={entity.path} entity={entity}
-          onSelected={handleEntitySelection} size={explorerSettings.currentTileSize * 40} viewType={explorerSettings.currentViewType}
-          selected={selectedEntity.path === entity.path} refreshContext={refreshContext}
+          onSelected={handleEntitySelection} refreshContext={refreshContext}
+          size={explorerSettings.currentTileSize * 40}
+          viewType={explorerSettings.currentViewType}
+          selected={selectedEntity.path === entity.path}
           handleContextMenuSelection={handleContextMenuSelection}
         />;
       } else {
         obj[entity.result_id] = <DirectoryTile key={entity.path} entity={entity}
-          onSelected={handleEntitySelection} size={explorerSettings.currentTileSize * 40} viewType={explorerSettings.currentViewType}
-          selected={selectedEntity.path === entity.path} refreshContext={refreshContext}
+          onSelected={handleEntitySelection}
+          selected={selectedEntity.path === entity.path}
           handleContextMenuSelection={handleContextMenuSelection}
+          size={explorerSettings.currentTileSize * 40}
+          refreshContext={refreshContext}
+          viewType={explorerSettings.currentViewType}
         />;
       }
       return obj;
     }, {});
     setTiles(_tiles);
-  }, [loadedData, selectedEntity.path, explorerSettings.currentViewType, explorerSettings.currentTileSize]);
+  }, [
+    loadedData, selectedEntity.path, explorerSettings.currentViewType,
+    explorerSettings.currentTileSize
+  ]);
 
   useEffect(() => {
     setPages((prevPages) => ({...prevPages, current: 1}));
@@ -183,7 +205,9 @@ function Explorer() {
 
   const handleFilterChange = value => {
     setIsLoading(true);
-    debounced(() => setQuery((prevState) => ({...prevState, filter_string: value})));
+    debounced(
+      () => setQuery((prevState) => ({...prevState, filter_string: value}))
+    );
   };
 
   const handleTilesPerPageChange = value => {
@@ -205,7 +229,8 @@ function Explorer() {
 
   const handleViewTypeChange = value => {
     const currentResultType = explorerSettings.currentResultType || "grid";
-    const savedTileSize = explorerSettings.saved[currentResultType]?.[value] || 5;
+    const savedTileSize =
+      explorerSettings.saved[currentResultType]?.[value] || 5;
     setExplorerSettings(prevState => {
       const saved = prevState.saved ?? defaultExplorerSettings.saved;
       saved[currentResultType].current = value;
@@ -239,7 +264,9 @@ function Explorer() {
     flexGrow: 1,
     display: "grid",
     overflowY: "auto",
-    gridTemplateColumns: `repeat(auto-fill, minmax(${explorerSettings.currentTileSize * 40}px, 1fr))`,
+    gridTemplateColumns: `
+      repeat(auto-fill, minmax(${explorerSettings.currentTileSize * 40}px, 1fr))
+    `,
     gridGap: "3px",
     padding: "0px 5px"
   };
@@ -294,7 +321,8 @@ function Explorer() {
       value: contextOption.name,
       dir_path: data.path,
       fn: () => data.handleClick(
-        "create", {...data, method: contextOption.name, kind: contextOption.dir_kind}
+        "create",
+        {...data, method: contextOption.name, kind: contextOption.dir_kind}
       )
     }));
   }
@@ -350,31 +378,52 @@ function Explorer() {
 
   const handleNewScene = () => setNewSceneOpen(true);
 
+  const handleDeleteDir = deletedEntityPath => {
+    if (deletedEntityPath === selectedEntity.path) setSelectedEntity({});
+    refreshContext();
+  };
+
   return (
     <div className={classes.container}>
-      <Modal open={newSceneOpen} onClose={() => setNewSceneOpen(false)} maxWidth="xs">
+      <Modal
+        maxWidth="xs"
+        open={newSceneOpen}
+        onClose={() => setNewSceneOpen(false)}
+      >
         <DccSelector newScene={true} task={currentContext.path}
           onClose={() => setNewSceneOpen(false)}
         />
       </Modal>
       <CreateDir open={modalData.createOpen} enqueueSnackbar={enqueueSnackbar}
-        onClose={() => setModalData(prevState => ({...prevState, createOpen: false}))}
+        onClose={() => setModalData(prevState =>
+          ({...prevState, createOpen: false}))
+        }
         data={modalData} fn={refreshContext}
       />
       <DeleteDir open={modalData.deleteOpen} enqueueSnackbar={enqueueSnackbar}
-        onClose={() => setModalData(prevState => ({...prevState, deleteOpen: false}))}
-        data={modalData} fn={refreshContext}
+        onClose={() => setModalData(prevState =>
+          ({...prevState, deleteOpen: false}))
+        }
+        data={modalData} fn={() => handleDeleteDir(modalData.path)}
       />
       <RenameDir open={modalData.renameOpen} enqueueSnackbar={enqueueSnackbar}
-        onClose={() => setModalData(prevState => ({...prevState, renameOpen: false}))}
+        onClose={() => setModalData(prevState =>
+          ({...prevState, renameOpen: false}))
+        }
         data={modalData} fn={refreshContext}
       />
-      <VaultImport open={modalData.vaultImportOpen} enqueueSnackbar={enqueueSnackbar}
-        onClose={() => setModalData(prevState => ({...prevState, vaultImportOpen: false}))}
+      <VaultImport open={modalData.vaultImportOpen}
+        enqueueSnackbar={enqueueSnackbar}
+        onClose={() =>
+          setModalData(prevState => ({...prevState, vaultImportOpen: false}))
+        }
         data={modalData} fn={refreshContext}
       />
-      <VaultExport open={modalData.vaultExportOpen} enqueueSnackbar={enqueueSnackbar}
-        onClose={() => setModalData(prevState => ({...prevState, vaultExportOpen: false}))}
+      <VaultExport open={modalData.vaultExportOpen}
+        enqueueSnackbar={enqueueSnackbar}
+        onClose={() =>
+          setModalData(prevState => ({...prevState, vaultExportOpen: false}))
+        }
         data={modalData} fn={refreshContext}
       />
       <ContextMenu items={contextItems} contextMenu={contextMenu}
@@ -393,7 +442,14 @@ function Explorer() {
         setQuery={setQuery}
       />
       <Divider />
-      <LinearProgress color="ignite" style={{width: "100%", minHeight: "2px", visibility: isLoading ? "visible" : "hidden"}} />
+      <LinearProgress
+        color="ignite"
+        style={{
+          width: "100%",
+          minHeight: "2px",
+          visibility: isLoading ? "visible" : "hidden"
+        }}
+      />
       <div className={classes.helperTextContainer}>
         <Typography variant="caption" style={{color: "grey"}}>
           {getBrowserHelperText()}
@@ -405,7 +461,13 @@ function Explorer() {
         onContextMenu={e => handleContextMenu(e, contextMenu, setContextMenu)}
       />
       <Divider />
-      <PageBar pages={pages.total} onChange={handlePageChange} tileSize={explorerSettings.currentTileSize} onTilesPerPageChange={e => handleTilesPerPageChange(e.target.value)} onTileSizeChange={e => handleTileSizeChange(e.target.value)}/>
+      <PageBar
+        pages={pages.total}
+        onChange={handlePageChange}
+        tileSize={explorerSettings.currentTileSize}
+        onTilesPerPageChange={e => handleTilesPerPageChange(e.target.value)}
+        onTileSizeChange={e => handleTileSizeChange(e.target.value)}
+      />
     </div>
   );
 }

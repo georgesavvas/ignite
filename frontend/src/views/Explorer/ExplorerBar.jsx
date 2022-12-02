@@ -35,6 +35,7 @@ import DccSelector from "../DccSelector";
 import Ingest from "../Ingest/Ingest";
 import ContextBar from "./ContextBar";
 import Modal from "../../components/Modal";
+import NewAsset from "./NewAsset";
 
 const style = { 
   display: "flex",
@@ -46,6 +47,7 @@ const style = {
 
 function ExplorerBar(props) {
   const [ingestOpen, setIngestOpen] = useState(false);
+  const [newAssetOpen, setNewAssetOpen] = useState(false);
   const [filterMenu, setFilterMenu] = useState(null);
   const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
   const [filterValue, setFilterValue] = useState("");
@@ -111,6 +113,9 @@ function ExplorerBar(props) {
         <Ingest open={ingestOpen} onClose={() => setIngestOpen(false)}
           enqueueSnackbar={props.enqueueSnackbar}
         />
+        <NewAsset open={newAssetOpen} onClose={() => setNewAssetOpen(false)}
+          enqueueSnackbar={props.enqueueSnackbar}
+        />
         <Stack direction="row" spacing={1} >
           <ToggleButtonGroup
             color="primary"
@@ -168,9 +173,19 @@ function ExplorerBar(props) {
           style={{minWidth: "80px"}}
           color="ignite" 
           variant="outlined"
+          disabled={currentContext.dir_kind !== "task"}
           onClick={() => setIngestOpen(true)}
         >
           Ingest
+        </IgnButton>
+        <IgnButton
+          style={{minWidth: "120px"}}
+          color="ignite" 
+          variant="outlined"
+          disabled={currentContext.dir_kind !== "task"}
+          onClick={() => setNewAssetOpen(true)}
+        >
+          New Asset
         </IgnButton>
         <IgnButton
           style={{minWidth: "120px"}}
