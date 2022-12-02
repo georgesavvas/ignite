@@ -1,0 +1,13 @@
+-e .
+uvicorn
+fastapi
+PyYAML
+platformdirs
+requests
+tinydb
+parse
+pyinstaller
+websockets
+mongoquery
+timeago
+clique
