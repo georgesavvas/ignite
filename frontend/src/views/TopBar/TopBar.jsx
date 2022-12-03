@@ -13,7 +13,7 @@
 // limitations under the License.
 
 
-import React, {useState, useContext} from "react";
+import React, {useState, useContext, useEffect} from "react";
 
 import IconButton from "@mui/material/IconButton";
 import HelpIcon from "@mui/icons-material/Help";
@@ -29,6 +29,7 @@ import Modal from "../../components/Modal";
 import DccSelector from "../DccSelector";
 import Feedback from "../Feedback.jsx";
 import CratesDropdown from "../Crates/CratesDropdown.jsx";
+import { Typography } from "@mui/material";
 
 
 export default function TopBar() {
@@ -38,6 +39,11 @@ export default function TopBar() {
   const [dccOpen, setDccOpen] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [,, refreshContext] = useContext(ContextContext);
+  const [appVersion, setAppVersion] = useState("");
+
+  useEffect(() => {
+    window.services.get_version().then(resp => setAppVersion(resp));
+  }, []);
 
   const handleVaultClose = () => {
     setVaultOpen(false);
@@ -85,6 +91,9 @@ export default function TopBar() {
         </div>
         <div className={styles.logoContainer}>
           <img src="media/ignite_logo.png" className={styles.logo} />
+          <Typography style={{color: "grey", alignSelf: "flex-end"}} variant="caption">
+            v{appVersion}
+          </Typography>
         </div>
         <div className={styles.rightSide}>
           <CratesDropdown />
