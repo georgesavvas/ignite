@@ -76,8 +76,14 @@ def startup_event():
 @app.on_event("shutdown")
 def shutdown_event():
     LOGGER.info("Cleaning up...")
-    port_file.unlink()
-    pid_file.unlink()
+    if port_file.exists():
+        port_file.unlink()
+    else:
+        LOGGER.warning(f"Port file {port_file} doesn't exist.")
+    if pid_file.exists():
+        pid_file.unlink()
+    else:
+        LOGGER.warning(f"PID file {pid_file} doesn't exist.")
 
 
 @app.get("/api/v1/quit")
