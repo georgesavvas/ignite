@@ -291,6 +291,19 @@ function createSplash () {
   return win;
 }
 
+const shouldQuit = app.makeSingleInstance(() => {
+  // Someone tried to run a second instance, we should focus our window.
+  if (window) {
+    if (window.isMinimized()) window.restore();
+    window.focus();
+  }
+});
+
+if (shouldQuit) {
+  app.quit();
+  return;
+}
+
 app.whenReady().then(async () => {
   checkBackend();
   const splash = createSplash();
