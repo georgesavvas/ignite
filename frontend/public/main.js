@@ -310,6 +310,7 @@ if (!gotTheLock) {
     // Someone tried to run a second instance, we should focus our window.
     if (window) {
       if (window.isMinimized()) window.restore();
+      window.show();
       window.focus();
     }
   });
