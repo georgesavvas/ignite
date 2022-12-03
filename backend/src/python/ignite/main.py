@@ -106,7 +106,7 @@ if __name__ == "__main__":
         f"{__name__}:app",
         host=SERVER_HOST,
         port=int(SERVER_PORT),
-        log_level="info"
+        log_level="debug"
     )
     server = uvicorn.Server(config=config)
     LOGGER.info(f"*** Launching server at {SERVER_HOST}:{SERVER_PORT}")

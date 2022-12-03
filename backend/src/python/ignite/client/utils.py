@@ -437,11 +437,15 @@ def get_action_files(root=None, project=None):
     for path in paths:
         for entity in entities:
             entity_path = path / entity
+            LOGGER.debug(f"Looking for actions in {entity_path}")
             if not entity_path.exists():
+                LOGGER.debug(f"Doesn't exist.")
                 continue
             if not files.get(entity):
                 files[entity] = []
-            files[entity] += entity_path.glob("*.py")
+            found = entity_path.glob("*.py")
+            LOGGER.debug(f"Found {found}")
+            files[entity] += found
     return files
 
 
