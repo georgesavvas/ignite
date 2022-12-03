@@ -48,6 +48,12 @@ let port = -1;
 const isDev = process.env.NODE_ENV === "dev";
 const public = path.join(__dirname, "..", isDev ? "public" : "build");
 
+const checkForUpdates = () => {
+  autoUpdater.checkForUpdatesAndNotify();
+};
+checkForUpdates();
+const updateTimer = setInterval(checkForUpdates, 1000 * 60 * 10);
+
 // const cpu = osu.cpu;
 // const mem = osu.mem;
 // const getResourceUsage = async () => {
