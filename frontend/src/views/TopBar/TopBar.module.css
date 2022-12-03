@@ -7,13 +7,15 @@
 
 .logoContainer {
     grid-row: 1;
-    display: grid;
-    /* width: 50%; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
 }
 
 .logo {
     display: block;
-    margin: auto;
+    /* margin: auto; */
     height: 30px;
 }
 
