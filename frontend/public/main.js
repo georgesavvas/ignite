@@ -219,6 +219,10 @@ function createWindow (show=true) {
     shell.openExternal(url);
   });
 
+  ipcMain.handle("get_version", () => {
+    return app.getVersion();
+  });
+
   ipcMain.handle("check_path", async (e, filepath) => {
     let valid = true;
     try {
@@ -291,58 +295,62 @@ function createSplash () {
   return win;
 }
 
-const shouldQuit = app.makeSingleInstance(() => {
-  // Someone tried to run a second instance, we should focus our window.
-  if (window) {
-    if (window.isMinimized()) window.restore();
-    window.focus();
-  }
-});
+const gotTheLock = app.requestSingleInstanceLock(sessionID);
 
-if (shouldQuit) {
+if (!gotTheLock) {
   app.quit();
-  return;
+} else {
+  app.on("second-instance", () => {
+    // Someone tried to run a second instance, we should focus our window.
+    if (window) {
+      if (window.isMinimized()) window.restore();
+      window.focus();
+    }
+  });
+
+  app.whenReady().then(async () => {
+    checkBackend();
+    const splash = createSplash();
+    window = createWindow(false);
+
+    window.webContents.once("did-finish-load", () => {
+      splash.destroy();
+      window.show();
+    });
+
+    ipcMain.handle("launch_dcc", async (e, cmd, args, env) => {
+      console.log("Running", cmd, args);
+      console.log(env);
+      const proc = spawn(cmd, args, {
+        env: {ALLUSERSPROFILE: process.env.ALLUSERSPROFILE, ...env},
+        detached: true
+      });
+      if (proc) return true;
+    });
+
+    ipcMain.handle("check_backend", async () => {
+      if (isDev) return;
+      return checkBackend();
+    });
+
+    if (tray === null) tray = new Tray(`${public}/media/icon.png`);
+    const contextMenu = Menu.buildFromTemplate([
+      { label: "Show", click: () => window.show() },
+      { label: "Exit", click: () => {
+        if (!isDev) {
+          console.log("Attempting to kill backend...");
+          if (backend) backend.kill("SIGINT");
+          clientRequest("quit");
+        } else console.log("not bye!");
+        app.quit();
+      } },
+    ]);
+    tray.setToolTip("Ignite");
+    tray.setContextMenu(contextMenu);
+    tray.on("click", () => window.show());
+    tray.on("double-click", () => window.show());
+  });
 }
-
-app.whenReady().then(async () => {
-  checkBackend();
-  const splash = createSplash();
-  window = createWindow(false);
-
-  window.webContents.once("did-finish-load", () => {
-    splash.destroy();
-    window.show();
-  });
-
-  ipcMain.handle("launch_dcc", async (e, cmd, args, env) => {
-    console.log("Running", cmd, args);
-    console.log(env);
-    const proc = spawn(cmd, args, {env: {ALLUSERSPROFILE: process.env.ALLUSERSPROFILE, ...env}, detached: true});
-    if (proc) return true;
-  });
-
-  ipcMain.handle("check_backend", async () => {
-    if (isDev) return;
-    return checkBackend();
-  });
-
-  if (tray === null) tray = new Tray(`${public}/media/icon.png`);
-  const contextMenu = Menu.buildFromTemplate([
-    { label: "Show", click: () => window.show() },
-    { label: "Exit", click: () => {
-      if (!isDev) {
-        console.log("Attempting to kill backend...");
-        if (backend) backend.kill("SIGINT");
-        clientRequest("quit");
-      } else console.log("not bye!");
-      app.quit();
-    } },
-  ]);
-  tray.setToolTip("Ignite");
-  tray.setContextMenu(contextMenu);
-  tray.on("click", () => window.show());
-  tray.on("double-click", () => window.show());
-});
 
 app.on("ready", async () => {
   const protocolName = "ign";
