@@ -19,7 +19,6 @@ import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import {useSnackbar} from "notistack";
 import {EXTENSIONTYPES} from "../../constants";
-import serverRequest from "../../services/serverRequest";
 import clientRequest from "../../services/clientRequest";
 import CopyIcon from "../../icons/CopyIcon";
 import {CopyToClipboard} from "../ContextActions";
