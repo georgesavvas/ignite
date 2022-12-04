@@ -1,6 +1,6 @@
 {
   "name": "ignite",
-  "version": "0.0.1",
+  "version": "0.0.11",
   "license": "Apache-2.0",
   "description": "Ignite VFX Pipeline",
   "author": "George Savvas <hello@georgesavvas.co.uk>",
