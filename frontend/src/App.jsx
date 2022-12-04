@@ -16,6 +16,7 @@
 import React from "react";
 
 import "react-reflex/styles.css";
+import {autoUpdater} from "electron-updater"
 import {createTheme, ThemeProvider} from "@mui/material/styles";
 import darkScrollbar from "@mui/material/darkScrollbar";
 import GlobalStyles from "@mui/material/GlobalStyles";
@@ -53,6 +54,7 @@ let darkTheme = createTheme({
 });
 
 BuildFileURL("");
+autoUpdater.checkForUpdatesAndNotify();
 
 const ErrorFallback = ({error, resetErrorBoundary}) => {
   return (
