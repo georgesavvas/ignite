@@ -28,6 +28,7 @@ const LostConnectionOverlay = () => {
   const [config, setConfig] = useContext(ConfigContext);
   const [settings, setSettings] = useState({serverDetails: {}, access: {}});
   const [canSave, setCanSave] = useState(false);
+  const [canRestart, setCanRestart] = useState(false);
   const [opacity, setOpacity] = useState(0);
 
   useEffect(() => {
@@ -38,6 +39,7 @@ const LostConnectionOverlay = () => {
         password: config.serverDetails.password
       }
     });
+    setTimeout(() => setCanRestart(true), 5000);
   }, [config.serverDetails]);
 
   useEffect(() => {
@@ -72,6 +74,12 @@ const LostConnectionOverlay = () => {
     });
   };
 
+  const handleRestart = () => {
+    setCanRestart(false);
+    window.services.check_backend();
+    setTimeout(() => setCanRestart(true), 5000);
+  };
+
   return (
     <div className={styles.container} style={{opacity: opacity}}>
       <div className={styles.content}>
@@ -79,7 +87,10 @@ const LostConnectionOverlay = () => {
           <Typography variant="h4">
             Lost connection to Ignite server...
           </Typography>
-          <LinearProgress color="ignite" />
+          <LinearProgress
+            color="ignite"
+            style={{visibility: canRestart ? "hidden" : "visible"}}
+          />
         </div>
         <IgnTextField
           label="Server address"
@@ -104,6 +115,11 @@ const LostConnectionOverlay = () => {
             onClick={() => handleSave()}
           >
             Save
+          </IgnButton>
+          <IgnButton disabled={!canRestart} color="ignite"
+            onClick={handleRestart}
+          >
+            Restart server
           </IgnButton>
         </div>
       </div>
