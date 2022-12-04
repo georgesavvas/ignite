@@ -14,9 +14,8 @@
 
 
 import React, {useState, createContext, useEffect, useContext} from "react";
-import { useRef } from "react";
 import clientRequest from "../services/clientRequest";
-import { ConfigContext } from "./ConfigContext";
+import {ConfigContext} from "./ConfigContext";
 
 export const CrateContext = createContext();
 

@@ -46,13 +46,6 @@ const splitterStyle = {
   backgroundColor: "rgb(80,80,80)"
 };
 
-const versionSelectStyle = {
-  minWidth: "150px",
-  position: "absolute",
-  right: "10px",
-  top: "15px"
-};
-
 const style = {
   width: "100%",
   height: "100%"

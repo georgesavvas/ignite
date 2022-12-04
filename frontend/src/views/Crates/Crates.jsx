@@ -13,17 +13,14 @@
 // limitations under the License.
 
 
-import { OutlinedInput, Typography } from "@mui/material";
-import React, {useState, useContext} from "react";
+import {OutlinedInput} from "@mui/material";
+import React, {useState, useContext, useEffect} from "react";
 import styles from "./Crates.module.css";
 import {CrateContext} from "../../contexts/CrateContext";
 import AddIcon from "@mui/icons-material/Add";
-import { useEffect } from "react";
 import IgnButton from "../../components/IgnButton";
-import ClearIcon from "@mui/icons-material/Clear";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import AssetTile from "../Explorer/AssetTile";
-import URI from "../../components/URI";
 import DirectoryTile from "../Explorer/DirectoryTile";
 import Component from "../DetailsView/Component";
 

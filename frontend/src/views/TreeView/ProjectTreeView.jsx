@@ -171,7 +171,7 @@ StyledTreeItem.propTypes = {
 
 function ProjectTreeView(props) {
   const [config] = useContext(ConfigContext);
-  const [selectedEntity, setSelectedEntity] = useContext(EntityContext);
+  const [, setSelectedEntity] = useContext(EntityContext);
   const [expandedItems, setExpandedItems] = useState(["root"]);
   const [modalData, setModalData] = useState({});
   const [selectedItems, setSelectedItems] = useState("root");

@@ -15,30 +15,18 @@
 
 import React, { useContext, useEffect, useState } from "react";
 
-import { Divider, IconButton, Link, Typography } from "@mui/material";
-import LoadingButton from "@mui/lab/LoadingButton";
-import CheckIcon from "@mui/icons-material/Check";
+import {Divider, Typography} from "@mui/material";
 import EmailIcon from "@mui/icons-material/Email";
 
-import {validateDirName} from "../utils/validateDirName";
-import FileInput from "../components/FileInput";
-import IgnButton from "../components/IgnButton";
 import Modal from "../components/Modal";
 import styles from "./Feedback.module.css";
-import IgnTextField from "../components/IgnTextField";
-import serverRequest from "../services/serverRequest";
 import {ConfigContext} from "../contexts/ConfigContext";
-import {setProject, ContextContext} from "../contexts/ContextContext";
 
 
 const Feedback = props => {
-  const [,,setCurrentContext] = useContext(ContextContext);
-  const [config, setConfig] = useContext(ConfigContext);
+  const [config] = useContext(ConfigContext);
   const [access, setAccess] = useState({});
-  const [canSave, setCanSave] = useState(false);
-  const [newProjectName, setNewProjectName] = useState("");
-  const [projectCreated, setProjectCreated] = useState();
-  const [projectLoading, setProjectLoading] = useState();
+  const [, setCanSave] = useState(false);
 
   useEffect(() => {
     setAccess({
@@ -57,47 +45,6 @@ const Feedback = props => {
     ) changed = true;
     setCanSave(changed);
   }, [access]);
-
-  const isServerLocal = config.serverDetails.address &&
-    config.serverDetails.address.startsWith("localhost");
-
-  const handleAccessChange = (field, value) => {
-    setAccess(prevState => {
-      const existing = {...prevState};
-      existing[field] = value;
-      if (isServerLocal && field === "projectsDir") {
-        existing["serverProjectsDir"] = value;
-      }
-      return existing;
-    });
-  };
-
-  const handleSave = () => {
-    setConfig("access", {...access});
-    setCanSave(false);
-  };
-
-  const handleNewProject = () => {
-    setProjectLoading(true);
-    const data = {
-      name: newProjectName
-    };
-    serverRequest("create_project", data).then(resp => {
-      if (resp.ok) {
-        setProject(newProjectName, setCurrentContext);
-        props.onClose();
-        setNewProjectName("");
-        return;
-      }
-    });
-    setProjectLoading(false);
-    setProjectCreated(true);
-  };
-
-  const handleProjectNameChange = e => {
-    const value = validateDirName(e.target.value);
-    setNewProjectName(value);
-  };
 
   return (
     <Modal open={props.open} maxWidth="md" onClose={() => props.onClose()}>

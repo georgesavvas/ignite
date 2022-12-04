@@ -13,12 +13,12 @@
 // limitations under the License.
 
 
-import React, {memo, useRef, useState} from "react";
+import React, {useRef, useState} from "react";
 
 import Typography from "@mui/material/Typography";
 import Select from "@mui/material/Select";
 import TextField from "@mui/material/TextField";
-import { Button, Divider, IconButton, Switch } from "@mui/material";
+import {Divider, IconButton, Switch} from "@mui/material";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
@@ -27,7 +27,7 @@ import ClearIcon from "@mui/icons-material/Clear";
 import FormControlLabel from "@mui/material/FormControlLabel";
 
 import styles from "./Rules.module.css";
-import { useEffect } from "react";
+import {useEffect} from "react";
 
 
 export const Rule = props => {
@@ -122,7 +122,7 @@ export const Rule = props => {
             className={styles.button}
             size="small"
             name="delete"
-            onClick={e => props.onRulesChange(null, "remove", origIndex)}
+            onClick={() => props.onRulesChange(null, "remove", origIndex)}
             color="lightgrey"
           >
             <ClearIcon />
