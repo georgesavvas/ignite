@@ -25,7 +25,7 @@ require("v8-compile-cache");
 const uuid4 = require("uuid4");
 const {autoUpdater} = require("electron-updater");
 
-// autoUpdater.channel = "alpha";
+autoUpdater.channel = "alpha";
 const sessionID = uuid4();
 let platformName = process.platform;
 let appPath = app.getAppPath();
@@ -182,7 +182,7 @@ function createWindow (show=true) {
     win.loadURL("http://localhost:3000");
     win.webContents.openDevTools();
   } else {
-    // win.removeMenu();
+    win.removeMenu();
     win.loadFile("build/index.html");
   }
 
