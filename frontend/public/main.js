@@ -115,6 +115,7 @@ function isPidAlive(pid) {
 
 async function checkBackend() {
   if (isDev) {
+    console.log("checkBackend but is dev");
     process.env.IGNITE_CLIENT_ADDRESS = "localhost:9070";
     port = 9070;
     return;
@@ -323,7 +324,10 @@ if (!gotTheLock) {
     });
 
     ipcMain.handle("check_backend", async () => {
-      if (isDev) return;
+      if (isDev) {
+        console.log("checkBackend but is dev");
+        return;
+      }
       return checkBackend();
     });
 
