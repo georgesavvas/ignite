@@ -10,5 +10,13 @@
         "Xarrow",
         "xarrows",
         "Xwrapper"
-    ]
+    ],
+    "cSpell.customDictionaries": {
+        "custom-dictionary-folder-frontend": {
+            "name": "custom-dictionary-folder-frontend",
+            "path": "${workspaceFolder:frontend}/.cspell/custom-dictionary-folder-frontend.txt",
+            "addWords": true,
+            "scope": "folder"
+        }
+    }
 }
