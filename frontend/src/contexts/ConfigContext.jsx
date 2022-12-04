@@ -188,13 +188,6 @@ export const ConfigProvider = props => {
     return [...config, ...filtered];
   };
 
-  const modifyDCCConfig = (config, data) => {
-    let cc = [...config];
-    cc[data.index][data.field] = data.value;
-    cc[data.index]["valid"] = data.valid;
-    return cc;
-  };
-
   const removeFromDCCConfig = (config, data) => {
     let cc = [...config];
     cc.splice(data.index, 1);

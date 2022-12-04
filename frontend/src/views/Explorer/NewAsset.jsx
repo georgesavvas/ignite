@@ -16,8 +16,8 @@
 import React, { useContext, useEffect, useState } from "react";
 
 import styles from "./NewAsset.module.css";
-import { Checkbox, Divider, FormControlLabel, IconButton, Link, Typography } from "@mui/material";
-import {setProject, ContextContext} from "../../contexts/ContextContext";
+import {Checkbox, FormControlLabel} from "@mui/material";
+import {ContextContext} from "../../contexts/ContextContext";
 import Modal from "../../components/Modal";
 import IgnTextField from "../../components/IgnTextField";
 import DynamicList from "../../components/DynamicList";
@@ -27,7 +27,6 @@ import Button from "@mui/material/Button";
 import clientRequest from "../../services/clientRequest";
 import IgnButton from "../../components/IgnButton";
 import TagContainer from "../DetailsView/TagContainer";
-import serverRequest from "../../services/serverRequest";
 
 
 const NewAsset = props => {

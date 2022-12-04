@@ -31,10 +31,8 @@ import FilterField from "../../components/FilterField";
 import GridViewIcon from "../../icons/GridViewIcon";
 import RowViewIcon from "../../icons/RowViewIcon";
 import {ContextContext} from "../../contexts/ContextContext";
-import DccSelector from "../DccSelector";
 import Ingest from "../Ingest/Ingest";
 import ContextBar from "./ContextBar";
-import Modal from "../../components/Modal";
 import NewAsset from "./NewAsset";
 
 const style = { 

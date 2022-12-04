@@ -29,7 +29,7 @@ const CratesDropdown = () => {
     removeCrate,
     forceOpen
   } = useContext(CrateContext);
-  const [pinned, setPinned] = useState(false);
+  const [pinned] = useState(false);
   const [contextMenu, setContextMenu] = useState(null);
 
   const getContainerStyle = () => {
