@@ -2,8 +2,8 @@
   "name": "ignite",
   "version": "0.0.1-alpha.7",
   "license": "Apache-2.0",
-  "description": "Ignite UI",
-  "author": "George Savvas <ignite@georgesavvas.co.uk>",
+  "description": "Ignite VFX Pipeline",
+  "author": "George Savvas <hello@georgesavvas.co.uk>",
   "main": "public/main.js",
   "homepage": ".",
   "dependencies": {
@@ -86,7 +86,7 @@
     "wait-on": "^6.0.1"
   },
   "build": {
-    "appId": "com.ignitevfx.client",
+    "appId": "georgesavvas.ignitevfx",
     "productName": "ignite",
     "artifactName": "${productName}-setup-${version}.${ext}",
     "generateUpdatesFilesForAllChannels": true,
