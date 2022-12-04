@@ -23,10 +23,9 @@ const getPort = require("get-port");
 const axios = require("axios");
 require("v8-compile-cache");
 const uuid4 = require("uuid4");
-const {autoUpdater} = require("electron-updater");
-// const osu = require("node-os-utils");
+// const {autoUpdater} = require("electron-updater");
 
-autoUpdater.channel = "alpha";
+// autoUpdater.channel = "alpha";
 const sessionID = uuid4();
 let platformName = process.platform;
 let appPath = app.getAppPath();
@@ -48,23 +47,11 @@ let port = -1;
 const isDev = process.env.NODE_ENV === "dev";
 const public = path.join(__dirname, "..", isDev ? "public" : "build");
 
-const checkForUpdates = () => {
-  autoUpdater.checkForUpdatesAndNotify();
-};
-checkForUpdates();
-const updateTimer = setInterval(checkForUpdates, 1000 * 60 * 10);
-
-// const cpu = osu.cpu;
-// const mem = osu.mem;
-// const getResourceUsage = async () => {
-//   const cpu_data = await cpu.usage();
-//   const mem_data = await mem.info();
-//   const usage = {
-//     cpu: cpu_data,
-//     mem: mem_data.usedMemPercentage,
-//   };
-//   return usage;
+// const checkForUpdates = () => {
+//   autoUpdater.checkForUpdatesAndNotify();
 // };
+// checkForUpdates();
+// const updateTimer = setInterval(checkForUpdates, 1000 * 60 * 10);
 
 const iconPaths = {
   "win32": "media/desktop_icon/win/icon.ico",
@@ -194,7 +181,7 @@ function createWindow (show=true) {
     win.loadURL("http://localhost:3000");
     win.webContents.openDevTools();
   } else {
-    win.removeMenu();
+    // win.removeMenu();
     win.loadFile("build/index.html");
   }
 

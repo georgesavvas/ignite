@@ -1,8 +1,0 @@
-#!/bin/bash
-
-parent_path=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
-cd "$parent_path"
-cd ../../..
-source env/bin/activate
-pyinstaller src/python/ignite/main.py --noconfirm --onefile --name=IgniteBackend --icon=../frontend/public/media/desktop_icon/mac/icon.icns
-cp dist/IgniteBackend ../frontend

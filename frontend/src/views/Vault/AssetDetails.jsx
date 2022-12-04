@@ -23,7 +23,6 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 
-import DataPlaceholder from "../../components/DataPlaceholder";
 import {CopyToClipboard} from "../ContextActions";
 import ContextMenu from "../../components/ContextMenu";
 import Path from "../../components/Path";
