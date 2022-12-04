@@ -24,7 +24,6 @@ const axios = require("axios");
 require("v8-compile-cache");
 const uuid4 = require("uuid4");
 const {autoUpdater} = require("electron-updater");
-// const osu = require("node-os-utils");
 
 autoUpdater.channel = "alpha";
 const sessionID = uuid4();
@@ -53,18 +52,6 @@ const checkForUpdates = () => {
 };
 checkForUpdates();
 const updateTimer = setInterval(checkForUpdates, 1000 * 60 * 10);
-
-// const cpu = osu.cpu;
-// const mem = osu.mem;
-// const getResourceUsage = async () => {
-//   const cpu_data = await cpu.usage();
-//   const mem_data = await mem.info();
-//   const usage = {
-//     cpu: cpu_data,
-//     mem: mem_data.usedMemPercentage,
-//   };
-//   return usage;
-// };
 
 const iconPaths = {
   "win32": "media/desktop_icon/win/icon.ico",
