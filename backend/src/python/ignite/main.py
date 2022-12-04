@@ -67,8 +67,8 @@ pid_file.write_text(PID)
 def startup_event():
     uvicorn_error_logger = logging.getLogger("uvicorn.error")
     uvicorn_access_logger = logging.getLogger("uvicorn.access")
-    setup_logger(uvicorn_error_logger)
-    setup_logger(uvicorn_access_logger)
+    # setup_logger(uvicorn_error_logger)
+    # setup_logger(uvicorn_access_logger)
     uvicorn_access_logger.addFilter(EndpointFilter(path="/api/v1/ping"))
     mount_root(app, CONFIG)
 
