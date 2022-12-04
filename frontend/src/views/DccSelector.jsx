@@ -51,17 +51,6 @@ function DccSelector(props) {
     }
   };
 
-  const getDccName = path => {
-    const name = path.replaceAll("\\", "/").split("/").at(-1).split(".")[0];
-    let dcc_name = "unknown";
-    DCCINFO.forEach(dcc => {
-      dcc.keywords.forEach(keyword => {
-        if (name.toLowerCase().includes(keyword)) dcc_name = dcc.name;
-      });
-    });
-    return dcc_name;
-  };
-
   const getDccIcon = path => {
     const name = path.replaceAll("\\", "/").split("/").at(-1).split(".")[0];
     let icon = "media/dcc/unknown.png";

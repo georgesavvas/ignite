@@ -13,7 +13,7 @@
 // limitations under the License.
 
 
-import React, {useState, useContext, useRef} from "react";
+import React, {useState, useRef} from "react";
 
 import ClearIcon from "@mui/icons-material/Clear";
 import AddIcon from "@mui/icons-material/Add";
@@ -23,9 +23,6 @@ import {useSnackbar} from "notistack";
 import Tooltip from "@mui/material/Tooltip";
 
 import {hexToHsl} from "../../utils/hexToHsl";
-import {ConfigContext} from "../../contexts/ConfigContext";
-import serverRequest from "../../services/serverRequest";
-import BuildFileURL from "../../services/BuildFileURL";
 import {CopyToClipboard} from "../ContextActions";
 import ContextMenu, { handleContextMenu } from "../../components/ContextMenu";
 import styles from "./TagContainer.module.css";
