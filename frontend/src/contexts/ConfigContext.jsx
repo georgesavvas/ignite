@@ -49,6 +49,61 @@ export const ConfigProvider = props => {
 
   useEffect(() => {
     if (config.lostConnection) return;
+    firstRun();
+  }, [config.lostConnection]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!config.ready) {
+        // Server was down since the app started and never fetched config
+        firstRun();
+      }
+      const serverName = serverIsLocal.current ? "server/client" : "server";
+      serverRequest("ping").then(resp => {
+        if (!resp || !resp.ok) {
+          if (config.lostConnection) return;
+          console.log(`Lost connection to ${serverName}...`);
+          enqueueSnackbar("Lost connection to server...", {variant: "error"});
+          setConfig(prevState => {
+            const prev = {...prevState};
+            prev["lostConnection"] = true;
+            prev["write"] = false;
+            return prev;
+          });
+        }
+        else {
+          if (!config.lostConnection) return;
+          console.log(`${serverName} connection restored...`);
+          enqueueSnackbar("Connection restored!", {variant: "success"});
+          setConfig(prevState => {
+            const prev = {...prevState};
+            prev["lostConnection"] = false;
+            prev["write"] = true;
+            return prev;
+          });
+        }
+      });
+      if (serverIsLocal.current) return;
+      clientRequest("ping").then(resp => {
+        if (!resp || !resp.ok) {
+          if (config.lostConnection) return;
+          console.log("Lost connection to client...");
+          // window.services.check_backend();
+        }
+      });
+    }, 3000);
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [config.lostConnection, serverIsLocal.current]);
+
+  useEffect(() => {
+    if (!config.write) return;
+    if (config.lostConnection) window.services.check_backend();
+    else handleConfigChange(config);
+  }, [config]);
+
+  const firstRun = () => {
     const clientData = clientRequest("get_config");
     const clientAddress = window.services.get_env("IGNITE_CLIENT_ADDRESS");
     const serverPort = window.services.get_port();
@@ -95,54 +150,7 @@ export const ConfigProvider = props => {
         ready: true
       });
     });
-  }, [config.lostConnection]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const serverName = serverIsLocal.current ? "server/client" : "server";
-      serverRequest("ping").then(resp => {
-        if (!resp || !resp.ok) {
-          if (config.lostConnection) return;
-          console.log(`Lost connection to ${serverName}...`);
-          enqueueSnackbar("Lost connection to server...", {variant: "error"});
-          setConfig(prevState => {
-            const prev = {...prevState};
-            prev["lostConnection"] = true;
-            prev["write"] = false;
-            return prev;
-          });
-        }
-        else {
-          if (!config.lostConnection) return;
-          console.log(`${serverName} connection restored...`);
-          enqueueSnackbar("Connection restored!", {variant: "success"});
-          setConfig(prevState => {
-            const prev = {...prevState};
-            prev["lostConnection"] = false;
-            prev["write"] = true;
-            return prev;
-          });
-        }
-      });
-      if (serverIsLocal.current) return;
-      clientRequest("ping").then(resp => {
-        if (!resp || !resp.ok) {
-          if (config.lostConnection) return;
-          console.log("Lost connection to client...");
-          window.services.check_backend();
-        }
-      });
-    }, 3000);
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [config.lostConnection, serverIsLocal.current]);
-
-  useEffect(() => {
-    if (!config.write) return;
-    if (config.lostConnection) window.services.check_backend();
-    else handleConfigChange(config);
-  }, [config]);
+  };
 
   const handleConfigChange = async c => {
     let serverAddress = c.serverDetails.address;
