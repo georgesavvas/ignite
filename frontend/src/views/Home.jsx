@@ -82,7 +82,7 @@ export default function Home() {
     const noWelcome = localStorage.getItem("disable_welcome");
     if (noWelcome) return;
     serverRequest("get_projects").then(resp => {
-      if (resp && resp.data) {
+      if (resp && resp.data.length) {
         localStorage.setItem("disable_welcome", true);
         return;
       } else {
