@@ -13,6 +13,8 @@
 // limitations under the License.
 
 
+import fetch from "./fetch";
+
 async function serverRequest(method, data=undefined) {
   const address = await window.services.get_env("IGNITE_SERVER_ADDRESS");
   if (!address) {
@@ -39,7 +41,10 @@ async function request(address, method, data, attempt=0) {
     }
     return resp2;
   } catch (error) {
-    return {ok: false, msg: "Could not connect to Ignite server..."};
+    if (error === "timeout") {
+      return {ok: false, msg: "Could not connect to Ignite server..."};
+    }
+    return {ok: false, msg: "Something went wrong..."};
   //   if (attempt == 0) {
   //     // await window.services.check_server();
   //     setTimeout(request, 2000, address, method, data, attempt += 1);

@@ -23,6 +23,7 @@ from fastapi.responses import PlainTextResponse
 from ignite.server import api, utils
 from ignite.vault import api as vault_api
 from ignite.server.socket_manager import SocketManager
+from ignite.server.utils import CONFIG
 from ignite.logger import get_logger
 from ignite.utils import error, mount_root, log_request, process_request
 

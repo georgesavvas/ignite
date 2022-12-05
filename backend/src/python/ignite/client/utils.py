@@ -26,6 +26,7 @@ from pathlib import PurePath, Path
 
 from ignite.utils import get_logger, get_config_paths
 from ignite.server import api as server_api
+from ignite.server import utils as server_utils
 from ignite.server.socket_manager import SocketManager
 from ignite.client.constants import GENERIC_ENV, DCC_ENVS, OS_NAMES
 from ignite.client.constants import DCC_DISCOVERY, DCC_VERSIONS
@@ -55,10 +56,9 @@ def get_config(formatted=True) -> dict:
     LOGGER.debug(f"Reading config from {path}")    
     with open(path, "r") as f:
         config = yaml.safe_load(f)
-    config["projects_root"] = config["access"].get("projects_root", "")
     if formatted:
         return {
-            "root": PurePath(config["projects_root"]),
+            "root": PurePath(config["root"]),
             "dcc_config": config["dcc_config"],
             "server_details": config["server_details"],
             "access": config["access"]
@@ -72,6 +72,21 @@ IGNITE_SERVER_ADDRESS = CONFIG["server_details"].get("address", "")
 IGNITE_SERVER_PASSWORD = CONFIG["server_details"].get("password", "")
 ENV["IGNITE_SERVER_ADDRESS"] = IGNITE_SERVER_ADDRESS
 ENV["IGNITE_SERVER_PASSWORD"] = IGNITE_SERVER_PASSWORD
+
+
+def is_server_local():
+    local = (
+        "0.0.0.0",
+        "localhost"
+    )
+    for s in local:
+        if IGNITE_SERVER_ADDRESS.startswith(s):
+            return True
+
+
+# Ensure project root between server and client are synced, if server is local
+if is_server_local():
+    server_utils.set_projects_root(CONFIG["root"])
 
 
 def set_config(data):
@@ -92,8 +107,11 @@ def set_config(data):
     new_projects_root = config["access"]["server_projects_root"]
     if new_projects_root != old_config["access"]["server_projects_root"]:
         LOGGER.warning("New projects root received.")
-        LOGGER.warning(f"Asking server to mount {new_projects_root}")
-        server_request("set_projects_root", {"path": new_projects_root})
+        if not is_server_local():
+            LOGGER.warning(f"Asking server to mount {new_projects_root}")
+            server_request("set_projects_root", {"path": new_projects_root})
+        else:
+            server_utils.set_projects_root(new_projects_root)
 
     config["root"] = config["access"].get("projects_root", "")
     changed = old_config != config
@@ -106,18 +124,8 @@ def set_config(data):
     
     CONFIG.update(get_config())
 
-    root_changed = old_config["root"] != config["root"]
+    root_changed = old_config.get("root") != config["root"]
     return config, root_changed
-
-
-def is_server_local():
-    local = (
-        "0.0.0.0",
-        "localhost"
-    )
-    for s in local:
-        if IGNITE_SERVER_ADDRESS.startswith(s):
-            return True
 
 
 def get_dcc_name(dcc):

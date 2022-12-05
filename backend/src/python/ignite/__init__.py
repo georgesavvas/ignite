@@ -84,7 +84,7 @@ def ensure_config(filepath, default={}):
 SERVER_USER_CONFIG_PATH = USER_CONFIG_PATH / "server_config.yaml"
 ensure_config(SERVER_USER_CONFIG_PATH, {
     "server_address": "0.0.0.0:9070",
-    "projects_root": str(HOME / "projects"),
+    "root": str(HOME / "projects"),
     "vault_name": "__vault__"
 })
 
