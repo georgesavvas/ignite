@@ -101,6 +101,7 @@ async def ping():
     return {"ok": True}
 
 
+import subprocess
 if __name__ == "__main__":
     config = uvicorn.Config(
         f"{__name__}:app",

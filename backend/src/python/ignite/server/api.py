@@ -60,6 +60,7 @@ def get_vault_path() -> str:
 def get_projects() -> list:
     from ignite.server.entities.project import Project
     projects = Path(CONFIG["root"]).iterdir()
+    print(CONFIG)
     projects = [p for p in projects if not p.name.startswith(".")]
     projects = [Project(path=p).as_dict() for p in projects if (Path(p) / PROJECT_ANCHOR).exists()]
     return projects
