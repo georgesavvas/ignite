@@ -40,10 +40,10 @@ def get_config(formatted=True) -> dict:
     LOGGER.info(f"Reading config from {SERVER_CONFIG_PATH}...")    
     with open(SERVER_CONFIG_PATH, "r") as f:
         config = yaml.safe_load(f)
-    paths = ("projects_root",)
+    paths = ("root",)
     for p in paths:
         config[p] = os.path.abspath(config[p])
-    root = PurePath(config["projects_root"])
+    root = PurePath(config["root"])
     if formatted:
         return {
             "root": root,
@@ -89,11 +89,11 @@ def set_projects_root(path):
         return False
 
     config = get_config(False)
-    config["projects_root"] = str(path)
+    config["root"] = str(path)
     with open(SERVER_CONFIG_PATH, "w") as f:
         yaml.safe_dump(config, f)
 
-    CONFIG["projects_root"] = path
+    CONFIG["root"] = path
     return True
 
 

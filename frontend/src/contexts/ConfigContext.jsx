@@ -95,7 +95,7 @@ export const ConfigProvider = props => {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [config.lostConnection, serverIsLocal.current]);
+  }, [config.lostConnection, config.ready, serverIsLocal.current]);
 
   useEffect(() => {
     if (!config.write) return;

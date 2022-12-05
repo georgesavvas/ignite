@@ -13,6 +13,8 @@
 // limitations under the License.
 
 
+import fetch from "./fetch";
+
 async function clientRequest(method, data=undefined) {
   const address = await window.services.get_env("IGNITE_CLIENT_ADDRESS");
   if (!address) {

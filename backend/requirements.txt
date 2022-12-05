@@ -1,5 +1,5 @@
 -e .
-uvicorn==0.18.3
+uvicorn[standard]==0.18.3
 fastapi==0.85.0
 PyYAML==6.0
 platformdirs==2.5.2
