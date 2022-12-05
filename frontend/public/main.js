@@ -47,6 +47,7 @@ let port = -1;
 const isDev = process.env.NODE_ENV === "dev";
 const public = path.join(__dirname, "..", isDev ? "public" : "build");
 
+autoUpdater.allowPrerelease = true;
 const checkForUpdates = () => {
   autoUpdater.checkForUpdatesAndNotify();
 };
