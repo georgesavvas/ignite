@@ -7,7 +7,7 @@
 
 > **Warning**<br>
 > Ignite is still at an early stage in its development. Even though I will be working hard in ensuring its continued progression and offering as much support as I can, by using the software you acknowledge there might be workflow-breaking bugs that might require you to stop using it.
-> Any support you can give, from reporting errors and crashes to development/code advice, will be greatly appreciated. You can either use the [Discord server](https://discord.gg/2HWQduERrJ) or [Github Discussions](https://github.com/georgesavvas/ignite/discussions) to get in touch, or an email to ignite@georgesavvas.co.uk
+> Any support you can give, from reporting errors and crashes to development/code advice, will be greatly appreciated. You can either use the [Discord server](https://discord.gg/2HWQduERrJ) or [Github Discussions](https://github.com/georgesavvas/ignite/discussions) to get in touch, or an email to george@ignitevfx.co.uk
 
 # Summary
 Ignite is a VFX pipeline solution aimed at freelancers running jobs from home. Its purpose is to offer studio-like tools that take away the complexities of managing the project file structure and naming conventions without requiring any technical knowledge to set up.
