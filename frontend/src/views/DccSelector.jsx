@@ -56,7 +56,9 @@ function DccSelector(props) {
     let icon = "media/dcc/unknown.png";
     DCCINFO.forEach(dcc => {
       dcc.keywords.forEach(keyword => {
-        if (name.toLowerCase().replaceAll(" ", "").includes(keyword)) icon = dcc.icon;
+        if (name.toLowerCase().replaceAll(" ", "").includes(keyword)) {
+          icon = dcc.icon;
+        }
       });
     });
     return `url(${icon})`;
@@ -64,16 +66,22 @@ function DccSelector(props) {
 
   function formatDcc(dcc, index) {
     const dccIcon = getDccIcon(dcc.path);
-    const relevant = props.scene ? dcc.exts.includes(props.scene.extension) : true;
+    const relevant = props.scene ?
+      dcc.exts.includes(props.scene.extension) : true;
     const containerStyle = {
       display: relevant || showAll ? null : "none",
-      borderColor: dcc.name === selectedDcc ? "rgb(252, 140, 3)" : "rgb(70,70,70)"
+      borderColor: dcc.name === selectedDcc ?
+        "rgb(252, 140, 3)" : "rgb(70,70,70)"
     };
 
     return (
-      <div className={styles.dccContainer} id={dcc.name} key={index} onClick={handleDccClick} style={containerStyle}>
+      <div className={styles.dccContainer} id={dcc.name} key={index}
+        onClick={handleDccClick} style={containerStyle}
+      >
         <div className={styles.dccIcon} style={{backgroundImage: dccIcon}} />
-        <Typography variant="subtitle1" className={styles.label}>{dcc.name}</Typography>
+        <Typography variant="subtitle1" className={styles.label}>
+          {dcc.name}
+        </Typography>
       </div>
     );
   }
@@ -101,7 +109,9 @@ function DccSelector(props) {
     setIsLoading(false);
   }
 
-  let dccConfigSorted = config.dccConfig;
+  let dccConfigSorted = config.dccConfig.filter(
+    dcc => [dcc.name, dcc.exts, dcc.path].every(Boolean)
+  );
   dccConfigSorted.sort((a, b) => a.name.localeCompare(b.name));
 
   return (
@@ -126,7 +136,14 @@ function DccSelector(props) {
       <div className={styles.dccList}>
         {dccConfigSorted.map((dcc, index) => formatDcc(dcc, index))}
       </div>
-      <div style={{width: "100%", display: "grid", justifyContent: "center", marginTop: "20px"}}>
+      <div
+        style={{
+          width: "100%",
+          display: "grid",
+          justifyContent: "center",
+          marginTop: "20px"
+        }}
+      >
         <LoadingButton
           loading={isLoading}
           size="large"

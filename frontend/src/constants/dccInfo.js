@@ -5,6 +5,11 @@ export const DCCINFO = [
     name: "houdini"
   },
   {
+    keywords: ["djv"],
+    icon: "media/dcc/djv.png",
+    name: "djv"
+  },
+  {
     keywords: ["maya"],
     icon: "media/dcc/maya.png",
     name: "maya"

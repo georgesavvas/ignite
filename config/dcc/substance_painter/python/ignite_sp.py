@@ -25,6 +25,7 @@ def save_next():
     new_dir.mkdir(exist_ok=False)
     new_filepath = new_dir / filename
     spp.save_as(str(new_filepath))
+    ignite.update_env_version(next_v, version)
     anchor = new_dir / ".ign_scene.yaml"
     anchor.touch()
 
