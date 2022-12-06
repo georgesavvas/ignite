@@ -26,6 +26,11 @@ const uuid4 = require("uuid4");
 const {autoUpdater} = require("electron-updater");
 
 autoUpdater.channel = "alpha";
+const checkForUpdates = () => {
+  autoUpdater.checkForUpdates();
+};
+// const updateTimer = setInterval(checkForUpdates, 1000 * 60 * 10);
+
 const sessionID = uuid4();
 let platformName = process.platform;
 let appPath = app.getAppPath();
@@ -46,13 +51,6 @@ let backendLock = false;
 let port = -1;
 const isDev = process.env.NODE_ENV === "dev";
 const public = path.join(__dirname, "..", isDev ? "public" : "build");
-
-autoUpdater.allowPrerelease = true;
-const checkForUpdates = () => {
-  autoUpdater.checkForUpdatesAndNotify();
-};
-checkForUpdates();
-const updateTimer = setInterval(checkForUpdates, 1000 * 60 * 10);
 
 const iconPaths = {
   "win32": "media/desktop_icon/win/icon.ico",
@@ -112,6 +110,10 @@ function isPidAlive(pid) {
   } catch (err) {
     return false;
   }
+}
+
+async function sleep(ms) {
+  await new Promise(resolve => setTimeout(resolve, ms));
 }
 
 async function checkBackend() {
@@ -282,9 +284,27 @@ function createSplash () {
     frame: false,
     backgroundColor: "#141414",
     alwaysOnTop: true,
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true,
+      preload: path.join(__dirname, "preload.js")
+    },
     icon: path.join(__dirname, iconPaths[platformName])
   });
   win.loadFile(`${public}/splash.html`);
+  autoUpdater.on("download-progress", data => {
+    win.webContents.send(
+      "autoUpdater",
+      {status: "Downloading update", progress: data.percent}
+    );
+  });
+  autoUpdater.on("update-downloaded", () => {
+    win.webContents.send(
+      "autoUpdater",
+      {status: "Installing update..."}
+    );
+    setTimeout(() => autoUpdater.quitAndInstall(), 2000);
+  });
   return win;
 }
 
@@ -303,14 +323,25 @@ if (!gotTheLock) {
   });
 
   app.whenReady().then(async () => {
-    checkBackend();
     const splash = createSplash();
+    let launched = false;
+    checkForUpdates();
     window = createWindow(false);
-
-    window.webContents.once("did-finish-load", () => {
+    autoUpdater.once("update-not-available", () => {
+      launched = true;
+      checkBackend();
+      window.webContents.once("did-finish-load", () => {
+        splash.destroy();
+        window.show();
+      });
+    });
+    // Failsafe in case updater goes wrong
+    setTimeout(() => {
+      if (launched) return;
+      checkBackend();
       splash.destroy();
       window.show();
-    });
+    }, 4000);
 
     ipcMain.handle("launch_dcc", async (e, cmd, args, env) => {
       console.log("Running", cmd, args);
