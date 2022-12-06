@@ -22,7 +22,7 @@ from uuid import uuid4
 
 from tinydb import Query, TinyDB
 
-from ..utils import get_logger
+from ignite.logger import get_logger
 
 LOGGER = get_logger(__name__)
 
@@ -127,12 +127,15 @@ class ProcessManager():
         self.run_process(process)
     
     def run_process(self, process):
-        if not self.thread or self.thread.is_alive():
+        LOGGER.debug(f"Process manager info: {self.thread} {self.loop}")
+        LOGGER.debug(f"Process: {process}")
+        if not self.thread or not self.thread.is_alive():
             self.start()
         if not self.loop:
             self.loop = asyncio.new_event_loop()
         asyncio.create_task(self.send(process))
         future = asyncio.run_coroutine_threadsafe(process.run(), self.loop)
+        LOGGER.debug(f"Future: {future}")
         self.remove(Query().process.id)
         self.db.insert(process.as_dict())
         self.processes.append({
@@ -166,7 +169,7 @@ class ProcessManager():
     
     def handle_process_finished(self, process_id, result):
         process = self.get_process(process_id)
-        asyncio.create_process(self.send(process, state="finished" if not process.state["killed"] else "error"))
+        asyncio.create_task(self.send(process, state="finished" if not process.state["killed"] else "error"))
         print(f"Removing {process_id} from db...")
         self.db.remove(Query().process_id == process_id)
         print("Done.")
