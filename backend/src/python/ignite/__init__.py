@@ -27,7 +27,7 @@ LOGGER.info("\n\n\n****************\nLAUNCHING IGNITE\n****************")
 
 
 if getattr(sys, "frozen", False):
-    DIR = sys._MEIPASS
+    DIR = os.path.dirname(sys.executable)
 else:
     DIR = os.path.dirname(os.path.abspath(__file__))
 ENV = os.environ

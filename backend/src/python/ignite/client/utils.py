@@ -453,8 +453,8 @@ def get_action_files(root=None, project=None):
             if not files.get(entity):
                 files[entity] = []
             found = entity_path.glob("*.py")
-            LOGGER.debug(f"Found {list(found)}")
             files[entity] += found
+    LOGGER.debug(f"Found {files}")
     return files
 
 
