@@ -12,8 +12,26 @@
     <title>Ignite</title>
   </head>
   <body>
+    <script>
+      window.services.onAutoUpdater((event, data) => {
+        window.document.getElementById("loading-status").innerHTML = data.status;
+        if (data.progress) {
+          window.document.getElementById("loading-bar-bg")
+            .style.visibility = "visible";
+          window.document.getElementById("loading-bar")
+            .style.width = `${data.progress}%`;
+        } else window.document.getElementById("loading-bar-bg")
+          .style.visibility = "hidden";
+      })
+    </script>
     <div class="container">
       <div class="logo"></div>
+      <div class="loadingContainer">
+        <h4 id="loading-status" class="loadingStatus">Checking for updates...</h4>
+        <div id="loading-bar-bg" class="loadingBarBg">
+          <div id="loading-bar" class="loadingBar"></div>
+        </div>
+      </div>
     </div>
   </body>
 </html>
