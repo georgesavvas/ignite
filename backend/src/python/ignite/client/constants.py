@@ -1,6 +1,6 @@
 GENERIC_ENV = {
     "PROJECTS_ROOT": "{projects_root}",
-    # "OCIO": "{dcc}/ocio/aces_1.2/config.ocio"
+    "OCIO": "{dcc}/ocio/config-aces-cg.ocio"
 }
 
 

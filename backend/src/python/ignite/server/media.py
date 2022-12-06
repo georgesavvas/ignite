@@ -42,8 +42,11 @@ def convert_img(input, output):
     else:
         cmd = f"{tool} {input} "
     # cmd += f"--colorconvert \"ACES - ACEScg\" \"Output - sRGB\" -o {output}"
-    cmd += f"--autocc -o {output}"
+    # cmd += "--autocc "
+    cmd += "--ch R,G,B "
+    cmd += f"-o {output}"
     LOGGER.debug(cmd)
+    LOGGER.warning(os.environ.get("OCIO"))
     os.system(cmd)
     # exit_code = -1
     # try:
