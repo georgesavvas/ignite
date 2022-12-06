@@ -42,6 +42,10 @@ contextBridge.exposeInMainWorld("services", {
     ipcRenderer.removeAllListeners("resource_usage");
     ipcRenderer.on("resource_usage", callback);
   },
+  onAutoUpdater: callback => {
+    ipcRenderer.removeAllListeners("autoUpdater");
+    ipcRenderer.on("autoUpdater", callback);
+  },
   check_backend: () => {
     return ipcRenderer.invoke("check_backend");
   },
