@@ -292,6 +292,12 @@ function createSplash () {
     icon: path.join(__dirname, iconPaths[platformName])
   });
   win.loadFile(`${public}/splash.html`);
+  autoUpdater.on("checking-for-update", () => {
+    win.webContents.send(
+      "autoUpdater",
+      {status: "Checking for updates..."}
+    );
+  });
   autoUpdater.on("download-progress", data => {
     win.webContents.send(
       "autoUpdater",
@@ -326,17 +332,17 @@ if (!gotTheLock) {
     const splash = createSplash();
     let isUpdating = false;
     let launched = false;
+
     checkForUpdates();
     window = createWindow(false);
     autoUpdater.once("update-available", () => isUpdating = true);
     autoUpdater.once("update-not-available", () => {
       launched = true;
       checkBackend();
-      window.webContents.once("did-finish-load", () => {
-        splash.destroy();
-        window.show();
-      });
+      splash.destroy();
+      window.show();
     });
+
     // Failsafe in case updater goes wrong
     setTimeout(() => {
       if (launched || isUpdating) return;
