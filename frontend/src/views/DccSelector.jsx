@@ -130,7 +130,7 @@ function DccSelector(props) {
           }
           label="Show all"
           labelPlacement="start"
-          disabled={!props.scene}
+          sx={{visibility: props.scene ? "visible" : "hidden"}}
         />
       </div>
       <div className={styles.dccList}>
