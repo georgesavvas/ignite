@@ -28,6 +28,7 @@ import debounce from "lodash.debounce";
 import clientRequest from "../../services/clientRequest";
 import styles from "./Dcc.module.css";
 import {ConfigContext} from "../../contexts/ConfigContext";
+import FileInput from "../../components/FileInput";
 
 
 const debounced = debounce(fn => fn(), 1000);
@@ -103,39 +104,26 @@ const Dcc = () => {
     handleDccModify(data);
   };
 
-  const handleRemoveDcc = e => {
-    const target_id = e.currentTarget.id.split("-")[1];
-    const data = {index: target_id};
-    shouldWrite.current = true;
-    handleDccRemove(data);
-    // debounced(() => {
-    //   setConfig("dccConfig", data, "remove");
-    // });
-  };
-
-  const handleFileInput = e => {
-    window.api.fileInput().then(resp => {
-      if (resp.cancelled) return;
-      onFileSelected(e, resp.filePaths[0]);
-    });
-  };
-
-  const onFileSelected = (e, filepath) => {
-    const s = e.target.id.split("-");
-    const target_id = s[1];
+  const handleDccConfigPathChange = (index, value) => {
     const data = {
-      index: target_id,
+      index: index,
       field: "path",
-      value: filepath
+      value: value
     };
     shouldWrite.current = true;
     handleDccModify(data);
   };
 
+  const handleRemoveDcc = e => {
+    const target_id = e.currentTarget.id.split("-")[1];
+    const data = {index: target_id};
+    shouldWrite.current = true;
+    handleDccRemove(data);
+  };
+
   const handleAddDcc = () => {
     shouldWrite.current = true;
     handleDccAdd();
-    // setConfig("dccConfig", [], "add");
   };
 
   const handleDiscoverDcc = () => {
@@ -170,21 +158,16 @@ const Dcc = () => {
         <Divider flexItem orientation="vertical" />
         <div className={styles.gridContainer}>
           <div className={styles.gridItemPath}>
-            <TextField
-              margin="dense"
+            <FileInput
               id={"path-" + index}
+              margin="dense"
               label="Executable"
               fullWidth
-              variant="outlined"
               value={dcc_.path}
               size="small"
-              onChange={handleDccConfigChange}
+              onChange={(_, value) => handleDccConfigPathChange(index, value)}
               className={styles.textField}
-              InputProps={{
-                className: styles.input
-              }}
             />
-            <Button id={"file-" + index} variant="outlined" className={styles.browse} onClick={handleFileInput}>...</Button>
           </div>
           <div className={styles.gridItemName}>
             <TextField

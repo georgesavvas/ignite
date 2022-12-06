@@ -123,9 +123,10 @@ const General = () => {
           label="Projects directory"
           size="small"
           fullWidth
+          directory
           disabled={settings.access.remote}
           value={settings.access.projectsDir || ""}
-          onChange={value => handleAccessChange("projectsDir", value)}
+          onChange={(_, value) => handleAccessChange("projectsDir", value)}
           buttonStyle={{marginTop: "4px"}}
         />
         <FileInput

@@ -228,15 +228,13 @@ function createWindow (show=true) {
     return valid;
   });
 
-  ipcMain.handle("dir_input", async (e, defaultDir) => {
-    const settings = {properties: ["openDirectory"]};
-    if (defaultDir) settings.defaultPath = defaultDir;
+  ipcMain.handle("dir_input", async (e, properties=[]) => {
+    const settings = {properties: ["openDirectory", ...properties]};
     return await dialog.showOpenDialog(win, settings);
   });
 
-  ipcMain.handle("file_input", async (e, defaultDir) => {
-    const settings = {properties: ["openFile"]};
-    if (defaultDir) settings.defaultPath = defaultDir;
+  ipcMain.handle("file_input", async (e, properties=[]) => {
+    const settings = {properties: ["openFile", ...properties]};
     return await dialog.showOpenDialog(win, settings);
   });
 
