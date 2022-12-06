@@ -24,7 +24,8 @@ import shutil
 from copy import deepcopy
 from pathlib import PurePath, Path
 
-from ignite.utils import get_logger, get_config_paths
+from ignite.utils import get_config_paths
+from ignite.logger import get_logger
 from ignite.server import api as server_api
 from ignite.server import utils as server_utils
 from ignite.server.socket_manager import SocketManager
@@ -462,7 +463,7 @@ def discover_actions(project=None):
     for entity, files in get_action_files(CONFIG["root"], project).items():
         actions[entity] = {}
         for file in files:
-            if file.name == "__init__.py":
+            if file.name in ("__init__.py", "action_template.py"):
                 continue
             module = importlib.machinery.SourceFileLoader(
                 file.name, str(file)

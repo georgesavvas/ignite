@@ -324,9 +324,11 @@ if (!gotTheLock) {
 
   app.whenReady().then(async () => {
     const splash = createSplash();
+    let isUpdating = false;
     let launched = false;
     checkForUpdates();
     window = createWindow(false);
+    autoUpdater.once("update-available", () => isUpdating = true);
     autoUpdater.once("update-not-available", () => {
       launched = true;
       checkBackend();
@@ -337,11 +339,11 @@ if (!gotTheLock) {
     });
     // Failsafe in case updater goes wrong
     setTimeout(() => {
-      if (launched) return;
+      if (launched || isUpdating) return;
       checkBackend();
       splash.destroy();
       window.show();
-    }, 4000);
+    }, 5000);
 
     ipcMain.handle("launch_dcc", async (e, cmd, args, env) => {
       console.log("Running", cmd, args);
