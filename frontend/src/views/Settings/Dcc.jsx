@@ -141,6 +141,7 @@ const Dcc = () => {
         discovered ${new_config.length}, adding ${filtered.length}`
       );
       setConfig("dccConfig", filtered, "add");
+      setDcc(prev => [...prev, ...filtered]);
     });
   };
 
@@ -160,10 +161,9 @@ const Dcc = () => {
           <div className={styles.gridItemPath}>
             <FileInput
               id={"path-" + index}
-              margin="dense"
               label="Executable"
               fullWidth
-              value={dcc_.path}
+              value={dcc_.path || ""}
               size="small"
               onChange={(_, value) => handleDccConfigPathChange(index, value)}
               className={styles.textField}
