@@ -109,7 +109,7 @@ function Browser(props) {
   const getBrowserHelperText = () => {
     let s = `${props.pages.results} results | `;
     s += props.query.sort ? `Sorted by: ${props.query.sort.label}` : "";
-    s += ` | Collection: ${props.selectedCollection.path}`;
+    s += ` | Collection: ${props.selectedCollection?.path}`;
     return s;
   };
 

@@ -28,8 +28,14 @@ LOGGER = get_logger(__name__)
 
 
 def start_worker(loop):
+    from ignite.client.utils import get_generic_env
     PID = str(os.getpid())
     LOGGER.warning(f"WORKER INIT - PID {PID}")
+    env = os.environ
+    ignite_env = get_generic_env()
+    from pprint import pprint
+    for k, v in ignite_env.items():
+        env[k] = v
     asyncio.set_event_loop(loop)
     loop.run_forever()
     LOGGER.warning("WORKER END")

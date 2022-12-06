@@ -83,8 +83,9 @@ function Vault(props) {
   }, []);
 
   useEffect(() => {
-    const selectedCollection = localStorage.getItem("selectedCollection");
-    if (!selectedCollection) return;
+    const previous = localStorage.getItem("selectedCollection");
+    if (!selectedCollection && !previous) setSelectedCollection("/all");
+    else if (!previous) return;
     setSelectedCollection(selectedCollection);
   }, []);
 
