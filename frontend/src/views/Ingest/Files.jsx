@@ -50,7 +50,8 @@ function Files(props) {
 
   const handleAddFiles = async dir => {
     const resp = dir ?
-      await window.api.dirInput() : await window.api.fileInput();
+      await window.api.dirInput(["multiSelections"]) :
+      await window.api.fileInput(["multiSelections"]);
     if (resp.cancelled) return;
     const filePaths = resp.filePaths;
     if (!filePaths?.length) return;

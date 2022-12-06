@@ -21,26 +21,28 @@ import TextField from "@mui/material/TextField";
 
 
 export default function FileInput(props) {
-  const hiddenFileInput = useRef(null);
-
-  const {buttonStyle, ...other} = props;
+  const {
+    buttonStyle,
+    directory,
+    multi,
+    buttonLabel,
+    ...other
+  } = props;
 
   const handleChange = e => {
     if (!props.onChange) return;
-    props.onChange(e.target.value);
+    props.onChange(e, e.target.value);
   };
 
-  const handleFileInput = e => {
-    const paths = [...e.target.files].reduce((previous, current) => {
-      return previous ? `${previous}\n${current.path}` : current.path;
-    }, "");
-    e.target.value = "";
-    if (!props.onChange) return;
-    if (!props.additive) {
-      props.onChange(paths);
-      return;
-    }
-    props.onChange(props.value ? `${props.value}\n${paths}` : paths);
+  const handleFileInput = async e => {
+    const properties = multi ? ["multiSelections"] : [];
+    const resp = directory ?
+      await window.api.dirInput(properties) :
+      await window.api.fileInput(properties);
+    if (resp.cancelled) return;
+    const filePaths = resp.filePaths;
+    if (!props.onChange || !filePaths?.length) return;
+    props.onChange(e, filePaths.join("\n"));
   };
 
   const style = { 
@@ -60,21 +62,12 @@ export default function FileInput(props) {
       />
       <IgnButton
         variant="outlined"
-        onClick={() => hiddenFileInput.current.click()}
+        onClick={handleFileInput}
         style={{height: 37.5, ...buttonStyle}}
       >
-        ...
+        {buttonLabel || "..."}
       </IgnButton>
       {props.children}
-      <input
-        ref={hiddenFileInput}
-        type="file"
-        // webkitdirectory={props.directory ? "true" : undefined}
-        // directory={props.directory ? "true" : undefined}
-        multiple={props.multiline}
-        style={{display: "none"}}
-        onChange={handleFileInput}
-      />
     </div>
   );
 }
