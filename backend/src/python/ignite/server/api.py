@@ -162,7 +162,6 @@ def find(path):
             version, comp = version.split("#", 1)
         if version.isnumeric():
             path = utils.uri_to_path(path)
-            print("------", path)
             return _find_from_path(path)
         else:
             if version not in ("best", "latest"):

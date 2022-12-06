@@ -87,7 +87,6 @@ def get_collections(user=None, scope=None):
             sort_children(coll)
         collections = prep_collections(collections)
         collections_all[name] = collections
-    # print("-----", scope, collections, collections_all)
 
     return collections_all
 

@@ -46,6 +46,7 @@ const Crate = props => {
   };
 
   const getEntityCrate = entity => {
+    console.log(entity.uri);
     if (("asset", "assetversion").includes(entity.dir_kind)) {
       return <AssetTile key={entity.uri} entity={entity} noOverlay noInfo />;
     }
