@@ -8,7 +8,7 @@ EXTENSIONS = [".exr"]
 
 LOGGER = logging.getLogger('huey')
 
-def main(entity):
+def main(entity, state, progress_fn=None):
     from ignite_server.media import convert_img
     
     input = PurePath(entity["path"])
