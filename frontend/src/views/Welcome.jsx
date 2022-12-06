@@ -129,7 +129,7 @@ const Welcome = props => {
               fullWidth
               disabled={access.remote}
               value={access.projectsDir || ""}
-              onChange={value => handleAccessChange("projectsDir", value)}
+              onChange={(_, value) => handleAccessChange("projectsDir", value)}
               buttonStyle={{marginTop: "4px"}}
             >
               <IgnButton

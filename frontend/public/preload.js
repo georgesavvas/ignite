@@ -25,11 +25,11 @@ contextBridge.exposeInMainWorld("api", {
   checkPath: (filepath) => {
     return ipcRenderer.invoke("check_path", filepath);
   },
-  fileInput: async default_dir => {
-    return await ipcRenderer.invoke("file_input", default_dir);
+  fileInput: async properties => {
+    return await ipcRenderer.invoke("file_input", properties);
   },
-  dirInput: async default_dir => {
-    return await ipcRenderer.invoke("dir_input", default_dir);
+  dirInput: async properties => {
+    return await ipcRenderer.invoke("dir_input", properties);
   },
   launch_dcc: async (cmd, args, env) => {
     return await ipcRenderer.invoke("launch_dcc", cmd, args, env);

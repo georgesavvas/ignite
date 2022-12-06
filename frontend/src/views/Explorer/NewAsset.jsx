@@ -27,6 +27,7 @@ import Button from "@mui/material/Button";
 import clientRequest from "../../services/clientRequest";
 import IgnButton from "../../components/IgnButton";
 import TagContainer from "../DetailsView/TagContainer";
+import FileInput from "../../components/FileInput";
 
 
 const NewAsset = props => {
@@ -48,9 +49,10 @@ const NewAsset = props => {
   };
 
   // useEffect(() => {
-  //   if (props.open) return;
-  //   reset();
-  // }, [props.open]);
+  //   comps.forEach(comp => {
+  //     if (comp)
+  //   })
+  // }, [comps]);
 
   const handleCompAdd = () => {
     setComps(prevState => [...prevState, {}]);
@@ -89,15 +91,19 @@ const NewAsset = props => {
     });
   };
 
-  const handleCompChange = (index, field, value) => {
+  const handleCompChange = async (index, field, value) => {
+    let info = undefined;
+    if (field == "source" && value) {
+      info = await clientRequest("process_filepath", {path: value})
+        .then(resp => resp.data);
+    }
     setComps(prev => {
       const existing = [...prev];
-      existing[index][field] = value;
-      if (field == "source" && value) {
-        clientRequest("process_filepath", {path: value}).then(resp => {
-          const data = resp.data;
-          existing[index].info = data;
-        });
+      const comp = existing[index];
+      comp[field] = value;
+      if (field == "source") {
+        comp.info = info;
+        handleCompSequence(comp);
       }
       return existing;
     });
@@ -108,11 +114,16 @@ const NewAsset = props => {
       const existing = [...prev];
       const comp = existing[index];
       comp.sequence = value;
-      if (!comp.info) return existing;
-      if (value) comp.source = comp.info.sequence_expr;
-      else comp.source = comp.info.path;
+      handleCompSequence(comp);
       return existing;
     });
+  };
+
+  const handleCompSequence = comp => {
+    if (!comp.info) return comp;
+    if (comp.sequence) comp.source = comp.info.sequence_expr;
+    else comp.source = comp.info.path;
+    return comp;
   };
 
   const handleAddTags = tags => {
@@ -122,18 +133,6 @@ const NewAsset = props => {
 
   const handleRemoveTag = tag => {
     setTags(prev => prev.filter(t => t !== tag));
-  };
-
-  const handleSelectFile = async index => {
-    const resp = await window.api.fileInput();
-    if (resp.cancelled) return;
-    const filePaths = resp.filePaths;
-    if (!filePaths?.length) return;
-    setComps(prev => {
-      const existing = [...prev];
-      existing[index]["source"] = filePaths[0];
-      return existing;
-    });
   };
 
   return (
@@ -195,18 +194,17 @@ const NewAsset = props => {
                   />
                 </div>
                 <div className={styles.compRow}>
-                  <IgnTextField
+                  <FileInput
                     placeholder="Source file"
+                    buttonLabel="Browse"
                     style={{minWidth: "300px"}}
                     fullWidth
+                    size="small"
                     value={comp.source || ""}
                     onChange={
-                      e => handleCompChange(index, "source", e.target.value)
+                      (_, value) => handleCompChange(index, "source", value)
                     }
                   />
-                  <IgnButton onClick={() => handleSelectFile(index)}>
-                    Browse
-                  </IgnButton>
                 </div>
               </div>
             </div>
