@@ -16,7 +16,7 @@ if not cmd:
     print(f"Could not figure out platform name {OS_NAME}")
     sys.exit()
 print(f"cmd: {cmd}")
-subprocess.run(cmd.split(), shell=True)
+subprocess.run(cmd.split())
 current = Path(__file__)
 backend_root = current.parent
 source = backend_root / "dist"
