@@ -1,6 +1,6 @@
 GENERIC_ENV = {
     "PROJECTS_ROOT": "{projects_root}",
-    # "OCIO": "{dcc}/ocio/aces_1.2/config.ocio"
+    "OCIO": "{dcc}/ocio/config-aces-cg.ocio"
 }
 
 
@@ -61,6 +61,21 @@ OS_NAMES = {
 
 
 DCC_DISCOVERY = {
+    "djv": {
+        "label": "DJV",
+        "exts": ["exr", "jpg", "jpeg", "png", "tif", "tiff", "tga"],
+        "paths": {
+            "win": [
+                "C:/Program Files/DJV2/bin/djv.exe"
+            ],
+            "darwin": [
+                "",
+            ],
+            "linux": [
+                ""
+            ]
+        }
+    },
     "houdinifx": {
         "label": "Houdini FX",
         "exts": ["hip", "hipnc"],

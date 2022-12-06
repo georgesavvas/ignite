@@ -148,11 +148,14 @@ def get_uri(path, version_override=None):
     if not path:
         return ""
     path = Path(path)
+    path_str = path.as_posix()
     if path.is_file() or "#" in path.name:
         entity_kind = "component"
     else:
         entity_kind = get_dir_kind(path)
-    splt = path.as_posix().split(
+    if not entity_kind:
+        return ""
+    splt = path_str.split(
         CONFIG["root"].as_posix(), 1
     )[1].replace("/exports", "").split("/")[1:]
     i = len(splt)
@@ -171,6 +174,18 @@ def get_uri(path, version_override=None):
     elif entity_kind.startswith("task"):
         context = "/".join(splt[2:-1])
         task = splt[-1]
+    elif entity_kind == "scene":
+        context = "/".join(splt[2:-3])
+        task = splt[-3]
+        name = "__scene__"
+        version = splt[-1]
+    elif entity_kind == "component" and splt[-2] == "preview":
+        # Scene component, currently just used for previews.
+        context = "/".join(splt[2:-5])
+        task = splt[-5]
+        name = splt[-2]
+        version = splt[-3]
+        comp = splt[-1]
     elif entity_kind == "component":
         context = "/".join(splt[2:-4])
         task = splt[-4]
@@ -185,7 +200,6 @@ def get_uri(path, version_override=None):
     for bit in bits:
         if bit:
             uri += f":{bit}"
-    # uri = f"ign:{project}:{group}:{context}:{task}:{name}"
     if version_override:
         if isinstance(version_override, str):
             version_override = int(version_override.replace("v", ""))
@@ -264,8 +278,11 @@ def uri_to_path(uri):
         LOGGER.error(f"Failed to parse {uri}")
         return ""
     data = result.named
-    if data.get("name"):
+    name = data.get("name")
+    if name and name != "__scene__":
         data["task"] += "/exports"
+    elif name:
+        data["name"] = "scenes"
     if data.get("version"):
         version = data.get("version")
         if not version.startswith("v"):
@@ -273,7 +290,7 @@ def uri_to_path(uri):
     if data.get("comp"):
         data["comp"] = data["comp"].replace("#", "")
     path = CONFIG["root"]
-    parts = ("project", "group", "context", "task", "name", "version", "comp")
+    parts = ["project", "group", "context", "task", "name", "version", "comp"]
     for part in parts:
         if not data.get(part):
             return path

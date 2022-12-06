@@ -27,22 +27,26 @@ OS_NAME = OS_NAMES[platform.system()]
 
 
 def convert_img(input, output):
-    padding = input.count("#")
-    files = glob.glob(input.replace("#" * padding, "*"))
-    sequences, _ = clique.assemble(files)
-    seq = sequences[0]
-    indexes = list(seq.indexes)
-    range = "{}-{}".format(indexes[0], indexes[-1])
-    # input = input.replace("#" * padding, f"%0{padding}d")
-
-    # padding = output.count("#")
-    # output = output.replace("#" * padding, f"%0{padding}d")
-
     tool = TOOLS.get("oiiotool").get(OS_NAME)
-    cmd = f"{tool} --frames {range} --framepadding {padding} {input} "
+    if "#" in input:
+        padding = input.count("#")
+        files = glob.glob(input.replace("#" * padding, "*"))
+        sequences, _ = clique.assemble(files)
+        seq = sequences[0]
+        indexes = list(seq.indexes)
+        range = "{}-{}".format(indexes[0], indexes[-1])
+        # input = input.replace("#" * padding, f"%0{padding}d")
+        # padding = output.count("#")
+        # output = output.replace("#" * padding, f"%0{padding}d")
+        cmd = f"{tool} --frames {range} --framepadding {padding} {input} "
+    else:
+        cmd = f"{tool} {input} "
     # cmd += f"--colorconvert \"ACES - ACEScg\" \"Output - sRGB\" -o {output}"
-    cmd += f"--autocc -o {output}"
-    print(cmd)
+    # cmd += "--autocc "
+    cmd += "--ch R,G,B "
+    cmd += f"-o {output}"
+    LOGGER.debug(cmd)
+    LOGGER.warning(os.environ.get("OCIO"))
     os.system(cmd)
     # exit_code = -1
     # try:

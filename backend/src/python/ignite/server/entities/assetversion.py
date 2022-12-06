@@ -17,10 +17,13 @@ from pathlib import Path, PurePath
 
 import clique
 from ignite.server import utils
+from ignite.logger import get_logger
 from ignite.server.constants import COMP_TYPES, TAG_WEIGHTS
 from ignite.server.entities.asset import Asset
 from ignite.server.entities.component import Component
 from ignite.server.entities.directory import Directory
+
+LOGGER = get_logger(__name__)
 
 COMP_EXT_TYPES = {}
 for name, exts in COMP_TYPES.items():
@@ -69,10 +72,13 @@ class AssetVersion(Directory):
             comp = Component(c)
             comps.append(comp.as_dict())
         for r in remainder:
-            r2 = PurePath(r)
+            r2 = Path(r)
             if r2.name.split("/")[-1].startswith("."):
                 continue
             if ".temp." in r2.name:
+                continue
+            if r2.is_dir():
+                LOGGER.warning(f"Found component directory {r2}")
                 continue
             comp = Component(r2)
             comps.append(comp.as_dict())

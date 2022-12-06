@@ -21,12 +21,12 @@ import clique
 from ignite.server.constants import ANCHORS, DCC_EXTENSIONS
 from ignite.server.entities.directory import Directory
 from ignite.server.entities.component import Component
-from ignite.server.utils import CONFIG
+from ignite.server.utils import CONFIG, get_uri
 
 
 class Scene(Directory):
     def __init__(self, path="") -> None:
-        self.dict_attrs = ["group" ,"dcc", "version", "scene", "task",
+        self.dict_attrs = ["group" ,"dcc", "version", "scene", "task", "uri",
             "version", "vsn", "attributes", "comment", "thumbnail", "extension"]
         self.nr_attrs = ["task", "scene"]
         self.project = ""
@@ -38,6 +38,7 @@ class Scene(Directory):
         self.tags = []
         self.dir_kind = "scene"
         self.dcc = ""
+        self.uri = ""
         self.comment = ""
         self.version = ""
         self.vsn = 0
@@ -99,9 +100,10 @@ class Scene(Directory):
 
         ext = self.scene.suffix[1:]
         self.extension = ext
-        self.task = path=path.parent.parent
+        self.task = path.parent.parent
         self.dcc = ext_dcc.get(ext, "")
         self.context = self.get_context()
+        self.uri = get_uri(path)
         self.load_from_config()
     
     def is_valid(self):
