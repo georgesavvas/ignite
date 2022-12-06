@@ -97,6 +97,7 @@ ENV["IGNITE_SERVER_ROOT"] = DIR
 default_project_dir = str(HOME / "projects")
 CLIENT_CONFIG_PATH = USER_CONFIG_PATH / "client_config.yaml"
 ensure_config(CLIENT_CONFIG_PATH, {
+    "root": default_project_dir,
     "dcc_config": [],
     "server_details": {
         "address": "localhost:9070",
@@ -122,7 +123,7 @@ LOGGER.info(f"Setting IGNITE_DCC to {dcc}")
 ENV["IGNITE_DCC"] = str(dcc)
 
 
-ocio = dcc / "ocio/aces_1.2/config.ocio"
+ocio = dcc / "ocio/config-aces-cg.ocio"
 LOGGER.info(f"Setting OCIO to {ocio}")
 ENV["OCIO"] = str(ocio)
 
