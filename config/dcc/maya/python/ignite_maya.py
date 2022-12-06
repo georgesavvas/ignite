@@ -82,6 +82,7 @@ def save_next():
     new_filepath = new_dir / filename
     cmds.file(rename=str(new_filepath))
     cmds.file(save=True, type="mayaBinary")
+    ignite.update_env_version(next_v, version)
     anchor = new_dir / ".ign_scene.yaml"
     anchor.touch()
 

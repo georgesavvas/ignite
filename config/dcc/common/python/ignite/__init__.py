@@ -1,7 +1,7 @@
 import os
 import json
 # import requests
-from urllib import request, parse
+from urllib import request
 
 
 ENV = os.environ
@@ -36,3 +36,9 @@ def server_request(method, data=None):
 
 def client_request(method, data=None):
     return ignite_request("client", method, data)
+
+
+def update_env_version(s, i):
+    ENV["VS"] = s
+    ENV["VERSION"] = s
+    ENV["VSN"] = i

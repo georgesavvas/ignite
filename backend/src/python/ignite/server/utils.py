@@ -147,12 +147,16 @@ def create_delayed_anchor(path=None, name=None, anchor=None):
 def get_uri(path, version_override=None):
     if not path:
         return ""
+    print("-------", path)
     path = Path(path)
+    path_str = path.as_posix()
     if path.is_file() or "#" in path.name:
         entity_kind = "component"
     else:
         entity_kind = get_dir_kind(path)
-    splt = path.as_posix().split(
+    if not entity_kind:
+        return ""
+    splt = path_str.split(
         CONFIG["root"].as_posix(), 1
     )[1].replace("/exports", "").split("/")[1:]
     i = len(splt)
@@ -171,6 +175,13 @@ def get_uri(path, version_override=None):
     elif entity_kind.startswith("task"):
         context = "/".join(splt[2:-1])
         task = splt[-1]
+    elif entity_kind == "component" and splt[-2] == "preview":
+        # Scene component, currently just used for previews.
+        context = "/".join(splt[2:-5])
+        task = splt[-5]
+        name = splt[-2]
+        version = splt[-3]
+        comp = splt[-1]
     elif entity_kind == "component":
         context = "/".join(splt[2:-4])
         task = splt[-4]

@@ -1,4 +1,9 @@
+import shutil
+from pathlib import Path
+
 import nuke
+
+import ignite
 
 
 def save():
@@ -19,6 +24,7 @@ def save_next():
     new_dir.mkdir(exist_ok=False)
     new_filepath = new_dir / filename
     nuke.scriptSaveAs(filename=str(new_filepath))
+    ignite.update_env_version(next_v, version)
     anchor = new_dir / ".ign_scene.yaml"
     anchor.touch()
 
@@ -26,7 +32,7 @@ def save_next():
 def scene_comment():
     save()
     path = current_filepath()
-    text, nuke.getInput("Comment")
+    text = nuke.getInput("Comment")
     if text:
         data = {
             "path": path,

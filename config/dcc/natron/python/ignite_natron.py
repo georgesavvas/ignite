@@ -1,11 +1,9 @@
 import os
-import shutil
-# from pathlib import Path
 
 import NatronEngine
 import NatronGui
 
-# import ignite
+import ignite
 
 
 print("Hello from ignite_natron")
@@ -37,6 +35,7 @@ def save_next():
     new_filepath = os.path.join(new_dir, filename)
     print("Saving at", new_filepath)
     NatronEngine.saveProjectAs(new_filepath)
+    ignite.update_env_version(next_v, version)
     anchor = os.path.join(new_dir, ".ign_scene.yaml")
     if os.path.exists(anchor):
         os.utime(anchor, None)
