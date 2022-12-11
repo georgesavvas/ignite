@@ -111,8 +111,12 @@ const NewTaskContent = (values, setValues) => {
       label: "Model",
     },
     {
-      value: "look",
-      label: "Look",
+      value: "layout",
+      label: "Layout",
+    },
+    {
+      value: "surface",
+      label: "Surface",
     },
     {
       value: "light",

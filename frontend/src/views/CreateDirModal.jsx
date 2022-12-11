@@ -35,7 +35,8 @@ const KINDTYPES = {
   task: [
     ["generic", "Generic"],
     ["model", "Model"],
-    ["look", "Look"],
+    ["layout", "Layout"],
+    ["surface", "Surface"],
     ["light", "Light"],
     ["anim", "Anim"],
     ["rig", "Rig"],
