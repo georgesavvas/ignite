@@ -13,6 +13,7 @@ import DirectionsRunIcon from "@mui/icons-material/DirectionsRun";
 import PrecisionManufacturingIcon from "@mui/icons-material/PrecisionManufacturing";
 import UnarchiveIcon from "@mui/icons-material/Unarchive";
 import LocalFireDepartmentIcon from "@mui/icons-material/LocalFireDepartment";
+import TerrainIcon from "@mui/icons-material/Terrain";
 
 export const DIRECTORYICONS = {
   directory: FolderIcon,
@@ -24,11 +25,12 @@ export const DIRECTORYICONS = {
   task: AssignmentIcon,
   task_generic: AssignmentIcon,
   task_model: FortIcon,
-  task_look: FormatPaintIcon,
+  task_surface: FormatPaintIcon,
   task_light: LightbulbIcon,
   task_anim: DirectionsRunIcon,
   task_rig: PrecisionManufacturingIcon,
   task_asset: UnarchiveIcon,
   task_fx: LocalFireDepartmentIcon,
-  rnd: ScienceIcon,
+  task_layout: TerrainIcon,
+  rnd: ScienceIcon
 };
