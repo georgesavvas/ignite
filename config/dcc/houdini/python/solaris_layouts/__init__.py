@@ -183,8 +183,8 @@ def create_asset_layout(kwargs):
         sop_create = insert_sop_create(nodes)
         nodes.append(sop_create)
 
-    make_tasks(loader, ("model", "fx", "look"), task)
-    if task == "look":
+    make_tasks(loader, ("model", "fx", "surface"), task)
+    if task == "surface":
         stage_export.parm("ext").set("usda")
     else:
         stage_export.parm("ext").set("usdc")
