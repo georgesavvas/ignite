@@ -249,6 +249,13 @@ function createWindow (show=true) {
     return uuid4();
   });
 
+  ipcMain.on("ondragstart", (event, filePath) => {
+    event.sender.startDrag({
+      file: path.join(__dirname, filePath),
+      // icon: iconName,
+    });
+  });
+
   ipcMain.handle("set_env", (e, env_name, env_value) => {
     const prev = process.env[env_name];
     // console.log("Setting", env_name, "from", prev, "to", env_value);

@@ -13,9 +13,13 @@
 // limitations under the License.
 
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const {ipcRenderer, contextBridge} = require("electron");
 
 contextBridge.exposeInMainWorld("api", {
+  startDrag: fileName => {
+    ipcRenderer.send("ondragstart", fileName);
+  },
   storeData: async (filename, data) => {
     return await ipcRenderer.invoke("store_data", filename, data);
   },

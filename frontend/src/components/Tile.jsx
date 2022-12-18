@@ -82,6 +82,12 @@ export default function Tile(props) {
     if (props.onSelected) props.onSelected(props.entity);
   };
 
+  const handleDragStart = e => {
+    e.dataTransfer.setData("text/plain", props.entity.uri);
+    // e.preventDefault();
+    // window.api.startDrag("this is a test");
+  };
+
   return (
     <>
       {props.contextItems ?
@@ -93,6 +99,7 @@ export default function Tile(props) {
       }
       <div className={styles.tile} style={tileStyle} onClick={handleClick}
         onContextMenu={e => handleContextMenu(e, contextMenu, setContextMenu)}
+        draggable={true} onDragStart={handleDragStart}
       >
         {ThumbComp ? <ThumbComp className={styles.thumbnail} style={thumbnailCompStyle} /> : null}
         {!ThumbComp && thumbnailURL ?
