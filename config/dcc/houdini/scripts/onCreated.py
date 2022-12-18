@@ -25,6 +25,12 @@ PRESETS = {
         },
         "dop": {
             "dopoutput": r"$CACHE/sim/${VS}/$OS.$SF.sim"
+        },
+        "reference": {
+            "primpath": "/root",
+            "primkind": "assembly",
+            "reftype": "payload",
+            "handlemissingfiles": "ignore"
         }
     }
 }
