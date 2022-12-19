@@ -83,10 +83,22 @@ function AssetTile(props) {
     );
   }
 
+  const handleDragStart = e => {
+    e.dataTransfer.setData("text/plain", props.entity.uri);
+    e.dataTransfer.setData("ignite/kind", props.entity.kind);
+    e.dataTransfer.setData("ignite/path", props.entity.path);
+    e.dataTransfer.setData("ignite/uri", props.entity.uri);
+  };
+
   return (
     <>
-      <Tile {...props} contextItems={contextItems} thumbnailWidth={thumbnailWidth}
-        thumbnail={hasThumbnail ? undefined : "media/no_icon_grey.png"} noTopGradient
+      <Tile {...props}
+        contextItems={contextItems}
+        thumbnailWidth={thumbnailWidth}
+        noTopGradient
+        thumbnail={hasThumbnail ? undefined : "media/no_icon_grey.png"}
+        draggable={true}
+        onDragStart={handleDragStart}
       >
         {details()}
       </Tile>

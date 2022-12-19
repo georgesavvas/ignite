@@ -38,16 +38,25 @@ const RowView = props => {
   }, [props.data]);
 
   const renderEntity = params => {
-    switch (params.value.dir_kind) {
+    const entity = params.value;
+    const handleDragStart = e => {
+      e.dataTransfer.setData("text/plain", entity.uri);
+      e.dataTransfer.setData("ignite/kind", entity.kind);
+      e.dataTransfer.setData("ignite/path", entity.path);
+      e.dataTransfer.setData("ignite/uri", entity.uri);
+    };
+    switch (entity.dir_kind) {
     default:
       return useMemo(() =>
         <DirectoryTile
           onContextMenu={props.onContextMenu}
           handleContextMenuSelection={props.handleContextMenuSelection}
-          entity={params.value}
+          entity={entity}
           noInfo
           noBorder
           noOverlay
+          draggable={true}
+          onDragStart={handleDragStart}
         />, [params.value]
       );
     case "assetversion":
@@ -55,10 +64,12 @@ const RowView = props => {
         <AssetTile
           onContextMenu={props.onContextMenu}
           handleContextMenuSelection={props.handleContextMenuSelection}
-          entity={params.value}
+          entity={entity}
           noInfo
           noBorder
           noOverlay
+          draggable={true}
+          onDragStart={handleDragStart}
         />, [params.value]
       );
     }
