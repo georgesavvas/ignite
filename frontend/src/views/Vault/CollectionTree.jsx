@@ -158,12 +158,13 @@ const StyledTreeItem = memo(function StyledTreeItem(props) {
     bgColor,
     color,
     labelInfo,
+    handleContextMenuSelection,
     name,
     ...other
   } = props;
 
   const handleClick = (action, data) => {
-    props.handleContextMenuSelection(action, data);
+    handleContextMenuSelection(action, data);
     handleClose();
   };
 

@@ -164,7 +164,7 @@ function StyledTreeItem(props) {
 StyledTreeItem.propTypes = {
   bgColor: PropTypes.string,
   color: PropTypes.string,
-  labelIcon: PropTypes.elementType.isRequired,
+  labelIcon: PropTypes.elementType,
   labelInfo: PropTypes.string,
   labelText: PropTypes.string.isRequired
 };
@@ -257,7 +257,7 @@ function ProjectTreeView(props) {
         key={nodes.id}
         nodeId={nodes.id}
         labelText={nodes.name}
-        labelIcon={DIRECTORYICONS[nodes.icon]}
+        labelIcon={DIRECTORYICONS[nodes.icon] || DIRECTORYICONS.directory}
         labelInfo={nodes.dir_kind}
         dirkind={nodes.dir_kind}
         dirpath={path}
