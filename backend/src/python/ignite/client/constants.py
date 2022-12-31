@@ -12,7 +12,7 @@ DCC_ENVS = {
         "HOUDINI_PATH": "{dcc}/houdini;&",
         "HOUDINI_MENU_PATH": "{dcc}/houdini;&",
         "HOUDINI_OTLSCAN_PATH": "&;{dcc}/houdini/hda",
-        "HOUDINI_PYTHON_PANEL_PATH": "{dcc}/houdini/python_panels",
+        "HOUDINI_PYTHON_PANEL_PATH": "{dcc}/houdini/python_panels;&",
         "PXR_PLUGINPATH_NAME": "{dcc}/houdini/dso/{version}/{os}/resources"
     },
     "maya": {
