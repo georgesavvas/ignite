@@ -50,6 +50,8 @@ jobs:
         run: npm run build
         env: 
           CI: false
+          CSC_LINK: ${{ secrets.CERT }}
+          CSC_KEY_PASSWORD: ${{ secrets.CERT_PW }}
 
       - name: Deploy
         working-directory: ./frontend
