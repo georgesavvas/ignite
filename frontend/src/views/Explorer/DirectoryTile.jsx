@@ -183,6 +183,13 @@ function DirectoryTile(props) {
     contextItems.splice(2, 0, goToTaskItem);
   }
 
+  const handleDragStart = e => {
+    e.dataTransfer.setData("text/plain", props.entity.uri);
+    e.dataTransfer.setData("ignite/kind", props.entity.kind);
+    e.dataTransfer.setData("ignite/path", props.entity.path);
+    e.dataTransfer.setData("ignite/uri", props.entity.uri);
+  };
+
   return (
     <>
       <Tile
@@ -192,7 +199,12 @@ function DirectoryTile(props) {
         thumbnailWidth={thumbnailWidth}
         onClick={handleClick}
         contextItems={contextItems}
-        columnWidths={isScene ? ["100px", "100px", "100px", "200px"] : ["100px", "100px", "100px", "200px"]}
+        columnWidths={isScene ?
+          ["100px", "100px", "100px", "200px"] :
+          ["100px", "100px", "100px", "200px"]
+        }
+        draggable={true}
+        onDragStart={handleDragStart}
       >
         {details()}
       </Tile>

@@ -93,6 +93,7 @@ export default function Tile(props) {
       }
       <div className={styles.tile} style={tileStyle} onClick={handleClick}
         onContextMenu={e => handleContextMenu(e, contextMenu, setContextMenu)}
+        draggable={props.draggable} onDragStart={props.onDragStart}
       >
         {ThumbComp ? <ThumbComp className={styles.thumbnail} style={thumbnailCompStyle} /> : null}
         {!ThumbComp && thumbnailURL ?

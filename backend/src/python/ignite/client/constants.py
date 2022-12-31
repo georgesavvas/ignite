@@ -6,12 +6,13 @@ GENERIC_ENV = {
 
 DCC_ENVS = {
     "houdini": {
+        "HSITE": "{dcc}",
         "IGNITE_DCC": "{dcc}/houdini",
         "PYTHONPATH": "{dcc}/houdini/python;{dcc}/common/python;&",
         "HOUDINI_PATH": "{dcc}/houdini;&",
         "HOUDINI_MENU_PATH": "{dcc}/houdini;&",
-        "HOUDINI_OTLSCAN_PATH": "&;{dcc}/houdini/otls",
-        "HOUDINI_PYTHON_PANEL_PATH": "{dcc}/houdini/python_panels",
+        "HOUDINI_OTLSCAN_PATH": "&;{dcc}/houdini/hda",
+        "HOUDINI_PYTHON_PANEL_PATH": "{dcc}/houdini/python_panels;&",
         "PXR_PLUGINPATH_NAME": "{dcc}/houdini/dso/{version}/{os}/resources"
     },
     "maya": {
