@@ -147,7 +147,7 @@ const Dcc = () => {
 
   function renderDcc(dcc_, index) {
     return (
-      <ListItem key={dcc_.path || index}>
+      <ListItem key={index}>
         <IconButton
           color="primary"
           component="span"
