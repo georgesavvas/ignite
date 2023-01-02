@@ -50,8 +50,8 @@ jobs:
         run: npm run build
         env: 
           CI: false
-          CSC_LINK: ${{ runner.os == "macOS" && secrets.MAC_CERT || secrets.WIN_CERT }}
-          CSC_KEY_PASSWORD: ${{ runner.os == "macOS" && secrets.MAC_PW || secrets.WIN_PW }}
+          CSC_LINK: ${{ runner.os == 'macOS' && secrets.MAC_CERT || secrets.WIN_CERT }}
+          CSC_KEY_PASSWORD: ${{ runner.os == 'macOS' && secrets.MAC_PW || secrets.WIN_PW }}
 
       - name: Deploy
         working-directory: ./frontend
