@@ -118,7 +118,7 @@ const config = {
         //     ],
         //   },
         // ],
-        copyright: `Copyright © ${new Date().getFullYear()} Ignite, George Savvas`,
+        copyright: `Copyright © ${new Date().getFullYear()} Ignite, Georgios Savvas`,
       },
       colorMode: {
         defaultMode: 'dark',

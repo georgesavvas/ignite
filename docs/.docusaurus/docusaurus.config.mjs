@@ -67,7 +67,7 @@ export default {
     },
     "footer": {
       "style": "dark",
-      "copyright": "Copyright © 2022 Ignite, George Savvas",
+      "copyright": "Copyright © 2022 Ignite, Georgios Savvas",
       "links": []
     },
     "colorMode": {

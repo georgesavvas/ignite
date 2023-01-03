@@ -3,7 +3,7 @@
   "version": "0.0.1-alpha.19",
   "license": "Apache-2.0",
   "description": "Ignite VFX Pipeline",
-  "author": "George Savvas <hello@georgesavvas.co.uk>",
+  "author": "Georgios Savvas <hello@georgesavvas.co.uk>",
   "main": "public/main.js",
   "homepage": ".",
   "dependencies": {
