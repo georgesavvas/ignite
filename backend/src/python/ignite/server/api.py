@@ -561,7 +561,7 @@ def discover_scenes(path, dcc=[], latest=False, sort=None, as_dict=False):
                 if name.startswith("."):
                     continue
                 elif not d["dir_kind"]:
-                    if path.parent == "scenes":
+                    if path.parent.name == "scenes":
                         # Probably a scene
                         d["dir_kind"] = "scene"
                         utils.create_delayed_anchor(path, "scene")

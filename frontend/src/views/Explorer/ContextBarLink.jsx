@@ -27,7 +27,6 @@ function ContextBarLink(props) {
   const {enqueueSnackbar} = useSnackbar();
   const [contextMenu, setContextMenu] = useState(null);
   const Icon = props.icon;
-  console.log(props);
   const contextItems = [
     {
       "label": "Copy path",

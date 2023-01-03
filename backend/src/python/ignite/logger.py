@@ -65,7 +65,7 @@ def setup_logger(logger):
 def get_logger(name):
     logger = logging.getLogger(name)
     logger.handlers = []
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.INFO)
 
     setup_logger(logger)
 
