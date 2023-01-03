@@ -88,6 +88,9 @@ const dirTemplate = {
   type: "",
   name: ""
 };
+const kindDefaults = {
+  task: {}
+};
 
 const ShotRange = props => {
   const [start, setStart] = useState("");
@@ -151,9 +154,10 @@ const ShotRange = props => {
 
 function CreateDirModal(props) {
   const [dirList, setDirList] = useState([]);
+  const kindOverrides = kindDefaults?.[props.data.kind] ?? {};
 
   useEffect(() => {
-    setDirList([{...dirTemplate}]);
+    setDirList([{...dirTemplate, ...kindOverrides}]);
   }, [props.open]);
 
   const handleAdd = () => {

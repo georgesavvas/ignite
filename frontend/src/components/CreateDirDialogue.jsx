@@ -141,7 +141,7 @@ const NewTaskContent = (values, setValues) => {
     data[field] = e.target.value;
     setValues(prevState => ({...prevState, ...data}));
   };
-
+  console.log(values);
   return (
     <DialogContent>
       <TextField
@@ -182,7 +182,7 @@ const dialogueContents = {
 
 export default function CreateDirDialogue(props) {
   const fields = {
-    dir_name: "",
+    dir_name: props.meta.dir_kind === "task" ? "main" : "",
     task_type: "generic",
     tasks: []
   };
