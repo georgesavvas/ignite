@@ -80,6 +80,7 @@ DCC_DISCOVERY = {
     "houdinifx": {
         "label": "Houdini FX",
         "exts": ["hip", "hipnc"],
+        "args": "-n",
         "paths": {
             "win": [
                 "C:/Program Files/Side Effects Software/Houdini *.*.*/bin/houdini.exe"
@@ -95,6 +96,7 @@ DCC_DISCOVERY = {
     "houdinicore": {
         "label": "Houdini Core",
         "exts": ["hip", "hipnc"],
+        "args": "-n",
         "paths": {
             "win": [
                 "C:/Program Files/Side Effects Software/Houdini *.*.*/bin/houdinicore.exe"

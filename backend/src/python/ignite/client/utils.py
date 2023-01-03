@@ -1,4 +1,4 @@
-# Copyright 2022 George Savvas
+# Copyright 2022 Georgios Savvas
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -60,7 +60,7 @@ def get_config(formatted=True) -> dict:
     if formatted:
         return {
             "root": PurePath(config["root"]),
-            "dcc_config": config["dcc_config"],
+            "dcc_config": config.get("dcc_config", []),
             "server_details": config["server_details"],
             "access": config["access"]
         }
@@ -141,7 +141,7 @@ def get_dcc_version(dcc):
     dcc_name = dcc["name"]
     dcc_path = dcc["path"]
     for data in DCC_VERSIONS:
-        if dcc_name != data["name"]:
+        if not dcc_name.startswith(data["name"]):
             continue
         for actual_v, strings in data["versions"].items():
             for v in strings:
@@ -229,10 +229,15 @@ def get_scene_env(scene):
 
 def get_dcc_env(dcc, projects_root=None):
     dcc_name = dcc["name"]
-    if not dcc_name in DCC_ENVS:
+    envs = None
+    for name, data in DCC_ENVS.items():
+        if dcc_name.startswith(name):
+            envs = data
+            break
+    else:
         return {}
     return replace_vars(
-        DCC_ENVS[dcc_name],
+        envs,
         projects_root=projects_root,
         dcc=dcc
     )
@@ -322,26 +327,26 @@ def get_launch_cmd(dcc, task, scene):
     dcc["name"] = get_dcc_name(dcc)
     env = get_env(task, dcc, scene)
     if scene:
-        scene = scene.get("scene")
+        scene = str(scene.get("scene"))
     for config in CONFIG.get("dcc_config", []):
         if config["name"] == dcc_label:
             dcc_config = config
             break
     else:
         return
-
     os_cmd = {
         "win": [],
         "darwin": ["open", "-a"],
         "linux": []
     }
+    dcc_exec, *args = dcc_config["path"].split(" -", 1)
+    if args:
+        args[0] = "-" + args[0]
     cmd = os_cmd[OS_NAME]
-    cmd += [dcc_config["path"]]
-    if scene:
-        cmd.append(scene)
+    cmd += [dcc_exec]
     data = {
         "cmd": cmd[0],
-        "args": cmd[1:],
+        "args": [scene] if not args else [scene] + args,
         "env": env
     }
     return data
@@ -363,10 +368,15 @@ def copy_default_scene(task, dcc):
     with open(filepath, "r") as f:
         data = yaml.safe_load(f)
     dcc_name = get_dcc_name(dcc)
-    if dcc_name not in data:
-        LOGGER.error(f"Default scenes config is empty {filepath}")
+    scene_path = None
+    for name, path in data.items():
+        if dcc_name.startswith(name):
+            scene_path = path
+            break
+    else:
+        LOGGER.error(f"{dcc_name} is not defined in default scenes {filepath}")
         return
-    src = DCC / "default_scenes" / data[dcc_name]
+    src = DCC / "default_scenes" / scene_path
     dest = Path(task.get("next_scene"))
     dest.mkdir(parents=True, exist_ok=True)
     LOGGER.info(f"Copying default scene {src} to {dest}")

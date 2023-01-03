@@ -1,4 +1,4 @@
-// Copyright 2022 George Savvas
+// Copyright 2022 Georgios Savvas
 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -90,7 +90,7 @@ export default function ContextBar() {
             const Icon = DIRECTORYICONS[kind];
             return (
               <ContextBarLink setCurrentContext={setCurrentContext} icon={Icon}
-                path={path} key={index}
+                path={path} key={index} root={currentContext.root}
               >
                 {section}
               </ContextBarLink>
