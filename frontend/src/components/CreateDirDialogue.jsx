@@ -1,4 +1,4 @@
-// Copyright 2022 George Savvas
+// Copyright 2022 Georgios Savvas
 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -141,7 +141,7 @@ const NewTaskContent = (values, setValues) => {
     data[field] = e.target.value;
     setValues(prevState => ({...prevState, ...data}));
   };
-
+  console.log(values);
   return (
     <DialogContent>
       <TextField
@@ -182,7 +182,7 @@ const dialogueContents = {
 
 export default function CreateDirDialogue(props) {
   const fields = {
-    dir_name: "",
+    dir_name: props.meta.dir_kind === "task" ? "main" : "",
     task_type: "generic",
     tasks: []
   };

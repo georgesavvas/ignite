@@ -1,4 +1,4 @@
-// Copyright 2022 George Savvas
+// Copyright 2022 Georgios Savvas
 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,16 +27,15 @@ function ContextBarLink(props) {
   const {enqueueSnackbar} = useSnackbar();
   const [contextMenu, setContextMenu] = useState(null);
   const Icon = props.icon;
-
   const contextItems = [
     {
       "label": "Copy path",
-      "fn": () =>  CopyToClipboard(props.path, enqueueSnackbar),
+      "fn": () =>  CopyToClipboard(`${props.root}/${props.path}`, enqueueSnackbar),
       "divider": true
     },
     {
       "label": "Open in file explorer",
-      "fn": () => openExplorer(props.path, enqueueSnackbar)
+      "fn": () => openExplorer(`${props.root}/${props.path}`, enqueueSnackbar)
     },
   ];
 

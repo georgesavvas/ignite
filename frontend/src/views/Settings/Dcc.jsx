@@ -1,4 +1,4 @@
-// Copyright 2022 George Savvas
+// Copyright 2022 Georgios Savvas
 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -62,6 +62,7 @@ const Dcc = () => {
 
   const handleDccAdd = data => {
     if (!data || !data.length) {
+      console.log(dcc);
       setDcc(prevState => [placeholder_config, ...prevState]);
       return;
     }
@@ -76,10 +77,15 @@ const Dcc = () => {
   };
 
   const handleDccModify = data => {
+    console.log("modify", data);
+    console.log("before", dcc);
     setDcc(prevState => {
-      let cc = [...prevState];
-      cc[data.index][data.field] = data.value;
-      return cc;
+      let dcc_copy = [...prevState];
+      let index_copy = {...dcc_copy[data.index]};
+      index_copy[data.field] = data.value;
+      dcc_copy[data.index] = index_copy;
+      console.log(dcc_copy);
+      return dcc_copy;
     });
   };
 

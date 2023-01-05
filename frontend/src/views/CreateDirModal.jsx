@@ -1,4 +1,4 @@
-// Copyright 2022 George Savvas
+// Copyright 2022 Georgios Savvas
 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -88,6 +88,9 @@ const dirTemplate = {
   type: "",
   name: ""
 };
+const kindDefaults = {
+  task: {}
+};
 
 const ShotRange = props => {
   const [start, setStart] = useState("");
@@ -151,9 +154,10 @@ const ShotRange = props => {
 
 function CreateDirModal(props) {
   const [dirList, setDirList] = useState([]);
+  const kindOverrides = kindDefaults?.[props.data.kind] ?? {};
 
   useEffect(() => {
-    setDirList([{...dirTemplate}]);
+    setDirList([{...dirTemplate, ...kindOverrides}]);
   }, [props.open]);
 
   const handleAdd = () => {
