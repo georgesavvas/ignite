@@ -150,8 +150,8 @@
       "icon": "public/media/desktop_icon/mac/icon.icns",
       "target": "dmg",
       "hardenedRuntime": true,
-      "entitlements": "build/entitlements.mac.plist",
-      "entitlementsInherit": "build/entitlements.mac.plist",
+      "entitlements": "public/entitlements.mac.plist",
+      "entitlementsInherit": "public/entitlements.mac.plist",
       "gatekeeperAssess": false,
       "publish": [
         "github"
