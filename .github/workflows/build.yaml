@@ -32,7 +32,7 @@ jobs:
         run: python tools_cleanup.py
 
       - name: Build and copy backend
-        if: runner.os == "macOS"
+        if: runner.os == 'macOS'
         env: 
           MACOS_CERTIFICATE: ${{ secrets.MAC_CERT }}
           MACOS_CERTIFICATE_PWD: ${{ secrets.MAC_PW }}
@@ -50,7 +50,7 @@ jobs:
           python build_and_copy.py
       
       - name: Build and copy backend
-        if: runner.os != "macOS"
+        if: runner.os != 'macOS'
         working-directory: ./backend
         run: python build_and_copy.py
 
