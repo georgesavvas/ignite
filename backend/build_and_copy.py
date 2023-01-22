@@ -7,7 +7,7 @@ from pathlib import Path
 OS_NAME = platform.system()
 CMDS = {
     "Windows": "pyinstaller --hidden-import=timeago.locales.en src/python/ignite/main.py --noconfirm --uac-admin --windowed --onefile --name=IgniteBackend --icon ../frontend/public/media/desktop_icon/win/icon.ico",
-    "Darwin": "pyinstaller --hidden-import=timeago.locales.en src/python/ignite/main.py --noconfirm --windowed --onefile --codesign-identity=$MACOS_CERTIFICATE_NAME --osx-entitlements-file=./entitlements.plist --name=IgniteBackend --icon=../frontend/public/media/desktop_icon/mac/icon.icns",
+    "Darwin": "pyinstaller --hidden-import=timeago.locales.en src/python/ignite/main.py --noconfirm --windowed --onefile --codesign-identity=\"$MACOS_CERTIFICATE_NAME\" --osx-entitlements-file=./entitlements.plist --name=IgniteBackend --icon=../frontend/public/media/desktop_icon/mac/icon.icns",
     "Linux": "pyinstaller --hidden-import=timeago.locales.en src/python/ignite/main.py --noconfirm --windowed --onefile --name=IgniteBackend --icon=../icon.icns"
 }
 
