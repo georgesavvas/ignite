@@ -39,6 +39,7 @@ jobs:
           MACOS_CI_KEYCHAIN_PWD: ${{ secrets.MAC_KEYCHAIN_CI_PW }}
         # working-directory: ./backend
         run: |
+          echo "Setting up keychain for codesigning"
           if [ "$RUNNER_OS" == "macOS" ]; then
             echo $MACOS_CERTIFICATE | base64 --decode > certificate.p12
             
@@ -47,6 +48,8 @@ jobs:
             security unlock-keychain -p "$MACOS_CI_KEYCHAIN_PWD" build.keychain
             security import certificate.p12 -k build.keychain -P "$MACOS_CERTIFICATE_PWD" -T /usr/bin/codesign
             security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$MACOS_CI_KEYCHAIN_PWD" build.keychain
+          else
+            echo "Not running on mac, skipping"
           fi
           cd ./backend
           python build_and_copy.py
