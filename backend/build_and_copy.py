@@ -17,8 +17,7 @@ if not cmd:
     sys.exit()
 print(f"cmd: {cmd}")
 cmd_split = cmd.split()
-for section in cmd_split:
-    section = section.replace("{cert_name}", "Mac Developer ID Application: Georgios Savvas")
+cmd_split = [section.replace("{cert_name}", "Mac Developer ID Application: Georgios Savvas") for section in cmd_split]
 print(cmd_split)
 subprocess.run(cmd_split)
 current = Path(__file__)
