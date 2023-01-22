@@ -10,7 +10,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     strategy:
-      fail-fast: false
+      fail-fast: false  
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
 
@@ -32,8 +32,39 @@ jobs:
         run: python tools_cleanup.py
 
       - name: Build and copy backend
-        working-directory: ./backend
-        run: python build_and_copy.py
+        env: 
+          MACOS_CERTIFICATE: ${{ secrets.MAC_CERT }}
+          MACOS_CERTIFICATE_PWD: ${{ secrets.MAC_PW }}
+          MACOS_CERTIFICATE_NAME: ${{ secrets.MAC_CERT_NAME }}
+          MACOS_CI_KEYCHAIN_PWD: ${{ secrets.MAC_KEYCHAIN_CI_PW }}
+        # working-directory: ./backend
+        run: |
+          echo $MACOS_CERTIFICATE | base64 --decode > certificate.p12
+          
+          security create-keychain -p "$MACOS_CI_KEYCHAIN_PWD" build.keychain 
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "$MACOS_CI_KEYCHAIN_PWD" build.keychain
+          security import certificate.p12 -k build.keychain -P "$MACOS_CERTIFICATE_PWD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$MACOS_CI_KEYCHAIN_PWD" build.keychain
+          cd ./backend
+          python build_and_copy.py
+      
+      # - name: Codesign backend
+      #   env: 
+      #     MACOS_CERTIFICATE: ${{ secrets.MAC_CERT }}
+      #     MACOS_CERTIFICATE_PWD: ${{ secrets.MAC_PW }}
+      #     MACOS_CERTIFICATE_NAME: ${{ secrets.MAC_CERT_NAME }}
+      #     MACOS_CI_KEYCHAIN_PWD: ${{ secrets.MAC_KEYCHAIN_CI_PW }}
+      #   run: |
+      #     echo $MACOS_CERTIFICATE | base64 --decode > certificate.p12
+          
+      #     security create-keychain -p "$MACOS_CI_KEYCHAIN_PWD" build.keychain 
+      #     security default-keychain -s build.keychain
+      #     security unlock-keychain -p "$MACOS_CI_KEYCHAIN_PWD" build.keychain
+      #     security import certificate.p12 -k build.keychain -P "$MACOS_CERTIFICATE_PWD" -T /usr/bin/codesign
+      #     security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$MACOS_CI_KEYCHAIN_PWD" build.keychain
+          
+      #     /usr/bin/codesign --force -s "$MACOS_CERTIFICATE_NAME" --options runtime target/mac/Espanso.app -v
 
       - name: Install Node.js, NPM and Yarn
         uses: actions/setup-node@v3
