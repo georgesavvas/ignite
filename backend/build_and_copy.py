@@ -18,7 +18,7 @@ if not cmd:
 print(f"cmd: {cmd}")
 cmd_split = cmd.split()
 for section in cmd_split:
-    section.format(cert_name="Developer ID Application: Georgios Savvas (AJ25U37XWA)")
+    section.format(cert_name="Mac Developer ID Application: Georgios Savvas")
 subprocess.run(cmd_split)
 current = Path(__file__)
 backend_root = current.parent
