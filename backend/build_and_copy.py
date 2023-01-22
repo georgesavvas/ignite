@@ -19,6 +19,7 @@ print(f"cmd: {cmd}")
 cmd_split = cmd.split()
 for section in cmd_split:
     section = section.replace("{cert_name}", "Mac Developer ID Application: Georgios Savvas")
+print(cmd_split)
 subprocess.run(cmd_split)
 current = Path(__file__)
 backend_root = current.parent
