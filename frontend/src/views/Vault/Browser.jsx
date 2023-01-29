@@ -49,7 +49,9 @@ function Browser(props) {
   useEffect(() => {
     if (!props.loadedData) return;
     const _tiles = props.loadedData.reduce(function(obj, entity) {
-      if (entity.path === props.selectedEntity.path) props.handleEntitySelected(entity);
+      if (entity.path === props.selectedEntity.path) {
+        props.handleEntitySelected(entity);
+      }
       entity.path = BuildFileURL(entity.path, config, {pathOnly: true});
       if (entity.components) {
         entity.components.forEach(comp => {
@@ -68,7 +70,8 @@ function Browser(props) {
       return obj;
     }, {});
     setTiles(_tiles);
-  }, [props.loadedData, props.selectedEntity.path, explorerSettings.currentViewType, explorerSettings.currentTileSize]);
+  }, [props.loadedData, props.selectedEntity.path,
+    explorerSettings.currentViewType, explorerSettings.currentTileSize]);
 
   const handleContextMenuSelection = (action, _data) => {
     const data = {..._data};
@@ -85,7 +88,7 @@ function Browser(props) {
   };
 
   const handleTilesPerPageChange = (event) => {
-    props.setTilesPerPage(parseInt(event.target.value));
+    props.setTilesPerPage(parseInt(event.target.value) || 50);
   };
 
   const handleTileSizeChange = (event) => {
@@ -109,26 +112,26 @@ function Browser(props) {
   const getBrowserHelperText = () => {
     let s = `${props.pages.results} results | `;
     s += props.query.sort ? `Sorted by: ${props.query.sort.label}` : "";
-    s += ` | Collection: ${props.selectedCollection?.path}`;
+    s += ` | Collection: ${props.selectedCollection}`;
     return s;
   };
 
   return (
     <div className={styles.container}>
       <DeleteDir open={modalData.deleteOpen} enqueueSnackbar={enqueueSnackbar}
-        onClose={() => setModalData(prevState => ({...prevState, deleteOpen: false}))}
+        onClose={() => setModalData(prev => ({...prev, deleteOpen: false}))}
         data={modalData} fn={props.onRefresh}
       />
       <RenameDir open={modalData.renameOpen} enqueueSnackbar={enqueueSnackbar}
-        onClose={() => setModalData(prevState => ({...prevState, renameOpen: false}))}
+        onClose={() => setModalData(prev => ({...prev, renameOpen: false}))}
         data={modalData} fn={props.onRefresh}
       />
-      <VaultExport open={modalData.vaultExportOpen} enqueueSnackbar={enqueueSnackbar}
-        onClose={() => setModalData(prevState => ({...prevState, vaultExportOpen: false}))}
-        data={modalData} fn={props.onRefresh}
+      <VaultExport open={modalData.vaultExportOpen}
+        onClose={() => setModalData(prev => ({...prev, vaultExportOpen: false}))}
+        data={modalData} fn={props.onRefresh} enqueueSnackbar={enqueueSnackbar}
       />
-      <TopBar onRefresh={props.onRefresh}
-        onFilterStringChange={handleFilterStringChange} setQuery={props.handleQueryChange}
+      <TopBar onRefresh={props.onRefresh} setQuery={props.handleQueryChange}
+        onFilterStringChange={handleFilterStringChange}
         onFiltersToggle={() => setFiltersOpen(prevState => !prevState)}
       />
       <Divider />
@@ -162,9 +165,9 @@ function Browser(props) {
       </div>
       <Divider />
       <PageBar pages={props.pages?.total} currentPage={props.pages.current}
-        onChange={handlePageChange}
+        onChange={handlePageChange} tileSize={explorerSettings.currentTileSize}
         onTilesPerPageChange={handleTilesPerPageChange}
-        onTileSizeChange={handleTileSizeChange} tileSize={explorerSettings.currentTileSize}
+        onTileSizeChange={handleTileSizeChange}
       />
     </div>
   );

@@ -211,7 +211,10 @@ function Explorer() {
   };
 
   const handleTilesPerPageChange = value => {
-    setExplorerSettings(prevState => ({...prevState, tilesPerPage: value}));
+    setExplorerSettings(prevState => ({
+      ...prevState,
+      tilesPerPage: parseInt(value) || 50
+    }));
   };
 
   const handleResultTypeChange = value => {
