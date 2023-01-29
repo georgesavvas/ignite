@@ -72,35 +72,26 @@ const StyledTreeItemRoot = styled(TreeItem)(({theme}) => ({
   }
 }));
 
-const shouldBeDisabled = (scope, path) => {
-  if (scope !== "studio") return;
-  if (path.startsWith("/all/2d/elements") || path.startsWith("/all/projects")) {
-    return true;
-  }
-  if (path === "/all") return true;
-};
-
 function getContextItems(data, enqueueSnackbar) {
-  const disabled = shouldBeDisabled(data.scope, data.path);
+  const isRoot = data.path === "/all";
   return [
     {
       label: "Create",
-      disabled: disabled,
       fn: () =>  data.handleClick("create", data)
     },
     {
       label: "Edit",
-      disabled: disabled,
+      disabled: isRoot,
       fn: () =>  data.handleClick("edit", data)
     },
     {
       label: "Rename",
-      disabled: disabled,
+      disabled: isRoot,
       fn: () =>  data.handleClick("rename", data)
     },
     {
       label: "Delete",
-      disabled: disabled,
+      disabled: isRoot,
       fn: () => data.handleClick("delete", data),
       divider: true
     },
