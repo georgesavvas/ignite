@@ -10,8 +10,7 @@
 .treeContainer {
     box-sizing: border-box;
     overflow-y: auto;
-    /* height: 100%;
-    fle */
+    height: 100%;
 }
 
 .filterBar {
