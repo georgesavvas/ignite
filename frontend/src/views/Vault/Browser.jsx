@@ -133,6 +133,7 @@ function Browser(props) {
       <TopBar onRefresh={props.onRefresh} setQuery={props.handleQueryChange}
         onFilterStringChange={handleFilterStringChange}
         onFiltersToggle={() => setFiltersOpen(prevState => !prevState)}
+        enqueueSnackbar={enqueueSnackbar}
       />
       <Divider />
       <LinearProgress color="ignite"

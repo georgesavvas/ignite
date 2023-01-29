@@ -43,11 +43,17 @@ const style = {
   gap: "5px"
 };
 
+const iconButtonStyle = {height: "34.25px", width: "34.25px"};
+
 function ExplorerBar(props) {
   const [ingestOpen, setIngestOpen] = useState(false);
   const [newAssetOpen, setNewAssetOpen] = useState(false);
   const [filterMenu, setFilterMenu] = useState(null);
-  const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
+  const [
+    currentContext,
+    setCurrentContext,
+    refreshContext
+  ] = useContext(ContextContext);
   const [filterValue, setFilterValue] = useState("");
 
   const handleResultTypeChange = (e, value) => {
@@ -149,12 +155,20 @@ function ExplorerBar(props) {
             </ToggleButton>
           </ToggleButtonGroup>
         </Stack>
-        <FilterField filterValue={filterValue} setFilterValue={handleFilterChange} />
-        <IconButton onClick={handleSortClicked} style={{height: "34.25px"}}>
+        <FilterField filterValue={filterValue}
+          setFilterValue={handleFilterChange}
+        />
+        <IconButton onClick={handleSortClicked} style={iconButtonStyle}>
           <SortIcon />
         </IconButton>
-        <FormControlLabel style={{height: "34.25px"}} control={<Checkbox defaultChecked onChange={props.onLatestChange} />} label="Latest" />
-        <IgnButton variant="outlined" style={{minWidth: "90px"}} onClick={refreshContext}>Refresh</IgnButton>
+        <FormControlLabel style={{height: "34.25px"}} label="Latest"
+          control={<Checkbox defaultChecked onChange={props.onLatestChange} />}
+        />
+        <IgnButton variant="outlined" style={{minWidth: "90px"}}
+          onClick={refreshContext}
+        >
+          Refresh
+        </IgnButton>
       </div>
       <div style={style}>
         <IgnButton

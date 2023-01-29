@@ -77,7 +77,7 @@ const NewAsset = props => {
       name: name,
       comps: comps,
       tags: tags,
-      task: currentContext.path
+      task: props.path || currentContext.path
     };
     clientRequest("ingest_asset", {data: data}).then(resp => {
       if (resp.ok) {

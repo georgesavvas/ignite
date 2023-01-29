@@ -13,12 +13,24 @@
 // limitations under the License.
 
 
-import React, {useState, createContext} from "react";
+import React, {useState, createContext, useEffect, useContext} from "react";
+import BuildFileURL from "../services/BuildFileURL";
+import { ConfigContext } from "./ConfigContext";
 
 export const VaultContext = createContext();
 
 export const VaultProvider = props => {
   const [vaultContext, setVaultContext] = useState({update: 0});
+  const [config] = useContext(ConfigContext);
+
+  useEffect(() => {
+    const path = BuildFileURL(
+      "__vault__",
+      config,
+      {reverse: true, pathOnly: true}
+    );
+    setVaultContext(prev => ({...prev, path: path}));
+  }, [config.access, config.serverDetails]);
 
   const refreshVault = () => {
     setVaultContext(prevState => ({...prevState, update: prevState.update + 1}));

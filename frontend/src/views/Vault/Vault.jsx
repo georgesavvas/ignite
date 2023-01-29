@@ -105,7 +105,7 @@ function Vault(props) {
     if (!props.open) return;
     if (!config.ready) return;
     const data = {
-      path: BuildFileURL("__vault__", config, {reverse: true, pathOnly: true}),
+      path: vaultContext.path,
       page: pages.current,
       limit: tilesPerPage,
       query: {...query, latest: true}
