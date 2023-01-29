@@ -96,7 +96,7 @@ function Ingest(props) {
   const RULETEMPLATE = {
     file_target: "*",
     file_target_type: "filename",
-    task: currentContext.path,
+    task: props.path || currentContext.path,
     name: "{name}",
     comp: "{comp}",
     rule: "{name}/{comp}.{ext}",
