@@ -84,9 +84,7 @@ function Vault(props) {
 
   useEffect(() => {
     const previous = localStorage.getItem("selectedCollection");
-    if (!selectedCollection && !previous) setSelectedCollection("/all");
-    else if (!previous) return;
-    setSelectedCollection(selectedCollection);
+    setSelectedCollection(selectedCollection || (previous ?? "/all"));
   }, []);
 
   useEffect(() => {
@@ -116,9 +114,14 @@ function Vault(props) {
     serverRequest("get_assetversions", data).then(resp => {
       setIsLoading(false);
       setLoadedData(resp.data);
-      setPages(prevState => ({...prevState, total: resp.pages?.total, results: resp.pages?.results}));
+      setPages(prevState => ({
+        ...prevState,
+        total: resp.pages?.total,
+        results: resp.pages?.results
+      }));
     });
-  }, [pages.current, vaultContext, query, tilesPerPage, selectedCollection, refreshValue, props.open, config.ready]);
+  }, [pages.current, vaultContext, query, tilesPerPage, selectedCollection,
+    refreshValue, props.open, config.ready]);
 
   const handleEntitySelected = entity => {
     setSelectedEntity(entity);
@@ -143,14 +146,16 @@ function Vault(props) {
   const handleFilterChange = data => {
     setIsLoading(true);
     debounced(() => {
-      setQuery(prevState => ({...prevState, filters: {...prevState.filters, ...data}}));
+      setQuery(
+        prevState => ({...prevState, filters: {...prevState.filters, ...data}})
+      );
       setPages(prevState => ({...prevState, current: 1}));
     });
   };
 
   const handleCollectionChange = coll => {
-    setSelectedCollection(coll);
-    localStorage.setItem("selectedCollection", coll);
+    setSelectedCollection(coll.path);
+    localStorage.setItem("selectedCollection", coll.path);
   };
 
   return (
@@ -166,9 +171,10 @@ function Vault(props) {
           <div className={styles.collectionContainer}>
             <DndProvider backend={HTML5Backend}>
               <CollectionTree collectionData={collectionData}
-                refreshValue={refreshValue}
-                selectedCollection={selectedCollection} onRefresh={handleRefresh}
-                setSelectedCollection={handleCollectionChange} onFilterChange={handleFilterChange}
+                refreshValue={refreshValue} onFilterChange={handleFilterChange}
+                selectedCollection={selectedCollection}
+                setSelectedCollection={handleCollectionChange}
+                onRefresh={handleRefresh}
               />
             </DndProvider>
           </div>
