@@ -1,7 +1,7 @@
 #!/bin/bash
 
-echo "Killing processes listening on 9070...";
-lsof -P | grep ':9070' | awk '{print $2}' | xargs kill -9
+# echo "Killing processes listening on 9070...";
+# lsof -P | grep ':9070' | awk '{print $2}' | xargs kill -9
 parent_path=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
 cd "$parent_path"
 cd ../../..

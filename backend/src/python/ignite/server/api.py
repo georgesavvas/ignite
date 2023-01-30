@@ -507,7 +507,6 @@ def discover_assets(path, asset_kinds=[], sort=None, as_dict=False, filters={}, 
     if as_dict:
         assets = [a.as_dict() for a in assets]
         if filters:
-            from pprint import pprint
             assets = promote_av_attribs(assets)
         if filters.get("collection"):
             query = Query(format_filter(filters["collection"]))
@@ -523,7 +522,7 @@ def discover_assets(path, asset_kinds=[], sort=None, as_dict=False, filters={}, 
     return assets
 
 
-def discover_assetversions(path, asset_kinds=[], latest=False, sort=None, filters=[], as_dict=False):
+def discover_assetversions(path, asset_kinds=[], latest=False, sort=None, filters={}, as_dict=False):
     assetversions = []
     assets = discover_assets(path, asset_kinds=asset_kinds)
     for asset in assets:
@@ -536,6 +535,16 @@ def discover_assetversions(path, asset_kinds=[], latest=False, sort=None, filter
         assetversions += avs
     if as_dict:
         assetversions = [av.as_dict() for av in assetversions]
+        if filters.get("collection"):
+            query = Query(format_filter(filters["collection"]))
+            filtered = list(filter(query.match, assetversions))
+            assetversions = filtered
+            print("AFTER COLLECTION FILTER", len(assetversions))
+        if filters.get("search"):
+            expr = format_filter(filters["search"])
+            query = Query(expr)
+            filtered = list(filter(query.match, assetversions))
+            assetversions = filtered
         assetversions = sort_results(assetversions, sort)
     return assetversions
 
