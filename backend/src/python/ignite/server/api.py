@@ -281,7 +281,7 @@ def create_dirs(path, method, dirs):
     created = 0
     entity = find(path)
     if not entity:
-        print(f"Couldn't find entity at {path}")
+        LOGGER.warning(f"Couldn't find entity at {path}")
         return created
     for d in dirs:
         dir_name = d.get("dir_name")
@@ -292,7 +292,7 @@ def create_dirs(path, method, dirs):
             created += 1
             continue
         if not hasattr(entity, method):
-            print(entity, "has no method", method)
+            LOGGER.warning(entity, "has no method", method)
             continue
         getattr(entity, method)(dir_name)
         created += 1
@@ -512,7 +512,6 @@ def discover_assets(path, asset_kinds=[], sort=None, as_dict=False, filters={}, 
             query = Query(format_filter(filters["collection"]))
             filtered = list(filter(query.match, assets))
             assets = filtered
-            print("AFTER COLLECTION FILTER", len(assets))
         if filters.get("search"):
             expr = format_filter(filters["search"])
             query = Query(expr)
@@ -539,7 +538,6 @@ def discover_assetversions(path, asset_kinds=[], latest=False, sort=None, filter
             query = Query(format_filter(filters["collection"]))
             filtered = list(filter(query.match, assetversions))
             assetversions = filtered
-            print("AFTER COLLECTION FILTER", len(assetversions))
         if filters.get("search"):
             expr = format_filter(filters["search"])
             query = Query(expr)
@@ -779,10 +777,8 @@ def get_repr_comp(target):
 def delete_entity(path, entity_type):
     entity = find(path)
     if entity.dir_kind != entity_type:
-        print(
-            "Attempted to delete", entity.dir_kind,
-            "but the entity was supposed to be", entity_type
-        )
+        LOGGER.error(f"Attempted to delete {entity.dir_kind} but the entity"
+            "was supposed to be {entity_type}")
         return False
     if not hasattr(entity, "delete"):
         return False
