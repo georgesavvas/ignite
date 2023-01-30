@@ -440,21 +440,27 @@ def discover_assets(path, asset_kinds=[], sort=None, as_dict=False, filters={}, 
     def discover(path, l=[]):
         name = path.name
         if path.is_dir():
+            LOGGER.debug(f"Checking if {path} is an asset...")
+            contents = sorted(list(path.iterdir()))
             d = {}
             d["name"] = name
             d["path"] = str(path)
             d["dir_kind"] = ""
             d["anchor"] = None
-            for x in sorted(list(path.iterdir())):
+            for x in contents:
+                LOGGER.debug(f"Processing {x}")
                 name = x.name
                 if name in (".config", "common"):
+                    LOGGER.debug("Ignoring cause it's reserved")
                     continue
                 if name in KINDS:
                     kind = KINDS[name]
                     d["dir_kind"] = kind
                     d["anchor"] = x
+                    LOGGER.debug(f"{x} is an anchor ({kind})")
                     continue
                 if name.startswith("."):
+                    LOGGER.debug("Ignoring cause it starts with a .")
                     continue
                 elif not d["dir_kind"]:
                     parent1 = path.parent
@@ -469,6 +475,7 @@ def discover_assets(path, asset_kinds=[], sort=None, as_dict=False, filters={}, 
                         utils.create_delayed_anchor(path, "asset")
                     elif d["name"] not in ("exports", "scenes"):
                         # We should ignore
+                        LOGGER.debug("Ignoring cause it has no anchor")
                         return []
                 if d["dir_kind"] == "asset" and d["anchor"]:
                     with open(d["anchor"], "r") as f:
