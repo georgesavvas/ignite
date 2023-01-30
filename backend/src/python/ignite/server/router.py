@@ -296,7 +296,7 @@ async def get_assetversions(request: Request):
         latest=query.get("latest", 0),
         sort=query.get("sort"),
         as_dict=True,
-        filters=query.get("filters")
+        filters=query.get("filters", {})
     )
     data = utils.query_filter(data, query)
     limit = result.get("limit", 20)
