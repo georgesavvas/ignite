@@ -173,4 +173,5 @@ def ensure_clean_name(name):
 
 
 def is_read_only(path):
-    return not os.access(path, os.W_OK)
+    # return not os.access(path, os.W_OK)
+    return oct(Path(path).stat().st_mode).endswith("555")

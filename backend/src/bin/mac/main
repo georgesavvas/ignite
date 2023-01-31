@@ -7,4 +7,4 @@ cd "$parent_path"
 cd ../../..
 source env/bin/activate
 cd src/python
-python3 -m ignite.main
+sudo python3 -m ignite.main
