@@ -14,6 +14,7 @@
 
 
 import os
+import stat
 import shutil
 from datetime import datetime, timezone
 from pathlib import Path
@@ -287,35 +288,58 @@ class Directory():
         return existing
 
     def set_protected(self, protected):
+        read_only = (
+            stat.S_IRUSR | stat.S_IXUSR |
+            stat.S_IRGRP | stat.S_IXGRP |
+            stat.S_IROTH | stat.S_IXOTH
+        )
+        read_write = (
+            stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR |
+            stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP |
+            stat.S_IROTH | stat.S_IWOTH | stat.S_IXOTH
+        )
         ok = True
-        mode = 0o444 if protected else 0o777
+        # mode = 0o555 if protected else 0o777
+        mode = read_write if not protected else read_only
+        LOGGER.info("Protecting files" if protected else "Un-protecting files")
+        LOGGER.info(f"Changing permissions of files inside {self.path}...")
         for file in self.path.iterdir():
-            LOGGER.info(f"Changing {file} mode to {mode}")
+            LOGGER.debug(f"Changing {file} mode to {oct(mode)}")
             try:
                 file.chmod(mode)
             except Exception as e:
                 LOGGER.error(e)
                 ok = False
                 break
+        should_be = "555" if protected else "777"
+        anchor_mode = oct(self.anchor.stat().st_mode)
+        LOGGER.info(f"{self.anchor} mode is now {anchor_mode}")
+        ok = anchor_mode.endswith(should_be)
         if ok:
-            LOGGER.info(f"Changing {self.path} mode to {mode}")
+            LOGGER.info(f"Changing {self.path} mode to {oct(mode)}")
             try:
                 self.path.chmod(mode)
             except Exception as e:
                 LOGGER.error(e)
                 ok = False
+        self_mode = oct(self.path.stat().st_mode)
+        LOGGER.info(f"{self.path} mode is now {self_mode}")
+        ok = self_mode.endswith(should_be)
         if ok:
-            can_access = os.access(self.anchor, os.W_OK)
-            LOGGER.debug(f"Anchor access: {can_access}")
-            if can_access != protected:
-                return True
+            # Doesn't work anymore as the backend runs as root
+            # can_access = os.access(self.anchor, os.W_OK)
+            # LOGGER.debug(f"Anchor access: {can_access}")
+            # if can_access != protected:
+            #     return True
+            return True
         # Something went wrong, revert changes
-        LOGGER.warning("Reverting permission changes...")
-        mode = 0o444 if not protected else 0o777
-        LOGGER.info(f"Changing {self.path} mode to {mode}")
+        LOGGER.warning("Failed, reverting permission changes...")
+        # mode = 0o555 if not protected else 0o777
+        mode = read_only if not protected else read_write
+        LOGGER.info(f"Changing {self.path} mode to {oct(mode)}")
         self.path.chmod(mode)
         for file in self.path.iterdir():
-            LOGGER.info(f"Changing {file} mode to {mode}")
+            LOGGER.debug(f"Changing {file} mode to {oct(mode)}")
             try:
                 file.chmod(mode)
             except Exception as e:
