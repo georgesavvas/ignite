@@ -108,7 +108,7 @@ export const ConfigProvider = props => {
     const clientAddress = window.services.get_env("IGNITE_CLIENT_ADDRESS");
     const serverPort = window.services.get_port();
     Promise.all([clientData, clientAddress, serverPort]).then(resp => {
-      if (!resp[0]) return;
+      if (!resp[0] || !resp[0].ok) return;
       const clientDataResults = resp[0].data;
       console.log("Config received:", clientDataResults);
       const savedServerDetails = clientDataResults.server_details;
