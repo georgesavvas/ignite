@@ -281,7 +281,7 @@ def create_dirs(path, method, dirs):
     created = 0
     entity = find(path)
     if not entity:
-        print(f"Couldn't find entity at {path}")
+        LOGGER.warning(f"Couldn't find entity at {path}")
         return created
     for d in dirs:
         dir_name = d.get("dir_name")
@@ -292,7 +292,7 @@ def create_dirs(path, method, dirs):
             created += 1
             continue
         if not hasattr(entity, method):
-            print(entity, "has no method", method)
+            LOGGER.warning(entity, "has no method", method)
             continue
         getattr(entity, method)(dir_name)
         created += 1
@@ -440,21 +440,27 @@ def discover_assets(path, asset_kinds=[], sort=None, as_dict=False, filters={}, 
     def discover(path, l=[]):
         name = path.name
         if path.is_dir():
+            LOGGER.debug(f"Checking if {path} is an asset...")
+            contents = sorted(list(path.iterdir()))
             d = {}
             d["name"] = name
             d["path"] = str(path)
             d["dir_kind"] = ""
             d["anchor"] = None
-            for x in sorted(list(path.iterdir())):
+            for x in contents:
+                LOGGER.debug(f"Processing {x}")
                 name = x.name
                 if name in (".config", "common"):
+                    LOGGER.debug("Ignoring cause it's reserved")
                     continue
                 if name in KINDS:
                     kind = KINDS[name]
                     d["dir_kind"] = kind
                     d["anchor"] = x
+                    LOGGER.debug(f"{x} is an anchor ({kind})")
                     continue
                 if name.startswith("."):
+                    LOGGER.debug("Ignoring cause it starts with a .")
                     continue
                 elif not d["dir_kind"]:
                     parent1 = path.parent
@@ -469,6 +475,7 @@ def discover_assets(path, asset_kinds=[], sort=None, as_dict=False, filters={}, 
                         utils.create_delayed_anchor(path, "asset")
                     elif d["name"] not in ("exports", "scenes"):
                         # We should ignore
+                        LOGGER.debug("Ignoring cause it has no anchor")
                         return []
                 if d["dir_kind"] == "asset" and d["anchor"]:
                     with open(d["anchor"], "r") as f:
@@ -500,13 +507,11 @@ def discover_assets(path, asset_kinds=[], sort=None, as_dict=False, filters={}, 
     if as_dict:
         assets = [a.as_dict() for a in assets]
         if filters:
-            from pprint import pprint
             assets = promote_av_attribs(assets)
         if filters.get("collection"):
             query = Query(format_filter(filters["collection"]))
             filtered = list(filter(query.match, assets))
             assets = filtered
-            print("AFTER COLLECTION FILTER", len(assets))
         if filters.get("search"):
             expr = format_filter(filters["search"])
             query = Query(expr)
@@ -516,7 +521,7 @@ def discover_assets(path, asset_kinds=[], sort=None, as_dict=False, filters={}, 
     return assets
 
 
-def discover_assetversions(path, asset_kinds=[], latest=False, sort=None, filters=[], as_dict=False):
+def discover_assetversions(path, asset_kinds=[], latest=False, sort=None, filters={}, as_dict=False):
     assetversions = []
     assets = discover_assets(path, asset_kinds=asset_kinds)
     for asset in assets:
@@ -529,6 +534,15 @@ def discover_assetversions(path, asset_kinds=[], latest=False, sort=None, filter
         assetversions += avs
     if as_dict:
         assetversions = [av.as_dict() for av in assetversions]
+        if filters.get("collection"):
+            query = Query(format_filter(filters["collection"]))
+            filtered = list(filter(query.match, assetversions))
+            assetversions = filtered
+        if filters.get("search"):
+            expr = format_filter(filters["search"])
+            query = Query(expr)
+            filtered = list(filter(query.match, assetversions))
+            assetversions = filtered
         assetversions = sort_results(assetversions, sort)
     return assetversions
 
@@ -763,10 +777,8 @@ def get_repr_comp(target):
 def delete_entity(path, entity_type):
     entity = find(path)
     if entity.dir_kind != entity_type:
-        print(
-            "Attempted to delete", entity.dir_kind,
-            "but the entity was supposed to be", entity_type
-        )
+        LOGGER.error(f"Attempted to delete {entity.dir_kind} but the entity"
+            "was supposed to be {entity_type}")
         return False
     if not hasattr(entity, "delete"):
         return False

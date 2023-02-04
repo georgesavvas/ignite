@@ -72,35 +72,26 @@ const StyledTreeItemRoot = styled(TreeItem)(({theme}) => ({
   }
 }));
 
-const shouldBeDisabled = (scope, path) => {
-  if (scope !== "studio") return;
-  if (path.startsWith("/all/2d/elements") || path.startsWith("/all/projects")) {
-    return true;
-  }
-  if (path === "/all") return true;
-};
-
 function getContextItems(data, enqueueSnackbar) {
-  const disabled = shouldBeDisabled(data.scope, data.path);
+  const isRoot = data.path === "/all";
   return [
     {
       label: "Create",
-      disabled: disabled,
       fn: () =>  data.handleClick("create", data)
     },
     {
       label: "Edit",
-      disabled: disabled,
+      disabled: isRoot,
       fn: () =>  data.handleClick("edit", data)
     },
     {
       label: "Rename",
-      disabled: disabled,
+      disabled: isRoot,
       fn: () =>  data.handleClick("rename", data)
     },
     {
       label: "Delete",
-      disabled: disabled,
+      disabled: isRoot,
       fn: () => data.handleClick("delete", data),
       divider: true
     },
@@ -199,7 +190,9 @@ const StyledTreeItem = memo(function StyledTreeItem(props) {
           <Box onContextMenu={onContextMenu} ref={ref}
             sx={{display: "flex", alignItems: "center", p: 0.1, pr: 0.8}} 
           >
-            <Typography variant="body2" sx={{textAlign: "left", fontWeight: "inherit", flexGrow: 1}}>
+            <Typography variant="body2"
+              sx={{textAlign: "left", fontWeight: "inherit", flexGrow: 1}}
+            >
               {name}
             </Typography>
             <Typography variant="caption" color="rgb(100,100,100)">
@@ -232,14 +225,16 @@ function CollectionTree(props) {
   const {enqueueSnackbar} = useSnackbar();
   const [filterValue, setFilterValue] = useState("");
   const [modalData, setModalData] = useState({});
-  const [dropPreviewData, setDropPreviewData] = useState({opacity: 0, top: 0, height: 20});
+  const [dropPreviewData, setDropPreviewData] = useState(
+    {opacity: 0, top: 0, height: 20}
+  );
 
   const scope = props.user ? "user" : "studio";
 
   useEffect(() => {
-    if (!props.selectedCollection || !props.selectedCollection.path) return;
+    if (!props.selectedCollection) return;
     const [selectedScope, selectedPath] = [
-      "studio", props.selectedCollection.path
+      "studio", props.selectedCollection
     ];
     if (scope !== selectedScope) {
       setSelectedItems([]);
@@ -316,7 +311,9 @@ function CollectionTree(props) {
         handleContextMenuSelection={handleContextMenuSelection}
         style={hide ? {display: "none"} : null}
         onFocusCapture={e => e.stopPropagation()}
-        custom={{setdroppreviewdata: setDropPreviewData, onreorder: handleReOrder}}
+        custom={
+          {setdroppreviewdata: setDropPreviewData, onreorder: handleReOrder}
+        }
         user={props.user}
         scope={scope}
       >
@@ -344,19 +341,19 @@ function CollectionTree(props) {
         setContextMenu={setContextMenu}
       />
       <EditColl open={modalData.editOpen} enqueueSnackbar={enqueueSnackbar}
-        onClose={() => setModalData(prevState => ({...prevState, editOpen: false}))}
+        onClose={() => setModalData(prev => ({...prev, editOpen: false}))}
         data={modalData} fn={props.onRefresh}
       />
       <CreateColl open={modalData.createOpen} enqueueSnackbar={enqueueSnackbar}
-        onClose={() => setModalData(prevState => ({...prevState, createOpen: false}))}
+        onClose={() => setModalData(prev => ({...prev, createOpen: false}))}
         data={modalData} fn={props.onRefresh}
       />
       <DeleteColl open={modalData.deleteOpen} enqueueSnackbar={enqueueSnackbar}
-        onClose={() => setModalData(prevState => ({...prevState, deleteOpen: false}))}
+        onClose={() => setModalData(prev => ({...prev, deleteOpen: false}))}
         data={modalData} fn={props.onRefresh}
       />
       <RenameColl open={modalData.renameOpen} enqueueSnackbar={enqueueSnackbar}
-        onClose={() => setModalData(prevState => ({...prevState, renameOpen: false}))}
+        onClose={() => setModalData(prev => ({...prev, renameOpen: false}))}
         data={modalData} fn={props.onRefresh}
       />
       <FilterField filterValue={filterValue} setFilterValue={setFilterValue} />

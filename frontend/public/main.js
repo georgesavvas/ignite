@@ -91,8 +91,8 @@ async function clientRequest(method, data=undefined) {
 
 function launchBackend() {
   const backendCmd = {
-    darwin: `${backendPath}`,
-    linux: `${backendPath}`,
+    darwin: `sudo ${backendPath}`,
+    linux: `sudo ${backendPath}`,
     win32: `${backendPath}`
   }[platformName];
   console.log("Launching backend...", backendCmd);
