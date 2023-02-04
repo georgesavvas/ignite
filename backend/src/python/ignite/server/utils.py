@@ -233,7 +233,7 @@ def get_dir_type(path, dir_type):
     path = Path(path)
     parent = path
     iter = 1
-    while root in parent.as_posix():
+    while root != parent.as_posix():
         contents = [c.name for c in parent.iterdir()]
         if anchor in contents:
             return parent

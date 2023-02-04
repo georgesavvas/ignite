@@ -328,7 +328,9 @@ class Directory():
         parent = Path(self.path.parent)
         iter = 1
         parent_attrib_list = []
-        while root in parent.as_posix():
+        while root != parent.as_posix():
+            if iter > 20:
+                raise Exception(f"Reached iteration limit when walking directory: {self.path}")
             contents = next(parent.glob(".ign_*.yaml"), None)
             if not contents:
                 parent = parent.parent
@@ -341,8 +343,6 @@ class Directory():
                 parent_attrib_list.append(dir_attribs)
             parent = parent.parent
             iter +=1
-            if iter > 20:
-                raise Exception(f"Reached iteration limit when walking directory: {self.path}")
         parent_attrib_list.reverse()
         parent_attribs = {}
         for attribs in parent_attrib_list:

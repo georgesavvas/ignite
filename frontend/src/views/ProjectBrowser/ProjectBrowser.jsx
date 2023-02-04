@@ -83,7 +83,7 @@ export default function ProjectBrowser(props) {
     setIsLoading(true);
     serverRequest("get_projects").then(resp => {
       setIsLoading(false);
-      setLoadedData(resp.data);
+      setLoadedData(resp.data || []);
     });
   }, [props.open, currentContext]);
 
