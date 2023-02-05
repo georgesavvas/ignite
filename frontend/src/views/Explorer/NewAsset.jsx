@@ -25,7 +25,6 @@ import ClearIcon from "@mui/icons-material/Clear";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import clientRequest from "../../services/clientRequest";
-import IgnButton from "../../components/IgnButton";
 import TagContainer from "../DetailsView/TagContainer";
 import FileInput from "../../components/FileInput";
 

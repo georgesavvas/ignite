@@ -13,7 +13,7 @@
 // limitations under the License.
 
 
-import React, {useState, useContext} from "react";
+import React, {useState, useContext, useEffect} from "react";
 
 import Stack from "@mui/material/Stack";
 import ToggleButton from "@mui/material/ToggleButton";
@@ -55,6 +55,12 @@ function ExplorerBar(props) {
     refreshContext
   ] = useContext(ContextContext);
   const [filterValue, setFilterValue] = useState("");
+
+  useEffect(() => {
+    if (props.droppedFiles) {
+      openNewAsset();
+    }
+  }, [props.droppedFiles]);
 
   const handleResultTypeChange = (e, value) => {
     if (value !== null) props.onResultTypeChange(value);
@@ -108,6 +114,14 @@ function ExplorerBar(props) {
     handleContextMenu(e, filterMenu, setFilterMenu);
   };
 
+  const openNewAsset = () => {
+    setNewAssetOpen(true);
+  };
+
+  const openIngest = () => {
+    setIngestOpen(true);
+  };
+
   return (
     <div style={{padding: "0 5px 3px 5px", display: "flex", flexDirection: "column"}}>
       <ContextMenu items={filterOptions} contextMenu={filterMenu}
@@ -119,6 +133,8 @@ function ExplorerBar(props) {
         />
         <NewAsset open={newAssetOpen} onClose={() => setNewAssetOpen(false)}
           enqueueSnackbar={props.enqueueSnackbar}
+          droppedFiles={props.droppedFiles}
+          clearDroppedFiles={props.clearDroppedFiles}
         />
         <Stack direction="row" spacing={1} >
           <ToggleButtonGroup
@@ -186,7 +202,7 @@ function ExplorerBar(props) {
           color="ignite" 
           variant="outlined"
           disabled={currentContext.dir_kind !== "task"}
-          onClick={() => setIngestOpen(true)}
+          onClick={openIngest}
         >
           Ingest
         </IgnButton>
@@ -195,7 +211,7 @@ function ExplorerBar(props) {
           color="ignite" 
           variant="outlined"
           disabled={currentContext.dir_kind !== "task"}
-          onClick={() => setNewAssetOpen(true)}
+          onClick={openNewAsset}
         >
           New Asset
         </IgnButton>
