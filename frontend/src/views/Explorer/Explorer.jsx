@@ -425,7 +425,7 @@ function Explorer() {
   };
 
   return (
-    <div className={classes.container} onPaste={handlePaste} onDragLeave={handleDragEnd} onDragEnd={handleDragEnd} onDragOver={handleDragOver} onDrop={handleDrop}>
+    <div className={classes.container}>
       {dropData.visible ? <DragOverlay text="Create asset" error={dropData.error} /> : null}
       <Modal
         maxWidth="xs"
@@ -497,7 +497,9 @@ function Explorer() {
           {getBrowserHelperText()}
         </Typography>
       </div>
-      {getView()}
+      <div onPaste={handlePaste} onDragLeave={handleDragEnd} onDragEnd={handleDragEnd} onDragOver={handleDragOver} onDrop={handleDrop}>
+        {getView()}
+      </div>
       <div
         className={classes.layoutHelper}
         onContextMenu={e => handleContextMenu(e, contextMenu, setContextMenu)}
