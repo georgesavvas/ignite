@@ -46,6 +46,7 @@ import DirectoryTile from "./DirectoryTile";
 import RowView from "./RowView";
 import Modal from "../../components/Modal";
 import DccSelector from "../DccSelector";
+import DragOverlay from "../../components/DragOverlay";
 
 
 const debounced = debounce(fn => fn(), 500);
@@ -100,6 +101,7 @@ function Explorer() {
   );
   const [tiles, setTiles] = useState([]);
   const [modalData, setModalData] = useState({});
+  const [dropData, setDropData] = useState({visible: false});
   const [selectedEntity, setSelectedEntity] = useContext(EntityContext);
   const [currentContext,, refreshContext] = useContext(ContextContext);
   const [newSceneOpen, setNewSceneOpen] = useState(false);
@@ -386,8 +388,41 @@ function Explorer() {
     refreshContext();
   };
 
+  const handlePaste = e => {
+    const cb = e.clipboardData;
+    console.log(cb.types);
+  };
+
+  const handleDragEnd = e => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDropData({visible: false});
+  };
+
+  const handleDragOver = e => {
+    e.preventDefault();
+    e.stopPropagation();
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    if (!files) return;
+    const data = {visible: true};
+    if (currentContext.dir_kind != "task") {
+      data.error = "Current directory not a task";
+    }
+    setDropData(data);
+  };
+
+  const handleDrop = e => {
+    e.preventDefault();
+    e.stopPropagation();
+    const dt = e.dataTransfer;
+    console.log(dt.files);
+    handleDragEnd(e);
+  };
+
   return (
-    <div className={classes.container}>
+    <div className={classes.container} onPaste={handlePaste} onDragLeave={handleDragEnd} onDragEnd={handleDragEnd} onDragOver={handleDragOver} onDrop={handleDrop}>
+      {dropData.visible ? <DragOverlay text="Create asset" error={dropData.error} /> : null}
       <Modal
         maxWidth="xs"
         open={newSceneOpen}
@@ -433,8 +468,7 @@ function Explorer() {
         setContextMenu={setContextMenu} title={currentContext.name}
         subtitle={currentContext.dir_kind}
       />
-      <ExplorerBar
-        onFilterChange={handleFilterChange}
+      <ExplorerBar onFilterChange={handleFilterChange}
         resultType={explorerSettings.currentResultType}
         onResultTypeChange={handleResultTypeChange}
         viewType={explorerSettings.currentViewType}
@@ -445,8 +479,7 @@ function Explorer() {
         setQuery={setQuery}
       />
       <Divider />
-      <LinearProgress
-        color="ignite"
+      <LinearProgress color="ignite"
         style={{
           width: "100%",
           minHeight: "2px",
