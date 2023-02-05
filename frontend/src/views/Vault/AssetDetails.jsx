@@ -160,21 +160,27 @@ function AssetDetails(props) {
           <ComponentViewer comp={selectedComp} />
         </ReflexElement>
         <ReflexSplitter style={splitterStyle} />
-        <ReflexElement flex={flexRatios["vault.details.details"]} name={"vault.details.details"} onStopResize={handleResized}>
+        <ReflexElement
+          flex={flexRatios["vault.details.details"]}
+          name={"vault.details.details"}
+          onStopResize={handleResized}
+        >
           <div style={{margin: "10px", overflow: "hidden"}}>
-            <FormControl size="small" style={versionSelectStyle}>
-              <InputLabel>Version</InputLabel>
-              <Select
-                value={props.entity.version}
-                label="Version"
-                onChange={handleVersionChange}
-              >
-                {props.entity.versions.map(ver =>
-                  <MenuItem key={ver} value={ver}>{ver}</MenuItem>
-                )}
-              </Select>
-            </FormControl>
-            <Typography variant="h5">{props.entity.name}</Typography>
+            <div style={{display: "flex", alignItems: "center", minHeight: "50px"}}>
+              <FormControl size="small" style={versionSelectStyle}>
+                <InputLabel>Version</InputLabel>
+                <Select
+                  value={props.entity.version}
+                  label="Version"
+                  onChange={handleVersionChange}
+                >
+                  {props.entity.versions.map(ver =>
+                    <MenuItem key={ver} value={ver}>{ver}</MenuItem>
+                  )}
+                </Select>
+              </FormControl>
+              <Typography variant="h5">{props.entity.name}</Typography>
+            </div>
             <Path path={props.entity.path} />
           </div>
           <TagContainer entityPath={props.entity.path} tags={props.entity.tags || []} onRefresh={refreshVault} />

@@ -91,7 +91,7 @@ export default function TopBar() {
         </div>
         <div className={styles.logoContainer}>
           <img src="media/ignite_logo.png" className={styles.logo} />
-          <Typography style={{color: "grey", alignSelf: "flex-end"}} variant="caption">
+          <Typography style={{color: "rgb(60,60,60)", alignSelf: "flex-end"}} variant="caption">
             v{appVersion}
           </Typography>
         </div>
