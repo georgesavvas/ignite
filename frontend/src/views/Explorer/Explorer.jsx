@@ -420,6 +420,10 @@ function Explorer() {
     handleDragEnd(e);
   };
 
+  const clearDroppedFiles = () => {
+    setDropData({visible: false});
+  };
+
   return (
     <div className={classes.container} onPaste={handlePaste} onDragLeave={handleDragEnd} onDragEnd={handleDragEnd} onDragOver={handleDragOver} onDrop={handleDrop}>
       {dropData.visible ? <DragOverlay text="Create asset" error={dropData.error} /> : null}
@@ -477,6 +481,8 @@ function Explorer() {
         onNewScene={handleNewScene}
         enqueueSnackbar={enqueueSnackbar}
         setQuery={setQuery}
+        droppedFiles={dropData.files}
+        clearDroppedFiles={clearDroppedFiles}
       />
       <Divider />
       <LinearProgress color="ignite"
