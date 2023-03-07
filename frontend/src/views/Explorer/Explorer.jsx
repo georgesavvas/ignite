@@ -47,6 +47,7 @@ import RowView from "./RowView";
 import Modal from "../../components/Modal";
 import DccSelector from "../DccSelector";
 import DragOverlay from "../../components/DragOverlay";
+import SceneDrop from "./SceneDrop";
 
 
 const debounced = debounce(fn => fn(), 500);
@@ -396,6 +397,11 @@ function Explorer() {
     const cb = e.clipboardData;
     const files = cb.files;
     if (!files) return;
+    const sceneFiles = filterScenesFromFiles(files);
+    if (sceneFiles.length) {
+      setDropData({visible: false, scenes: sceneFiles});
+      return;
+    }
     setDropData({visible: false, files: files});
   };
 
@@ -418,6 +424,18 @@ function Explorer() {
     setDropData(data);
   };
 
+  const fileInDCCConfig = file => {
+    return config.dccConfig.some(dcc =>
+      dcc.scenes.some(ext =>
+        file.path.endsWith(`.${ext.trim()}`)
+      )
+    );
+  };
+
+  const filterScenesFromFiles = files => {
+    return [...files].filter(file => fileInDCCConfig(file));
+  };
+
   const handleDrop = e => {
     e.preventDefault();
     e.stopPropagation();
@@ -426,11 +444,34 @@ function Explorer() {
       return;
     }
     const dt = e.dataTransfer;
+    const sceneFiles = filterScenesFromFiles(dt.files);
+    if (sceneFiles.length) {
+      setDropData({visible: false, scenes: sceneFiles, all: [...dt.files]});
+      return;
+    }
     setDropData({visible: false, files: dt.files});
   };
 
   const clearDroppedFiles = () => {
     setDropData({visible: false});
+  };
+
+  const handleSceneDropClose = fileName => {
+    if (!fileName) setDropData(prev => ({
+      visible: false,
+      files: prev.files
+    }));
+    else {
+      setDropData(prev => {
+        const files = prev.all;
+        if (!files || !files.length) return {visible: false};
+        const index = files.findIndex(file => file.name === fileName);
+        const scene = files.splice(index, 1)[0];
+        console.log(`Ingesting ${scene.name} as scene`);
+        console.log("Remaining files are", files);
+        return {visible: false, files: files};
+      });
+    }
   };
 
   return (
@@ -445,6 +486,9 @@ function Explorer() {
           onClose={() => setNewSceneOpen(false)}
         />
       </Modal>
+      <SceneDrop files={dropData.scenes}
+        onClose={handleSceneDropClose}
+      />
       <CreateDir open={modalData.createOpen} enqueueSnackbar={enqueueSnackbar}
         onClose={() => setModalData(prevState =>
           ({...prevState, createOpen: false}))
