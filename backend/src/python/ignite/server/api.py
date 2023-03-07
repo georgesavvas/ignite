@@ -96,6 +96,9 @@ def get_context_info(path):
     exists = path.exists()
     if not exists and utils.is_uri(path):
         entity = find(path)
+        if not entity:
+            LOGGER.error(f"Couldn't resolve URI {path}")
+            return {}
         kind = entity.dir_kind
         if kind == "assetversion":
             path = entity.task
@@ -103,7 +106,7 @@ def get_context_info(path):
             path = entity.path.parent
         else:
             path = entity.path
-    if not path.exists():
+    if not exists:
         return {}
     if path.name in ("exports", "scenes") or path.is_file():
         path = path.parent

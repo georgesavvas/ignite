@@ -389,8 +389,14 @@ function Explorer() {
   };
 
   const handlePaste = e => {
+    if (currentContext.dir_kind != "task") {
+      setDropData({visible: false});
+      return;
+    }
     const cb = e.clipboardData;
-    console.log(cb.types);
+    const files = cb.files;
+    if (!files) return;
+    setDropData({visible: false, files: files});
   };
 
   const handleDragEnd = e => {
@@ -415,9 +421,12 @@ function Explorer() {
   const handleDrop = e => {
     e.preventDefault();
     e.stopPropagation();
+    if (currentContext.dir_kind != "task") {
+      setDropData({visible: false});
+      return;
+    }
     const dt = e.dataTransfer;
-    console.log(dt.files);
-    handleDragEnd(e);
+    setDropData({visible: false, files: dt.files});
   };
 
   const clearDroppedFiles = () => {
@@ -497,12 +506,16 @@ function Explorer() {
           {getBrowserHelperText()}
         </Typography>
       </div>
-      <div onPaste={handlePaste} onDragLeave={handleDragEnd} onDragEnd={handleDragEnd} onDragOver={handleDragOver} onDrop={handleDrop}>
+      <div onPaste={handlePaste} onDragLeave={handleDragEnd} onDrop={handleDrop}
+        onDragEnd={handleDragEnd} onDragOver={handleDragOver}
+      >
         {getView()}
       </div>
       <div
         className={classes.layoutHelper}
         onContextMenu={e => handleContextMenu(e, contextMenu, setContextMenu)}
+        onPaste={handlePaste} onDragLeave={handleDragEnd} onDrop={handleDrop}
+        onDragEnd={handleDragEnd} onDragOver={handleDragOver}
       />
       <Divider />
       <PageBar
