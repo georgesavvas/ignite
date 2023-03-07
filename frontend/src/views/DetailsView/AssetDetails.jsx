@@ -179,27 +179,6 @@ function AssetDetails(props) {
     });
   };
 
-  const handleAddTags = tags => {
-    const data = {
-      path: BuildFileURL(
-        props.entity.path, config,
-        {pathOnly: true, reverse: true}
-      ),
-      tags: tags
-    };
-    serverRequest("add_tags", data).then(() => refreshContext());
-  };
-
-  const handleRemoveTag = tag => {
-    const data = {
-      path: BuildFileURL(
-        props.entity.path, config, {pathOnly: true, reverse: true}
-      ),
-      tags: tag
-    };
-    serverRequest("remove_tags", data).then(() => refreshContext());
-  };
-
   return (
     <div style={style}>
       <ContextMenu items={contextItems} contextMenu={contextMenu}
@@ -270,9 +249,8 @@ function AssetDetails(props) {
           </div>
           <div style={{padding: "5px"}}>
             <TagContainer
+              entityPath={props.entity.path}
               tags={props.entity.tags}
-              onAdd={handleAddTags}
-              onRemove={handleRemoveTag}
             />
           </div>
         </ReflexElement>

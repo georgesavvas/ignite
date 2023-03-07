@@ -25,19 +25,29 @@ import Attributes from "./Attributes";
 import URI from "../../components/URI";
 import Path from "../../components/Path";
 import {ContextContext} from "../../contexts/ContextContext";
+import { padding } from "@mui/system";
+import { Divider } from "@mui/material";
 
 const style = {
   width: "100%",
   height: "100%",
   display: "flex",
-  flexDirection: "column"
+  flexDirection: "column",
+  padding: "5px"
+};
+
+const detailsStyle = {
+  overflow: "hidden",
+  display: "flex",
+  flexDirection: "column",
+  gap: "5px",
+  marginBottom: "10px"
 };
 
 const rowStyle = {
   display: "flex",
   alignItems: "center",
-  gap: "10px",
-  marginTop: "10px"
+  gap: "10px"
 };
 
 function DirectoryDetails(props) {
@@ -64,10 +74,11 @@ function DirectoryDetails(props) {
 
   return (
     <div style={style}>
-      <div style={{margin: "10px", overflow: "hidden"}}>
-        <Typography variant="h5" style={{marginBottom: "10px"}}>
+      <div style={detailsStyle}>
+        <Typography variant="h5" style={{marginBottom: "0px"}}>
           {props.entity.name}
         </Typography>
+        <Divider sx={{m: "5px"}} />
         <URI uri={props.entity.uri} />
         <Path path={props.entity.path} />
         <div style={rowStyle}>
@@ -100,9 +111,15 @@ function DirectoryDetails(props) {
             </>
           }
         </div>
+        <TagContainer
+          entityPath={props.entity.path}
+          tags={props.entity.tags}
+        />
       </div>
-      <TagContainer entityPath={props.entity.path} tags={props.entity.tags} />
-      <Attributes entityPath={props.entity.path} attributes={props.entity.attributes} />
+      <Attributes
+        entityPath={props.entity.path}
+        attributes={props.entity.attributes}
+      />
     </div>
   );
 }

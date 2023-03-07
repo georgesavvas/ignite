@@ -1,5 +1,4 @@
 .container {
-    margin: 10px;
     box-sizing: border-box;
     flex-grow: 1;
     overflow: auto;
