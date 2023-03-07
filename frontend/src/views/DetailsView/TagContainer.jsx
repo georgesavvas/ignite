@@ -135,8 +135,6 @@ export function TagContainer(props) {
 }
 
 function Tag(props) {
-  const [isHovered, setIsHovered] = useState(false);
-
   let style = {};
   if (namedStyles[props.name]) style = namedStyles[props.name];
   else style = {backgroundColor: hexToHsl(stc(props.name), 80, 30)};
@@ -147,18 +145,12 @@ function Tag(props) {
     props.name.substring(0, limit) + "...";
 
   return (
-    <div className={styles.tag} style={style}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
+    <div className={styles.tag} style={style}>
       <Typography>{nameFormatted}</Typography>
-      {isHovered && !props.add ?
-        <ClearIcon
-          style={{cursor: "pointer"}}
-          onClick={() => props.onDelete(props.name)}
-        /> :
-        null
-      }
+      <ClearIcon
+        className={styles.clearIcon}
+        onClick={() => props.onDelete(props.name)}
+      />
     </div>
   );
 }
