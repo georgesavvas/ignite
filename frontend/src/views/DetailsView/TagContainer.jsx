@@ -13,7 +13,7 @@
 // limitations under the License.
 
 
-import React, {useState, useRef} from "react";
+import React, {useState, useRef, useContext} from "react";
 
 import ClearIcon from "@mui/icons-material/Clear";
 import AddIcon from "@mui/icons-material/Add";
@@ -28,6 +28,10 @@ import ContextMenu, { handleContextMenu } from "../../components/ContextMenu";
 import styles from "./TagContainer.module.css";
 import Modal from "../../components/Modal";
 import DataPlaceholder from "../../components/DataPlaceholder";
+import BuildFileURL from "../../services/BuildFileURL";
+import {ConfigContext} from "../../contexts/ConfigContext";
+import serverRequest from "../../services/serverRequest";
+import {ContextContext} from "../../contexts/ContextContext";
 
 
 const namedStyles = {
@@ -46,6 +50,8 @@ export function TagContainer(props) {
   const [newTagsOpen, setNewTagsOpen] = useState(false);
   const [newTags, setNewTags] = useState("");
   const [contextMenu, setContextMenu] = useState(null);
+  const [config] = useContext(ConfigContext);
+  const [,, refreshContext] = useContext(ContextContext);
   const {enqueueSnackbar} = useSnackbar();
   const newTagsRef = useRef();
 
@@ -64,13 +70,36 @@ export function TagContainer(props) {
   ];
 
   const handleAddTags = () => {
-    props.onAdd(newTags);
+    if (props.onAdd) {
+      props.onAdd(newTags);
+      setNewTagsOpen(false);
+      return;
+    }
+    const data = {
+      path: BuildFileURL(
+        props.entityPath, config,
+        {pathOnly: true, reverse: true}
+      ),
+      tags: newTags
+    };
+    serverRequest("add_tags", data).then(() => refreshContext());
     setNewTagsOpen(false);
   };
 
   const handleRemoveTag = tag => {
+    if (props.onRemove) {
+      props.onRemove(tag);
+      setNewTagsOpen(false);
+      return;
+    }
+    const data = {
+      path: BuildFileURL(
+        props.entityPath, config, {pathOnly: true, reverse: true}
+      ),
+      tags: tag
+    };
+    serverRequest("remove_tags", data).then(() => refreshContext());
     props.onRemove(tag);
-    setNewTagsOpen(false);
   };
 
   return (

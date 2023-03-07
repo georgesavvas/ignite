@@ -145,18 +145,20 @@ const NewAsset = props => {
       ]}
     >
       <div className={styles.container}>
-        <IgnTextField
-          label="Asset name"
-          value={name}
-          error={nameError}
-          onChange={e => setName(e.target.value)}
-          style={{minWidth: "300px", alignSelf: "flex-start"}}
-        />
-        <TagContainer
-          tags={tags}
-          onAdd={handleAddTags}
-          onRemove={handleRemoveTag}
-        />
+        <div className={styles.firstRow}>
+          <IgnTextField
+            label="Asset name"
+            value={name}
+            error={nameError}
+            onChange={e => setName(e.target.value)}
+            style={{minWidth: "300px", alignSelf: "flex-start"}}
+          />
+          <TagContainer
+            tags={tags}
+            onAdd={handleAddTags}
+            onRemove={handleRemoveTag}
+          />
+        </div>
         <DynamicList
           title="Components"
           onAdd={handleCompAdd}
