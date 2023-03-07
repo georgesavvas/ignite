@@ -64,6 +64,7 @@ OS_NAMES = {
 DCC_DISCOVERY = {
     "djv": {
         "label": "DJV",
+        "scenes": [],
         "exts": ["exr", "jpg", "jpeg", "png", "tif", "tiff", "tga"],
         "paths": {
             "win": [
@@ -79,7 +80,8 @@ DCC_DISCOVERY = {
     },
     "houdinifx": {
         "label": "Houdini FX",
-        "exts": ["hip", "hipnc"],
+        "scenes": ["hip", "hipnc"],
+        "exts": [],
         "args": "-n",
         "paths": {
             "win": [
@@ -95,7 +97,8 @@ DCC_DISCOVERY = {
     },
     "houdinicore": {
         "label": "Houdini Core",
-        "exts": ["hip", "hipnc"],
+        "scenes": ["hip", "hipnc"],
+        "exts": [],
         "args": "-n",
         "paths": {
             "win": [
@@ -111,7 +114,8 @@ DCC_DISCOVERY = {
     },
     "hython": {
         "label": "Hython",
-        "exts": ["hip", "hipnc"],
+        "scenes": ["hip", "hipnc"],
+        "exts": [],
         "paths": {
             "win": [
                 "C:/Program Files/Side Effects Software/Houdini *.*.*/bin/hython.exe"
@@ -126,7 +130,8 @@ DCC_DISCOVERY = {
     },
     "maya": {
         "label": "Maya",
-        "exts": ["ma", "mb"],
+        "scenes": ["ma", "mb"],
+        "exts": [],
         "paths": {
             "win": [
                 "C:/Program Files/Autodesk/Maya*/bin/maya.exe"
@@ -141,7 +146,8 @@ DCC_DISCOVERY = {
     },
     "nuke": {
         "label": "Nuke",
-        "exts": ["nk", "nuke", "nkple"],
+        "scenes": ["nk", "nuke", "nkple"],
+        "exts": [],
         "paths": {
             "win": [
                 "C:/Program Files/Nuke*.*/Nuke*.*.exe"
@@ -156,7 +162,8 @@ DCC_DISCOVERY = {
     },
     "nukex": {
         "label": "NukeX",
-        "exts": ["nk", "nuke", "nkple"],
+        "scenes": ["nk", "nuke", "nkple"],
+        "exts": [],
         "args": "--nukex",
         "paths": {
             "win": [
@@ -172,7 +179,8 @@ DCC_DISCOVERY = {
     },
     "nukestudio": {
         "label": "Nuke Studio",
-        "exts": ["nk", "nuke", "nkple"],
+        "scenes": ["nk", "nuke", "nkple"],
+        "exts": [],
         "args": "--studio",
         "paths": {
             "win": [
@@ -188,7 +196,8 @@ DCC_DISCOVERY = {
     },
     "blender": {
         "label": "Blender",
-        "exts": ["blend"],
+        "scenes": ["blend"],
+        "exts": [],
         "paths": {
             "win": [
                 "C:/blender/*.*/blender.exe",
@@ -203,7 +212,8 @@ DCC_DISCOVERY = {
     },
     "natron": {
         "label": "Natron",
-        "exts": ["nps", "npt"],
+        "scenes": ["nps", "npt"],
+        "exts": [],
         "paths": {
             "win": [
                 "C:/Program Files/Natron/bin/Natron.exe"
@@ -218,7 +228,8 @@ DCC_DISCOVERY = {
     },
     "photoshop": {
         "label": "Photoshop",
-        "exts": ["psd"],
+        "scenes": ["psd"],
+        "exts": ["exr", "jpg", "jpeg", "png", "tif", "tiff", "tga"],
         "paths": {
             "win": [
                 "C:/Program Files/Adobe/Adobe Photoshop */Photoshop.exe"
@@ -231,7 +242,8 @@ DCC_DISCOVERY = {
     },
     "aftereffects": {
         "label": "After Effects",
-        "exts": ["aep"],
+        "scenes": ["aep"],
+        "exts": [],
         "paths": {
             "win": [
                 "C:/Program Files/Adobe/Adobe After Effects */Adobe After Effects *"
@@ -244,7 +256,8 @@ DCC_DISCOVERY = {
     },
     "premiere": {
         "label": "Premiere",
-        "exts": ["prproj"],
+        "scenes": ["prproj"],
+        "exts": [],
         "paths": {
             "win": [
                 "C:/Program Files/Adobe/Adobe Premiere Pro */Adobe Premiere Pro.exe"
@@ -257,7 +270,8 @@ DCC_DISCOVERY = {
     },
     "illustrator": {
         "label": "Illustrator",
-        "exts": ["ai", "eps"],
+        "scenes": ["ai", "eps"],
+        "exts": ["svg"],
         "paths": {
             "win": [
                 "C:/Program Files/Adobe/Adobe Illustrator */Adobe Illustrator *"
@@ -270,7 +284,8 @@ DCC_DISCOVERY = {
     },
     "designer": {
         "label": "Designer",
-        "exts": ["sbs", "sbsar", "sbsasm"],
+        "scenes": ["sbs", "sbsar", "sbsasm"],
+        "exts": [],
         "paths": {
             "win": [
                 "C:/Program Files/Allegorithmic/Substance Designer/Substance Designer.exe",
@@ -286,7 +301,8 @@ DCC_DISCOVERY = {
     },
     "painter": {
         "label": "Painter",
-        "exts": ["sbar", "sbsar", "spp"],
+        "scenes": ["sbar", "sbsar", "spp"],
+        "exts": [],
         "paths": {
             "win": [
                 "C:/Program Files/Allegorithmic/Substance Painter/Substance Painter.exe",
@@ -302,7 +318,8 @@ DCC_DISCOVERY = {
     },
     "vscode": {
         "label": "VS Code",
-        "exts": ["py"],
+        "scenes": ["code-workspace"],
+        "exts": ["py", "usda"],
         "paths": {
             "win": [
                 "C:/Users/George/AppData/Local/Programs/Microsoft VS Code/Code.exe"

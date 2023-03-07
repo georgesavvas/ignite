@@ -62,7 +62,7 @@ const Dcc = () => {
 
   const handleDccAdd = data => {
     if (!data || !data.length) {
-      console.log(dcc);
+      // console.log(dcc);
       setDcc(prevState => [placeholder_config, ...prevState]);
       return;
     }
@@ -77,8 +77,8 @@ const Dcc = () => {
   };
 
   const handleDccModify = data => {
-    console.log("modify", data);
-    console.log("before", dcc);
+    // console.log("modify", data);
+    // console.log("before", dcc);
     setDcc(prevState => {
       let dcc_copy = [...prevState];
       let index_copy = {...dcc_copy[data.index]};
@@ -101,10 +101,12 @@ const Dcc = () => {
     const s = e.currentTarget.id.split("-");
     const target_id = s[1];
     const target_field = s[0];
+    let value = e.target.value;
+    if (target_field === "exts") value = value.trim().split(",");
     const data = {
       index: target_id,
       field: target_field,
-      value: e.target.value
+      value: value
     };
     shouldWrite.current = true;
     handleDccModify(data);
@@ -182,7 +184,23 @@ const Dcc = () => {
               label="Name"
               variant="outlined"
               fullWidth
-              value={dcc_.name}
+              value={dcc_.name || ""}
+              size="small"
+              onChange={handleDccConfigChange}
+              className={styles.textField}
+              InputProps={{
+                className: styles.input
+              }}
+            />
+          </div>
+          <div className={styles.gridItemScenes}>
+            <TextField
+              margin="dense"
+              id={"scenes-" + index}
+              label="Scene extensions"
+              fullWidth
+              variant="outlined"
+              value={dcc_.scenes || ""}
               size="small"
               onChange={handleDccConfigChange}
               className={styles.textField}
@@ -195,10 +213,10 @@ const Dcc = () => {
             <TextField
               margin="dense"
               id={"exts-" + index}
-              label="Extensions"
+              label="Also show for"
               fullWidth
               variant="outlined"
-              value={dcc_.exts}
+              value={dcc_.exts || ""}
               size="small"
               onChange={handleDccConfigChange}
               className={styles.textField}

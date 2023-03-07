@@ -15,7 +15,7 @@
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-rows: auto;
     grid-template-areas: 
-        "name exts exts"
+        "name scenes exts"
         "path path path"
 }
 
@@ -28,6 +28,10 @@
 
 .gridItemName {
     grid-area: name;
+}
+
+.gridItemScenes {
+    grid-area: scenes;
 }
 
 .gridItemExts {

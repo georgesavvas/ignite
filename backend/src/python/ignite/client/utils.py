@@ -282,6 +282,7 @@ def discover_dcc():
             LOGGER.info(f"Appending args {args}")
             path += f" {args}"
         dcc = {
+            "scenes": data["scenes"],
             "exts": data["exts"],
             "name": data["label"],
             "path": path
@@ -487,3 +488,7 @@ def discover_actions(project=None):
             }
             actions[entity][file.name] = entity_action
     return actions
+
+
+def get_dcc_scenes():
+    return {k: v["scenes"] for k, v in DCC_DISCOVERY.items()}

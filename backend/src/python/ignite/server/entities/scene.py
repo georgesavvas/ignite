@@ -18,10 +18,11 @@ from datetime import datetime, timezone
 from pathlib import Path, PurePath
 
 import clique
-from ignite.server.constants import ANCHORS, DCC_EXTENSIONS
+from ignite.server.constants import ANCHORS
 from ignite.server.entities.directory import Directory
 from ignite.server.entities.component import Component
 from ignite.server.utils import CONFIG, get_uri
+from ignite.client.utils import get_dcc_scenes
 
 
 class Scene(Directory):
@@ -93,7 +94,7 @@ class Scene(Directory):
 
         extensions = []
         ext_dcc = {}
-        for dcc, exts in DCC_EXTENSIONS.items():
+        for dcc, exts in get_dcc_scenes().items():
             extensions += exts
             for ext in exts:
                 ext_dcc[ext] = dcc
