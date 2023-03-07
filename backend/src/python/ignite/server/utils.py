@@ -157,7 +157,7 @@ def get_uri(path, version_override=None):
         return ""
     splt = path_str.split(
         CONFIG["root"].as_posix(), 1
-    )[1].replace("/exports", "").split("/")[1:]
+    )[1].replace("/exports", "").split("/")
     i = len(splt)
     project = splt[0]
     group = splt[1] if i > 1 else None

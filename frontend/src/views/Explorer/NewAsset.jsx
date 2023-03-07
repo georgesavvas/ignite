@@ -41,6 +41,16 @@ const NewAsset = props => {
     setNameError(false);
   }, [name]);
 
+  useEffect(() => {
+    if (!props.droppedFiles) return;
+    const fileList = [...props.droppedFiles];
+    if (!fileList.length) return;
+    setComps(fileList.map(
+      file => ({name: file.name.split(".")[0], source: file.path}))
+    );
+    props.clearDroppedFiles();
+  }, [props.droppedFiles]);
+
   const reset = () => {
     setName("");
     setComps([{}, {}]);

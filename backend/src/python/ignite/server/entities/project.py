@@ -70,6 +70,7 @@ class Project(Directory):
         for d in dirs:
             dir_path = path / d
             setattr(self, f"{d}_path", dir_path)
+        self.uri = utils.get_uri(path)
         self.load_from_config()
     
     def set_short_name(self, name):
