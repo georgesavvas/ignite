@@ -48,6 +48,7 @@ import Modal from "../../components/Modal";
 import DccSelector from "../DccSelector";
 import DragOverlay from "../../components/DragOverlay";
 import SceneDrop from "./SceneDrop";
+import clientRequest from "../../services/clientRequest";
 
 
 const debounced = debounce(fn => fn(), 500);
@@ -456,6 +457,21 @@ function Explorer() {
     setDropData({visible: false});
   };
 
+  const ingestScene = scenePath => {
+    const data = {
+      scene: scenePath,
+      task: currentContext.path
+    };
+    clientRequest("ingest_scene", {data: data}).then(resp => {
+      if (resp.ok) {
+        enqueueSnackbar("Scene created!", {variant: "success"});
+        // refreshContext();
+      } else {
+        enqueueSnackbar("Failed to create scene.", {variant: "error"});
+      }
+    });
+  };
+
   const handleSceneDropClose = fileName => {
     if (!fileName) setDropData(prev => ({
       visible: false,
@@ -467,8 +483,7 @@ function Explorer() {
         if (!files || !files.length) return {visible: false};
         const index = files.findIndex(file => file.name === fileName);
         const scene = files.splice(index, 1)[0];
-        console.log(`Ingesting ${scene.name} as scene`);
-        console.log("Remaining files are", files);
+        ingestScene(scene.path);
         return {visible: false, files: files};
       });
     }
@@ -476,7 +491,10 @@ function Explorer() {
 
   return (
     <div className={classes.container}>
-      {dropData.visible ? <DragOverlay text="Create asset" error={dropData.error} /> : null}
+      {dropData.visible ?
+        <DragOverlay text="Create asset" error={dropData.error} />
+        : null
+      }
       <Modal
         maxWidth="xs"
         open={newSceneOpen}
