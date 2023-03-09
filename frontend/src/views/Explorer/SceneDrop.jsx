@@ -30,7 +30,10 @@ const SceneDrop = props => {
         </Button>
       ]}
     >
-      <Typography variant="subtitle1">Would you like to ingest one of them as an actual scene? Any remaining ones will carry over to the New Asset stage to be treated as components</Typography>
+      <Typography variant="subtitle1">
+        Would you like to ingest one of them as an actual scene? Any remaining
+        ones will carry over to the New Asset stage to be treated as components
+      </Typography>
       <div className={styles.container}>
         {props.files?.map(file =>
           <div key={file.name}

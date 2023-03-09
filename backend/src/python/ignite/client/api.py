@@ -338,6 +338,21 @@ def ingest_asset(data):
     return True
 
 
+def ingest_scene(data):
+    scene_path = Path(data["scene"])
+    task_path = Path(data["task"])
+    if is_server_local():
+        task = server_api.find(task_path.as_posix())
+        asset_dict = entity.as_dict() if hasattr(entity, "as_dict") else {}
+    else:
+        asset_dict = utils.server_request(
+            "find", {"path": asset.as_posix()}
+        ).get("data")
+    if not task or not task.dir_kind == "task":
+        LOGGER.error(f"Invalid task {task}")
+        return
+
+
 def get_actions(project=None):
     return utils.discover_actions(project)
 
