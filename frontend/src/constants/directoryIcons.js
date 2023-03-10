@@ -14,6 +14,7 @@ import PrecisionManufacturingIcon from "@mui/icons-material/PrecisionManufacturi
 import UnarchiveIcon from "@mui/icons-material/Unarchive";
 import LocalFireDepartmentIcon from "@mui/icons-material/LocalFireDepartment";
 import TerrainIcon from "@mui/icons-material/Terrain";
+import PanoramaIcon from "@mui/icons-material/Panorama";
 
 export const DIRECTORYICONS = {
   directory: FolderIcon,

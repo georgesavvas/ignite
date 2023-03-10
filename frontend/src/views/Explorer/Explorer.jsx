@@ -475,15 +475,18 @@ function Explorer() {
   const handleSceneDropClose = fileName => {
     if (!fileName) setDropData(prev => ({
       visible: false,
-      files: prev.files
+      files: prev.all
     }));
     else {
       setDropData(prev => {
         const files = prev.all;
         if (!files || !files.length) return {visible: false};
         const index = files.findIndex(file => file.name === fileName);
+        if (index < -1) return {visible: false, files: files};
         const scene = files.splice(index, 1)[0];
         ingestScene(scene.path);
+        refreshContext();
+        if (!files.length) return {visible: false};
         return {visible: false, files: files};
       });
     }
@@ -569,7 +572,7 @@ function Explorer() {
         </Typography>
       </div>
       <div onPaste={handlePaste} onDragLeave={handleDragEnd} onDrop={handleDrop}
-        onDragEnd={handleDragEnd} onDragOver={handleDragOver}
+        onDragEnd={handleDragEnd} onDragOver={handleDragOver} style={{height: "100%"}}
       >
         {getView()}
       </div>
