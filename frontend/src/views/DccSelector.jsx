@@ -53,15 +53,14 @@ function DccSelector(props) {
 
   const getDccIcon = path => {
     const name = path.replaceAll("\\", "/").split("/").at(-1).split(".")[0];
-    let icon = "media/dcc/unknown.png";
     DCCINFO.forEach(dcc => {
       dcc.keywords.forEach(keyword => {
         if (name.toLowerCase().replaceAll(" ", "").includes(keyword)) {
-          icon = dcc.icon;
+          return `url(${dcc.icon})`;
         }
       });
     });
-    return `url(${icon})`;
+    return "url(media/dcc/unknown.png)";
   };
 
   function formatDcc(dcc, index) {

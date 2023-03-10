@@ -1,5 +1,5 @@
 import { Button, Typography } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Modal from "../../components/Modal";
 
 import styles from "./SceneDrop.module.css";
@@ -7,6 +7,10 @@ import styles from "./SceneDrop.module.css";
 
 const SceneDrop = props => {
   const [selected, setSelected] = useState();
+
+  useEffect(() => {
+    setSelected();
+  }, [props.files]);
 
   const handleConfirm = () => props.onClose(selected);
 
@@ -24,7 +28,6 @@ const SceneDrop = props => {
         <Button key="confirm"
           color="ignite"
           onClick={handleConfirm}
-          disabled={!selected}
         >
           Confirm
         </Button>
@@ -35,6 +38,13 @@ const SceneDrop = props => {
         ones will carry over to the New Asset stage to be treated as components
       </Typography>
       <div className={styles.container}>
+        <div
+          className={styles.file}
+          style={!selected ? style : null}
+          onClick={() => setSelected()}
+        >
+          <Typography>None</Typography>
+        </div>
         {props.files?.map(file =>
           <div key={file.name}
             className={styles.file}

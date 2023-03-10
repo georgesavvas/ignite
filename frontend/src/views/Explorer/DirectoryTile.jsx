@@ -20,22 +20,33 @@ import { useSnackbar } from "notistack";
 
 import {CopyToClipboard, ShowInExplorer, clearRepr} from "../ContextActions";
 import {setReprForProject, setReprForParent} from "../ContextActions";
-import {DIRECTORYICONS, DIRCONTEXTOPTIONS} from "../../constants";
+import {DIRECTORYICONS, DIRCONTEXTOPTIONS, DCCINFO} from "../../constants";
 import Tile from "../../components/Tile";
 import {ContextContext} from "../../contexts/ContextContext";
 import {CrateContext} from "../../contexts/CrateContext";
 import { Box } from "@mui/material";
 
 
+const getDccIcon = name => {
+  if (!name) return;
+  const dcc = DCCINFO.find(dcc =>
+    dcc.keywords.some(keyword => 
+      name.toLowerCase().replaceAll(" ", "").includes(keyword)
+    )
+  );
+  return dcc?.icon;
+};
+
 function DirectoryTile(props) {
   const {enqueueSnackbar} = useSnackbar();
   const {addToCrate} = useContext(CrateContext);
   const [currentContext, setCurrentContext] = useContext(ContextContext);
-  const hasThumbnail = props.entity.thumbnail &&
-    props.entity.thumbnail.filename;
+  const hasThumbnail = props.entity.thumbnail?.filename !== undefined;
   const isScene = props.entity.dir_kind === "scene";
-  const thumbnailWidth = isScene || hasThumbnail ? "100%" : "30%";
-  const currentPath = currentContext.path_nr?.replace(currentContext.project + "/", "");
+  const sceneIcon = isScene ? getDccIcon(props.entity.dcc) : undefined;
+  const thumbnailWidth = sceneIcon || hasThumbnail ? "100%" : "30%";
+  const currentPath = currentContext.path_nr
+    ?.replace(currentContext.project + "/", "");
   let contextPath = props.entity.context.replace(currentPath, "");
   if (contextPath.startsWith("/")) contextPath = contextPath.slice(1);
 
@@ -115,26 +126,13 @@ function DirectoryTile(props) {
     }
   };
 
-  function thumbnailPath() {
-    let path = "media/folder_icon.png";
-    if (isScene) {
-      const available = [
-        "aftereffects", "blender", "designer", "houdini", "illustrator", "maya",
-        "natron", "nuke", "painter", "photoshop", "premiere", "unreal", "vscode"
-      ];
-      if (!available.includes(props.entity.dcc)) return "media/dcc/unknown.png";
-      return `media/dcc/${props.entity.dcc}.png`;
-    }
-    return path;
-  }
-
   const name = isScene ? props.entity.dcc : props.entity.name;
 
   let Icon = props.entity.icon && props.entity.icon in DIRECTORYICONS ?
     DIRECTORYICONS[props.entity.icon] : undefined;
 
   const getBadge = () => {
-    if (!hasThumbnail && !props.entity.thumbnail) return null;
+    if (!hasThumbnail) return null;
     const style = {
       position: "absolute",
       top: "10px",
@@ -144,7 +142,9 @@ function DirectoryTile(props) {
       borderRadius: "2px",
       color: "rgb(150, 150, 150)"
     };
-    if (isScene) return <img src={thumbnailPath()} style={style} />;
+    if (isScene && sceneIcon) return (
+      <img src={sceneIcon} style={style} />
+    );
     return <Box component={Icon} style={style} />;
   };
 
@@ -190,12 +190,17 @@ function DirectoryTile(props) {
     e.dataTransfer.setData("ignite/uri", props.entity.uri);
   };
 
+  const getThumbnailUrl = () => {
+    if (isScene) return sceneIcon || "media/dcc/unknown.png";
+    return "media/folder_icon.png";
+  };
+
   return (
     <>
       <Tile
         {...props}
-        thumbnail={hasThumbnail ? undefined : thumbnailPath()}
-        thumbnailComp={!hasThumbnail ? Icon : null}
+        thumbnail={hasThumbnail ? undefined : getThumbnailUrl()}
+        thumbnailComp={hasThumbnail ? null : Icon}
         thumbnailWidth={thumbnailWidth}
         onClick={handleClick}
         contextItems={contextItems}

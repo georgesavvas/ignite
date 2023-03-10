@@ -299,15 +299,11 @@ const RowView = props => {
         }}
         rowHeight={props.tileSize * 9}
         // getRowHeight={() => "auto"}
-        headerHeight={0}
+        columnHeaderHeight={0}
         hideFooter
         selectionModel={selectionModel}
         onSelectionModelChange={setSelectionModel}
         columns={addSpecificColumns(columns)}
-        // isCellEditable={shouldBeEditable}
-        // processRowUpdate={handleEdit}
-        // onProcessRowUpdateError={handleError}
-        // experimentalFeatures={{ newEditingApi: true }}
         components={{
           NoRowsOverlay: () => <DataPlaceholder text="No data" />
         }}

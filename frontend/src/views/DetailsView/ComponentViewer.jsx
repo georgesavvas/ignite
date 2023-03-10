@@ -20,7 +20,7 @@ import {grid} from "@mui/system";
 import Slider from "@mui/material/Slider";
 import * as THREE from "three";
 import {Canvas, useLoader, useThree} from "@react-three/fiber";
-import {OrbitControls, Center } from "@react-three/drei";
+import {OrbitControls, Center, useTexture} from "@react-three/drei";
 import {TextureLoader} from "three/src/loaders/TextureLoader";
 import {EXRLoader} from "three/examples/jsm/loaders/EXRLoader.js";
 import {Typography} from "@mui/material";
@@ -77,7 +77,11 @@ function Scene({path}) {
   const ratio = width / height;
 
   return(
-    <Center onCentered={({container, width, height}) => container.scale.setScalar(Math.min(viewport.width / width, viewport.height / height))}>
+    <Center
+      onCentered={({container, width, height}) => container.scale.setScalar(
+        Math.min(viewport.width / width, viewport.height / height)
+      )}
+    >
       <mesh>
         <planeGeometry attach="geometry" args={[ratio, 1]} />
         <meshBasicMaterial map={colorMap} />
@@ -102,9 +106,6 @@ function EXRViewer(props) {
     const sectionSize = 1 / amount;
     const section = clamp(Math.floor(progress / sectionSize), 0, amount - 1);
     const frame = comp.frames[section];
-    // let frame = comp.first_frame + (comp.last_frame - comp.first_frame) * progress;
-    // frame = Math.round(frame);
-    // frame = clamp(frame, comp.first_frame, comp.last_frame);
     path = path.replace("####", frame);
   }
   
@@ -116,7 +117,12 @@ function EXRViewer(props) {
 
   return (
     <div style={{position: "relative", height: "100%", width: "100%"}}>
-      <div style={{...sliderContainerStyle, display: comp.static ? "none" : "inherit"}}>
+      <div
+        style={{
+          ...sliderContainerStyle,
+          display: comp.static ? "none" : "inherit"
+        }}
+      >
         {comp.frames.length > 0 ?
           <Slider
             defaultValue={comp.first}
@@ -132,8 +138,8 @@ function EXRViewer(props) {
         }
       </div>
       <Canvas orthographic camera={{ zoom: 350, position: [0, 0, 1] }}>
-        <OrbitControls enableRotate={false} enableDamping={false} zoomSpeed={3} mouseButtons=
-          {mouseButtons} />
+        <OrbitControls enableRotate={false} enableDamping={false} zoomSpeed={3}
+          mouseButtons={mouseButtons} />
         {/* <ambientLight intensity={0.75} /> */}
         <Suspense fallback={null}>
           <Scene path={path} />
