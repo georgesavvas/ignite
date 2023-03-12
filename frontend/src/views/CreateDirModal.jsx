@@ -25,29 +25,16 @@ import InputLabel from "@mui/material/InputLabel";
 import Button from "@mui/material/Button";
 import ClearIcon from "@mui/icons-material/Clear";
 
-import {DIRECTORYICONS} from "../constants";
+import {DIRECTORYICONS, KINDTYPES} from "../constants";
 import styles from "./CreateDirModal.module.css";
 import DynamicList from "../components/DynamicList";
 import Modal from "../components/Modal";
+import LoadingButton from "@mui/lab/LoadingButton";
 
-
-const KINDTYPES = {
-  task: [
-    ["generic", "Generic"],
-    ["model", "Model"],
-    ["layout", "Layout"],
-    ["surface", "Surface"],
-    ["light", "Light"],
-    ["anim", "Anim"],
-    ["rig", "Rig"],
-    ["asset", "Asset"],
-    ["fx", "FX"]
-  ]
-};
 
 function Dir(props) {
   const kind = props.data.kind;
-  const types = KINDTYPES[kind];
+  const types = KINDTYPES[kind]?.sort((a, b) => a[1].localeCompare(b[1]));
 
   const Icon = DIRECTORYICONS[props.dir.type ? `${kind}_${props.dir.type}` : kind];
 
@@ -178,12 +165,21 @@ function CreateDirModal(props) {
     const value = e.target.value;
     setDirList(prevState => {
       const dirs = [...prevState];
+      const existingNames = dirs.map(d => d.name)
+        .filter(name => name.startsWith(value));
       const previousType = dirs[id].type;
       dirs[id][field] = value;
 
       const name = dirs[id].name;
-      if (!name || name === previousType) dirs[id].name = value;
-
+      if (!name || name === previousType) {
+        if (existingNames.includes(value)) {
+          let suffix = 2;
+          while (existingNames.includes(`${value}${suffix}`)) suffix++;
+          dirs[id].name = `${value}${suffix}`;
+        } else {
+          dirs[id].name = value;
+        }
+      }
       return dirs;
     });
   };
@@ -210,9 +206,9 @@ function CreateDirModal(props) {
     <Modal open={props.open} maxWidth="sm" onClose={props.onClose}
       title={`Create ${props.data.kind}`}
       buttons={[
-        <Button key="create" color="ignite" onClick={handleCreate}>
+        <LoadingButton key="create" color="ignite" onClick={handleCreate} loading={props.loading}>
           Create
-        </Button>
+        </LoadingButton>
       ]}
     >
       {props.data.kind === "shot" ?

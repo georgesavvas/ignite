@@ -1,18 +1,58 @@
-import { Button, Typography } from "@mui/material";
-import React, { useEffect, useState } from "react";
-import Modal from "../../components/Modal";
+import React, {useEffect, useState, useContext} from "react";
+import {Typography} from "@mui/material";
+import LoadingButton from "@mui/lab/LoadingButton";
+import {useSnackbar} from "notistack";
 
+import Modal from "../../components/Modal";
+import clientRequest from "../../services/clientRequest";
+import {ContextContext} from "../../contexts/ContextContext";
 import styles from "./SceneDrop.module.css";
 
 
 const SceneDrop = props => {
   const [selected, setSelected] = useState();
+  const [loading, setLoading] = useState(false);
+  const {enqueueSnackbar} = useSnackbar();
+  const [currentContext,, refreshContext] = useContext(ContextContext);
 
   useEffect(() => {
+    setLoading(false);
     setSelected();
   }, [props.files]);
 
-  const handleConfirm = () => props.onClose(selected);
+  if (!props.files?.scenes) return null;
+
+  const ingestScene = scenePath => {
+    const data = {
+      scene: scenePath,
+      task: currentContext.path
+    };
+    clientRequest("ingest_scene", {data: data}).then(resp => {
+      if (resp.ok) {
+        enqueueSnackbar("Scene created!", {variant: "success"});
+      } else {
+        enqueueSnackbar("Failed to create scene.", {variant: "error"});
+      }
+      refreshContext();
+    });
+  };
+
+  const handleConfirm = () => {
+    setLoading(true);
+    const files = [...props.files.all];
+    if (!files || !files.length) {
+      props.onClose();
+      return;
+    }
+    const index = files.findIndex(file => file.name === selected);
+    if (index < -1) {
+      props.onClose();
+      return;
+    }
+    const scene = files.splice(index, 1)[0];
+    ingestScene(scene.path);
+    props.onClose(files);
+  };
 
   const style = {
     border: "solid 2px rgb(0, 150, 0)"
@@ -21,16 +61,17 @@ const SceneDrop = props => {
   return (
     <Modal
       maxWidth="xs"
-      open={props.files?.length > 0}
+      open={props.files?.scenes.length > 0}
       onClose={() => props.onClose()}
       title="Your dropped files contain one or more scenes"
       buttons={[
-        <Button key="confirm"
+        <LoadingButton key="confirm"
+          loading={loading}
           color="ignite"
           onClick={handleConfirm}
         >
           Confirm
-        </Button>
+        </LoadingButton>
       ]}
     >
       <Typography variant="subtitle1">
@@ -45,7 +86,7 @@ const SceneDrop = props => {
         >
           <Typography>None</Typography>
         </div>
-        {props.files?.map(file =>
+        {props.files?.scenes.map(file =>
           <div key={file.name}
             className={styles.file}
             style={selected === file.name ? style : null}

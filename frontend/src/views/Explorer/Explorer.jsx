@@ -48,7 +48,6 @@ import Modal from "../../components/Modal";
 import DccSelector from "../DccSelector";
 import DragOverlay from "../../components/DragOverlay";
 import SceneDrop from "./SceneDrop";
-import clientRequest from "../../services/clientRequest";
 
 
 const debounced = debounce(fn => fn(), 500);
@@ -143,6 +142,7 @@ function Explorer() {
     };
     const method = methods[explorerSettings.currentResultType];
     setIsLoading(true);
+    setDropData({visible: false});
     serverRequest(method, data).then(resp => {
       setIsLoading(false);
       setLoadedData(resp.data);
@@ -360,6 +360,7 @@ function Explorer() {
   };
 
   const getView = () => {
+    if (dropData.visible) return;
     if (!loadedData || !loadedData.length) return (
       <DataPlaceholder text={isLoading ? "Fetching data..." : "No results"} />
     );
@@ -446,7 +447,7 @@ function Explorer() {
     }
     const dt = e.dataTransfer;
     const sceneFiles = filterScenesFromFiles(dt.files);
-    if (sceneFiles.length) {
+    if (sceneFiles.length > 0) {
       setDropData({visible: false, scenes: sceneFiles, all: [...dt.files]});
       return;
     }
@@ -457,47 +458,18 @@ function Explorer() {
     setDropData({visible: false});
   };
 
-  const ingestScene = scenePath => {
-    const data = {
-      scene: scenePath,
-      task: currentContext.path
-    };
-    clientRequest("ingest_scene", {data: data}).then(resp => {
-      if (resp.ok) {
-        enqueueSnackbar("Scene created!", {variant: "success"});
-        // refreshContext();
-      } else {
-        enqueueSnackbar("Failed to create scene.", {variant: "error"});
-      }
-    });
-  };
-
-  const handleSceneDropClose = fileName => {
-    if (!fileName) setDropData(prev => ({
-      visible: false,
-      files: prev.all
-    }));
-    else {
-      setDropData(prev => {
-        const files = prev.all;
-        if (!files || !files.length) return {visible: false};
-        const index = files.findIndex(file => file.name === fileName);
-        if (index < -1) return {visible: false, files: files};
-        const scene = files.splice(index, 1)[0];
-        ingestScene(scene.path);
-        refreshContext();
-        if (!files.length) return {visible: false};
-        return {visible: false, files: files};
+  const handleSceneDropClose = remaining => {
+    if (!remaining || remaining.length === 0) setDropData({visible: false});
+    else setDropData(prev => {
+      return ({
+        visible: false,
+        files: remaining || prev.all
       });
-    }
+    });
   };
 
   return (
     <div className={classes.container}>
-      {dropData.visible ?
-        <DragOverlay text="Create asset" error={dropData.error} />
-        : null
-      }
       <Modal
         maxWidth="xs"
         open={newSceneOpen}
@@ -507,7 +479,7 @@ function Explorer() {
           onClose={() => setNewSceneOpen(false)}
         />
       </Modal>
-      <SceneDrop files={dropData.scenes}
+      <SceneDrop files={dropData}
         onClose={handleSceneDropClose}
       />
       <CreateDir open={modalData.createOpen} enqueueSnackbar={enqueueSnackbar}
@@ -572,8 +544,12 @@ function Explorer() {
         </Typography>
       </div>
       <div onPaste={handlePaste} onDragLeave={handleDragEnd} onDrop={handleDrop}
-        onDragEnd={handleDragEnd} onDragOver={handleDragOver} style={{height: "100%"}}
+        onDragEnd={handleDragEnd} onDragOver={handleDragOver} style={{position: "relative", height: "100%"}}
       >
+        {dropData.visible ?
+          <DragOverlay text="Create asset" error={dropData.error} />
+          : null
+        }
         {getView()}
       </div>
       <div

@@ -779,6 +779,10 @@ def get_repr_comp(target):
 
 def delete_entity(path, entity_type):
     entity = find(path)
+    if not entity:
+        LOGGER.error(f"Attempted to delete {entity_type} {path} but couldn't"
+            "find it.")
+        return False
     if entity.dir_kind != entity_type:
         LOGGER.error(f"Attempted to delete {entity.dir_kind} but the entity"
             "was supposed to be {entity_type}")
@@ -803,6 +807,24 @@ def rename_entity(path, entity_type, new_name):
     if not hasattr(entity, "rename"):
         return False
     ok = entity.rename(new_name)
+    return ok, ""
+
+
+def change_task_type(path, new_task_type, new_name):
+    entity = find(path)
+    if not entity:
+        LOGGER.error(f"Entity {path} not found.")
+        return False, "entity not found"
+    if entity.dir_kind != "task":
+        LOGGER.error(" ".join(
+            "Attempted to change task type for an entity of type",
+            entity.dir_kind
+        ))
+        return False, "wrong entity type"
+    ok = entity.set_task_type(new_task_type)
+    if new_name and entity.name != new_name:
+        if hasattr(entity, "rename"):
+            entity.rename(new_name)
     return ok, ""
 
 

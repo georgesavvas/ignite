@@ -14,7 +14,6 @@ import PrecisionManufacturingIcon from "@mui/icons-material/PrecisionManufacturi
 import UnarchiveIcon from "@mui/icons-material/Unarchive";
 import LocalFireDepartmentIcon from "@mui/icons-material/LocalFireDepartment";
 import TerrainIcon from "@mui/icons-material/Terrain";
-import PanoramaIcon from "@mui/icons-material/Panorama";
 
 export const DIRECTORYICONS = {
   directory: FolderIcon,
@@ -31,6 +30,7 @@ export const DIRECTORYICONS = {
   task_anim: DirectionsRunIcon,
   task_rig: PrecisionManufacturingIcon,
   task_asset: UnarchiveIcon,
+  task_shot: UnarchiveIcon,
   task_fx: LocalFireDepartmentIcon,
   task_layout: TerrainIcon,
   rnd: ScienceIcon

@@ -150,7 +150,7 @@ def get_dcc_version(dcc):
     return "default"
 
 
-def replace_vars(d, projects_root=None, dcc={}):
+def replace_vars(d, projects_root=None, dcc={}, scene={}):
     fetched_projects_root = None
     if not projects_root:
         if is_server_local():
@@ -162,13 +162,23 @@ def replace_vars(d, projects_root=None, dcc={}):
     vars = {
         "os": OS_NAME,
         "dcc": str(DCC),
-        "version": get_dcc_version(dcc),
         "projects_root": (
             projects_root or fetched_projects_root
         )
     }
+    if dcc:
+        vars["version"] = get_dcc_version(dcc)
+    if scene:
+        vars["exports"] = scene.get("exports")
+        vars["project"] = scene.get("project")
+        vars["task"] = scene.get("task")
+        vars["task_nr"] = scene.get("task_nr")
+        vars["uri"] = scene.get("uri")
+        vars["version"] = scene.get("version")
     env = {}
     for k, v in d.items():
+        if "{" not in str(v):
+            continue
         for var_name, var_value in vars.items():
             s = "{" + var_name + "}"
             if s in v:
@@ -216,30 +226,24 @@ def get_task_env(path):
     return env
 
 
-def get_scene_env(scene):
-    if not scene or not scene.get("dir_kind") == "scene":
-        return {}
-    env = {
-        "VERSION": scene.get("version"),
-        "VS": scene.get("version"),
-        "VSN": scene.get("vsn")
-    }
-    return env
-
-
-def get_dcc_env(dcc, projects_root=None):
+def get_dcc_env(dcc, projects_root=None, scene={}):
     dcc_name = dcc["name"]
-    envs = None
+    env = None
     for name, data in DCC_ENVS.items():
         if dcc_name.startswith(name):
-            envs = data
+            env = data
             break
     else:
         return {}
+    if scene:
+        env["VERSION"] = str(scene.get("version"))
+        env["VS"] = str(scene.get("version"))
+        env["VSN"] = str(scene.get("vsn"))
     return replace_vars(
-        envs,
+        env,
         projects_root=projects_root,
-        dcc=dcc
+        dcc=dcc,
+        scene=scene
     )
 
 
@@ -253,9 +257,7 @@ def get_env(task="", dcc={}, scene={}):
     if task:
         env.update(get_task_env(task))
     if dcc:
-        env.update(get_dcc_env(dcc, projects_root))
-    if scene:
-        env.update(get_scene_env(scene))
+        env.update(get_dcc_env(dcc, projects_root, scene))
     env = {k: str(v) for k, v in env.items()}
     return env
 

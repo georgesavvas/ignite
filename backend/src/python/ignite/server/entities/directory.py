@@ -243,20 +243,23 @@ class Directory():
 
     def rename(self, new_name):
         path = Path(self.path)
-        path.rename(path.parent / new_name)
-        self.__init__(path, self.dir_kind)
+        path = path.rename(path.parent / new_name)
+        self.path = path
+        self.anchor = path / self.anchor.name
+        self.load_from_path()
         return path.name == new_name
 
     def delete(self):
-        LOGGER.warning(f"About to delete {self.path}")
+        path = Path(self.path)
+        LOGGER.warning(f"About to delete {path}")
         try:
-            shutil.rmtree(self.path)
+            shutil.rmtree(path)
         except Exception as e:
             LOGGER.error("Failed.")
             LOGGER.error(e)
             return False
         LOGGER.warning("Success.")
-        return not self.path.exists()
+        return not path.exists()
 
     def get_tags(self):
         return self.tags

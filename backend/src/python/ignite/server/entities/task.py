@@ -48,6 +48,7 @@ class Task(Directory):
         self.task_type = task_type
         config = {"task_type": task_type}
         self.update_config(config)
+        return True
 
     def as_dict(self):
         d = super().as_dict()

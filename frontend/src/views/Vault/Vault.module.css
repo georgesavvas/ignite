@@ -1,35 +1,34 @@
 .container {
-    box-sizing: border-box;
-    border: solid 1px rgb(40, 40, 40);
-    border-radius: 5px;
+  box-sizing: border-box;
+  border: solid 1px rgb(40, 40, 40);
+  border-radius: 5px;
 }
 
 .viewer {
-    width: 100%;
-    height: 100%;
+  width: 100%;
+  height: 100%;
 }
 
 .details {
-    background-color: red;
-    width: 100%;
-    height: 100%;
+  background-color: red;
+  width: 100%;
+  height: 100%;
 }
 
 .collections {
-    width: 100%;
-    height: 100%;
+  width: 100%;
+  height: 100%;
 }
 
 .browser {
-    width: 100%;
-    height: 100%;
+  width: 100%;
+  height: 100%;
 }
 
 .collectionContainer {
-    display: flex;
-    flex-direction: column;
-    overflow: auto;
-    flex-grow: 1;
-    box-sizing: border-box;
-    max-width: 300px;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  flex-grow: 1;
+  box-sizing: border-box;
 }
