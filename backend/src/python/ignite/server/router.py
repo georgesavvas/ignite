@@ -488,6 +488,21 @@ async def rename_entity(request: Request):
     return {"ok": ok}
 
 
+@router.post("/change_task_type")
+async def change_task_type(request: Request):
+    result = await request.json()
+    log_request(result)
+    path = result.get("path", "")
+    new_task_type = result.get("type")
+    new_name = result.get("name")
+    if not new_task_type:
+        return error("invalid_data")
+    ok, msg = api.change_task_type(path, new_task_type, new_name)
+    if not ok:
+        return error("invalid_data", msg)
+    return {"ok": ok}
+
+
 @router.post("/add_tags")
 async def add_tags(request: Request):
     result = await request.json()

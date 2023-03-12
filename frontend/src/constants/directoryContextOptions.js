@@ -4,7 +4,8 @@ const cOpts = {
   create_build: {name: "create_build", label: "Create build", dir_kind: "build"},
   create_sequence: {name: "create_sequence", label: "Create sequence", dir_kind: "sequence"},
   create_shot: {name: "create_shot", label: "Create shot", dir_kind: "shot"},
-  create_task: {name: "create_task", label: "Create task", dir_kind: "task"}
+  create_task: {name: "create_task", label: "Create task", dir_kind: "task"},
+  change_task_type: {name: "change_task_type", label: "Change type", dir_kind: "task", action: "changeTaskType"}
 };
 
 export const DIRCONTEXTOPTIONS = {
@@ -12,7 +13,7 @@ export const DIRCONTEXTOPTIONS = {
     default: [cOpts.create_group]
   },
   task: {
-    default: [cOpts.create_task],
+    default: [cOpts.create_task, cOpts.change_task_type],
   },
   directory: {
     default: [cOpts.create_directory, cOpts.create_sequence, cOpts.create_shot, cOpts.create_build, cOpts.create_task]

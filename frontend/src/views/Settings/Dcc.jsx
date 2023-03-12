@@ -102,7 +102,9 @@ const Dcc = () => {
     const target_id = s[1];
     const target_field = s[0];
     let value = e.target.value;
-    if (target_field === "exts") value = value.trim().split(",");
+    if (["exts", "scenes"].includes(target_field)) {
+      value = value.trim().split(",");
+    }
     const data = {
       index: target_id,
       field: target_field,

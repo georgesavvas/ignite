@@ -114,8 +114,8 @@ DCC_DISCOVERY = {
     },
     "hython": {
         "label": "Hython",
-        "scenes": ["hip", "hipnc"],
-        "exts": [],
+        "scenes": [],
+        "exts": ["hip", "hipnc"],
         "paths": {
             "win": [
                 "C:/Program Files/Side Effects Software/Houdini *.*.*/bin/hython.exe"

@@ -53,20 +53,18 @@ function DccSelector(props) {
 
   const getDccIcon = path => {
     const name = path.replaceAll("\\", "/").split("/").at(-1).split(".")[0];
-    DCCINFO.forEach(dcc => {
-      dcc.keywords.forEach(keyword => {
-        if (name.toLowerCase().replaceAll(" ", "").includes(keyword)) {
-          return `url(${dcc.icon})`;
-        }
-      });
-    });
+    const dcc = DCCINFO.find(dcc => dcc.keywords.some(keyword => {
+      return name.toLowerCase().replaceAll(" ", "").includes(keyword);
+    }));
+    if (dcc) return `url(${dcc.icon})`;
     return "url(media/dcc/unknown.png)";
   };
 
   function formatDcc(dcc, index) {
     const dccIcon = getDccIcon(dcc.path);
-    const relevant = props.scene ?
-      dcc.exts.includes(props.scene.extension) : true;
+    const relevant = props.scene?.length > 0 ||
+      dcc.scenes.includes(props.scene?.extension) ||
+      dcc.exts.includes(props.scene?.extension);
     const containerStyle = {
       display: relevant || showAll ? null : "none",
       borderColor: dcc.name === selectedDcc ?
@@ -88,7 +86,6 @@ function DccSelector(props) {
   async function handleLaunchClick() {
     setIsLoading(true);
     const dcc = getDcc();
-    // const dcc_name = getDccName(dcc.path);
     const data = {
       dcc: dcc,
       scene: props.scene,
@@ -109,7 +106,7 @@ function DccSelector(props) {
   }
 
   let dccConfigSorted = config.dccConfig.filter(
-    dcc => [dcc.name, dcc.exts, dcc.path].every(Boolean)
+    dcc => [dcc.name, dcc.path].every(Boolean)
   );
   dccConfigSorted.sort((a, b) => a.name.localeCompare(b.name));
 

@@ -353,9 +353,9 @@ def ingest_scene(data):
         return
     dest = task_dict.get("next_scene")
     os.makedirs(dest)
-    dest /= scene_path.with_stem("scene").name
-    LOGGER.info(f"Ingesting scene {scene_path} to {dest}")
-    shutil.copyfile(scene_path, dest)
+    new_scene = dest / scene_path.with_stem("scene").name
+    LOGGER.info(f"Ingesting scene {scene_path} to {new_scene}")
+    shutil.copyfile(scene_path, new_scene)
     if is_server_local():
         ok = server_api.register_scene(dest)
         if not ok:
@@ -366,7 +366,7 @@ def ingest_scene(data):
         if not resp.get("ok"):
             print("Failed.")
             return
-    return dest / PurePath(scene_path).name
+    return new_scene
 
 
 def get_actions(project=None):
