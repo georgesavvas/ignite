@@ -178,7 +178,7 @@ def replace_vars(d, projects_root=None, dcc={}, scene={}):
     env = {}
     for k, v in d.items():
         if "{" not in str(v):
-            continue
+            env[k] = v
         for var_name, var_value in vars.items():
             s = "{" + var_name + "}"
             if s in v:

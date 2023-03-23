@@ -59,7 +59,10 @@ function Attributes(props) {
 
   useEffect(() => {
     if (!data.shouldWrite) return;
-    serverRequest("set_attributes", {path: props.entityPath, attributes: data.attribs});
+    serverRequest(
+      "set_attributes",
+      {path: props.entityPath, attributes: data.attribs}
+    );
     refreshContext();
   }, [data]);
 
@@ -83,9 +86,27 @@ function Attributes(props) {
   };
   
   const columns = [
-    { field: "name", headerName: "Name", flex: 1, editable: true, cellClassName: getRowStyle},
-    { field: "inherited", headerName: "Inherited", flex: 1, editable: false, cellClassName: getRowStyle },
-    { field: "override", headerName: "Override", flex: 1, editable: true, cellClassName: getRowStyle },
+    {
+      field: "name",
+      headerName: "Name",
+      flex: 1,
+      editable: true,
+      cellClassName: getRowStyle
+    },
+    {
+      field: "inherited",
+      headerName: "Inherited",
+      flex: 1,
+      editable: false,
+      cellClassName: getRowStyle
+    },
+    {
+      field: "override",
+      headerName: "Override",
+      flex: 1,
+      editable: true,
+      cellClassName: getRowStyle
+    },
     actions
   ];
 
@@ -101,7 +122,6 @@ function Attributes(props) {
   };
 
   const handleEdit = (newValues, previousValues) => {
-    console.log(newValues, previousValues, newValues === previousValues);
     if (newValues === previousValues) return newValues;
     let attribs = data.attribs;
     attribs.forEach(attrib => {
@@ -166,7 +186,11 @@ function Attributes(props) {
           onProcessRowUpdateError={handleError}
           experimentalFeatures={{ newEditingApi: true }}
           components={{
-            NoRowsOverlay: () => <DataPlaceholder text="No attributes" />,
+            NoRowsOverlay: () =>
+              <DataPlaceholder
+                text="No attributes"
+                style={{position: "relative"}}
+              />,
           }}
         />
       </div>
