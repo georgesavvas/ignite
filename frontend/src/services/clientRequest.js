@@ -21,7 +21,7 @@ async function clientRequest(method, data=undefined) {
     // console.log("Invalid client address, aborting...");
     return;
   }
-  if (method !== "ping") console.log("Client request:", address, method, data);
+  // if (method !== "ping") console.log("Client request:", address, method, data);
   return await request(address, method, data);
 }
 
@@ -36,9 +36,9 @@ async function request(address, method, data, attempt=0) {
       body: JSON.stringify(data)
     });
     const resp2 = await resp.json();
-    if (method !== "ping") {
-      console.log(`Client response (${attempt}):`, method, resp2);
-    }
+    // if (method !== "ping") {
+    //   console.log(`Client response (${attempt}):`, method, resp2);
+    // }
     return resp2;
   } catch (error) {
     return {ok: false, msg: "Could not connect to Ignite client..."};

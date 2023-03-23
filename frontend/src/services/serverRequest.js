@@ -21,7 +21,7 @@ async function serverRequest(method, data=undefined) {
     // console.log("Invalid server address, aborting...");
     return;
   }
-  if (method !== "ping") console.log("Server request:", address, method, data);
+  // if (method !== "ping") console.log("Server request:", address, method, data);
   return await request(address, method, data);
 }
 
@@ -36,9 +36,9 @@ async function request(address, method, data, attempt=0) {
       body: JSON.stringify(data)
     });
     const resp2 = await resp.json();
-    if (method !== "ping") {
-      console.log(`Server response (${attempt}):`, method, resp2);
-    }
+    // if (method !== "ping") {
+    //   console.log(`Server response (${attempt}):`, method, resp2);
+    // }
     return resp2;
   } catch (error) {
     if (error === "timeout") {

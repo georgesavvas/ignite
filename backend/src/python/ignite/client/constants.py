@@ -19,7 +19,8 @@ DCC_ENVS = {
         "PYTHONPATH": "{dcc}/maya/python;{dcc}/common/python",
         "MAYA_SHELF_PATH": "{dcc}/maya/shelf",
         "MAYA_SCRIPT_PATH": "{dcc}/maya/scripts",
-        "MAYA_PLUG_IN_PATH": "{dcc}/maya/plug-ins"
+        "MAYA_PLUG_IN_PATH": "{dcc}/maya/plug-ins",
+        "MAYA_PROJECT": "{task}"
     },
     "nuke": {
         "PYTHONPATH": "{dcc}/nuke/python;{dcc}/common/python",
