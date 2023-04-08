@@ -1,0 +1,42 @@
+appId: georgesavvas.ignitevfx
+productName: ignite
+artifactName: ${productName}-setup-${version}.${ext}
+generateUpdatesFilesForAllChannels: true
+extraFiles:
+  - from: ../backend/dist/,
+    to: .
+  - from: ../config/,
+    to: config
+  - from: ../tools/,
+    to: tools
+],
+directories:
+  buildResources: build
+files:
+  - '!**/.vscode/*'
+  - '!src/*'
+  - '!electron.vite.config.{js,ts,mjs,cjs}'
+  - '!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
+  - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
+  - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
+asarUnpack:
+  - resources/**
+afterSign: build/notarize.js
+win:
+  executableName: ${productName}
+nsis:
+  shortcutName: ${productName}
+  uninstallDisplayName: ${productName}
+  createDesktopShortcut: always
+mac:
+  entitlementsInherit: build/entitlements.mac.plist
+  extendInfo:
+    - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
+    - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
+linux:
+  target:
+    - AppImage
+npmRebuild: false
+publish:
+  provider: generic
+  url: https://example.com/auto-updates
