@@ -12,27 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-import React, {useState, useContext, useEffect} from "react";
-
-import IconButton from "@mui/material/IconButton";
 import HelpIcon from "@mui/icons-material/Help";
 import SettingsIcon from "@mui/icons-material/Settings";
-
-import Settings from "../Settings/Settings.jsx";
-import ProjectBrowser from "../ProjectBrowser/ProjectBrowser";
-import Vault from "../Vault/Vault";
-import styles from "./TopBar.module.css";
-import IgnButton from "../../components/IgnButton";
-import {ContextContext} from "../../contexts/ContextContext";
-import Modal from "../../components/Modal";
-import DccSelector from "../DccSelector";
-import Feedback from "../Feedback.jsx";
-import CratesDropdown from "../Crates/CratesDropdown.jsx";
 import { Typography } from "@mui/material";
+import IconButton from "@mui/material/IconButton";
+import {useContext, useEffect, useState} from "react";
 
-
-const igniteLogo = new URL("@assets/ignite_logo.png", import.meta.url).href;
+import IgnButton from "../../components/IgnButton.js";
+import Modal from "../../components/Modal.js";
+import {ContextContext} from "../../contexts/ContextContext.js";
+import CratesDropdown from "../Crates/CratesDropdown.js";
+import DccSelector from "../DccSelector.jsx";
+import Feedback from "../Feedback.jsx";
+import ProjectBrowser from "../ProjectBrowser/ProjectBrowser.js";
+import Settings from "../Settings/Settings.js";
+import Vault from "../Vault/Vault.jsx";
+import styles from "./TopBar.module.css";
 
 export default function TopBar() {
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -92,7 +87,7 @@ export default function TopBar() {
           </IgnButton>
         </div>
         <div className={styles.logoContainer}>
-          <img src={igniteLogo} className={styles.logo} />
+          <img src="src/assets/ignite_logo.png" className={styles.logo} />
           <Typography style={{color: "rgb(60,60,60)", alignSelf: "flex-end"}} variant="caption">
             v{appVersion}
           </Typography>

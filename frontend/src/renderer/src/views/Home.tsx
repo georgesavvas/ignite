@@ -12,26 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-import React, {useEffect, useState, useContext} from "react";
-
 import Divider from "@mui/material/Divider";
-import {ReflexContainer, ReflexSplitter, ReflexElement} from "react-reflex";
+import React, {useContext, useEffect, useState} from "react";
+import {ReflexContainer, ReflexElement, ReflexSplitter} from "react-reflex";
 
-import Details from "../views/DetailsView/Details";
-import ProcessManager from "../views/ProcessManager/ProcessManager";
-import saveReflexLayout from "../utils/saveReflexLayout";
-import loadReflexLayout from "../utils/loadReflexLayout";
-import ProjectTree from "../views/TreeView/ProjectTree";
-import TopBar from "../views/TopBar/TopBar";
-import styles from "./Home.module.css";
-import Explorer from "../views/Explorer/Explorer";
-import WaitingForBackendOverlay from "./WaitingForBackendOverlay";
-import LostConnectionOverlay from "./LostConnectionOverlay";
 import {ConfigContext} from "../contexts/ConfigContext";
-import Welcome from "./Welcome";
 import serverRequest from "../services/serverRequest";
-
+import loadReflexLayout from "../utils/loadReflexLayout";
+import saveReflexLayout from "../utils/saveReflexLayout";
+import Details from "./DetailsView/Details";
+import Explorer from "./Explorer/Explorer";
+import styles from "./Home.module.css";
+import LostConnectionOverlay from "./LostConnectionOverlay";
+import ProcessManager from "./ProcessManager/ProcessManager";
+import TopBar from "./TopBar/TopBar";
+import ProjectTree from "./TreeView/ProjectTree";
+import WaitingForBackendOverlay from "./WaitingForBackendOverlay";
+import Welcome from "./Welcome";
 
 const splitterStyle = {
   borderColor: "rgb(80,80,80)",

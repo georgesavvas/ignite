@@ -12,15 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
+import Divider from "@mui/material/Divider";
+import Typography from "@mui/material/Typography";
 import React from "react";
 
-import Typography from "@mui/material/Typography";
-import Divider from "@mui/material/Divider";
-
+import Path from "../../components/Path.js";
 import DccSelector from "../DccSelector.jsx";
-import Path from "../../components/Path.jsx";
-
 
 const style = {
   width: "100%",

@@ -12,18 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-import React, {useState, useContext} from "react";
-import Crates from "./Crates";
-
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import styles from "./CratesDropdown.module.css";
-import {CrateContext} from "../../contexts/CrateContext";
+import React, {useContext, useState} from "react";
+
 import ContextMenu, { handleContextMenu } from "../../components/ContextMenu";
+import {CrateContext} from "../../contexts/CrateContext";
 import clientRequest from "../../services/clientRequest";
-
-
-const crateIcon = new URL("@assets/crate.png", import.meta.url).href;
+import Crates from "./Crates";
+import styles from "./CratesDropdown.module.css";
 
 const CratesDropdown = () => {
   const {
@@ -95,7 +91,7 @@ const CratesDropdown = () => {
       </div>
       <div className={styles.dropdown}>
         <img
-          src={crateIcon}
+          src="src/assets/crate.png"
           alt="crate_icon"
           className={styles.crateIcon}
         />

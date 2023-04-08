@@ -12,15 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import "./main.css";
 
 import * as React from "react";
 import {createRoot} from "react-dom/client";
 
-import "./main.css";
 import App from "./App";
 
-
-const container = document.getElementById("root");
+const container = document.getElementById("root") as HTMLElement;
 const root = createRoot(container);
 
 root.render(

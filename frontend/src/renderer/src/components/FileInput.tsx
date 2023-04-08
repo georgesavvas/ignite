@@ -14,11 +14,11 @@
 
 
 /* eslint-disable react/no-unknown-property */
+
+import TextField from "@mui/material/TextField";
 import React, {useRef} from "react";
 
-import IgnButton from "../components/IgnButton";
-import TextField from "@mui/material/TextField";
-
+import IgnButton from "./IgnButton";
 
 export default function FileInput(props) {
   const {
@@ -45,7 +45,7 @@ export default function FileInput(props) {
     props.onChange(e, filePaths.join("\n"));
   };
 
-  const style = { 
+  const style = {
     display: "flex",
     alignItems: !props.multiline ? "center" : "flex-start",
     gap: "5px",
