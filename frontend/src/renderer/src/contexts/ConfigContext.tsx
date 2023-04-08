@@ -12,14 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-import React, {useState, createContext, useEffect, useRef} from "react";
-
 import {useSnackbar} from "notistack";
+import {PropsWithChildren, createContext, useEffect, useRef, useState} from "react";
 
 import clientRequest from "../services/clientRequest";
 import serverRequest from "../services/serverRequest";
-
 
 export const ConfigContext = createContext();
 
@@ -40,7 +37,7 @@ const placeholder_config = {
   name: ""
 };
 
-export const ConfigProvider = props => {
+export const ConfigProvider = ({children}: PropsWithChildren): JSX.Element => {
   const serverIsLocal = useRef(true);
   const intervalRef = useRef();
   const {enqueueSnackbar} = useSnackbar();
@@ -53,15 +50,6 @@ export const ConfigProvider = props => {
   });
 
   useEffect(() => setupConfig(), []);
-
-  // useEffect(() => {
-  //   if (!config.ready) return;
-  //   if (!config.connection) {
-  //     console.log("CONNECTION LOST - REQUEST TO CHECK BACKEND");
-  //     window.services.check_backend();
-  //   } else {
-  //   }
-  // }, [config.connection]);
 
   const heartbeat = () => {
     const serverName = serverIsLocal.current ? "server/client" : "server";
@@ -290,7 +278,7 @@ export const ConfigProvider = props => {
 
   return (
     <ConfigContext.Provider value={[config, handleSetConfig]}>
-      {props.children}
+      {children}
     </ConfigContext.Provider>
   );
 };

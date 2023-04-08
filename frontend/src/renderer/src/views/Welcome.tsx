@@ -12,23 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-import React, { useContext, useEffect, useState } from "react";
-
-import {Divider, Typography} from "@mui/material";
-import LoadingButton from "@mui/lab/LoadingButton";
 import CheckIcon from "@mui/icons-material/Check";
+import LoadingButton from "@mui/lab/LoadingButton";
+import {Divider, Typography} from "@mui/material";
+import { useContext, useEffect, useState } from "react";
 
-import {validateDirName} from "../utils/validateDirName";
 import FileInput from "../components/FileInput";
 import IgnButton from "../components/IgnButton";
-import Modal from "../components/Modal";
-import styles from "./Welcome.module.css";
 import IgnTextField from "../components/IgnTextField";
-import serverRequest from "../services/serverRequest";
+import Modal from "../components/Modal";
 import {ConfigContext} from "../contexts/ConfigContext";
-import {setProject, ContextContext} from "../contexts/ContextContext";
-
+import {ContextContext, setProject} from "../contexts/ContextContext";
+import serverRequest from "../services/serverRequest";
+import {validateDirName} from "../utils/validateDirName";
+import styles from "./Welcome.module.css";
 
 const Welcome = props => {
   const [,,setCurrentContext] = useContext(ContextContext);

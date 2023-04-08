@@ -12,19 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import "react-reflex/styles.css";
 
-import React from "react";
+import "./App.css";
 
 import Button from "@mui/material/Button";
 import darkScrollbar from "@mui/material/darkScrollbar";
 import GlobalStyles from "@mui/material/GlobalStyles";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import { SnackbarProvider } from "notistack";
+import React from "react";
 import { ErrorBoundary } from "react-error-boundary";
-import "react-reflex/styles.css";
 
-import "./App.css";
 import { ConfigProvider } from "./contexts/ConfigContext";
 import { ContextProvider } from "./contexts/ContextContext";
 import { CrateProvider } from "./contexts/CrateContext";
@@ -33,24 +33,23 @@ import { VaultProvider } from "./contexts/VaultContext";
 import BuildFileURL from "./services/BuildFileURL";
 import Home from "./views/Home";
 
+declare module "@mui/material/styles" {
+  interface Palette {
+    ignite: Palette["primary"];
+  }
 
-// declare module "@mui/material/styles" {
-//   interface Palette {
-//     ignite: Palette["primary"];
-//   }
+  interface PaletteOptions {
+    ignite: PaletteOptions["primary"];
+  }
 
-//   interface PaletteOptions {
-//     ignite: PaletteOptions["primary"];
-//   }
+  interface Palette {
+    lightgrey: Palette["primary"];
+  }
 
-//   interface Palette {
-//     lightgrey: Palette["primary"];
-//   }
-
-//   interface PaletteOptions {
-//     lightgrey: PaletteOptions["primary"];
-//   }
-// };
+  interface PaletteOptions {
+    lightgrey: PaletteOptions["primary"];
+  }
+};
 
 
 const darkTheme = createTheme({
@@ -84,7 +83,7 @@ const ErrorFallback = ({error, resetErrorBoundary}) => {
   );
 };
 
-function App() {
+const App = (): JSX.Element => {
   return (
     <ThemeProvider theme={darkTheme}>
       <GlobalStyles styles={{...darkScrollbar()}} />
