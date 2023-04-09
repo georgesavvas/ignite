@@ -12,52 +12,48 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-import React, {useState, useContext} from "react";
-
 import Typography from "@mui/material/Typography";
-import {useSnackbar} from "notistack";
+import { useSnackbar } from "notistack";
+import React, { useContext, useState } from "react";
 
-import styles from "./URI.module.css";
+import { ContextContext } from "../contexts/ContextContext";
+import { CopyToClipboard } from "../views/ContextActions";
 import ContextMenu, { handleContextMenu } from "./ContextMenu";
-import {CopyToClipboard} from "../views/ContextActions";
-import {ContextContext} from "../contexts/ContextContext";
-
+import styles from "./URI.module.css";
 
 function URI(props) {
   const [, setCurrentContext] = useContext(ContextContext);
   const [contextMenu, setContextMenu] = useState(null);
-  const {enqueueSnackbar} = useSnackbar();
+  const { enqueueSnackbar } = useSnackbar();
 
   const contextItems = [
     {
-      "label": "Copy",
-      "fn": () => CopyToClipboard(props.uri, enqueueSnackbar)
+      label: "Copy",
+      fn: () => CopyToClipboard(props.uri, enqueueSnackbar),
     },
     {
-      "label": "Go to asset",
-      "fn": () => setCurrentContext(props.uri)
-    }
+      label: "Go to asset",
+      fn: () => setCurrentContext(props.uri),
+    },
   ];
 
   if (!props.uri) return null;
 
   return (
     <>
-      <ContextMenu items={contextItems} contextMenu={contextMenu}
-        setContextMenu={setContextMenu}
-      />
+      <ContextMenu items={contextItems} contextMenu={contextMenu} setContextMenu={setContextMenu} />
       <div
         className={styles.container}
-        onClick={e => handleContextMenu(e, contextMenu, setContextMenu)}
+        onClick={(e) => handleContextMenu(e, contextMenu, setContextMenu)}
         style={props.style}
       >
         <Typography
           noWrap
+          color="ignite"
           style={{
-            color: "rgb(252, 140, 3)",
+            // color: "rgb(252, 140, 3)",
             direction: "rtl",
-            textAlign: "left"
+            textAlign: "left",
           }}
         >
           {props.uri}

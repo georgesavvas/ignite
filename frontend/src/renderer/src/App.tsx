@@ -44,22 +44,29 @@ declare module "@mui/material/styles" {
   }
 }
 
+declare module "@mui/material" {
+  interface ButtonPropsColorOverrides {
+    ignite: true;
+    lightgrey: true;
+  }
+}
+
 const darkTheme = createTheme({
   palette: {
     mode: "dark",
     ignite: {
-      main: "rgb(252, 140, 3)"
+      main: "rgb(252, 140, 3)",
     },
     lightgrey: {
-      main: "rgb(211,211,211)"
-    }
+      main: "rgb(211,211,211)",
+    },
   },
   typography: {
     fontSize: 12.5,
     allVariants: {
-      color: "lightgrey"
-    }
-  }
+      color: "lightgrey",
+    },
+  },
 });
 
 BuildFileURL("");
