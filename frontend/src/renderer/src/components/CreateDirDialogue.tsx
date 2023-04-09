@@ -19,20 +19,16 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import MenuItem from "@mui/material/MenuItem";
 import TextField from "@mui/material/TextField";
+import { TextFieldChangeEvent } from "@renderer/types/common";
 import { FormEvent, MouseEventHandler, useState } from "react";
 
-type TextFieldEvent = React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>;
-
-const NewDirContent = (
-  values: { [key: string]: string },
-  setValues: Function
-) => {
-  const handleChange = (e: TextFieldEvent, field: string) => {
+const NewDirContent = (values: { [key: string]: string }, setValues: Function) => {
+  const handleChange = (e: TextFieldChangeEvent, field: string) => {
     const data: { [key: string]: string } = {};
     data[field] = e.target.value;
     setValues((prevState: { [key: string]: string }) => ({
       ...prevState,
-      ...data
+      ...data,
     }));
   };
 
@@ -52,16 +48,13 @@ const NewDirContent = (
   );
 };
 
-const NewBuildContent = (
-  values: { [key: string]: string },
-  setValues: Function
-) => {
-  const handleChange = (e: TextFieldEvent, field: string) => {
+const NewBuildContent = (values: { [key: string]: string }, setValues: Function) => {
+  const handleChange = (e: TextFieldChangeEvent, field: string) => {
     const data: { [key: string]: string } = {};
     data[field] = e.target.value;
     setValues((prevState: { [key: string]: string }) => ({
       ...prevState,
-      ...data
+      ...data,
     }));
   };
 
@@ -81,51 +74,48 @@ const NewBuildContent = (
   );
 };
 
-const NewTaskContent = (
-  values: { [key: string]: string },
-  setValues: Function
-) => {
+const NewTaskContent = (values: { [key: string]: string }, setValues: Function) => {
   const task_types = [
     {
       value: "generic",
-      label: "Generic"
+      label: "Generic",
     },
     {
       value: "model",
-      label: "Model"
+      label: "Model",
     },
     {
       value: "layout",
-      label: "Layout"
+      label: "Layout",
     },
     {
       value: "surface",
-      label: "Surface"
+      label: "Surface",
     },
     {
       value: "light",
-      label: "Light"
+      label: "Light",
     },
     {
       value: "fx",
-      label: "FX"
+      label: "FX",
     },
     {
       value: "anim",
-      label: "Anim"
+      label: "Anim",
     },
     {
       value: "rig",
-      label: "Rig"
-    }
+      label: "Rig",
+    },
   ];
 
-  const handleChange = (e: TextFieldEvent, field: string) => {
+  const handleChange = (e: TextFieldChangeEvent, field: string) => {
     const data: any = {};
     data[field] = e.target.value;
     setValues((prevState: { [key: string]: string }) => ({
       ...prevState,
-      ...data
+      ...data,
     }));
   };
 
@@ -164,7 +154,7 @@ const dialogueContents: { [key: string]: Function } = {
   build: NewBuildContent,
   sequence: NewDirContent,
   shot: NewDirContent,
-  task: NewTaskContent
+  task: NewTaskContent,
 };
 
 interface CreateDialogueProps {
@@ -178,7 +168,7 @@ export const CreateDirDialogue = (props: CreateDialogueProps) => {
   const defaultFields = {
     dir_name: props.meta.dir_kind === "task" ? "main" : "",
     task_type: "generic",
-    tasks: []
+    tasks: [],
   };
   const [values, setValues] = useState(defaultFields);
 
@@ -193,9 +183,7 @@ export const CreateDirDialogue = (props: CreateDialogueProps) => {
     <Dialog open={props.open} onClose={props.onClose as DialogProps["onClose"]}>
       <DialogTitle>{props.meta.modal_title}</DialogTitle>
       <form onSubmit={handleCreate}>
-        {props.open
-          ? dialogueContents[props.meta.dir_kind](values, setValues)
-          : null}
+        {props.open ? dialogueContents[props.meta.dir_kind](values, setValues) : null}
         <DialogActions>
           <Button type="button" onClick={props.onClose as MouseEventHandler}>
             Cancel

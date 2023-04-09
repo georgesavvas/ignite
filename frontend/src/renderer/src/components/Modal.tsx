@@ -50,9 +50,9 @@ function Modal(props: ModalProps) {
       "& .MuiPaper-root": {
         backgroundColor: "rgb(20,20,20)",
         backgroundImage: "none",
-        height: props.fullHeight ? "100%" : "none"
-      }
-    }
+        height: props.fullHeight ? "100%" : "none",
+      },
+    },
   };
 
   const handleSubmit = (e) => {
@@ -76,27 +76,15 @@ function Modal(props: ModalProps) {
       {formWrapper(
         props.onFormSubmit,
         <>
-          <ClearIcon
-            onClick={props.onClose}
-            className={styles.closeButtonStyle}
-          />
+          <ClearIcon onClick={props.onClose} className={styles.closeButtonStyle} />
           {props.title ? (
-            <DialogTitle style={{ padding: "10px 20px 0px 20px" }}>
-              {props.title}
-            </DialogTitle>
+            <DialogTitle style={{ padding: "10px 20px 0px 20px" }}>{props.title}</DialogTitle>
           ) : null}
-          <DialogContent
-            style={{ padding: "15px 20px" }}
-            {...props.dialogContentProps}
-          >
-            {props.text ? (
-              <DialogContentText>{props.text}</DialogContentText>
-            ) : null}
+          <DialogContent style={{ padding: "15px 20px" }} {...props.dialogContentProps}>
+            {props.text ? <DialogContentText>{props.text}</DialogContentText> : null}
             {props.children}
           </DialogContent>
-          {props.buttons ? (
-            <DialogActions>{props.buttons}</DialogActions>
-          ) : null}
+          {props.buttons ? <DialogActions>{props.buttons}</DialogActions> : null}
         </>
       )}
     </Dialog>
