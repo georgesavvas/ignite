@@ -16,15 +16,14 @@ import "react-reflex/styles.css";
 
 import "./App.css";
 
-import Button from "@mui/material/Button";
 import darkScrollbar from "@mui/material/darkScrollbar";
 import GlobalStyles from "@mui/material/GlobalStyles";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import { SnackbarProvider } from "notistack";
-import React from "react";
 import { ErrorBoundary } from "react-error-boundary";
 
+import IgnButton from "./components/IgnButton";
 import { ConfigProvider } from "./contexts/ConfigContext";
 import { ContextProvider } from "./contexts/ContextContext";
 import { CrateProvider } from "./contexts/CrateContext";
@@ -36,48 +35,48 @@ import Home from "./views/Home";
 declare module "@mui/material/styles" {
   interface Palette {
     ignite: Palette["primary"];
-  }
-
-  interface PaletteOptions {
-    ignite: PaletteOptions["primary"];
-  }
-
-  interface Palette {
     lightgrey: Palette["primary"];
   }
 
   interface PaletteOptions {
+    ignite: PaletteOptions["primary"];
     lightgrey: PaletteOptions["primary"];
   }
-};
-
+}
 
 const darkTheme = createTheme({
   palette: {
     mode: "dark",
     ignite: {
-      main: "rgb(252, 140, 3)",
+      main: "rgb(252, 140, 3)"
     },
     lightgrey: {
-      main: "rgb(211,211,211)",
-    },
+      main: "rgb(211,211,211)"
+    }
   },
   typography: {
     fontSize: 12.5,
     allVariants: {
       color: "lightgrey"
     }
-  },
+  }
 });
 
 BuildFileURL("");
 
-const ErrorFallback = ({error, resetErrorBoundary}) => {
+interface ErrorFallbackProps {
+  error: Error;
+  resetErrorBoundary: Function;
+}
+
+const ErrorFallback = ({ error, resetErrorBoundary }: ErrorFallbackProps) => {
   return (
     <div className="errorFallback" role="alert">
       {/* <ErrorIcon /> */}
       <Typography variant="h4">{"Ignite has crashed :("}</Typography>
-      <Button color="ignite" variant="outlined" size="large" onClick={resetErrorBoundary}>Reload</Button>
+      <IgnButton size="large" onClick={resetErrorBoundary}>
+        Reload
+      </IgnButton>
       <pre className="errorContainer">{error.message}</pre>
     </div>
   );
@@ -86,7 +85,7 @@ const ErrorFallback = ({error, resetErrorBoundary}) => {
 const App = (): JSX.Element => {
   return (
     <ThemeProvider theme={darkTheme}>
-      <GlobalStyles styles={{...darkScrollbar()}} />
+      <GlobalStyles styles={{ ...darkScrollbar() }} />
       <div className="App">
         <ErrorBoundary FallbackComponent={ErrorFallback}>
           <SnackbarProvider maxSnack={3} autoHideDuration={2500}>
@@ -106,6 +105,6 @@ const App = (): JSX.Element => {
       </div>
     </ThemeProvider>
   );
-}
+};
 
 export default App;

@@ -12,36 +12,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-import React from "react";
-
+import { Variant } from "@mui/material/styles/createTypography";
 import Typography from "@mui/material/Typography";
 
-
-const typeStyle = {
+const typeStyle: React.CSSProperties = {
   color: "rgb(200, 200, 200)"
 };
 
-const DragOverlay = props => {
+const containerStyle: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  flexGrow: "100",
+  position: "absolute",
+  left: "20px",
+  right: "20px",
+  top: "20px",
+  bottom: "20px",
+  borderRadius: "20px",
+  border: "3px dashed rgb(200, 200, 200)",
+  boxSizing: "border-box",
+  pointerEvents: "none",
+  backgroundColor: "rgba(255, 255, 255, 0.2)",
+  zIndex: 1
+};
 
-  const containerStyle = {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    flexGrow: "100",
-    position: "absolute",
-    left: "20px",
-    right: "20px",
-    top: "20px",
-    bottom: "20px",
-    borderRadius: "20px",
-    border: "3px dashed rgb(200, 200, 200)",
-    boxSizing: "border-box",
-    pointerEvents: "none",
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
-    zIndex: 1
-  };
+interface DragOverlayProps {
+  text: string;
+  error: string;
+  variant: Variant;
+  style: React.CSSProperties;
+}
 
+const DragOverlay = (props: DragOverlayProps) => {
   if (props.error) {
     containerStyle.backgroundColor = "rgba(255, 0, 0, 0.3)";
     containerStyle.borderColor = "rgb(200, 0, 0)";
@@ -49,7 +52,7 @@ const DragOverlay = props => {
   }
 
   return (
-    <div style={{...containerStyle, ...props.style}}>
+    <div style={{ ...containerStyle, ...props.style }}>
       <Typography variant={props.variant || "h3"} style={typeStyle}>
         {props.error || props.text}
       </Typography>

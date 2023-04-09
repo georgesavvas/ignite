@@ -13,10 +13,22 @@
 // limitations under the License.
 
 import Divider from "@mui/material/Divider";
-import React, {useContext, useEffect, useState} from "react";
-import {ReflexContainer, ReflexElement, ReflexSplitter} from "react-reflex";
+import {
+  DOMElement,
+  ReactComponentElement,
+  useCallback,
+  useContext,
+  useEffect,
+  useState
+} from "react";
+import {
+  ReflexContainer,
+  ReflexElement,
+  ReflexElementProps,
+  ReflexSplitter
+} from "react-reflex";
 
-import {ConfigContext} from "../contexts/ConfigContext";
+import { ConfigContext } from "../contexts/ConfigContext";
 import serverRequest from "../services/serverRequest";
 import loadReflexLayout from "../utils/loadReflexLayout";
 import saveReflexLayout from "../utils/saveReflexLayout";
@@ -41,7 +53,7 @@ const defaultFlexRations = {
   "home.details": 0.3
 };
 
-export default function Home() {
+export const Home = () => {
   const [flexRatios, setFlexRatios] = useState(defaultFlexRations);
   const [waitBackendOpen, setWaitBackendOpen] = useState(true);
   const [welcomeOpen, setWelcomeOpen] = useState(false);
@@ -77,10 +89,10 @@ export default function Home() {
 
   const openWelcomeDialogueIfNeeded = () => {
     const noWelcome = localStorage.getItem("disable_welcome");
-    if (noWelcome) return;
-    serverRequest("get_projects").then(resp => {
+    if (noWelcome === "true") return;
+    serverRequest("get_projects").then((resp) => {
       if (resp && resp.data.length) {
-        localStorage.setItem("disable_welcome", true);
+        localStorage.setItem("disable_welcome", "true");
         return;
       } else {
         console.log("No projects found, displaying welcome dialogue!", resp);
@@ -89,9 +101,9 @@ export default function Home() {
     });
   };
 
-  const handleResized = data => {
+  const handleResized = useCallback((data) => {
     saveReflexLayout(data);
-  };
+  }, []);
 
   return (
     <div className={styles.container}>
@@ -104,7 +116,9 @@ export default function Home() {
       </div>
       <div className={styles.contents}>
         <ReflexContainer orientation="vertical">
-          <ReflexElement flex={flexRatios["home.tree"]} name="home.tree"
+          <ReflexElement
+            flex={flexRatios["home.tree"]}
+            name="home.tree"
             onStopResize={handleResized}
           >
             <ReflexContainer>
@@ -118,13 +132,17 @@ export default function Home() {
             </ReflexContainer>
           </ReflexElement>
           <ReflexSplitter style={splitterStyle} />
-          <ReflexElement flex={flexRatios["home.explorer"]} name="home.explorer"
+          <ReflexElement
+            flex={flexRatios["home.explorer"]}
+            name="home.explorer"
             onStopResize={handleResized}
           >
             <Explorer />
           </ReflexElement>
           <ReflexSplitter style={splitterStyle} />
-          <ReflexElement flex={flexRatios["home.details"]} name="home.details"
+          <ReflexElement
+            flex={flexRatios["home.details"]}
+            name="home.details"
             onStopResize={handleResized}
           >
             <Details />
@@ -133,4 +151,6 @@ export default function Home() {
       </div>
     </div>
   );
-}
+};
+
+export default Home;

@@ -12,19 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-import React from "react";
-
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
+import { Typography } from "@mui/material";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import React from "react";
 
 import styles from "./DynamicList.module.css";
-import { Typography } from "@mui/material";
 
-
-const style = {
+const style: React.CSSProperties = {
   width: "100%",
   height: "100%",
   boxSizing: "border-box",
@@ -33,39 +30,65 @@ const style = {
   flexGrow: 1
 };
 
-function createListItem(child, index, dense) {
+const createListItem = (
+  child: React.ReactNode,
+  index: number,
+  dense: boolean
+) => {
   return (
     <ListItem key={index} dense={dense}>
       {child}
     </ListItem>
   );
+};
+
+interface ButtonProps {
+  title: string;
+  onAdd: Function;
+  onRemove: Function;
 }
 
-function buttons(props) {
+const buttons = (props: ButtonProps) => {
   return (
     <div className={styles.buttonContainer}>
-      {props.title ? 
+      {props.title ? (
         <Typography variant="h5" className={styles.title}>
           {props.title}
         </Typography>
-        :null
-      }
-      <AddIcon className={styles.button} onClick={props.onAdd || null}/>
-      <RemoveIcon className={styles.button} onClick={props.onRemove || null}/>
+      ) : null}
+      <AddIcon className={styles.button} onClick={props.onAdd} />
+      <RemoveIcon className={styles.button} onClick={props.onRemove} />
     </div>
   );
+};
+
+interface DynamicListProps {
+  noButtons: boolean;
+  onScroll: React.UIEventHandler<HTMLUListElement>;
+  style: React.CSSProperties;
+  children: React.ReactNode[];
+  title: string;
+  onAdd: Function;
+  onRemove: Function;
+  dense: boolean;
+  innerRef: any;
 }
 
-function DynamicList(props) {
+function DynamicList(props: DynamicListProps) {
   return (
     <>
       {props.noButtons ? null : buttons(props)}
-      <List sx={style} onScroll={props.onScroll} style={props.style} ref={props.innerRef}>
-        {
-          props.children ?
-            props.children.map((child, index) => createListItem(child, index, props.dense)) :
-            null
-        }
+      <List
+        sx={style}
+        onScroll={props.onScroll}
+        style={props.style}
+        ref={props.innerRef}
+      >
+        {props.children
+          ? props.children.map((child: React.ReactNode, index: number) =>
+              createListItem(child, index, props.dense)
+            )
+          : null}
       </List>
     </>
   );

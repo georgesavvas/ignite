@@ -12,33 +12,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-/* eslint-disable react/no-unknown-property */
-import React, {useState, Suspense, useEffect} from "react";
-
+import { Environment, OrbitControls, useGLTF } from "@react-three/drei";
+import { Canvas } from "@react-three/fiber";
+import { Suspense, useEffect, useState } from "react";
 import * as THREE from "three";
-import {Canvas} from "@react-three/fiber";
+
 // import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
-import {useGLTF, OrbitControls, Environment} from "@react-three/drei";
 
+const GLTF_PLACEHOLDER =
+  "/asset_library/3d/asset_library/common/model_placeholder.gltf";
 
-const GLTF_PLACEHOLDER = "/asset_library/3d/asset_library/common/model_placeholder.gltf";
+interface ModelProps {}
 
-function Model(props) {
+function Model(props: ModelProps) {
   const [path, setPath] = useState(GLTF_PLACEHOLDER);
 
   useEffect(() => {
     let gltf_path = props.asset.asset_dir + "/3dpreview/model.gltf";
-    window.api.checkPath(gltf_path).then(exists => {
+    window.api.checkPath(gltf_path).then((exists) => {
       if (!exists) gltf_path = GLTF_PLACEHOLDER;
       setPath(gltf_path);
     });
   }, [props.asset]);
 
-  let gltf = useGLTF(`http://192.168.11.44:8084/files/${path.replace("/asset_library/3d/asset_library/", "")}`);
+  let gltf = useGLTF(
+    `http://192.168.11.44:8084/files/${path.replace(
+      "/asset_library/3d/asset_library/",
+      ""
+    )}`
+  );
   console.log(path);
   // gltf.scene.children[0].material = <meshStandardMaterial attach="material" color="lightblue" />;
-  const mat = new THREE.MeshStandardMaterial({color: "red"});
+  const mat = new THREE.MeshStandardMaterial({ color: "red" });
   for (const [, mesh] of Object.entries(gltf.nodes)) {
     mesh.material = mat;
   }
@@ -72,10 +77,17 @@ const mouseButtons = {
   RIGHT: THREE.MOUSE.PAN
 };
 
-function ModelViewer({asset }) {
+interface ModelViewerProps {}
+
+function ModelViewer({ asset }: ModelViewerProps) {
   return (
-    <Canvas camera={{zoom: 1, position: [0, 0, 1] }}>
-      <OrbitControls enableRotate={true} enableDamping={false} zoomSpeed={3} mouseButtons={mouseButtons} />
+    <Canvas camera={{ zoom: 1, position: [0, 0, 1] }}>
+      <OrbitControls
+        enableRotate={true}
+        enableDamping={false}
+        zoomSpeed={3}
+        mouseButtons={mouseButtons}
+      />
       <Suspense fallback={null}>
         {/* <ambientLight intensity={50} /> */}
         <Environment preset="studio" />
