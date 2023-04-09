@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ipcRenderer, contextBridge } from "electron";
+import { electronAPI } from "@electron-toolkit/preload";
+import { contextBridge, ipcRenderer } from "electron";
 
 type Env = { [key: string]: string };
 
-contextBridge.exposeInMainWorld("api", {
+const api = {
   startDrag: (fileName: string): void => {
     ipcRenderer.send("ondragstart", fileName);
   },
@@ -42,9 +43,9 @@ contextBridge.exposeInMainWorld("api", {
   launch_dcc: async (cmd: string, args: string, env: Env): Promise<boolean> => {
     return await ipcRenderer.invoke("launch_dcc", cmd, args, env);
   }
-});
+};
 
-contextBridge.exposeInMainWorld("services", {
+const services = {
   onAutoUpdater: (callback: (event: Electron.IpcRendererEvent) => void) => {
     ipcRenderer.removeAllListeners("autoUpdater");
     ipcRenderer.on("autoUpdater", callback);
@@ -73,4 +74,19 @@ contextBridge.exposeInMainWorld("services", {
   get_port: (): Promise<number> => {
     return ipcRenderer.invoke("get_port");
   }
-});
+};
+
+if (process.contextIsolated) {
+  try {
+    contextBridge.exposeInMainWorld("electron", electronAPI);
+    contextBridge.exposeInMainWorld("api", api);
+    contextBridge.exposeInMainWorld("services", services);
+  } catch (error) {
+    console.error(error);
+  }
+} else {
+  // @ts-ignore (define in dts)
+  window.electron = electronAPI;
+  // @ts-ignore (define in dts)
+  window.api = api;
+}

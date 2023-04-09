@@ -12,17 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-import React from "react";
-
 import FormControl from "@mui/material/FormControl";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import Typography from "@mui/material/Typography";
 
 import styles from "./FilterField.module.css";
 
+interface FilterFieldProps {
+  filterValue: string;
+  setFilterValue: Function;
+  children: React.ReactNode[];
+}
 
-const FilterField = ({filterValue, setFilterValue, children}) => {
+const FilterField = ({
+  filterValue,
+  setFilterValue,
+  children
+}: FilterFieldProps) => {
   return (
     <div className={styles.filterBar}>
       <FormControl fullWidth focused={filterValue ? true : false}>
@@ -32,10 +38,10 @@ const FilterField = ({filterValue, setFilterValue, children}) => {
           fullWidth
           placeholder="Filter"
           value={filterValue}
-          onChange={e => setFilterValue(e.target.value || "")}
+          onChange={(e) => setFilterValue(e.target.value || "")}
           color={filterValue ? "error" : ""}
         />
-        {!filterValue ? null :
+        {!filterValue ? null : (
           <Typography
             variant="subtitle1"
             align="center"
@@ -44,7 +50,7 @@ const FilterField = ({filterValue, setFilterValue, children}) => {
           >
             Clear
           </Typography>
-        }
+        )}
       </FormControl>
       {children}
     </div>

@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-import React from "react";
-
 import TextField from "@mui/material/TextField";
 
-
-export default function IgnTextField(props) {
-  return (
-    <TextField size="small" {...props} />
-  );
+interface IgnTextFieldProps {
+  props: any;
 }
+
+export const IgnTextField = (props: IgnTextFieldProps) => {
+  return <TextField size="small" {...props} />;
+};
+
+export default IgnTextField;

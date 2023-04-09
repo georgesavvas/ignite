@@ -12,30 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-import React, {useState} from "react";
-
 import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
-import MenuItem from "@mui/material/MenuItem";
-import Dialog from "@mui/material/Dialog";
+import Dialog, { DialogProps } from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
+import MenuItem from "@mui/material/MenuItem";
+import TextField from "@mui/material/TextField";
+import { FormEvent, MouseEventHandler, useState } from "react";
 
+type TextFieldEvent = React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>;
 
-const NewDirContent = (values, setValues) => {
-  const handleChange = (e, field) => {
-    const data = {};
+const NewDirContent = (
+  values: { [key: string]: string },
+  setValues: Function
+) => {
+  const handleChange = (e: TextFieldEvent, field: string) => {
+    const data: { [key: string]: string } = {};
     data[field] = e.target.value;
-    setValues(prevState => ({...prevState, ...data}));
+    setValues((prevState: { [key: string]: string }) => ({
+      ...prevState,
+      ...data
+    }));
   };
 
   return (
     <DialogContent>
-      {/* <DialogContentText>
-        {props.info}
-      </DialogContentText> */}
       <TextField
         autoFocus
         margin="dense"
@@ -50,40 +52,21 @@ const NewDirContent = (values, setValues) => {
   );
 };
 
-const NewBuildContent = (values, setValues) => {
-  // const [checked, setChecked] = useState([1]);
-
-  const handleChange = (e, field) => {
-    const data = {};
+const NewBuildContent = (
+  values: { [key: string]: string },
+  setValues: Function
+) => {
+  const handleChange = (e: TextFieldEvent, field: string) => {
+    const data: { [key: string]: string } = {};
     data[field] = e.target.value;
-    setValues(prevState => ({...prevState, ...data}));
+    setValues((prevState: { [key: string]: string }) => ({
+      ...prevState,
+      ...data
+    }));
   };
 
   return (
     <DialogContent>
-      {/* <List dense sx={{ width: '100%', bgcolor: 'background.paper' }}>
-        {[0, 1, 2, 3].map((value) => {
-          const labelId = `checkbox-list-secondary-label-${value}`;
-          return (
-            <ListItem
-              key={value}
-              secondaryAction={
-                <Checkbox
-                  edge="end"
-                  onChange={handleChange(value, "tasks")}
-                  checked={values.tasks.indexOf(value) !== -1}
-                  inputProps={{ 'aria-labelledby': labelId }}
-                />
-              }
-              disablePadding
-            >
-              <ListItemButton>
-                <ListItemText id={labelId} primary={`Line item ${value + 1}`} />
-              </ListItemButton>
-            </ListItem>
-          );
-        })}
-      </List> */}
       <TextField
         autoFocus
         margin="dense"
@@ -98,50 +81,54 @@ const NewBuildContent = (values, setValues) => {
   );
 };
 
-const NewTaskContent = (values, setValues) => {
-  // const [checked, setChecked] = useState([1]);
-
+const NewTaskContent = (
+  values: { [key: string]: string },
+  setValues: Function
+) => {
   const task_types = [
     {
       value: "generic",
-      label: "Generic",
+      label: "Generic"
     },
     {
       value: "model",
-      label: "Model",
+      label: "Model"
     },
     {
       value: "layout",
-      label: "Layout",
+      label: "Layout"
     },
     {
       value: "surface",
-      label: "Surface",
+      label: "Surface"
     },
     {
       value: "light",
-      label: "Light",
+      label: "Light"
     },
     {
       value: "fx",
-      label: "FX",
+      label: "FX"
     },
     {
       value: "anim",
-      label: "Anim",
+      label: "Anim"
     },
     {
       value: "rig",
-      label: "Rig",
-    },
+      label: "Rig"
+    }
   ];
 
-  const handleChange = (e, field) => {
-    const data = {};
+  const handleChange = (e: TextFieldEvent, field: string) => {
+    const data: any = {};
     data[field] = e.target.value;
-    setValues(prevState => ({...prevState, ...data}));
+    setValues((prevState: { [key: string]: string }) => ({
+      ...prevState,
+      ...data
+    }));
   };
-  console.log(values);
+
   return (
     <DialogContent>
       <TextField
@@ -172,38 +159,52 @@ const NewTaskContent = (values, setValues) => {
   );
 };
 
-const dialogueContents = {
-  "directory": NewDirContent,
-  "build": NewBuildContent,
-  "sequence": NewDirContent,
-  "shot": NewDirContent,
-  "task": NewTaskContent
+const dialogueContents: { [key: string]: Function } = {
+  directory: NewDirContent,
+  build: NewBuildContent,
+  sequence: NewDirContent,
+  shot: NewDirContent,
+  task: NewTaskContent
 };
 
-export default function CreateDirDialogue(props) {
-  const fields = {
+interface CreateDialogueProps {
+  meta: { dir_kind: string; modal_title: string };
+  onCreate: Function;
+  onClose: Function;
+  open: boolean;
+}
+
+export const CreateDirDialogue = (props: CreateDialogueProps) => {
+  const defaultFields = {
     dir_name: props.meta.dir_kind === "task" ? "main" : "",
     task_type: "generic",
     tasks: []
   };
-  const [values, setValues] = useState(fields);
+  const [values, setValues] = useState(defaultFields);
 
-  const handleCreate = (e) => {
+  const handleCreate = (e: FormEvent) => {
     e.preventDefault();
     props.onCreate(values, props.meta);
-    setValues("");
+    setValues(defaultFields);
     props.onClose();
   };
+
   return (
-    <Dialog open={props.open} onClose={props.onClose}>
+    <Dialog open={props.open} onClose={props.onClose as DialogProps["onClose"]}>
       <DialogTitle>{props.meta.modal_title}</DialogTitle>
       <form onSubmit={handleCreate}>
-        {props.open ? dialogueContents[props.meta.dir_kind](values, setValues) : null}
+        {props.open
+          ? dialogueContents[props.meta.dir_kind](values, setValues)
+          : null}
         <DialogActions>
-          <Button onClick={props.onClose}>Cancel</Button>
+          <Button type="button" onClick={props.onClose as MouseEventHandler}>
+            Cancel
+          </Button>
           <Button type="submit">Create</Button>
         </DialogActions>
       </form>
     </Dialog>
   );
-}
+};
+
+export default CreateDirDialogue;

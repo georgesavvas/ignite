@@ -12,20 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-import React, { useEffect } from "react";
-
+import ClearIcon from "@mui/icons-material/Clear";
+import { Breakpoint, DialogProps } from "@mui/material";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import ClearIcon from "@mui/icons-material/Clear";
+import { useEffect } from "react";
 
 import styles from "./Modal.module.css";
 
+interface ModalProps {
+  open: boolean;
+  focusRef: any;
+  focusDelay: number;
+  fullHeight: string;
+  fullWidth: boolean;
+  onFormSubmit: Function;
+  onClose: Function;
+  maxWidth: Breakpoint;
+}
 
-function Modal(props) {
+function Modal(props: ModalProps) {
   useEffect(() => {
     if (!props.open || !props.focusRef) return;
     const timeout = setTimeout(() => {
@@ -42,43 +51,52 @@ function Modal(props) {
         backgroundColor: "rgb(20,20,20)",
         backgroundImage: "none",
         height: props.fullHeight ? "100%" : "none"
-      },
-    },
+      }
+    }
   };
 
-  const handleSubmit = e => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     props.onFormSubmit();
   };
 
-  const formWrapper = (onFormSubmit, children) => {
-    if (onFormSubmit) return (
-      <form onSubmit={handleSubmit}>
-        {children}
-      </form>
-    );
+  const formWrapper = (onFormSubmit: Function, children: React.ReactNode[]) => {
+    if (onFormSubmit) return <form onSubmit={handleSubmit}>{children}</form>;
     else return children;
   };
 
   return (
-    <Dialog open={props.open} onClose={props.onClose}
+    <Dialog
+      open={props.open}
+      onClose={props.onClose as DialogProps["onClose"]}
       fullWidth={props.fullWidth !== undefined ? props.fullWidth : true}
-      maxWidth={props.maxWidth || "sx"} sx={dialogStyle} 
+      maxWidth={props.maxWidth || "sx"}
+      sx={dialogStyle}
     >
-      {formWrapper(props.onFormSubmit, 
+      {formWrapper(
+        props.onFormSubmit,
         <>
-          <ClearIcon onClick={props.onClose} className={styles.closeButtonStyle} />
-          {props.title ? <DialogTitle style={{padding: "10px 20px 0px 20px"}}>{props.title}</DialogTitle> : null}
-          <DialogContent style={{padding: "15px 20px"}} {...props.dialogContentProps}>
-            {props.text ? <DialogContentText>{props.text}</DialogContentText> : null}
+          <ClearIcon
+            onClick={props.onClose}
+            className={styles.closeButtonStyle}
+          />
+          {props.title ? (
+            <DialogTitle style={{ padding: "10px 20px 0px 20px" }}>
+              {props.title}
+            </DialogTitle>
+          ) : null}
+          <DialogContent
+            style={{ padding: "15px 20px" }}
+            {...props.dialogContentProps}
+          >
+            {props.text ? (
+              <DialogContentText>{props.text}</DialogContentText>
+            ) : null}
             {props.children}
           </DialogContent>
-          {props.buttons ?
-            <DialogActions>
-              {props.buttons}
-            </DialogActions>
-            : null
-          }
+          {props.buttons ? (
+            <DialogActions>{props.buttons}</DialogActions>
+          ) : null}
         </>
       )}
     </Dialog>

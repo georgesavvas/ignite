@@ -16,11 +16,11 @@ import HelpIcon from "@mui/icons-material/Help";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { Typography } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
-import {useContext, useEffect, useState} from "react";
+import { useContext, useEffect, useState } from "react";
 
 import IgnButton from "../../components/IgnButton.js";
 import Modal from "../../components/Modal.js";
-import {ContextContext} from "../../contexts/ContextContext.js";
+import { ContextContext } from "../../contexts/ContextContext.js";
 import CratesDropdown from "../Crates/CratesDropdown.js";
 import DccSelector from "../DccSelector.jsx";
 import Feedback from "../Feedback.jsx";
@@ -29,17 +29,17 @@ import Settings from "../Settings/Settings.js";
 import Vault from "../Vault/Vault.jsx";
 import styles from "./TopBar.module.css";
 
-export default function TopBar() {
+export const TopBar = () => {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [projectBrowserOpen, setProjectBrowserOpen] = useState(false);
   const [vaultOpen, setVaultOpen] = useState(false);
   const [dccOpen, setDccOpen] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
-  const [,, refreshContext] = useContext(ContextContext);
+  const [, , refreshContext] = useContext(ContextContext);
   const [appVersion, setAppVersion] = useState("");
 
   useEffect(() => {
-    window.services.get_version().then(resp => setAppVersion(resp));
+    window.services.get_version().then((resp) => setAppVersion(resp));
   }, []);
 
   const handleVaultClose = () => {
@@ -55,8 +55,7 @@ export default function TopBar() {
         onClose={() => setProjectBrowserOpen(false)}
       />
       <Modal open={dccOpen} onClose={() => setDccOpen(false)} maxWidth="xs">
-        <DccSelector onClose={() => setDccOpen(false)}
-        />
+        <DccSelector onClose={() => setDccOpen(false)} />
       </Modal>
       <Feedback open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
       <Settings open={settingsOpen} onClose={() => setSettingsOpen(false)} />
@@ -65,7 +64,7 @@ export default function TopBar() {
           <IgnButton
             variant="outlined"
             color="ignite"
-            style={{minWidth: "180px"}}
+            style={{ minWidth: "180px" }}
             onClick={() => setProjectBrowserOpen(true)}
           >
             Project Browser
@@ -80,7 +79,7 @@ export default function TopBar() {
           <IgnButton
             variant="outlined"
             color="ignite"
-            style={{minWidth: "120px"}}
+            style={{ minWidth: "120px" }}
             onClick={() => setDccOpen(true)}
           >
             Launch App
@@ -88,29 +87,38 @@ export default function TopBar() {
         </div>
         <div className={styles.logoContainer}>
           <img src="src/assets/ignite_logo.png" className={styles.logo} />
-          <Typography style={{color: "rgb(60,60,60)", alignSelf: "flex-end"}} variant="caption">
+          <Typography
+            style={{ color: "rgb(60,60,60)", alignSelf: "flex-end" }}
+            variant="caption"
+          >
             v{appVersion}
           </Typography>
         </div>
         <div className={styles.rightSide}>
           <CratesDropdown />
-          <div style={{flexGrow: 1}} />
-          <IconButton size="small" style={{padding: 0}}
+          <div style={{ flexGrow: 1 }} />
+          <IconButton
+            size="small"
+            style={{ padding: 0 }}
             onClick={() => setFeedbackOpen(true)}
           >
             <div className={styles.feedbackIcon} />
           </IconButton>
-          <IconButton size="small"
-            onClick={() => window.services.open_url("https://docs.ignitevfx.co.uk/")}
+          <IconButton
+            size="small"
+            onClick={() =>
+              window.services.open_url("https://docs.ignitevfx.co.uk/")
+            }
           >
-            <HelpIcon style={{fontSize: "30px"}} />
+            <HelpIcon style={{ fontSize: "30px" }} />
           </IconButton>
-          <IconButton size="small"
-            onClick={() => setSettingsOpen(true)}>
-            <SettingsIcon style={{fontSize: "30px"}} />
+          <IconButton size="small" onClick={() => setSettingsOpen(true)}>
+            <SettingsIcon style={{ fontSize: "30px" }} />
           </IconButton>
         </div>
       </div>
     </>
   );
-}
+};
+
+export default TopBar;

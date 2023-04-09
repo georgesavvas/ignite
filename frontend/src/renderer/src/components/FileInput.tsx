@@ -12,33 +12,41 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /* eslint-disable react/no-unknown-property */
 
 import TextField from "@mui/material/TextField";
-import React, {useRef} from "react";
 
 import IgnButton from "./IgnButton";
 
-export default function FileInput(props) {
-  const {
-    buttonStyle,
-    directory,
-    multi,
-    buttonLabel,
-    ...other
-  } = props;
+type TextFieldEvent = React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>;
 
-  const handleChange = e => {
+interface FileInputProps {
+  onChange: Function;
+  multiline: boolean;
+  style: React.CSSProperties;
+  value: any;
+  buttonStyle: React.CSSProperties;
+  multi: boolean;
+  buttonLabel: string;
+  directory: boolean;
+  children: React.Node[];
+}
+
+export const FileInput = (props: FileInputProps) => {
+  const { buttonStyle, directory, multi, buttonLabel, ...other } = props;
+
+  const handleChange = (e: TextFieldEvent) => {
     if (!props.onChange) return;
     props.onChange(e, e.target.value);
   };
 
-  const handleFileInput = async e => {
+  const handleFileInput = async (
+    e: React.MouseEventHandler<HTMLButtonElement>
+  ) => {
     const properties = multi ? ["multiSelections"] : [];
-    const resp = directory ?
-      await window.api.dirInput(properties) :
-      await window.api.fileInput(properties);
+    const resp = directory
+      ? await window.api.dirInput(properties)
+      : await window.api.fileInput(properties);
     if (resp.cancelled) return;
     const filePaths = resp.filePaths;
     if (!props.onChange || !filePaths?.length) return;
@@ -53,7 +61,7 @@ export default function FileInput(props) {
   };
 
   return (
-    <div style={{...style, ...props.style}}>
+    <div style={{ ...style, ...props.style }}>
       <TextField
         {...other}
         value={props.value}
@@ -63,11 +71,13 @@ export default function FileInput(props) {
       <IgnButton
         variant="outlined"
         onClick={handleFileInput}
-        style={{height: 37.5, ...buttonStyle}}
+        style={{ height: 37.5, ...buttonStyle }}
       >
         {buttonLabel || "..."}
       </IgnButton>
       {props.children}
     </div>
   );
-}
+};
+
+export default FileInput;

@@ -12,13 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-import React from "react";
-
+import { Typography } from "@mui/material";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import { Typography } from "@mui/material";
-
 
 const style = {
   display: "flex",
@@ -29,33 +25,60 @@ const style = {
   marginBottom: "2px"
 };
 
-export function handleContextMenu(event, contextMenu, setContextMenu, data) {
-  event.preventDefault();
-  event.stopPropagation();
+interface ContextMenu {
+  mouseX: number;
+  mouseY: number;
+  data: any;
+}
+
+export const handleContextMenu = (
+  e: MouseEvent,
+  contextMenu: ContextMenu | null,
+  setContextMenu: Function,
+  data: any
+) => {
+  e.preventDefault();
+  e.stopPropagation();
   setContextMenu(
     contextMenu === null
       ? {
-        mouseX: event.clientX - 2,
-        mouseY: event.clientY - 4,
-        data: data
-      }
-      : null,
+          mouseX: e.clientX - 2,
+          mouseY: e.clientY - 4,
+          data: data
+        }
+      : null
   );
+};
+
+interface ContextMenuProps {
+  contextMenu: ContextMenu;
+  items: ContextMenuItem[];
+  title?: string;
+  subtitle?: string;
+  setContextMenu: Function;
 }
 
-function ContextMenu(props) {
+interface ContextMenuItem {
+  divider?: boolean;
+  args?: any[];
+  disabled?: boolean;
+  fn: Function;
+  label: string;
+}
+
+export const ContextMenu = (props: ContextMenuProps) => {
   const handleClose = () => {
     props.setContextMenu(null);
   };
 
-  function formatItem(item, index) {
-    if (!item.args) item.args = [];
+  function formatItem(item: ContextMenuItem, index: number) {
     return (
       <MenuItem
         key={index}
-        onClick={e => {
+        onClick={(e) => {
           e.stopPropagation();
-          if (item.fn) item.fn(...item.args);
+          if (item.fn && item.args?.length) item.fn(...item.args);
+          else if (item.fn) item.fn();
           handleClose();
         }}
         divider={item.divider || false}
@@ -74,7 +97,7 @@ function ContextMenu(props) {
     <Menu
       open={props.contextMenu !== null}
       onClose={handleClose}
-      MenuListProps={{style: {padding: 0, paddingBottom: "4px"}}}
+      MenuListProps={{ style: { padding: 0, paddingBottom: "4px" } }}
       anchorReference="anchorPosition"
       anchorPosition={
         props.contextMenu !== null
@@ -84,14 +107,13 @@ function ContextMenu(props) {
     >
       <div style={style}>
         {props.title ? <Typography>{props.title}</Typography> : null}
-        {props.subtitle ? 
+        {props.subtitle ? (
           <Typography color="darkgrey">({props.subtitle})</Typography>
-          : null
-        }
+        ) : null}
       </div>
       {props.items.map((item, index) => formatItem(item, index))}
     </Menu>
   );
-}
+};
 
 export default ContextMenu;

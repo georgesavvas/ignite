@@ -12,10 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+interface ServerDetails {
+  address: string;
+}
 
-function BuildFileURL(filepath, config, options={}) {
+interface Access {
+  serverProjectsDir: string;
+  projectsDir: string;
+  remote: Boolean;
+}
+
+interface Config {
+  serverDetails: ServerDetails;
+  access: Access;
+}
+
+interface Options {
+  reverse?: Boolean;
+  pathOnly?: Boolean;
+  forceRemote?: Boolean;
+}
+
+function BuildFileURL(
+  filepath: string,
+  config?: Config,
+  options: Options = {}
+): string {
   if (!filepath || filepath === undefined) return "";
-  // console.log("BuildFileURL Input -", filepath);
   const address = config.serverDetails.address;
   const remote = config.access.remote;
 
@@ -29,8 +52,8 @@ function BuildFileURL(filepath, config, options={}) {
     output = serverProjectsDir;
   }
   const isWinPath = output.includes("\\");
-  input = input.replaceAll("\\","/");
-  output = output.replaceAll("\\","/");
+  input = input.replaceAll("\\", "/");
+  output = output.replaceAll("\\", "/");
 
   if (!input.endsWith("/")) input += "/";
   if (!output.endsWith("/")) output += "/";
@@ -46,22 +69,18 @@ function BuildFileURL(filepath, config, options={}) {
     unix_path = unix_path.replace(output, "");
   }
 
-  // console.log(input, output);
-  // console.log(filepath, "->", `${output}${filepath_processed}`);
-
   if (options.pathOnly) {
-    const platform_path = isWinPath ? unix_path.replaceAll("/", "\\") : unix_path;
+    const platform_path = isWinPath
+      ? unix_path.replaceAll("/", "\\")
+      : unix_path;
     const platform_output = isWinPath ? output.replaceAll("/", "\\") : output;
     const value = `${platform_output}${platform_path}`;
-    // console.log("BuildFileURL Output -", value);
     return value;
   } else if (remote || options.forceRemote) {
     const value = `http://${address}/files/${unix_path}`;
-    // console.log("BuildFileURL Output -", value);
     return value;
   } else {
     const value = `ign://${output}${unix_path}`;
-    // console.log("BuildFileURL Output -", value);
     return value;
   }
 }

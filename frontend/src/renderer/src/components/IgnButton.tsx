@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-import React from "react";
-
 import Button from "@mui/material/Button";
 
-export default function IgnButton(props) {
-  return (
-    <Button variant="outlined" {...props} />
-  );
+interface IgnButtonProps {
+  props: any;
 }
+
+export const IgnButton = (props: IgnButtonProps) => {
+  return <Button variant="outlined" color="ignite" size="small" {...props} />;
+};
+
+export default IgnButton;

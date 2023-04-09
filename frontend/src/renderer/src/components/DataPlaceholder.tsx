@@ -12,13 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-import React from "react";
-
+import { Variant } from "@mui/material/styles/createTypography";
 import Typography from "@mui/material/Typography";
 
-
-const containerStyle = {
+const containerStyle: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
@@ -38,10 +35,22 @@ const typeStyle = {
   color: "rgb(70, 70, 70)"
 };
 
-const DataPlaceholder = props => {
+interface DataPlaceholderProps {
+  style: React.CSSProperties;
+  variant: Variant;
+  text: string;
+}
+
+const DataPlaceholder = ({
+  text,
+  variant = "h4",
+  style = {}
+}: DataPlaceholderProps) => {
   return (
-    <div style={{...containerStyle, ...props.style}}>
-      <Typography variant={props.variant || "h4"} style={typeStyle}>{props.text || "Fetching data..."}</Typography>
+    <div style={{ ...containerStyle, ...style }}>
+      <Typography variant={variant} style={typeStyle}>
+        {text || "Fetching data..."}
+      </Typography>
     </div>
   );
 };
