@@ -12,17 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import Button from "@mui/material/Button";
 import Dialog, { DialogProps } from "@mui/material/Dialog";
+import { FormEvent, MouseEventHandler, useState } from "react";
+
+import Button from "@mui/material/Button";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import MenuItem from "@mui/material/MenuItem";
 import TextField from "@mui/material/TextField";
 import { TextFieldChangeEvent } from "@renderer/types/common";
-import { FormEvent, MouseEventHandler, useState } from "react";
 
-const NewDirContent = (values: { [key: string]: string }, setValues: Function) => {
+const NewDirContent = (values: { string; string }, setValues: Function) => {
   const handleChange = (e: TextFieldChangeEvent, field: string) => {
     const data: { [key: string]: string } = {};
     data[field] = e.target.value;

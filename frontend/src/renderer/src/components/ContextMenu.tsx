@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Typography } from "@mui/material";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
+import { Typography } from "@mui/material";
 
 const style = {
   display: "flex",
@@ -22,7 +22,7 @@ const style = {
   justifyContent: "center",
   backgroundColor: "rgb(30, 30, 30)",
   padding: "2px 5px",
-  marginBottom: "2px"
+  marginBottom: "2px",
 };
 
 interface ContextMenu {
@@ -31,10 +31,12 @@ interface ContextMenu {
   data: any;
 }
 
+type HandleContextMenuFn = (contextMenu: ContextMenu | null) => void;
+
 export const handleContextMenu = (
   e: MouseEvent,
   contextMenu: ContextMenu | null,
-  setContextMenu: Function,
+  setContextMenu: HandleContextMenuFn,
   data: any
 ) => {
   e.preventDefault();
@@ -44,7 +46,7 @@ export const handleContextMenu = (
       ? {
           mouseX: e.clientX - 2,
           mouseY: e.clientY - 4,
-          data: data
+          data: data,
         }
       : null
   );
@@ -55,7 +57,7 @@ interface ContextMenuProps {
   items: ContextMenuItem[];
   title?: string;
   subtitle?: string;
-  setContextMenu: Function;
+  setContextMenu: HandleContextMenuFn;
 }
 
 interface ContextMenuItem {
@@ -86,7 +88,7 @@ export const ContextMenu = (props: ContextMenuProps) => {
         style={{
           paddingTop: "2px",
           paddingBottom: "2px",
-          fontSize: "0.8rem"
+          fontSize: "0.8rem",
         }}
       >
         {item.label}
@@ -107,9 +109,7 @@ export const ContextMenu = (props: ContextMenuProps) => {
     >
       <div style={style}>
         {props.title ? <Typography>{props.title}</Typography> : null}
-        {props.subtitle ? (
-          <Typography color="darkgrey">({props.subtitle})</Typography>
-        ) : null}
+        {props.subtitle ? <Typography color="darkgrey">({props.subtitle})</Typography> : null}
       </div>
       {props.items.map((item, index) => formatItem(item, index))}
     </Menu>
