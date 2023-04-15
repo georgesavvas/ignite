@@ -28,24 +28,20 @@ const containerStyle: React.CSSProperties = {
   width: "100%",
   boxSizing: "border-box",
   pointerEvents: "none",
-  userSelect: "none"
+  userSelect: "none",
 };
 
 const typeStyle = {
-  color: "rgb(70, 70, 70)"
+  color: "rgb(70, 70, 70)",
 };
 
 interface DataPlaceholderProps {
-  style: React.CSSProperties;
-  variant: Variant;
   text: string;
+  style?: React.CSSProperties;
+  variant?: Variant;
 }
 
-const DataPlaceholder = ({
-  text,
-  variant = "h4",
-  style = {}
-}: DataPlaceholderProps) => {
+const DataPlaceholder = ({ text, variant = "h4", style = {} }: DataPlaceholderProps) => {
   return (
     <div style={{ ...containerStyle, ...style }}>
       <Typography variant={variant} style={typeStyle}>

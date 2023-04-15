@@ -15,34 +15,30 @@
 /* eslint-disable react/no-unknown-property */
 
 import TextField from "@mui/material/TextField";
+import { TextFieldChangeEvent } from "@renderer/types/common";
 
 import IgnButton from "./IgnButton";
 
-type TextFieldEvent = React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>;
-
-interface FileInputProps {
-  onChange: Function;
-  multiline: boolean;
-  style: React.CSSProperties;
-  value: any;
-  buttonStyle: React.CSSProperties;
-  multi: boolean;
-  buttonLabel: string;
-  directory: boolean;
-  children: React.Node[];
-}
+type FileInputProps = React.PropsWithChildren<{
+  onChange?: Function;
+  multiline?: boolean;
+  style?: React.CSSProperties;
+  value?: any;
+  buttonStyle?: React.CSSProperties;
+  multi?: boolean;
+  buttonLabel?: string;
+  directory?: boolean;
+}>;
 
 export const FileInput = (props: FileInputProps) => {
   const { buttonStyle, directory, multi, buttonLabel, ...other } = props;
 
-  const handleChange = (e: TextFieldEvent) => {
+  const handleChange = (e: TextFieldChangeEvent) => {
     if (!props.onChange) return;
     props.onChange(e, e.target.value);
   };
 
-  const handleFileInput = async (
-    e: React.MouseEventHandler<HTMLButtonElement>
-  ) => {
+  const handleFileInput = async (e: React.MouseEventHandler<HTMLButtonElement>) => {
     const properties = multi ? ["multiSelections"] : [];
     const resp = directory
       ? await window.api.dirInput(properties)
@@ -57,17 +53,12 @@ export const FileInput = (props: FileInputProps) => {
     display: "flex",
     alignItems: !props.multiline ? "center" : "flex-start",
     gap: "5px",
-    flexGrow: 10
+    flexGrow: 10,
   };
 
   return (
     <div style={{ ...style, ...props.style }}>
-      <TextField
-        {...other}
-        value={props.value}
-        onChange={handleChange}
-        onBlur={handleChange}
-      />
+      <TextField {...other} value={props.value} onChange={handleChange} onBlur={handleChange} />
       <IgnButton
         variant="outlined"
         onClick={handleFileInput}

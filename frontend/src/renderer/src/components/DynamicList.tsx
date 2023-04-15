@@ -21,20 +21,7 @@ import React from "react";
 
 import styles from "./DynamicList.module.css";
 
-const style: React.CSSProperties = {
-  width: "100%",
-  height: "100%",
-  boxSizing: "border-box",
-  backgroundColor: "rgb(20,20,20)",
-  overflowY: "scroll",
-  flexGrow: 1
-};
-
-const createListItem = (
-  child: React.ReactNode,
-  index: number,
-  dense: boolean
-) => {
+const createListItem = (child: React.ReactNode, index: number, dense: boolean) => {
   return (
     <ListItem key={index} dense={dense}>
       {child}
@@ -56,8 +43,8 @@ const buttons = (props: ButtonProps) => {
           {props.title}
         </Typography>
       ) : null}
-      <AddIcon className={styles.button} onClick={props.onAdd} />
-      <RemoveIcon className={styles.button} onClick={props.onRemove} />
+      <AddIcon component="div" className={styles.button} onClick={props.onAdd} />
+      <RemoveIcon component="div" className={styles.button} onClick={props.onRemove} />
     </div>
   );
 };
@@ -79,7 +66,7 @@ function DynamicList(props: DynamicListProps) {
     <>
       {props.noButtons ? null : buttons(props)}
       <List
-        sx={style}
+        className={styles.container}
         onScroll={props.onScroll}
         style={props.style}
         ref={props.innerRef}

@@ -1,0 +1,21 @@
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 100;
+  position: absolute;
+  top: 20px;
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
+  border-radius: 20px;
+  border: 3px dashed rgb(200, 200, 200);
+  box-sizing: border-box;
+  pointer-events: none;
+  background-color: rgba(255, 255, 255, 0.2);
+  z-index: 1;
+}
+
+.text {
+  color: rgb(200, 200, 200);
+}
