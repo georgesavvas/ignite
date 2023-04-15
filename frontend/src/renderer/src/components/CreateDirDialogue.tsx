@@ -12,23 +12,68 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import Dialog, { DialogProps } from "@mui/material/Dialog";
-import { FormEvent, MouseEventHandler, useState } from "react";
-
 import Button from "@mui/material/Button";
+import Dialog, { DialogProps } from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import MenuItem from "@mui/material/MenuItem";
 import TextField from "@mui/material/TextField";
 import { TextFieldChangeEvent } from "@renderer/types/common";
+import { FormEvent, MouseEventHandler, useState } from "react";
 
-const NewDirContent = (values: { string; string }, setValues: Function) => {
+const taskTypes = [
+  {
+    value: "generic",
+    label: "Generic",
+  },
+  {
+    value: "model",
+    label: "Model",
+  },
+  {
+    value: "layout",
+    label: "Layout",
+  },
+  {
+    value: "surface",
+    label: "Surface",
+  },
+  {
+    value: "light",
+    label: "Light",
+  },
+  {
+    value: "fx",
+    label: "FX",
+  },
+  {
+    value: "anim",
+    label: "Anim",
+  },
+  {
+    value: "rig",
+    label: "Rig",
+  },
+];
+
+interface IgniteDirectory {
+  dirName?: string;
+}
+type setIgniteDirectory = React.Dispatch<React.SetStateAction<IgniteDirectory>>;
+
+interface IgniteTaskDirectory extends IgniteDirectory {
+  taskType?: string;
+  tasks?: string[];
+}
+type setIgniteTaskDirectory = React.Dispatch<React.SetStateAction<IgniteTaskDirectory>>;
+
+const NewDirContent = (setDirData: setIgniteDirectory, dirData: IgniteDirectory) => {
   const handleChange = (e: TextFieldChangeEvent, field: string) => {
     const data: { [key: string]: string } = {};
     data[field] = e.target.value;
-    setValues((prevState: { [key: string]: string }) => ({
-      ...prevState,
+    setDirData((prev) => ({
+      ...prev,
       ...data,
     }));
   };
@@ -38,23 +83,21 @@ const NewDirContent = (values: { string; string }, setValues: Function) => {
       <TextField
         autoFocus
         margin="dense"
-        id="text_field"
         label="Name"
         fullWidth
-        variant="standard"
-        value={values.dir_name}
-        onChange={(e) => handleChange(e, "dir_name")}
+        value={dirData.dirName}
+        onChange={(e: TextFieldChangeEvent) => handleChange(e, "dirName")}
       />
     </DialogContent>
   );
 };
 
-const NewBuildContent = (values: { [key: string]: string }, setValues: Function) => {
+const NewBuildContent = (setDirData: setIgniteTaskDirectory, dirData: IgniteTaskDirectory) => {
   const handleChange = (e: TextFieldChangeEvent, field: string) => {
     const data: { [key: string]: string } = {};
     data[field] = e.target.value;
-    setValues((prevState: { [key: string]: string }) => ({
-      ...prevState,
+    setDirData((prev) => ({
+      ...prev,
       ...data,
     }));
   };
@@ -64,58 +107,24 @@ const NewBuildContent = (values: { [key: string]: string }, setValues: Function)
       <TextField
         autoFocus
         margin="dense"
-        id="text_field"
         label="Name"
         fullWidth
-        variant="standard"
-        value={values.dir_name}
-        onChange={(e) => handleChange(e, "dir_name")}
+        value={dirData.dirName || ""}
+        onChange={(e: TextFieldChangeEvent) => handleChange(e, "dirName")}
       />
     </DialogContent>
   );
 };
 
-const NewTaskContent = (values: { [key: string]: string }, setValues: Function) => {
-  const task_types = [
-    {
-      value: "generic",
-      label: "Generic",
-    },
-    {
-      value: "model",
-      label: "Model",
-    },
-    {
-      value: "layout",
-      label: "Layout",
-    },
-    {
-      value: "surface",
-      label: "Surface",
-    },
-    {
-      value: "light",
-      label: "Light",
-    },
-    {
-      value: "fx",
-      label: "FX",
-    },
-    {
-      value: "anim",
-      label: "Anim",
-    },
-    {
-      value: "rig",
-      label: "Rig",
-    },
-  ];
-
+const NewTaskContent = (
+  setDirData: setIgniteTaskDirectory,
+  dirData: IgniteTaskDirectory = { dirName: "main" }
+) => {
   const handleChange = (e: TextFieldChangeEvent, field: string) => {
     const data: any = {};
     data[field] = e.target.value;
-    setValues((prevState: { [key: string]: string }) => ({
-      ...prevState,
+    setDirData((prev) => ({
+      ...prev,
       ...data,
     }));
   };
@@ -123,14 +132,12 @@ const NewTaskContent = (values: { [key: string]: string }, setValues: Function) 
   return (
     <DialogContent>
       <TextField
-        id="task_type"
         select
         label="Task type"
-        value={values.task_type}
-        onChange={(e) => handleChange(e, "task_type")}
-        variant="standard"
+        value={dirData.taskType}
+        onChange={(e: TextFieldChangeEvent) => handleChange(e, "taskType")}
       >
-        {task_types.map((option) => (
+        {taskTypes.map((option) => (
           <MenuItem key={option.value} value={option.value}>
             {option.label}
           </MenuItem>
@@ -139,18 +146,16 @@ const NewTaskContent = (values: { [key: string]: string }, setValues: Function) 
       <TextField
         autoFocus
         margin="dense"
-        id="dir_name"
         label="Name"
         fullWidth
-        variant="standard"
-        value={values.dir_name}
-        onChange={(e) => handleChange(e, "dir_name")}
+        value={dirData.dirName}
+        onChange={(e: TextFieldChangeEvent) => handleChange(e, "dirName")}
       />
     </DialogContent>
   );
 };
 
-const dialogueContents: { [key: string]: Function } = {
+const dialogueContents = {
   directory: NewDirContent,
   build: NewBuildContent,
   sequence: NewDirContent,
@@ -159,32 +164,30 @@ const dialogueContents: { [key: string]: Function } = {
 };
 
 interface CreateDialogueProps {
-  meta: { dir_kind: string; modal_title: string };
+  meta: { dirKind: string; modalTitle: string };
   onCreate: Function;
   onClose: Function;
   open: boolean;
 }
 
 export const CreateDirDialogue = (props: CreateDialogueProps) => {
-  const defaultFields = {
-    dir_name: props.meta.dir_kind === "task" ? "main" : "",
-    task_type: "generic",
-    tasks: [],
-  };
-  const [values, setValues] = useState(defaultFields);
+  const [dirData, setDirData] = useState<IgniteDirectory>({});
+  const dirKind = props.meta.dirKind;
 
   const handleCreate = (e: FormEvent) => {
     e.preventDefault();
-    props.onCreate(values, props.meta);
-    setValues(defaultFields);
+    props.onCreate(dirData, props.meta);
+    setDirData({});
     props.onClose();
   };
 
   return (
     <Dialog open={props.open} onClose={props.onClose as DialogProps["onClose"]}>
-      <DialogTitle>{props.meta.modal_title}</DialogTitle>
+      <DialogTitle>{props.meta.modalTitle}</DialogTitle>
       <form onSubmit={handleCreate}>
-        {props.open ? dialogueContents[props.meta.dir_kind](values, setValues) : null}
+        {props.open
+          ? dialogueContents[dirKind as keyof typeof dialogueContents](setDirData, dirData)
+          : null}
         <DialogActions>
           <Button type="button" onClick={props.onClose as MouseEventHandler}>
             Cancel
