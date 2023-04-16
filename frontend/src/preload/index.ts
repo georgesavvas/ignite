@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { electronAPI } from "@electron-toolkit/preload";
+// import { electronAPI } from "@electron-toolkit/preload";
+
 import { contextBridge, ipcRenderer } from "electron";
 
 type Env = { [key: string]: string };
@@ -74,7 +75,7 @@ const services = {
 
 if (process.contextIsolated) {
   try {
-    contextBridge.exposeInMainWorld("electron", electronAPI);
+    // contextBridge.exposeInMainWorld("electron", electronAPI);
     contextBridge.exposeInMainWorld("api", api);
     contextBridge.exposeInMainWorld("services", services);
   } catch (error) {
@@ -82,7 +83,9 @@ if (process.contextIsolated) {
   }
 } else {
   // @ts-ignore (define in dts)
-  window.electron = electronAPI;
+  // window.electron = electronAPI;
   // @ts-ignore (define in dts)
   window.api = api;
+  // @ts-ignore (define in dts)
+  window.services = services;
 }

@@ -12,51 +12,46 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import Divider from "@mui/material/Divider";
 import {
   DOMElement,
   ReactComponentElement,
   useCallback,
   useContext,
   useEffect,
-  useState
+  useState,
 } from "react";
-import {
-  ReflexContainer,
-  ReflexElement,
-  ReflexElementProps,
-  ReflexSplitter
-} from "react-reflex";
+import { ReflexContainer, ReflexElement, ReflexElementProps, ReflexSplitter } from "react-reflex";
 
 import { ConfigContext } from "../contexts/ConfigContext";
-import serverRequest from "../services/serverRequest";
-import loadReflexLayout from "../utils/loadReflexLayout";
-import saveReflexLayout from "../utils/saveReflexLayout";
 import Details from "./DetailsView/Details";
+import Divider from "@mui/material/Divider";
 import Explorer from "./Explorer/Explorer";
-import styles from "./Home.module.css";
 import LostConnectionOverlay from "./LostConnectionOverlay";
 import ProcessManager from "./ProcessManager/ProcessManager";
-import TopBar from "./TopBar/TopBar";
 import ProjectTree from "./TreeView/ProjectTree";
+import TopBar from "./TopBar/TopBar";
 import WaitingForBackendOverlay from "./WaitingForBackendOverlay";
 import Welcome from "./Welcome";
+import loadReflexLayout from "../utils/loadReflexLayout";
+import saveReflexLayout from "../utils/saveReflexLayout";
+import serverRequest from "../services/serverRequest";
+import styles from "./Home.module.css";
 
 const splitterStyle = {
   borderColor: "rgb(80,80,80)",
-  backgroundColor: "rgb(80,80,80)"
+  backgroundColor: "rgb(80,80,80)",
 };
 
 const defaultFlexRations = {
   "home.tree": 0.2,
   "home.explorer": 0.5,
-  "home.details": 0.3
+  "home.details": 0.3,
 };
 
 export const Home = () => {
   const [flexRatios, setFlexRatios] = useState(defaultFlexRations);
   const [waitBackendOpen, setWaitBackendOpen] = useState(true);
-  const [welcomeOpen, setWelcomeOpen] = useState(false);
+  const [welcomeOpen, setWelcomeOpen] = useState(true);
   const [config] = useContext(ConfigContext);
 
   useEffect(() => {
@@ -76,7 +71,7 @@ export const Home = () => {
     const ratios = {
       "home.tree": tree[0] / fullWidth,
       "home.explorer": explorer[0] / fullWidth,
-      "home.details": details[0] / fullWidth
+      "home.details": details[0] / fullWidth,
     };
     setFlexRatios(ratios);
   }, []);
