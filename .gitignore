@@ -11,6 +11,8 @@ common/server_config.yaml
 common/client_config.yaml
 common/ignite.db*
 
+frontend/IgniteBackend*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

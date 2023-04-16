@@ -13,26 +13,30 @@
 // limitations under the License.
 
 import ClearIcon from "@mui/icons-material/Clear";
-import { Breakpoint, DialogProps } from "@mui/material";
+import { Breakpoint, Button, DialogProps } from "@mui/material";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
+import DialogContent, { DialogContentProps } from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import { useEffect } from "react";
+import { ReactNode, useEffect } from "react";
 
 import styles from "./Modal.module.css";
 
-interface ModalProps {
+type ModalProps = React.PropsWithChildren<{
+  title?: string;
+  text?: string;
   open: boolean;
-  focusRef: any;
-  focusDelay: number;
-  fullHeight: string;
-  fullWidth: boolean;
-  onFormSubmit: Function;
+  dialogContentProps?: DialogContentProps;
+  focusRef?: any;
+  focusDelay?: number;
+  fullHeight?: string;
+  fullWidth?: boolean;
+  onFormSubmit?: Function;
   onClose: Function;
-  maxWidth: Breakpoint;
-}
+  maxWidth?: Breakpoint;
+  buttons?: ReactNode[];
+}>;
 
 function Modal(props: ModalProps) {
   useEffect(() => {
@@ -55,12 +59,12 @@ function Modal(props: ModalProps) {
     },
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     props.onFormSubmit();
   };
 
-  const formWrapper = (onFormSubmit: Function, children: React.ReactNode[]) => {
+  const formWrapper = (onFormSubmit: Function, children: ReactNode) => {
     if (onFormSubmit) return <form onSubmit={handleSubmit}>{children}</form>;
     else return children;
   };

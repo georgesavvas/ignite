@@ -12,13 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import Button from "@mui/material/Button";
+import Button, { ButtonProps } from "@mui/material/Button";
 
-interface IgnButtonProps {
-  props: any;
-}
-
-export const IgnButton = (props: IgnButtonProps) => {
+export const IgnButton = (props: ButtonProps) => {
   return <Button variant="outlined" color="ignite" size="small" {...props} />;
 };
 

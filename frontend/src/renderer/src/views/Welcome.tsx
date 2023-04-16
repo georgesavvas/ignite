@@ -14,52 +14,54 @@
 
 import CheckIcon from "@mui/icons-material/Check";
 import LoadingButton from "@mui/lab/LoadingButton";
-import {Divider, Typography} from "@mui/material";
+import { Divider, Typography } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 
 import FileInput from "../components/FileInput";
 import IgnButton from "../components/IgnButton";
 import IgnTextField from "../components/IgnTextField";
 import Modal from "../components/Modal";
-import {ConfigContext} from "../contexts/ConfigContext";
-import {ContextContext, setProject} from "../contexts/ContextContext";
+import { ConfigContext } from "../contexts/ConfigContext";
+import { ContextContext, setProject } from "../contexts/ContextContext";
 import serverRequest from "../services/serverRequest";
-import {validateDirName} from "../utils/validateDirName";
+import { validateDirName } from "../utils/validateDirName";
 import styles from "./Welcome.module.css";
 
-const Welcome = props => {
-  const [,,setCurrentContext] = useContext(ContextContext);
+interface WelcomeProps {
+  onClose: Function;
+  open: boolean;
+}
+
+const Welcome = (props: WelcomeProps) => {
+  const [, , setCurrentContext] = useContext(ContextContext);
   const [config, setConfig] = useContext(ConfigContext);
   const [access, setAccess] = useState({});
   const [canSave, setCanSave] = useState(false);
   const [newProjectName, setNewProjectName] = useState("");
-  const [projectCreated, setProjectCreated] = useState();
-  const [projectLoading, setProjectLoading] = useState();
+  const [projectCreated, setProjectCreated] = useState(false);
+  const [projectLoading, setProjectLoading] = useState(false);
 
   useEffect(() => {
     setAccess({
       projectsDir: config.access.projectsDir,
-      serverProjectsDir: config.access.serverProjectsDir
+      serverProjectsDir: config.access.serverProjectsDir,
     });
   }, [config.access]);
 
   useEffect(() => {
     let changed = false;
-    const configAccess = {...config.access};
+    const configAccess = { ...config.access };
     delete configAccess.remote;
-    if (
-      JSON.stringify(configAccess) !==
-      JSON.stringify(access)
-    ) changed = true;
+    if (JSON.stringify(configAccess) !== JSON.stringify(access)) changed = true;
     setCanSave(changed);
   }, [access]);
 
-  const isServerLocal = config.serverDetails.address &&
-    config.serverDetails.address.startsWith("localhost");
+  const isServerLocal =
+    config.serverDetails.address && config.serverDetails.address.startsWith("localhost");
 
-  const handleAccessChange = (field, value) => {
-    setAccess(prevState => {
-      const existing = {...prevState};
+  const handleAccessChange = (field: string, value: string) => {
+    setAccess((prevState) => {
+      const existing = { ...prevState };
       existing[field] = value;
       if (isServerLocal && field === "projectsDir") {
         existing["serverProjectsDir"] = value;
@@ -69,16 +71,16 @@ const Welcome = props => {
   };
 
   const handleSave = () => {
-    setConfig("access", {...access});
+    setConfig("access", { ...access });
     setCanSave(false);
   };
 
   const handleNewProject = () => {
     setProjectLoading(true);
     const data = {
-      name: newProjectName
+      name: newProjectName,
     };
-    serverRequest("create_project", data).then(resp => {
+    serverRequest("create_project", data).then((resp) => {
       if (resp.ok) {
         setProject(newProjectName, setCurrentContext);
         props.onClose();
@@ -90,7 +92,7 @@ const Welcome = props => {
     setProjectCreated(true);
   };
 
-  const handleProjectNameChange = e => {
+  const handleProjectNameChange = (e) => {
     const value = validateDirName(e.target.value);
     setNewProjectName(value);
   };
@@ -103,10 +105,8 @@ const Welcome = props => {
           <Typography variant="h5">Check the docs</Typography>
           <div className={styles.row}>
             <Typography
-              onClick={
-                () => window.services.open_url("https://docs.ignitevfx.co.uk")
-              }
-              sx={{cursor: "pointer"}}
+              onClick={() => window.services.open_url("https://docs.ignitevfx.co.uk")}
+              sx={{ cursor: "pointer" }}
               color="rgb(252, 140, 3)"
               variant="inherit"
             >
@@ -119,7 +119,6 @@ const Welcome = props => {
           <Typography variant="h5">Set your projects directory</Typography>
           <div className={styles.row}>
             <FileInput
-              margin="dense"
               id="projects-dir"
               label="Projects directory"
               size="small"
@@ -127,12 +126,13 @@ const Welcome = props => {
               disabled={access.remote}
               value={access.projectsDir || ""}
               onChange={(_, value) => handleAccessChange("projectsDir", value)}
-              buttonStyle={{marginTop: "4px"}}
+              buttonStyle={{ marginTop: "4px" }}
             >
               <IgnButton
-                color="ignite" size="medium"
+                color="ignite"
+                size="medium"
                 onClick={() => handleSave()}
-                sx={{height: "37.5px", marginTop: "4px"}}
+                sx={{ height: "37.5px", marginTop: "4px" }}
                 disabled={!canSave}
               >
                 Save
@@ -151,7 +151,7 @@ const Welcome = props => {
               onChange={handleProjectNameChange}
               disabled={projectLoading || projectCreated}
             />
-            {!projectCreated ?
+            {!projectCreated ? (
               <LoadingButton
                 color="ignite"
                 onClick={handleNewProject}
@@ -159,11 +159,12 @@ const Welcome = props => {
                 variant="outlined"
               >
                 Create
-              </LoadingButton> :
+              </LoadingButton>
+            ) : (
               <IgnButton variant="outlined" color="success">
                 <CheckIcon />
               </IgnButton>
-            }
+            )}
           </div>
         </div>
         <Divider />
@@ -173,16 +174,14 @@ const Welcome = props => {
             <img
               src="src/assets/discord.svg"
               className={styles.discord}
-              onClick={
-                () => window.services.open_url("https://discord.gg/2HWQduERrJ")
-              }
+              onClick={() => window.services.open_url("https://discord.gg/2HWQduERrJ")}
             />
           </div>
         </div>
       </div>
       <IgnButton
         color="ignite"
-        sx={{position: "absolute", bottom: "15px", right: "15px"}}
+        sx={{ position: "absolute", bottom: "15px", right: "15px" }}
         onClick={() => props.onClose()}
       >
         Close

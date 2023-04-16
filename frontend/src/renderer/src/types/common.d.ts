@@ -1,6 +1,10 @@
 import React from "react";
 
-export type TextFieldChangeEvent = React.ChangeEvent<HTMLInputElement>;
+export type UnknownEvent = React.ChangeEvent<unknown>;
+
+export type ClickEvent = React.MouseEventHandler<HTMLButtonElement>;
+
+export type InputChangeEvent = React.ChangeEvent<HTMLInputElement>;
 
 export type TextAreaChangeEvent = React.ChangeEvent<HTMLTextAreaElement>;
 
