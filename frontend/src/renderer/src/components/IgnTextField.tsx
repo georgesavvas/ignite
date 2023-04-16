@@ -12,13 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import TextField from "@mui/material/TextField";
+import TextField, { TextFieldProps } from "@mui/material/TextField";
 
-interface IgnTextFieldProps {
-  props: any;
-}
-
-export const IgnTextField = (props: IgnTextFieldProps) => {
+export const IgnTextField = (props: TextFieldProps) => {
   return <TextField size="small" {...props} />;
 };
 

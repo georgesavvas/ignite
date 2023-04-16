@@ -30,19 +30,15 @@ const api = {
   checkPath: (filepath: string): Promise<boolean> => {
     return ipcRenderer.invoke("check_path", filepath);
   },
-  fileInput: async (
-    properties: string[]
-  ): Promise<Electron.OpenDialogReturnValue> => {
+  fileInput: async (properties: string[]): Promise<Electron.OpenDialogReturnValue> => {
     return await ipcRenderer.invoke("file_input", properties);
   },
-  dirInput: async (
-    properties: string[]
-  ): Promise<Electron.OpenDialogReturnValue> => {
+  dirInput: async (properties: string[]): Promise<Electron.OpenDialogReturnValue> => {
     return await ipcRenderer.invoke("dir_input", properties);
   },
   launch_dcc: async (cmd: string, args: string, env: Env): Promise<boolean> => {
     return await ipcRenderer.invoke("launch_dcc", cmd, args, env);
-  }
+  },
 };
 
 const services = {
@@ -73,7 +69,7 @@ const services = {
   },
   get_port: (): Promise<number> => {
     return ipcRenderer.invoke("get_port");
-  }
+  },
 };
 
 if (process.contextIsolated) {

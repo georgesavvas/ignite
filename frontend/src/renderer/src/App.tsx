@@ -30,6 +30,7 @@ import { CrateProvider } from "./contexts/CrateContext";
 import { EntityProvider } from "./contexts/EntityContext";
 import { VaultProvider } from "./contexts/VaultContext";
 import BuildFileURL from "./services/BuildFileURL";
+import { ClickEvent } from "./types/common";
 import Home from "./views/Home";
 
 declare module "@mui/material/styles" {
@@ -48,6 +49,9 @@ declare module "@mui/material" {
   interface ButtonPropsColorOverrides {
     ignite: true;
     lightgrey: true;
+  }
+  interface LinearProgressPropsColorOverrides {
+    ignite: true;
   }
 }
 
@@ -73,7 +77,7 @@ BuildFileURL("");
 
 interface ErrorFallbackProps {
   error: Error;
-  resetErrorBoundary: Function;
+  resetErrorBoundary: ClickEvent;
 }
 
 const ErrorFallback = ({ error, resetErrorBoundary }: ErrorFallbackProps) => {

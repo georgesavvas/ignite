@@ -15,8 +15,9 @@
 /* eslint-disable react/no-unknown-property */
 
 import TextField from "@mui/material/TextField";
-import { TextFieldChangeEvent } from "@renderer/types/common";
+import { InputChangeEvent } from "@renderer/types/common";
 
+import styles from "./FileInput.module.css";
 import IgnButton from "./IgnButton";
 
 type FileInputProps = React.PropsWithChildren<{
@@ -33,9 +34,13 @@ type FileInputProps = React.PropsWithChildren<{
 export const FileInput = (props: FileInputProps) => {
   const { buttonStyle, directory, multi, buttonLabel, ...other } = props;
 
-  const handleChange = (e: TextFieldChangeEvent) => {
+  const handleChange = (e: InputChangeEvent) => {
     if (!props.onChange) return;
     props.onChange(e, e.target.value);
+  };
+
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    handleChange(e);
   };
 
   const handleFileInput = async (e: React.MouseEventHandler<HTMLButtonElement>) => {
@@ -50,15 +55,12 @@ export const FileInput = (props: FileInputProps) => {
   };
 
   const style = {
-    display: "flex",
     alignItems: !props.multiline ? "center" : "flex-start",
-    gap: "5px",
-    flexGrow: 10,
   };
 
   return (
-    <div style={{ ...style, ...props.style }}>
-      <TextField {...other} value={props.value} onChange={handleChange} onBlur={handleChange} />
+    <div className={styles.container} style={{ ...style, ...props.style }}>
+      <TextField {...other} value={props.value} onChange={handleChange} onBlur={handleBlur} />
       <IgnButton
         variant="outlined"
         onClick={handleFileInput}

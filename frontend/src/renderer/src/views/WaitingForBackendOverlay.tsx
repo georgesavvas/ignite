@@ -12,23 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-import React from "react";
-
-import Typography from "@mui/material/Typography";
 import LinearProgress from "@mui/material/LinearProgress";
+import Typography from "@mui/material/Typography";
 
 import styles from "./WaitingForBackendOverlay.module.css";
-
 
 const WaitingForBackendOverlay = () => {
   return (
     <div className={styles.container}>
       <div className={styles.content}>
-        <Typography variant="h4">
-          Waiting for Ignite server...
-        </Typography>
-        <LinearProgress style={{width: "400px"}} color="ignite" />
+        <Typography variant="h4">Waiting for Ignite server...</Typography>
+        <LinearProgress style={{ width: "400px" }} color="ignite" />
       </div>
     </div>
   );
