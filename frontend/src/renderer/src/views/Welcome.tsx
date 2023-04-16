@@ -12,20 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import CheckIcon from "@mui/icons-material/Check";
-import LoadingButton from "@mui/lab/LoadingButton";
+import { ContextContext, setProject } from "../contexts/ContextContext";
 import { Divider, Typography } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 
+import CheckIcon from "@mui/icons-material/Check";
+import { ConfigContext } from "../contexts/ConfigContext";
 import FileInput from "../components/FileInput";
 import IgnButton from "../components/IgnButton";
 import IgnTextField from "../components/IgnTextField";
+import LoadingButton from "@mui/lab/LoadingButton";
 import Modal from "../components/Modal";
-import { ConfigContext } from "../contexts/ConfigContext";
-import { ContextContext, setProject } from "../contexts/ContextContext";
 import serverRequest from "../services/serverRequest";
-import { validateDirName } from "../utils/validateDirName";
 import styles from "./Welcome.module.css";
+import { validateDirName } from "../utils/validateDirName";
 
 interface WelcomeProps {
   onClose: Function;
@@ -108,7 +108,6 @@ const Welcome = (props: WelcomeProps) => {
               onClick={() => window.services.open_url("https://docs.ignitevfx.co.uk")}
               sx={{ cursor: "pointer" }}
               color="rgb(252, 140, 3)"
-              variant="inherit"
             >
               docs.ignitevfx.co.uk
             </Typography>
@@ -119,7 +118,6 @@ const Welcome = (props: WelcomeProps) => {
           <Typography variant="h5">Set your projects directory</Typography>
           <div className={styles.row}>
             <FileInput
-              id="projects-dir"
               label="Projects directory"
               size="small"
               fullWidth

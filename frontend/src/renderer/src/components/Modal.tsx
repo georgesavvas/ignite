@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import ClearIcon from "@mui/icons-material/Clear";
 import { Breakpoint, Button, DialogProps } from "@mui/material";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
 import DialogContent, { DialogContentProps } from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
 import { ReactNode, useEffect } from "react";
 
+import ClearIcon from "@mui/icons-material/Clear";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
 import styles from "./Modal.module.css";
 
 type ModalProps = React.PropsWithChildren<{
@@ -34,11 +34,11 @@ type ModalProps = React.PropsWithChildren<{
   fullWidth?: boolean;
   onFormSubmit?: Function;
   onClose: Function;
-  maxWidth?: Breakpoint;
+  maxWidth: Breakpoint;
   buttons?: ReactNode[];
 }>;
 
-function Modal(props: ModalProps) {
+const Modal = ({ maxWidth = "xs", ...props }: ModalProps) => {
   useEffect(() => {
     if (!props.open || !props.focusRef) return;
     const timeout = setTimeout(() => {
@@ -61,10 +61,10 @@ function Modal(props: ModalProps) {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    props.onFormSubmit();
+    if (props.onFormSubmit) props.onFormSubmit();
   };
 
-  const formWrapper = (onFormSubmit: Function, children: ReactNode) => {
+  const formWrapper = (onFormSubmit?: Function, children: ReactNode) => {
     if (onFormSubmit) return <form onSubmit={handleSubmit}>{children}</form>;
     else return children;
   };
@@ -74,7 +74,7 @@ function Modal(props: ModalProps) {
       open={props.open}
       onClose={props.onClose as DialogProps["onClose"]}
       fullWidth={props.fullWidth !== undefined ? props.fullWidth : true}
-      maxWidth={props.maxWidth || "sx"}
+      maxWidth={maxWidth}
       sx={dialogStyle}
     >
       {formWrapper(
@@ -93,6 +93,6 @@ function Modal(props: ModalProps) {
       )}
     </Dialog>
   );
-}
+};
 
 export default Modal;
