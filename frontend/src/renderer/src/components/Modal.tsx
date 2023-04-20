@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Breakpoint, Button, DialogProps } from "@mui/material";
-import DialogContent, { DialogContentProps } from "@mui/material/DialogContent";
-import { ReactNode, useEffect } from "react";
-
 import ClearIcon from "@mui/icons-material/Clear";
+import { Breakpoint, Button, DialogProps } from "@mui/material";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
+import DialogContent, { DialogContentProps } from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import { ReactNode, useEffect } from "react";
+
 import styles from "./Modal.module.css";
 
 type ModalProps = React.PropsWithChildren<{
@@ -32,8 +32,8 @@ type ModalProps = React.PropsWithChildren<{
   focusDelay?: number;
   fullHeight?: string;
   fullWidth?: boolean;
-  onFormSubmit?: Function;
-  onClose: Function;
+  onFormSubmit?: () => void;
+  onClose: () => void;
   maxWidth: Breakpoint;
   buttons?: ReactNode[];
 }>;
@@ -64,8 +64,8 @@ const Modal = ({ maxWidth = "xs", ...props }: ModalProps) => {
     if (props.onFormSubmit) props.onFormSubmit();
   };
 
-  const formWrapper = (onFormSubmit?: Function, children: ReactNode) => {
-    if (onFormSubmit) return <form onSubmit={handleSubmit}>{children}</form>;
+  const formWrapper = (children: ReactNode) => {
+    if (props.onFormSubmit) return <form onSubmit={handleSubmit}>{children}</form>;
     else return children;
   };
 
@@ -78,7 +78,6 @@ const Modal = ({ maxWidth = "xs", ...props }: ModalProps) => {
       sx={dialogStyle}
     >
       {formWrapper(
-        props.onFormSubmit,
         <>
           <ClearIcon onClick={props.onClose} className={styles.closeButtonStyle} />
           {props.title ? (

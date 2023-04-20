@@ -12,17 +12,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { ClickEvent, ContextItem, Directory } from "@renderer/types/common";
+import { createRef, useContext, useState } from "react";
 
-import React, {useState, createRef, useContext} from "react";
-
-import styles from "./Tile.module.css";
-import ContextMenu, { handleContextMenu } from "./ContextMenu";
+import { ConfigContext } from "../contexts/ConfigContext";
 import BuildFileURL from "../services/BuildFileURL";
-import {ConfigContext} from "../contexts/ConfigContext";
-import {clamp} from "../utils/math";
+import { clamp } from "../utils/math";
+import ContextMenu, { handleContextMenu } from "./ContextMenu";
+import styles from "./Tile.module.css";
 
+type TileProps = React.PropsWithChildren<{
+  thumbnailComp: JSX.Element;
+  noOverlay: boolean;
+  thumbnail: string;
+  noBorder: boolean;
+  selected: boolean;
+  onSelected: () => void;
+  thumbnailWidth: string;
+  entity: Directory;
+  onClick: ClickEvent;
+  contextItems: ContextItem[];
+  noInfo: boolean;
+  onDragStart: () => void;
+  draggable: boolean;
+  noTopGradient: boolean;
+  noBottomGradient: boolean;
+}>;
 
-export default function Tile(props) {
+export const Tile = (props: TileProps) => {
   const [contextMenu, setContextMenu] = useState(null);
   const [config] = useContext(ConfigContext);
   const [progress, setProgress] = useState(0);
@@ -37,20 +54,20 @@ export default function Tile(props) {
     borderStyle: props.noBorder ? "none" : "solid",
     borderRightStyle: "solid",
     borderRadius: props.noBorder ? 0 : "3px",
-    borderColor: props.selected ? "rgb(252, 140, 3)" : "rgb(50, 50, 50)"
+    borderColor: props.selected ? "rgb(252, 140, 3)" : "rgb(50, 50, 50)",
   };
 
   const thumbnailCompStyle = {
     width: props.thumbnailWidth || "100%",
-    height: "100%"
+    height: "100%",
   };
 
   const thumbnailStyle = {
-    width: props.thumbnailWidth || "100%"
+    width: props.thumbnailWidth || "100%",
   };
 
   const barStyle = {
-    left: `${progress * 100}%`
+    left: `${progress * 100}%`,
   };
 
   const handleMouseMove = (e) => {
@@ -77,38 +94,46 @@ export default function Tile(props) {
   }
   const thumbnailURL = props.thumbnail || getSeqThumbnail();
 
-  const handleClick = e => {
+  const handleClick = (e: ClickEvent) => {
     if (props.onClick) props.onClick(e);
     if (props.onSelected) props.onSelected(props.entity);
   };
 
   return (
     <>
-      {props.contextItems ?
-        <ContextMenu items={props.contextItems} contextMenu={contextMenu}
-          setContextMenu={setContextMenu} title={props.entity.name}
+      {props.contextItems ? (
+        <ContextMenu
+          items={props.contextItems}
+          contextMenu={contextMenu}
+          setContextMenu={setContextMenu}
+          title={props.entity.name}
           subtitle={props.entity.dir_kind}
         />
-        : null
-      }
-      <div className={styles.tile} style={tileStyle} onClick={handleClick}
-        onContextMenu={e => handleContextMenu(e, contextMenu, setContextMenu)}
-        draggable={props.draggable} onDragStart={props.onDragStart}
+      ) : null}
+      <div
+        className={styles.tile}
+        style={tileStyle}
+        onClick={handleClick}
+        onContextMenu={(e) => handleContextMenu(e, contextMenu, setContextMenu)}
+        draggable={props.draggable}
+        onDragStart={props.onDragStart}
       >
         {ThumbComp ? <ThumbComp className={styles.thumbnail} style={thumbnailCompStyle} /> : null}
-        {!ThumbComp && thumbnailURL ?
+        {!ThumbComp && thumbnailURL ? (
           <img src={thumbnailURL} className={styles.thumbnail} style={thumbnailStyle} />
-          : null
-        }
-        <div className={styles.hoverArea} onMouseMove={isStatic ? null : handleMouseMove} ref={hoverArea}>
+        ) : null}
+        <div
+          className={styles.hoverArea}
+          onMouseMove={isStatic ? null : handleMouseMove}
+          ref={hoverArea}
+        >
           <div className={styles.overlay}>
-            {!ThumbComp && thumbnailURL && overlay ?
+            {!ThumbComp && thumbnailURL && overlay ? (
               <>
                 {props.noTopGradient ? null : <div className={styles.topGrad} />}
                 {props.noBottomGradient ? null : <div className={styles.bottomGrad} />}
               </>
-              : null
-            }
+            ) : null}
             {props.noInfo ? null : props.children}
           </div>
           {isStatic ? null : <div className={styles.bar} style={barStyle} />}
@@ -116,4 +141,6 @@ export default function Tile(props) {
       </div>
     </>
   );
-}
+};
+
+export default Tile;
