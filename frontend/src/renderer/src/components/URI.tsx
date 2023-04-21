@@ -12,16 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import Typography from "@mui/material/Typography";
-import { useSnackbar } from "notistack";
+import ContextMenu, { handleContextMenu } from "./ContextMenu";
 import React, { useContext, useState } from "react";
 
 import { ContextContext } from "../contexts/ContextContext";
 import { CopyToClipboard } from "../views/ContextActions";
-import ContextMenu, { handleContextMenu } from "./ContextMenu";
+import Typography from "@mui/material/Typography";
 import styles from "./URI.module.css";
+import { useSnackbar } from "notistack";
 
-function URI(props) {
+interface URIProps {
+  uri: string;
+  style?: React.CSSProperties;
+}
+
+const URI = (props: URIProps) => {
   const [, setCurrentContext] = useContext(ContextContext);
   const [contextMenu, setContextMenu] = useState(null);
   const { enqueueSnackbar } = useSnackbar();
@@ -61,6 +66,6 @@ function URI(props) {
       </div>
     </>
   );
-}
+};
 
 export default URI;

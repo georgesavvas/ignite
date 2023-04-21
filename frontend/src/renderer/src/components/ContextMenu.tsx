@@ -34,10 +34,10 @@ interface ContextMenu {
 type HandleContextMenuFn = (contextMenu: ContextMenu | null) => void;
 
 export const handleContextMenu = (
-  e: MouseEvent,
+  e: React.MouseEvent<HTMLElement>,
   contextMenu: ContextMenu | null,
-  setContextMenu: HandleContextMenuFn,
-  data: any
+  setContextMenu: (contextMenu: any) => void,
+  data?: any
 ) => {
   e.preventDefault();
   e.stopPropagation();

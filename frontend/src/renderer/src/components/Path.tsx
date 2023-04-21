@@ -12,25 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-import React, {useState} from "react";
-
-import Typography from "@mui/material/Typography";
-import {useSnackbar} from "notistack";
-
-import styles from "./Path.module.css";
 import ContextMenu, { handleContextMenu } from "./ContextMenu";
-import {CopyToClipboard} from "../views/ContextActions";
 
+import { CopyToClipboard } from "../views/ContextActions";
+import Typography from "@mui/material/Typography";
+import styles from "./Path.module.css";
+import { useSnackbar } from "notistack";
+import { useState } from "react";
 
-function Path(props) {
+interface PathProps {
+  path: string;
+}
+
+function Path(props: PathProps) {
   const [contextMenu, setContextMenu] = useState(null);
-  const {enqueueSnackbar} = useSnackbar();
+  const { enqueueSnackbar } = useSnackbar();
 
   const contextItems = [
     {
-      "label": "Copy",
-      "fn": () => CopyToClipboard(props.path, enqueueSnackbar)
+      label: "Copy",
+      fn: () => CopyToClipboard(props.path, enqueueSnackbar),
     },
     // {
     //   "label": "Go to asset",
@@ -43,8 +44,13 @@ function Path(props) {
   return (
     <>
       <ContextMenu items={contextItems} contextMenu={contextMenu} setContextMenu={setContextMenu} />
-      <div className={styles.container} onClick={e => handleContextMenu(e, contextMenu, setContextMenu)}>
-        <Typography style={{color: "cadetblue", direction: "rtl", textAlign: "left"}} noWrap>{props.path}</Typography>
+      <div
+        className={styles.container}
+        onClick={(e) => handleContextMenu(e, contextMenu, setContextMenu)}
+      >
+        <Typography style={{ color: "cadetblue", direction: "rtl", textAlign: "left" }} noWrap>
+          {props.path}
+        </Typography>
       </div>
     </>
   );
