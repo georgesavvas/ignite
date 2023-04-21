@@ -2,11 +2,13 @@ import React from "react";
 
 export type UnknownEvent = React.ChangeEvent<unknown>;
 
-export type ClickEvent = React.MouseEventHandler<HTMLButtonElement>;
+export type ClickEvent = React.MouseEvent<HTMLElement>;
 
 export type InputChangeEvent = React.ChangeEvent<HTMLInputElement>;
 
 export type TextAreaChangeEvent = React.ChangeEvent<HTMLTextAreaElement>;
+
+export type GenericObject = { [key: string]: any };
 
 export interface ContextItem {
   label: string;

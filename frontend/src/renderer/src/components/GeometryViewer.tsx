@@ -12,34 +12,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Environment, OrbitControls, useGLTF } from "@react-three/drei";
-import { Canvas } from "@react-three/fiber";
-import { Suspense, useEffect, useState } from "react";
 import * as THREE from "three";
+
+import { Environment, OrbitControls, useGLTF } from "@react-three/drei";
+import { Suspense, useEffect, useState } from "react";
+
+import { Asset } from "@renderer/types/common";
+import { Canvas } from "@react-three/fiber";
 
 // import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
 
-const GLTF_PLACEHOLDER =
-  "/asset_library/3d/asset_library/common/model_placeholder.gltf";
+const GLTF_PLACEHOLDER = "/asset_library/3d/asset_library/common/model_placeholder.gltf";
 
-interface ModelProps {}
+interface ModelProps {
+  asset: Asset;
+}
 
-function Model(props: ModelProps) {
+const Model = (props: ModelProps) => {
   const [path, setPath] = useState(GLTF_PLACEHOLDER);
 
   useEffect(() => {
     let gltf_path = props.asset.asset_dir + "/3dpreview/model.gltf";
-    window.api.checkPath(gltf_path).then((exists) => {
+    window.api.checkPath(gltf_path).then((exists: boolean) => {
       if (!exists) gltf_path = GLTF_PLACEHOLDER;
       setPath(gltf_path);
     });
   }, [props.asset]);
 
   let gltf = useGLTF(
-    `http://192.168.11.44:8084/files/${path.replace(
-      "/asset_library/3d/asset_library/",
-      ""
-    )}`
+    `http://192.168.11.44:8084/files/${path.replace("/asset_library/3d/asset_library/", "")}`
   );
   console.log(path);
   // gltf.scene.children[0].material = <meshStandardMaterial attach="material" color="lightblue" />;
@@ -69,17 +70,19 @@ function Model(props: ModelProps) {
       </mesh> */}
     </>
   );
-}
+};
 
 const mouseButtons = {
   LEFT: THREE.MOUSE.ROTATE,
   MIDDLE: THREE.MOUSE.PAN,
-  RIGHT: THREE.MOUSE.PAN
+  RIGHT: THREE.MOUSE.PAN,
 };
 
-interface ModelViewerProps {}
+interface ModelViewerProps {
+  asset: Asset;
+}
 
-function ModelViewer({ asset }: ModelViewerProps) {
+const ModelViewer = ({ asset }: ModelViewerProps) => {
   return (
     <Canvas camera={{ zoom: 1, position: [0, 0, 1] }}>
       <OrbitControls
@@ -120,7 +123,7 @@ function ModelViewer({ asset }: ModelViewerProps) {
     //   </Suspense>
     // </Canvas>
   );
-}
+};
 
 export default ModelViewer;
 

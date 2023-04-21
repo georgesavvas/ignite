@@ -13,12 +13,12 @@
 // limitations under the License.
 
 import { ClickEvent, ContextItem, Directory } from "@renderer/types/common";
-import { createRef, useContext, useState } from "react";
-
-import { ConfigContext } from "../contexts/ConfigContext";
-import BuildFileURL from "../services/BuildFileURL";
-import { clamp } from "../utils/math";
 import ContextMenu, { handleContextMenu } from "./ContextMenu";
+import { useContext, useRef, useState } from "react";
+
+import BuildFileURL from "../services/BuildFileURL";
+import { ConfigContext } from "../contexts/ConfigContext";
+import { clamp } from "../utils/math";
 import styles from "./Tile.module.css";
 
 type TileProps = React.PropsWithChildren<{
@@ -27,10 +27,10 @@ type TileProps = React.PropsWithChildren<{
   thumbnail: string;
   noBorder: boolean;
   selected: boolean;
-  onSelected: () => void;
+  onSelected: (entity: Directory) => void;
   thumbnailWidth: string;
   entity: Directory;
-  onClick: ClickEvent;
+  onClick: (e: ClickEvent) => void;
   contextItems: ContextItem[];
   noInfo: boolean;
   onDragStart: () => void;
@@ -43,7 +43,7 @@ export const Tile = (props: TileProps) => {
   const [contextMenu, setContextMenu] = useState(null);
   const [config] = useContext(ConfigContext);
   const [progress, setProgress] = useState(0);
-  const hoverArea = createRef();
+  const hoverArea = useRef<HTMLInputElement>(null);
   const ThumbComp = props.thumbnailComp;
   const overlay = props.noOverlay === undefined ? true : !props.noOverlay;
 
@@ -52,7 +52,7 @@ export const Tile = (props: TileProps) => {
 
   const tileStyle = {
     borderStyle: props.noBorder ? "none" : "solid",
-    borderRightStyle: "solid",
+    borderRightStyle: "solid" as React.CSSProperties["borderRightStyle"],
     borderRadius: props.noBorder ? 0 : "3px",
     borderColor: props.selected ? "rgb(252, 140, 3)" : "rgb(50, 50, 50)",
   };
@@ -70,7 +70,8 @@ export const Tile = (props: TileProps) => {
     left: `${progress * 100}%`,
   };
 
-  const handleMouseMove = (e) => {
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!hoverArea.current) return;
     const rect = hoverArea.current.getBoundingClientRect();
     const width = (e.clientX - rect.left) / rect.width;
     setProgress(clamp(width, 0, 1));
@@ -85,8 +86,6 @@ export const Tile = (props: TileProps) => {
       const sectionSize = 1 / amount;
       const section = clamp(Math.floor(progress / sectionSize), 0, amount - 1);
       const frame = thumbnail.frames[section];
-      // let frame = thumbnail.first_frame + (thumbnail.last_frame - thumbnail.first_frame) * progress;
-      // frame = clamp(Math.round(frame), thumbnail.first_frame, thumbnail.last_frame);
       thumbnailPath = thumbnailPath.replace("####", frame);
     }
     if (!hasThumbnail) return "";
@@ -124,7 +123,7 @@ export const Tile = (props: TileProps) => {
         ) : null}
         <div
           className={styles.hoverArea}
-          onMouseMove={isStatic ? null : handleMouseMove}
+          onMouseMove={isStatic ? undefined : handleMouseMove}
           ref={hoverArea}
         >
           <div className={styles.overlay}>
