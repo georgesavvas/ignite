@@ -12,109 +12,130 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { ConfigContext, ConfigContextType } from "./ConfigContext";
+import { PropsWithChildren, createContext, useContext, useEffect, useState } from "react";
 
-import React, {useState, createContext, useEffect, useContext} from "react";
+import { Entity } from "@renderer/types/common";
 import clientRequest from "../services/clientRequest";
-import {ConfigContext} from "./ConfigContext";
 
-export const CrateContext = createContext();
+type Crate = {
+  id: string;
+  entities: Entity[];
+};
 
-export const CrateProvider = props => {
+type CrateContextType = {
+  addCrate: () => void;
+  removeCrate: () => void;
+  addToCrate: () => void;
+  removeFromCrate: () => void;
+  dropFloating: boolean;
+  emptyCrate: () => void;
+  floating: boolean;
+  crates: Crate[];
+  forceOpen: boolean;
+  setForceOpen: (forceOpen: boolean) => void;
+};
+
+export const CrateContext = createContext<CrateContextType | undefined>(undefined);
+
+export const CrateProvider = ({ children }: PropsWithChildren) => {
   const [fetched, setFetched] = useState(false);
-  const [crates, setCrates] = useState([]);
+  const [crates, setCrates] = useState<Entity[]>([]);
   const [floating, setFloating] = useState([]);
-  const [config] = useContext(ConfigContext);
+  const { config } = useContext(ConfigContext) as ConfigContextType;
   const [forceOpen, setForceOpen] = useState(false);
 
   useEffect(() => {
     if (!config.ready) return;
     if (!fetched) {
-      clientRequest("get_crates").then(resp => {
+      clientRequest("get_crates").then((resp) => {
         setCrates(resp.data || []);
         setFetched(true);
       });
       return;
     }
-    const data = crates.map(crate => {
-      const entities = crate.entities.map(entity => entity.uri);
-      return {id: crate.id, entities: entities};
+    const data = crates.map((crate) => {
+      const entities = crate.entities.map((entity) => entity.uri);
+      return { id: crate.id, entities: entities };
     });
-    clientRequest("set_crates", {data: data}).then(resp => {
+    clientRequest("set_crates", { data: data }).then((resp) => {
       if (!resp.ok) console.log("There was an issue setting crates");
     });
   }, [crates, config.ready]);
 
-  const addCrate = async (entities=[]) => {
+  const addCrate = async (entities = []) => {
     const crateID = await window.services.uuid();
-    setCrates(prev => {
+    setCrates((prev) => {
       let existing = [...prev];
-      existing = existing.concat({id: crateID, entities: entities});
+      existing = existing.concat({ id: crateID, entities: entities });
       return existing;
     });
   };
 
-  const removeCrate = async crateID => {
-    setCrates(prev => {
+  const removeCrate = async (crateID) => {
+    setCrates((prev) => {
       const existing = [...prev];
-      const index = existing.findIndex(crate => crate.id === crateID);
+      const index = existing.findIndex((crate) => crate.id === crateID);
       existing.splice(index, 1);
       return existing;
     });
   };
 
-  const addToCrate = async entities => {
-    if (crates.length) setFloating(prev => [...prev, ...entities]);
+  const addToCrate = async (entities) => {
+    if (crates.length) setFloating((prev) => [...prev, ...entities]);
     else addCrate(entities);
   };
 
   const handleAddToCrate = async (crateID, entities) => {
-    setCrates(prev => {
+    setCrates((prev) => {
       const existing = [...prev];
-      const crate = existing.find(crate => crate.id === crateID);
+      const crate = existing.find((crate) => crate.id === crateID);
       crate.entities.push(...entities);
       return existing;
     });
   };
 
   const removeFromCrate = async (crateID, index) => {
-    setCrates(prev => {
+    setCrates((prev) => {
       const existing = [...prev];
-      const crate = existing.find(crate => crate.id === crateID);
+      const crate = existing.find((crate) => crate.id === crateID);
       crate.entities.splice(index, 1);
       return existing;
     });
   };
 
-  const emptyCrate = async crateID => {
-    setCrates(prev => {
+  const emptyCrate = async (crateID) => {
+    setCrates((prev) => {
       const existing = [...prev];
-      const crate = existing.find(crate => crate.id === crateID);
+      const crate = existing.find((crate) => crate.id === crateID);
       crate.entities = [];
       return existing;
     });
   };
 
-  const dropFloating = async crateID => {
-    setFloating(prev => {
+  const dropFloating = async (crateID) => {
+    setFloating((prev) => {
       crateID ? handleAddToCrate(crateID, prev) : addCrate(prev);
       return [];
     });
   };
 
   return (
-    <CrateContext.Provider value={{
-      addCrate: addCrate,
-      removeCrate: removeCrate,
-      addToCrate: addToCrate,
-      removeFromCrate: removeFromCrate,
-      dropFloating: dropFloating,
-      emptyCrate: emptyCrate,
-      floating: floating,
-      crates: crates,
-      forceOpen: forceOpen,
-      setForceOpen: setForceOpen
-    }}>
-      {props.children}
+    <CrateContext.Provider
+      value={{
+        addCrate: addCrate,
+        removeCrate: removeCrate,
+        addToCrate: addToCrate,
+        removeFromCrate: removeFromCrate,
+        dropFloating: dropFloating,
+        emptyCrate: emptyCrate,
+        floating: floating,
+        crates: crates,
+        forceOpen: forceOpen,
+        setForceOpen: setForceOpen,
+      }}
+    >
+      {children}
     </CrateContext.Provider>
   );
 };

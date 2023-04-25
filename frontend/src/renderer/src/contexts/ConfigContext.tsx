@@ -40,6 +40,7 @@ type Config = {
   connection: boolean;
   ready: boolean;
   write: boolean;
+  lostConnection?: false;
 };
 
 type SetConfig = (
@@ -48,7 +49,10 @@ type SetConfig = (
   operation: "modify" | "add" | "remove"
 ) => void;
 
-type ConfigContextType = (Config | SetConfig)[];
+export type ConfigContextType = {
+  config: Config;
+  handleSetConfig: SetConfig;
+};
 
 export const ConfigContext = createContext<ConfigContextType | undefined>(undefined);
 
@@ -69,7 +73,7 @@ const placeholder_config = {
   name: "",
 };
 
-export const ConfigProvider = ({ children }: PropsWithChildren): JSX.Element => {
+export const ConfigProvider = ({ children }: PropsWithChildren) => {
   const serverIsLocal = useRef(true);
   const intervalRef = useRef<NodeJS.Timer | undefined>();
   const { enqueueSnackbar } = useSnackbar();
@@ -311,6 +315,6 @@ export const ConfigProvider = ({ children }: PropsWithChildren): JSX.Element => 
   };
 
   return (
-    <ConfigContext.Provider value={[config, handleSetConfig]}>{children}</ConfigContext.Provider>
+    <ConfigContext.Provider value={{ config, handleSetConfig }}>{children}</ConfigContext.Provider>
   );
 };
