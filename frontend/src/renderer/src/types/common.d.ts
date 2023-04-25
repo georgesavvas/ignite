@@ -81,6 +81,8 @@ export interface Component {
   dir_kind: "scene";
 }
 
+export type Entity = Directory | Asset | AssetVersion | Scene | Component;
+
 // type Props = React.ComponentPropsWithoutRef<"button">;
 
 // interface Props extends React.ComponentPropsWithoutRef<"button"> {

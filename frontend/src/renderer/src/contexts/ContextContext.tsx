@@ -12,34 +12,41 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-import React, {useState, createContext, useContext, useEffect} from "react";
+import { ConfigContext, ConfigContextType } from "./ConfigContext";
+import { PropsWithChildren, createContext, useContext, useEffect, useState } from "react";
 
 import BuildFileURL from "../services/BuildFileURL";
 import serverRequest from "../services/serverRequest";
 import { serverSocket } from "../services/serverWebSocket";
-import { ConfigContext } from "./ConfigContext";
 
+type Context = {};
 
-export const ContextContext = createContext();
+type ContextContextType = {
+  currentContext: Context;
+  handleContextChange: (path: string) => void;
+  refresh: () => void;
+};
 
-const createAssetUpdatesSocket = (sessionID, address) => {
+export const ContextContext = createContext<ContextContextType | undefined>(undefined);
+
+const createAssetUpdatesSocket = (sessionID: string, address: string) => {
   return serverSocket("asset_updates", sessionID, address);
 };
 
-const destroySocket = socket => {
+const destroySocket = (socket: WebSocket) => {
   if (!socket) return;
   if (socket.interval) socket.interval.clear();
   socket.close();
 };
 
-export const ContextProvider = props => {
-  const [config] = useContext(ConfigContext);
-  const [currentContext, setCurrentContext] = useState({update: 0});
-  const [socket, setSocket] = useState();
+export const ContextProvider = ({ children }: PropsWithChildren) => {
+  const { config } = useContext(ConfigContext) as ConfigContextType;
+  const [currentContext, setCurrentContext] = useState({ update: 0 });
+  const [socket, setSocket] = useState<WebSocket | undefined>();
 
   useEffect(() => {
     const data = localStorage.getItem("context");
+    if (data === null) return;
     const context = JSON.parse(data);
     if (!context || !context.path) return;
     setCurrentContext(context);
@@ -47,39 +54,34 @@ export const ContextProvider = props => {
     if (socket) return;
     const sessionID = window.services.get_env("IGNITE_SESSION_ID");
     const serverAddress = window.services.get_env("IGNITE_SERVER_ADDRESS");
-    Promise.all([sessionID, serverAddress]).then(resp => {
+    Promise.all([sessionID, serverAddress]).then((resp) => {
       const ws = createAssetUpdatesSocket(resp[0], resp[1]);
-      ws.onmessage = data => console.log("ASSET_UPDATES RECEIVED:", data);
+      ws.onmessage = (data: string) => console.log("ASSET_UPDATES RECEIVED:", data);
       setSocket(ws);
     });
-    return (() => {
+    return () => {
+      if (!socket) return;
       destroySocket(socket);
-      setSocket();
-    });
+      setSocket(undefined);
+    };
   }, [config.serverDetails, config.ready]);
 
   useEffect(() => {
     if (!config.lostConnection) refresh();
   }, [config.lostConnection]);
 
-  async function handleContextChange(path) {
+  async function handleContextChange(path: string) {
     if (!path) return false;
     let path_processed = path;
-    if (!path_processed.startsWith("ign:")) path_processed = BuildFileURL(
-      path,
-      config,
-      {reverse: true, pathOnly: true}
-    );
+    if (!path_processed.startsWith("ign:"))
+      path_processed = BuildFileURL(path, config, { reverse: true, pathOnly: true });
     let success = false;
-    const resp = await serverRequest(
-      "get_context_info",
-      {path: path_processed}
-    );
+    const resp = await serverRequest("get_context_info", { path: path_processed });
     let data = resp.data;
     if (!data) return false;
     if (!Object.keys(data).length) return false;
     for (const key of ["parent", "path", "posix", "project_path"]) {
-      data[key] = BuildFileURL(data[key], config, {pathOnly: true});
+      data[key] = BuildFileURL(data[key], config, { pathOnly: true });
     }
     data.posix = data.posix.replaceAll("\\", "/");
     data.update = 0;
@@ -91,20 +93,16 @@ export const ContextProvider = props => {
   }
 
   function refresh() {
-    setCurrentContext(prevState =>
-      ({...prevState, update: prevState.update + 1})
-    );
+    setCurrentContext((prevState) => ({ ...prevState, update: prevState.update + 1 }));
   }
 
   return (
-    <ContextContext.Provider
-      value={[currentContext, handleContextChange, refresh]}
-    >
-      {props.children}
+    <ContextContext.Provider value={{ currentContext, handleContextChange, refresh }}>
+      {children}
     </ContextContext.Provider>
   );
 };
 
-export const setProject = (project, setCurrentContext) => {
+export const setProject = (project: string, setCurrentContext: (context: Context) => void) => {
   setCurrentContext(project);
 };
