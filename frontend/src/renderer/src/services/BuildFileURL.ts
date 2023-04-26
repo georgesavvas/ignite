@@ -1,5 +1,7 @@
 // Copyright 2023 Georgios Savvas
 
+import { Config } from "@renderer/contexts/ConfigContext";
+
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -12,32 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-interface ServerDetails {
-  address: string;
-}
-
-interface Access {
-  serverProjectsDir: string;
-  projectsDir: string;
-  remote: Boolean;
-}
-
-interface Config {
-  serverDetails: ServerDetails;
-  access: Access;
-}
-
 interface Options {
   reverse?: Boolean;
   pathOnly?: Boolean;
   forceRemote?: Boolean;
 }
 
-function BuildFileURL(
-  filepath: string,
-  config?: Config,
-  options: Options = {}
-): string {
+function BuildFileURL(filepath: string, config: Config, options: Options = {}): string {
   if (!filepath || filepath === undefined) return "";
   const address = config.serverDetails.address;
   const remote = config.access.remote;
@@ -70,9 +53,7 @@ function BuildFileURL(
   }
 
   if (options.pathOnly) {
-    const platform_path = isWinPath
-      ? unix_path.replaceAll("/", "\\")
-      : unix_path;
+    const platform_path = isWinPath ? unix_path.replaceAll("/", "\\") : unix_path;
     const platform_output = isWinPath ? output.replaceAll("/", "\\") : output;
     const value = `${platform_output}${platform_path}`;
     return value;

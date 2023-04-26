@@ -12,23 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-import React, {useContext} from "react";
-
 import Typography from "@mui/material/Typography";
 import { useSnackbar } from "notistack";
+import React, { useContext } from "react";
 
-import {CopyToClipboard, ShowInExplorer} from "../ContextActions";
-import { ContextContext } from "../../contexts/ContextContext";
-import {ConfigContext} from "../../contexts/ConfigContext";
 import Tile from "../../components/Tile";
+import { ConfigContext } from "../../contexts/ConfigContext";
+import { ContextContext } from "../../contexts/ContextContext";
 import BuildFileURL from "../../services/BuildFileURL";
-
+import { CopyToClipboard, ShowInExplorer } from "../ContextActions";
 
 function AssetTile(props) {
   const [currentContext] = useContext(ContextContext);
-  const [config] = useContext(ConfigContext);
-  const {enqueueSnackbar} = useSnackbar();
+  const { config } = useContext(ConfigContext) as ConfigContextType;
+  const { enqueueSnackbar } = useSnackbar();
 
   const hasThumbnail = props.entity.thumbnail && props.entity.thumbnail.filename;
   const thumbnailWidth = hasThumbnail ? "100%" : "50%";
@@ -36,37 +33,38 @@ function AssetTile(props) {
   const dirData = {
     kind: props.entity.dir_kind,
     path: props.entity.path,
-    name: props.entity.name
+    name: props.entity.name,
   };
 
   const contextItems = [
     {
       label: "Copy URI",
-      fn: () =>  CopyToClipboard(props.entity.uri, enqueueSnackbar)
+      fn: () => CopyToClipboard(props.entity.uri, enqueueSnackbar),
     },
     {
       label: "Copy path",
-      fn: () =>  CopyToClipboard(props.entity.path, enqueueSnackbar),
-      divider: true
+      fn: () => CopyToClipboard(props.entity.path, enqueueSnackbar),
+      divider: true,
     },
     {
       label: "Open in file explorer",
       fn: () => ShowInExplorer(props.entity.path, enqueueSnackbar),
-      divider: true
+      divider: true,
     },
     {
       label: "Delete asset version",
-      fn: () => props.onContextMenu("delete", dirData)
-    }
+      fn: () => props.onContextMenu("delete", dirData),
+    },
   ];
 
   const vaultExportItem = {
     label: "Import to current task",
-    fn: () =>  props.onContextMenu("vaultExport", {
-      ...dirData,
-      task: BuildFileURL(currentContext.path, config, {pathOnly: true})
-    }),
-    divider: true
+    fn: () =>
+      props.onContextMenu("vaultExport", {
+        ...dirData,
+        task: BuildFileURL(currentContext.path, config, { pathOnly: true }),
+      }),
+    divider: true,
   };
 
   if (currentContext.dir_kind === "task") {
@@ -76,14 +74,14 @@ function AssetTile(props) {
   function details() {
     return (
       <>
-        <Typography style={{position: "absolute", bottom: "5px", left: "10px"}}>
+        <Typography style={{ position: "absolute", bottom: "5px", left: "10px" }}>
           {props.entity.name}
         </Typography>
       </>
     );
   }
 
-  const handleDragStart = e => {
+  const handleDragStart = (e) => {
     e.dataTransfer.setData("text/plain", props.entity.uri);
     e.dataTransfer.setData("ignite/kind", props.entity.kind);
     e.dataTransfer.setData("ignite/path", props.entity.path);
@@ -92,7 +90,8 @@ function AssetTile(props) {
 
   return (
     <>
-      <Tile {...props}
+      <Tile
+        {...props}
         contextItems={contextItems}
         thumbnailWidth={thumbnailWidth}
         noTopGradient

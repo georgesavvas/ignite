@@ -12,30 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {
-  DOMElement,
-  ReactComponentElement,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
-import { ReflexContainer, ReflexElement, ReflexElementProps, ReflexSplitter } from "react-reflex";
-
-import { ConfigContext } from "../contexts/ConfigContext";
-import Details from "./DetailsView/Details";
 import Divider from "@mui/material/Divider";
-import Explorer from "./Explorer/Explorer";
-import LostConnectionOverlay from "./LostConnectionOverlay";
-import ProcessManager from "./ProcessManager/ProcessManager";
-import ProjectTree from "./TreeView/ProjectTree";
-import TopBar from "./TopBar/TopBar";
-import WaitingForBackendOverlay from "./WaitingForBackendOverlay";
-import Welcome from "./Welcome";
+import { useCallback, useContext, useEffect, useState } from "react";
+import { HandlerProps, ReflexContainer, ReflexElement, ReflexSplitter } from "react-reflex";
+
+import { ConfigContext, ConfigContextType } from "../contexts/ConfigContext";
+import serverRequest from "../services/serverRequest";
 import loadReflexLayout from "../utils/loadReflexLayout";
 import saveReflexLayout from "../utils/saveReflexLayout";
-import serverRequest from "../services/serverRequest";
+import Details from "./DetailsView/Details";
+import Explorer from "./Explorer/Explorer";
 import styles from "./Home.module.css";
+import LostConnectionOverlay from "./LostConnectionOverlay";
+import ProcessManager from "./ProcessManager/ProcessManager";
+import TopBar from "./TopBar/TopBar";
+import ProjectTree from "./TreeView/ProjectTree";
+import WaitingForBackendOverlay from "./WaitingForBackendOverlay";
+import Welcome from "./Welcome";
 
 const splitterStyle = {
   borderColor: "rgb(80,80,80)",
@@ -52,7 +45,7 @@ export const Home = () => {
   const [flexRatios, setFlexRatios] = useState(defaultFlexRations);
   const [waitBackendOpen, setWaitBackendOpen] = useState(true);
   const [welcomeOpen, setWelcomeOpen] = useState(true);
-  const [config] = useContext(ConfigContext);
+  const { config } = useContext(ConfigContext) as ConfigContextType;
 
   useEffect(() => {
     const data = loadReflexLayout();
@@ -96,7 +89,7 @@ export const Home = () => {
     });
   };
 
-  const handleResized = useCallback((data) => {
+  const handleResized = useCallback((data: HandlerProps) => {
     saveReflexLayout(data);
   }, []);
 

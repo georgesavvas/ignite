@@ -12,18 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ConfigContext, ConfigContextType } from "./ConfigContext";
 import { PropsWithChildren, createContext, useContext, useEffect, useState } from "react";
 
 import BuildFileURL from "../services/BuildFileURL";
 import serverRequest from "../services/serverRequest";
 import { serverSocket } from "../services/serverWebSocket";
+import { ConfigContext, ConfigContextType } from "./ConfigContext";
 
-type Context = {};
+type Context = {
+  path: string;
+  path_nr: string;
+  project: string;
+};
 
-type ContextContextType = {
+export type ContextContextType = {
   currentContext: Context;
-  handleContextChange: (path: string) => void;
+  setCurrentContext: (path: string) => void;
   refresh: () => void;
 };
 
@@ -97,12 +101,14 @@ export const ContextProvider = ({ children }: PropsWithChildren) => {
   }
 
   return (
-    <ContextContext.Provider value={{ currentContext, handleContextChange, refresh }}>
+    <ContextContext.Provider
+      value={{ currentContext, setCurrentContext: handleContextChange, refresh }}
+    >
       {children}
     </ContextContext.Provider>
   );
 };
 
-export const setProject = (project: string, setCurrentContext: (context: Context) => void) => {
+export const setProject = (project: string, setCurrentContext: (path: string) => void) => {
   setCurrentContext(project);
 };

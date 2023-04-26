@@ -21,14 +21,10 @@ import styles from "./FilterField.module.css";
 interface FilterFieldProps {
   filterValue: string;
   setFilterValue: Function;
-  children: React.ReactNode[];
+  children?: React.ReactNode[];
 }
 
-const FilterField = ({
-  filterValue,
-  setFilterValue,
-  children
-}: FilterFieldProps) => {
+const FilterField = ({ filterValue, setFilterValue, children }: FilterFieldProps) => {
   return (
     <div className={styles.filterBar}>
       <FormControl fullWidth focused={filterValue ? true : false}>

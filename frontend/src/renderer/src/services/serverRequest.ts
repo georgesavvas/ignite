@@ -14,7 +14,7 @@
 
 import fetch from "./fetch";
 
-async function serverRequest(method: string, data?: object) {
+async function serverRequest(method: string, data?: any) {
   const address = await window.services.get_env("IGNITE_SERVER_ADDRESS");
   if (!address) {
     // console.log("Invalid server address, aborting...");
@@ -26,14 +26,14 @@ async function serverRequest(method: string, data?: object) {
 
 async function request(address: string, method: string, data: object) {
   try {
-    const resp = await fetch(`http://${address}/api/v1/${method}`, {
+    const resp = (await fetch(`http://${address}/api/v1/${method}`, {
       method: !data ? "GET" : "POST",
       headers: {
         Accept: "application/json, text/plain, */*",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(data)
-    });
+      body: JSON.stringify(data),
+    })) as any;
     const resp2 = await resp.json();
     // if (method !== "ping") {
     //   console.log(`Server response (${attempt}):`, method, resp2);

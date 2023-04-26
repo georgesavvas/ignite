@@ -13,12 +13,12 @@
 // limitations under the License.
 
 import { ClickEvent, ContextItem, Directory } from "@renderer/types/common";
-import ContextMenu, { handleContextMenu } from "./ContextMenu";
 import { useContext, useRef, useState } from "react";
 
-import BuildFileURL from "../services/BuildFileURL";
 import { ConfigContext } from "../contexts/ConfigContext";
+import BuildFileURL from "../services/BuildFileURL";
 import { clamp } from "../utils/math";
+import ContextMenu, { handleContextMenu } from "./ContextMenu";
 import styles from "./Tile.module.css";
 
 type TileProps = React.PropsWithChildren<{
@@ -41,7 +41,7 @@ type TileProps = React.PropsWithChildren<{
 
 export const Tile = (props: TileProps) => {
   const [contextMenu, setContextMenu] = useState(null);
-  const [config] = useContext(ConfigContext);
+  const { config } = useContext(ConfigContext) as ConfigContextType;
   const [progress, setProgress] = useState(0);
   const hoverArea = useRef<HTMLInputElement>(null);
   const ThumbComp = props.thumbnailComp;

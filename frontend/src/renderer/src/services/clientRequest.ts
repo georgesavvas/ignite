@@ -26,14 +26,14 @@ async function clientRequest(method: string, data?: { [key: string]: any }) {
 
 async function request(address: string, method: string, data?: { [key: string]: any }) {
   try {
-    const resp = await fetch(`http://${address}/api/v1/${method}`, {
+    const resp = (await fetch(`http://${address}/api/v1/${method}`, {
       method: !data ? "GET" : "POST",
       headers: {
         Accept: "application/json, text/plain, */*",
         "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
-    });
+    })) as any;
     const resp2 = await resp.json();
     // if (method !== "ping") {
     //   console.log(`Client response (${attempt}):`, method, resp2);

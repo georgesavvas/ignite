@@ -12,10 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
+import { Config } from "@renderer/contexts/ConfigContext";
 import Sockette from "sockette";
 
-export function clientSocket(endpoint, config, sessionID, websocketConfig={}) {
+export function clientSocket(
+  endpoint: string,
+  config: Config,
+  sessionID: string,
+  websocketConfig = {}
+) {
   const address = config.clientAddress;
   const defaultWebsocketConfig = {
     // onopen: e => console.log(e),
@@ -25,9 +30,9 @@ export function clientSocket(endpoint, config, sessionID, websocketConfig={}) {
     // onclose: e => console.log(e),
     // onerror: e => console.log(e)
   };
-  const ws = new Sockette(
-    `ws://${address}/api/v1/ws/${endpoint}/${sessionID}`,
-    {...defaultWebsocketConfig, ...websocketConfig}
-  );
+  const ws = new Sockette(`ws://${address}/api/v1/ws/${endpoint}/${sessionID}`, {
+    ...defaultWebsocketConfig,
+    ...websocketConfig,
+  });
   return ws;
 }

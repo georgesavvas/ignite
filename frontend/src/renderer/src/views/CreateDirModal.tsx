@@ -12,37 +12,54 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-import React, {useEffect, useState} from "react";
-
-import Box from "@mui/material/Box";
-import Stack from "@mui/material/Stack";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import Select from "@mui/material/Select";
-import TextField from "@mui/material/TextField";
-import InputLabel from "@mui/material/InputLabel";
-import Button from "@mui/material/Button";
 import ClearIcon from "@mui/icons-material/Clear";
+import LoadingButton from "@mui/lab/LoadingButton";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
+import Stack from "@mui/material/Stack";
+import TextField from "@mui/material/TextField";
+import { InputChangeEvent } from "@renderer/types/common";
+import { useEffect, useState } from "react";
 
-import {DIRECTORYICONS, KINDTYPES} from "../constants";
-import styles from "./CreateDirModal.module.css";
 import DynamicList from "../components/DynamicList";
 import Modal from "../components/Modal";
-import LoadingButton from "@mui/lab/LoadingButton";
+import { DIRECTORYICONS, KINDTYPES } from "../constants";
+import styles from "./CreateDirModal.module.css";
 
+type DirType = {
+  name: string;
+  type: string;
+};
 
-function Dir(props) {
+interface DirProps {
+  data: any;
+  dir: DirType;
+  index: number;
+  id: string;
+  onRemove: (index: number) => void;
+  onChange: (e: InputChangeEvent) => void;
+}
+
+const Dir = (props: DirProps) => {
   const kind = props.data.kind;
-  const types = KINDTYPES[kind]?.sort((a, b) => a[1].localeCompare(b[1]));
+  const types = KINDTYPES[kind]?.sort((a: string, b: string) => a[1].localeCompare(b[1]));
 
   const Icon = DIRECTORYICONS[props.dir.type ? `${kind}_${props.dir.type}` : kind];
 
   return (
-    <Stack direction="row" gap={1} style={{width: "100%"}}>
-      <Box component={ClearIcon} onClick={() => props.onRemove(props.index)} sx={{width: "30px", height: "30px", m: "auto"}} className={styles.removeIcon} />
-      {types ?
-        <FormControl sx={{minWidth: 120}} size="small">
+    <Stack direction="row" gap={1} style={{ width: "100%" }}>
+      <Box
+        component={ClearIcon}
+        onClick={() => props.onRemove(props.index)}
+        sx={{ width: "30px", height: "30px", m: "auto" }}
+        className={styles.removeIcon}
+      />
+      {types ? (
+        <FormControl sx={{ minWidth: 120 }} size="small">
           <InputLabel id="type">Type</InputLabel>
           <Select
             labelId="type"
@@ -52,10 +69,14 @@ function Dir(props) {
             name={"type-" + props.index}
             onChange={props.onChange}
           >
-            {types.map(data => <MenuItem key={data[0]} value={data[0]} >{data[1]}</MenuItem>)}
+            {types.map((data: string[]) => (
+              <MenuItem key={data[0]} value={data[0]}>
+                {data[1]}
+              </MenuItem>
+            ))}
           </Select>
         </FormControl>
-        : null}
+      ) : null}
       <TextField
         id={"name-" + props.index}
         name={"name-" + props.index}
@@ -66,20 +87,27 @@ function Dir(props) {
         size="small"
         fullWidth
       />
-      <Box component={Icon} sx={{height: "30px", width: "30px", m: "auto", color: "lightgrey.main"}} />
+      <Box
+        component={Icon}
+        sx={{ height: "30px", width: "30px", m: "auto", color: "lightgrey.main" }}
+      />
     </Stack>
   );
-}
+};
 
 const dirTemplate = {
   type: "",
-  name: ""
+  name: "",
 };
 const kindDefaults = {
-  task: {}
+  task: {},
 };
 
-const ShotRange = props => {
+interface ShotRange {
+  setDirList: (dirs: DirType[]) => void;
+}
+
+const ShotRange = (props: ShotRange) => {
   const [start, setStart] = useState("");
   const [end, setEnd] = useState("");
   const [inc, setInc] = useState("");
@@ -90,24 +118,24 @@ const ShotRange = props => {
     const endInt = parseInt(end);
     const incInt = inc ? parseInt(inc) : 10;
     const amount = Math.floor((endInt - startInt) / incInt + 1);
-    const range = [...Array(amount).keys()].map(index => {
+    const range = [...Array(amount).keys()].map((index) => {
       return (index * incInt + startInt).toString().padStart(padding, "0");
     });
     if (range.at(-1) !== end) range.push(end);
-    props.setDirList(range.map(n => ({type: "", name: n})));
+    props.setDirList(range.map((n) => ({ type: "", name: n })));
   };
 
   const handleClear = () => {
-    props.setDirList([{...dirTemplate}]);
+    props.setDirList([{ ...dirTemplate }]);
   };
 
   return (
-    <Stack gap="5px" direction="row" style={{margin: "10px 0px"}}>
+    <Stack gap="5px" direction="row" style={{ margin: "10px 0px" }}>
       <TextField
         id="rangex"
         label="First shot"
         value={start}
-        onChange={e => setStart(e.target.value)}
+        onChange={(e) => setStart(e.target.value)}
         placeholder="0010"
         size="small"
       />
@@ -115,7 +143,7 @@ const ShotRange = props => {
         id="rangey"
         label="Last shot"
         value={end}
-        onChange={e => setEnd(e.target.value)}
+        onChange={(e) => setEnd(e.target.value)}
         placeholder="0050"
         size="small"
       />
@@ -123,13 +151,11 @@ const ShotRange = props => {
         id="step"
         label="Increment"
         value={inc}
-        onChange={e => setInc(e.target.value)}
+        onChange={(e) => setInc(e.target.value)}
         placeholder="10"
         size="small"
       />
-      <Button variant="outlined" color="ignite" onClick={handlePopulate}
-        disabled={!start || !end}
-      >
+      <Button variant="outlined" color="ignite" onClick={handlePopulate} disabled={!start || !end}>
         Populate
       </Button>
       <Button variant="outlined" color="ignite" onClick={handleClear}>
@@ -139,45 +165,53 @@ const ShotRange = props => {
   );
 };
 
-function CreateDirModal(props) {
-  const [dirList, setDirList] = useState([]);
-  const kindOverrides = kindDefaults?.[props.data.kind] ?? {};
+interface CreateDirModalProps {
+  data: any;
+  open: boolean;
+  loading: boolean;
+  onCreate: (data: any) => void;
+  onClose: () => void;
+}
+
+const CreateDirModal = (props: CreateDirModalProps) => {
+  const [dirList, setDirList] = useState<DirType[]>([]);
+  const kindOverrides = kindDefaults?.[props.data.kind as keyof typeof kindDefaults] ?? {};
 
   useEffect(() => {
-    setDirList([{...dirTemplate, ...kindOverrides}]);
+    setDirList([{ ...dirTemplate, ...kindOverrides }]);
   }, [props.open]);
 
   const handleAdd = () => {
-    setDirList(prevState => [...prevState, {...dirTemplate}]);
+    setDirList((prev) => [...prev, { ...dirTemplate }]);
   };
 
-  const handleRemove = (index=-1) => {
-    setDirList(prevState => {
-      const dirs = [...prevState];
+  const handleRemove = (index = -1) => {
+    setDirList((prev: DirType[]) => {
+      const dirs = [...prev];
       if (index < 0) dirs.pop();
       else dirs.splice(index, 1);
       return dirs;
     });
   };
 
-  const handleChange = e => {
+  const handleChange = (e: InputChangeEvent) => {
     const [field, id] = e.target.name.split("-");
+    const id_ = parseInt(id);
     const value = e.target.value;
-    setDirList(prevState => {
-      const dirs = [...prevState];
-      const existingNames = dirs.map(d => d.name)
-        .filter(name => name.startsWith(value));
-      const previousType = dirs[id].type;
-      dirs[id][field] = value;
+    setDirList((prev) => {
+      const dirs = [...prev];
+      const existingNames = dirs.map((d) => d.name).filter((name) => name.startsWith(value));
+      const previousType = dirs[id_].type;
+      dirs[id_][field as keyof DirType] = value;
 
-      const name = dirs[id].name;
+      const name = dirs[id_].name;
       if (!name || name === previousType) {
         if (existingNames.includes(value)) {
           let suffix = 2;
           while (existingNames.includes(`${value}${suffix}`)) suffix++;
-          dirs[id].name = `${value}${suffix}`;
+          dirs[id_].name = `${value}${suffix}`;
         } else {
-          dirs[id].name = value;
+          dirs[id_].name = value;
         }
       }
       return dirs;
@@ -185,42 +219,50 @@ function CreateDirModal(props) {
   };
 
   const handleCreate = () => {
-    const data = {...props.data};
+    const data = { ...props.data };
     delete data.handleClick;
-    data.dirs = dirList.map(dir => ({
+    data.dirs = dirList.map((dir) => ({
       dir_type: dir.type,
-      dir_name: dir.name
+      dir_name: dir.name,
     }));
     props.onCreate(data);
     props.onClose();
   };
 
-  const getDirList = dirs => {
-    return dirs.map((dir, index) => <Dir
-      key={"dir-" + index} index={index} dir={dir} onRemove={handleRemove}
-      onChange={handleChange} id={"dir-" + index} data={props.data}
-    />);
+  const getDirList = (dirs: DirType[]) => {
+    return dirs.map((dir, index) => (
+      <Dir
+        key={"dir-" + index}
+        index={index}
+        dir={dir}
+        onRemove={handleRemove}
+        onChange={handleChange}
+        id={"dir-" + index}
+        data={props.data}
+      />
+    ));
   };
 
   return (
-    <Modal open={props.open} maxWidth="sm" onClose={props.onClose}
+    <Modal
+      open={props.open}
+      maxWidth="sm"
+      onClose={props.onClose}
       title={`Create ${props.data.kind}`}
       buttons={[
         <LoadingButton key="create" color="ignite" onClick={handleCreate} loading={props.loading}>
           Create
-        </LoadingButton>
+        </LoadingButton>,
       ]}
     >
-      {props.data.kind === "shot" ?
-        <ShotRange setDirList={setDirList} /> :
-        null}
-      <div style={{display: "flex", flexDirection: "column", height: "60vh"}}>
+      {props.data.kind === "shot" ? <ShotRange setDirList={setDirList} /> : null}
+      <div style={{ display: "flex", flexDirection: "column", height: "60vh" }}>
         <DynamicList onAdd={handleAdd} onRemove={() => handleRemove(-1)}>
           {getDirList(dirList)}
         </DynamicList>
       </div>
     </Modal>
   );
-}
+};
 
 export default CreateDirModal;

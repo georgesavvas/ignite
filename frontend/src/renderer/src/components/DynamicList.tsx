@@ -21,7 +21,7 @@ import React from "react";
 
 import styles from "./DynamicList.module.css";
 
-const createListItem = (child: React.ReactNode, index: number, dense: boolean) => {
+const createListItem = (child: React.ReactNode, index: number, dense?: boolean) => {
   return (
     <ListItem key={index} dense={dense}>
       {child}
@@ -30,7 +30,7 @@ const createListItem = (child: React.ReactNode, index: number, dense: boolean) =
 };
 
 interface ButtonProps {
-  title: string;
+  title?: string;
   onAdd: Function;
   onRemove: Function;
 }
@@ -50,18 +50,18 @@ const buttons = (props: ButtonProps) => {
 };
 
 interface DynamicListProps {
-  noButtons: boolean;
-  onScroll: React.UIEventHandler<HTMLUListElement>;
-  style: React.CSSProperties;
-  children: React.ReactNode[];
-  title: string;
+  noButtons?: boolean;
+  onScroll?: React.UIEventHandler<HTMLUListElement>;
+  style?: React.CSSProperties;
+  title?: string;
   onAdd: Function;
   onRemove: Function;
-  dense: boolean;
-  innerRef: any;
+  dense?: boolean;
+  innerRef?: any;
+  children: React.ReactNode[];
 }
 
-function DynamicList(props: DynamicListProps) {
+const DynamicList = (props: DynamicListProps) => {
   return (
     <>
       {props.noButtons ? null : buttons(props)}
@@ -79,6 +79,6 @@ function DynamicList(props: DynamicListProps) {
       </List>
     </>
   );
-}
+};
 
 export default DynamicList;

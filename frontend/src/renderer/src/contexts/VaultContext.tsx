@@ -12,33 +12,40 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { PropsWithChildren, createContext, useContext, useEffect, useState } from "react";
 
-import React, {useState, createContext, useEffect, useContext} from "react";
 import BuildFileURL from "../services/BuildFileURL";
-import { ConfigContext } from "./ConfigContext";
+import { ConfigContext, ConfigContextType } from "./ConfigContext";
 
-export const VaultContext = createContext();
+type Context = {
+  update?: number;
+  path?: string;
+};
 
-export const VaultProvider = props => {
-  const [vaultContext, setVaultContext] = useState({update: 0});
-  const [config] = useContext(ConfigContext);
+type VaultContextType = {
+  vaultContext: Context;
+  setVaultContext: (context: Context) => void;
+  refreshVault: () => void;
+};
+
+export const VaultContext = createContext<VaultContextType | undefined>(undefined);
+
+export const VaultProvider = ({ children }: PropsWithChildren) => {
+  const [vaultContext, setVaultContext] = useState<Context>({ update: 0 });
+  const { config } = useContext(ConfigContext) as ConfigContextType;
 
   useEffect(() => {
-    const path = BuildFileURL(
-      "__vault__",
-      config,
-      {reverse: true, pathOnly: true}
-    );
-    setVaultContext(prev => ({...prev, path: path}));
+    const path = BuildFileURL("__vault__", config, { reverse: true, pathOnly: true });
+    setVaultContext((prev) => ({ ...prev, path: path }));
   }, [config.access, config.serverDetails]);
 
   const refreshVault = () => {
-    setVaultContext(prevState => ({...prevState, update: prevState.update + 1}));
+    setVaultContext((prev) => ({ ...prev, update: prev.update || 0 + 1 }));
   };
 
   return (
-    <VaultContext.Provider value={[vaultContext, setVaultContext, refreshVault]}>
-      {props.children}
+    <VaultContext.Provider value={{ vaultContext, setVaultContext, refreshVault }}>
+      {children}
     </VaultContext.Provider>
   );
 };

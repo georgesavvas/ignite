@@ -14,13 +14,17 @@
 
 /* eslint-disable react/no-unknown-property */
 
-import TextField from "@mui/material/TextField";
-import { InputChangeEvent } from "@renderer/types/common";
+import TextField, { TextFieldProps } from "@mui/material/TextField";
+import { ClickEvent, InputChangeEvent } from "@renderer/types/common";
 
 import styles from "./FileInput.module.css";
 import IgnButton from "./IgnButton";
 
 type FileInputProps = React.PropsWithChildren<{
+  label: string;
+  size: string;
+  fullWidth?: boolean;
+  disabled?: boolean;
   onChange?: Function;
   multiline?: boolean;
   style?: React.CSSProperties;
@@ -43,7 +47,7 @@ export const FileInput = (props: FileInputProps) => {
     handleChange(e);
   };
 
-  const handleFileInput = async (e: React.MouseEventHandler<HTMLButtonElement>) => {
+  const handleFileInput = async (e: ClickEvent) => {
     const properties = multi ? ["multiSelections"] : [];
     const resp = directory
       ? await window.api.dirInput(properties)
@@ -60,7 +64,12 @@ export const FileInput = (props: FileInputProps) => {
 
   return (
     <div className={styles.container} style={{ ...style, ...props.style }}>
-      <TextField {...other} value={props.value} onChange={handleChange} onBlur={handleBlur} />
+      <TextField
+        {...(other as TextFieldProps)}
+        value={props.value}
+        onChange={handleChange}
+        onBlur={handleBlur}
+      />
       <IgnButton
         variant="outlined"
         onClick={handleFileInput}

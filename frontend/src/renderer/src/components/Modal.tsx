@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Breakpoint, DialogProps } from "@mui/material";
-import DialogContent, { DialogContentProps } from "@mui/material/DialogContent";
-import { ReactNode, useEffect } from "react";
-
 import ClearIcon from "@mui/icons-material/Clear";
+import { Breakpoint, DialogProps } from "@mui/material";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
+import DialogContent, { DialogContentProps } from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import { ReactNode, useEffect } from "react";
+
 import styles from "./Modal.module.css";
 
 type ModalProps = React.PropsWithChildren<{

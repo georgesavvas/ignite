@@ -39,7 +39,7 @@ function Browser(props) {
   const [explorerSettings] = useState(defaultExplorerSettings);
   const [tileSize, setTileSize] = useState(200);
   const [tiles, setTiles] = useState([]);
-  const [config] = useContext(ConfigContext);
+  const { config } = useContext(ConfigContext) as ConfigContextType;
   const [modalData, setModalData] = useState({});
   const { enqueueSnackbar } = useSnackbar();
 

@@ -12,90 +12,101 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-import React, {useState, useContext, useEffect} from "react";
-
-import Typography from "@mui/material/Typography";
+import { Divider } from "@mui/material";
 import Button from "@mui/material/Button";
-import TagContainer from "./TagContainer";
 import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import { Directory } from "@renderer/types/common";
+import React, { useContext, useEffect, useState } from "react";
 
+import Path from "../../components/Path";
+import URI from "../../components/URI";
+import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
 import serverRequest from "../../services/serverRequest";
 import Attributes from "./Attributes";
-import URI from "../../components/URI";
-import Path from "../../components/Path";
-import {ContextContext} from "../../contexts/ContextContext";
-import { padding } from "@mui/system";
-import { Divider } from "@mui/material";
+import TagContainer from "./TagContainer";
 
 const style = {
   width: "100%",
   height: "100%",
   display: "flex",
   flexDirection: "column",
-  padding: "5px"
-};
+  padding: "5px",
+} as React.CSSProperties;
 
 const detailsStyle = {
   overflow: "hidden",
   display: "flex",
   flexDirection: "column",
   gap: "5px",
-  marginBottom: "10px"
-};
+  marginBottom: "10px",
+} as React.CSSProperties;
 
 const rowStyle = {
   display: "flex",
   alignItems: "center",
-  gap: "10px"
-};
+  gap: "10px",
+} as React.CSSProperties;
 
-function DirectoryDetails(props) {
+interface DirectoryDetailsProps {
+  entity: Directory;
+}
+
+const DirectoryDetails = (props: DirectoryDetailsProps) => {
   const [reprValue, setReprValue] = useState("");
   const [reptEdit, setReptEdit] = useState(false);
-  const [,, refreshContext] = useContext(ContextContext);
+  const { refresh } = useContext(ContextContext) as ContextContextType;
 
   useEffect(() => {
     setReprValue("");
   }, [props.entity.path]);
 
   const handleReptChange = () => {
-    if (props.entity.repr === null && !reprValue) {setReptEdit(false); return;}
-    if (props.entity.repr === reprValue) {setReptEdit(false); return;}
+    if (props.entity.repr === null && !reprValue) {
+      setReptEdit(false);
+      return;
+    }
+    if (props.entity.repr === reprValue) {
+      setReptEdit(false);
+      return;
+    }
     const data = {
       target: props.entity.path,
-      repr: reprValue
+      repr: reprValue,
     };
     serverRequest("set_repr", data);
     setReprValue("");
     setReptEdit(false);
-    refreshContext();
+    refresh();
   };
 
   return (
     <div style={style}>
       <div style={detailsStyle}>
-        <Typography variant="h5" style={{marginBottom: "0px"}}>
+        <Typography variant="h5" style={{ marginBottom: "0px" }}>
           {props.entity.name}
         </Typography>
-        <Divider sx={{m: "5px"}} />
+        <Divider sx={{ m: "5px" }} />
         <URI uri={props.entity.uri} />
         <Path path={props.entity.path} />
         <div style={rowStyle}>
-          {reptEdit || !props.entity.repr ?
+          {reptEdit || !props.entity.repr ? (
             <TextField
               size="small"
               label="Get thumbnail from..."
               placeholder="Path or URI"
               fullWidth
-              autoFocus={reptEdit && props.entity.repr && props.entity.repr !== null}
+              autoFocus={reptEdit && !!props.entity.repr && props.entity.repr !== null}
               value={reprValue}
-              onChange={e => setReprValue(e.target.value)}
+              onChange={(e) => setReprValue(e.target.value)}
               onBlur={handleReptChange}
-              onKeyPress={e => {if (e.key === "Enter") handleReptChange();}}
-            /> :
+              onKeyPress={(e) => {
+                if (e.key === "Enter") handleReptChange();
+              }}
+            />
+          ) : (
             <>
-              <Typography style={{minWidth: "110px"}}>Thumbnail from:</Typography>
+              <Typography style={{ minWidth: "110px" }}>Thumbnail from:</Typography>
               <URI uri={props.entity.repr} />
               <Button
                 variant="outlined"
@@ -109,19 +120,13 @@ function DirectoryDetails(props) {
                 Edit
               </Button>
             </>
-          }
+          )}
         </div>
-        <TagContainer
-          entityPath={props.entity.path}
-          tags={props.entity.tags}
-        />
+        <TagContainer entityPath={props.entity.path} tags={props.entity.tags} />
       </div>
-      <Attributes
-        entityPath={props.entity.path}
-        attributes={props.entity.attributes}
-      />
+      <Attributes entityPath={props.entity.path} attributes={props.entity.attributes} />
     </div>
   );
-}
+};
 
 export default DirectoryDetails;

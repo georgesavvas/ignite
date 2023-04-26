@@ -12,58 +12,64 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-import React, {useState, useContext, useEffect} from "react";
-
-import Typography from "@mui/material/Typography";
-import {DataGrid, GridActionsCellItem} from "@mui/x-data-grid";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import Select from "@mui/material/Select";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
+import FormControl from "@mui/material/FormControl";
+import MenuItem from "@mui/material/MenuItem";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
+import Typography from "@mui/material/Typography";
+import {
+  DataGrid,
+  GridActionsCellItem,
+  GridCellParams,
+  GridRowId,
+  GridRowProps,
+} from "@mui/x-data-grid";
+import { IgniteAttribute } from "@renderer/types/common";
+import { useContext, useEffect, useState } from "react";
 
-import styles from "./Attributes.module.css";
 import DataPlaceholder from "../../components/DataPlaceholder";
+import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
 import serverRequest from "../../services/serverRequest";
-import {ContextContext} from "../../contexts/ContextContext";
+import styles from "./Attributes.module.css";
 
-
-const shouldBeEditable = params => {
+const shouldBeEditable = (params: GridCellParams) => {
   // console.log(params);
   const row = params.row;
-  if (params.field !== "name" && !row.name) return;
-  if (row.inherited && params.field === "name") return;
+  if (params.field !== "name" && !row.name) return false;
+  if (row.inherited && params.field === "name") return false;
   return true;
 };
 
-const getRowStyle = params => {
+const getRowStyle = (params: GridCellParams) => {
   if (params.isEditable) return "";
   return "locked";
 };
 
 const gridStyles = {
   "& .locked": {
-    backgroundColor: "rgb(81,81,81)"
+    backgroundColor: "rgb(81,81,81)",
   },
 };
 
-function Attributes(props) {
-  const [,, refreshContext] = useContext(ContextContext);
-  const [data, setData] = useState({attribs: [], shouldWrite: false});
+interface AttributesProps {
+  attributes: IgniteAttribute[];
+  entityPath: string;
+}
+
+const Attributes = (props: AttributesProps) => {
+  const { refresh } = useContext(ContextContext) as ContextContextType;
+  const [data, setData] = useState({ attribs: [] as IgniteAttribute[], shouldWrite: false });
 
   useEffect(() => {
     let attribs = props.attributes || [];
-    attribs.forEach((attrib, index) => attrib.id = index);
-    setData({attribs: attribs || [], shouldWrite: false});
+    attribs.forEach((attrib, index) => (attrib.id = index));
+    setData({ attribs: attribs || [], shouldWrite: false });
   }, [props.entityPath, props.attributes]);
 
   useEffect(() => {
     if (!data.shouldWrite) return;
-    serverRequest(
-      "set_attributes",
-      {path: props.entityPath, attributes: data.attribs}
-    );
-    refreshContext();
+    serverRequest("set_attributes", { path: props.entityPath, attributes: data.attribs });
+    refresh();
   }, [data]);
 
   const actions = {
@@ -72,7 +78,7 @@ function Attributes(props) {
     headerName: "Actions",
     width: 80,
     cellClassName: "actions",
-    getActions: params => {
+    getActions: (params: GridCellParams) => {
       return [
         <GridActionsCellItem
           key="delete"
@@ -82,83 +88,85 @@ function Attributes(props) {
           color="inherit"
         />,
       ];
-    }
+    },
   };
-  
+
   const columns = [
     {
       field: "name",
       headerName: "Name",
       flex: 1,
       editable: true,
-      cellClassName: getRowStyle
+      cellClassName: getRowStyle,
     },
     {
       field: "inherited",
       headerName: "Inherited",
       flex: 1,
       editable: false,
-      cellClassName: getRowStyle
+      cellClassName: getRowStyle,
     },
     {
       field: "override",
       headerName: "Override",
       flex: 1,
       editable: true,
-      cellClassName: getRowStyle
+      cellClassName: getRowStyle,
     },
-    actions
+    actions,
   ];
 
-  const handleAddAttrib = e => {
+  const handleAddAttrib = (e: SelectChangeEvent) => {
     let value = e.target.value;
     if (value === "custom") value = "";
     const lastAttrib = data.attribs.at(-1);
-    setData(prevState => {
+    setData((prevState) => {
       let attribs = [...prevState.attribs];
-      attribs.push({id: lastAttrib ? lastAttrib.id + 1 : 0, name: value});
-      return {attribs: attribs, shouldWrite: false};
+      attribs.push({ id: lastAttrib ? lastAttrib.id + 1 : 0, name: value } as IgniteAttribute);
+      return { attribs: attribs, shouldWrite: false };
     });
   };
 
-  const handleEdit = (newValues, previousValues) => {
+  const handleEdit = (newValues: IgniteAttribute, previousValues: IgniteAttribute) => {
     if (newValues === previousValues) return newValues;
     let attribs = data.attribs;
-    attribs.forEach(attrib => {
+    attribs.forEach((attrib) => {
       if (attrib.id === newValues.id) {
         attrib.name = newValues.name;
         attrib.override = newValues.override;
       }
     });
-    setData({attribs: attribs, shouldWrite: true});
+    setData({ attribs: attribs, shouldWrite: true });
     return newValues;
   };
 
-  const handleDelete = (id, row) => () => {
+  const handleDelete = (id: GridRowId, row: GridRowProps) => () => {
     if (row.inherited) {
-      setData(prevState => ({
-        attribs: prevState.attribs.map(row => {
+      setData((prevState) => ({
+        attribs: prevState.attribs.map((row) => {
           if (row.id === id) row.override = "";
           return row;
         }),
-        shouldWrite: true
+        shouldWrite: true,
       }));
     } else {
-      setData(prevState => ({
-        attribs: prevState.attribs.filter(row => row.id !== id),
-        shouldWrite: true
+      setData((prevState) => ({
+        attribs: prevState.attribs.filter((row) => row.id !== id),
+        shouldWrite: true,
       }));
     }
   };
 
-  const handleError = error => {
+  const handleError = (error: string) => {
     console.log(error);
   };
 
   return (
     <div className={styles.container}>
       <div className={styles.topBar}>
-        <Typography variant="h5" style={{ marginBottom: "10px" }}>Attributes</Typography>
+        <Typography variant="h5" style={{ marginBottom: "10px" }}>
+          Attributes
+        </Typography>
         <FormControl>
           <Select
             value="add"
@@ -166,7 +174,9 @@ function Attributes(props) {
             inputProps={{ "aria-label": "Without label" }}
             size="small"
           >
-            <MenuItem disabled value="add">Add</MenuItem>
+            <MenuItem disabled value="add">
+              Add
+            </MenuItem>
             <MenuItem value="fstart">Start Frame</MenuItem>
             <MenuItem value="fend">End Frame</MenuItem>
             <MenuItem value="fps">FPS</MenuItem>
@@ -177,25 +187,21 @@ function Attributes(props) {
       <div className={styles.attributeList}>
         <DataGrid
           sx={gridStyles}
-          disableSelectionOnClick
           hideFooter
           rows={data.attribs}
           columns={columns}
           isCellEditable={shouldBeEditable}
           processRowUpdate={handleEdit}
           onProcessRowUpdateError={handleError}
-          experimentalFeatures={{ newEditingApi: true }}
           components={{
-            NoRowsOverlay: () =>
-              <DataPlaceholder
-                text="No attributes"
-                style={{position: "relative"}}
-              />,
+            NoRowsOverlay: () => (
+              <DataPlaceholder text="No attributes" style={{ position: "relative" }} />
+            ),
           }}
         />
       </div>
     </div>
   );
-}
+};
 
 export default Attributes;

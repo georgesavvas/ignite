@@ -12,37 +12,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-import React, { useContext, useEffect, useState } from "react";
-
-import {Divider, Typography} from "@mui/material";
 import EmailIcon from "@mui/icons-material/Email";
+import { Divider, Typography } from "@mui/material";
+import { useContext, useEffect, useState } from "react";
 
 import Modal from "../components/Modal";
+import { ConfigContext, ConfigContextType } from "../contexts/ConfigContext";
 import styles from "./Feedback.module.css";
-import {ConfigContext} from "../contexts/ConfigContext";
 
+interface FeedbackProps {
+  open: boolean;
+  onClose: () => void;
+}
 
-const Feedback = props => {
-  const [config] = useContext(ConfigContext);
+const Feedback = (props: FeedbackProps) => {
+  const { config } = useContext(ConfigContext) as ConfigContextType;
   const [access, setAccess] = useState({});
   const [, setCanSave] = useState(false);
 
   useEffect(() => {
     setAccess({
       projectsDir: config.access.projectsDir,
-      serverProjectsDir: config.access.serverProjectsDir
+      serverProjectsDir: config.access.serverProjectsDir,
     });
   }, [config.access]);
 
   useEffect(() => {
     let changed = false;
-    const configAccess = {...config.access};
+    const configAccess = { ...config.access };
     delete configAccess.remote;
-    if (
-      JSON.stringify(configAccess) !==
-      JSON.stringify(access)
-    ) changed = true;
+    if (JSON.stringify(configAccess) !== JSON.stringify(access)) changed = true;
     setCanSave(changed);
   }, [access]);
 
@@ -51,7 +50,8 @@ const Feedback = props => {
       <div className={styles.container}>
         <Typography variant="h4">Feedback</Typography>
         <Typography variant="h5">
-          {"Your input is greatly appreciated! Feel free to propose changes, \
+          {
+            "Your input is greatly appreciated! Feel free to propose changes, \
             new features, report bugs or just give your opinion!"
           }
         </Typography>
@@ -61,34 +61,31 @@ const Feedback = props => {
             <img
               src="src/assets/discord.svg"
               className={styles.discord}
-              onClick={
-                () => window.services.open_url("https://discord.gg/2HWQduERrJ")
-              }
+              onClick={() => window.services.open_url("https://discord.gg/2HWQduERrJ")}
             />
             <div>
               <img
                 src="src/assets/github_mark.png"
                 className={styles.github}
-                onClick={() => window.services.open_url(
-                  "https://github.com/georgesavvas/ignite/discussions"
-                )}
+                onClick={() =>
+                  window.services.open_url("https://github.com/georgesavvas/ignite/discussions")
+                }
               />
               <img
                 src="src/assets/github_logo.png"
                 className={styles.github}
-                onClick={() => window.services.open_url(
-                  "https://github.com/georgesavvas/ignite/discussions"
-                )}
+                onClick={() =>
+                  window.services.open_url("https://github.com/georgesavvas/ignite/discussions")
+                }
               />
             </div>
             <div className={styles.email}>
-              <EmailIcon className={styles.emailIcon} color="ignite"
-                onClick={() =>
-                  window.services.open_url("mailto:feedback@ignite.co.uk")}
+              <EmailIcon
+                className={styles.emailIcon}
+                sx={{ color: "rgb(252, 140, 3)" }}
+                onClick={() => window.services.open_url("mailto:feedback@ignite.co.uk")}
               />
-              <Typography style={{color: "rgb(252, 140, 3)"}}>
-                feedback@ignite.co.uk
-              </Typography>
+              <Typography sx={{ color: "rgb(252, 140, 3)" }}>feedback@ignite.co.uk</Typography>
             </div>
           </div>
         </div>

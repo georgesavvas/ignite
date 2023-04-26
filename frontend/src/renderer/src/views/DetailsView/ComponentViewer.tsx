@@ -12,25 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /* eslint-disable react/no-unknown-property */
-import React, {Suspense, useContext, useState} from "react";
 
-import {grid} from "@mui/system";
+import { Typography } from "@mui/material";
 import Slider from "@mui/material/Slider";
+import { grid } from "@mui/system";
+import { Center, OrbitControls, useTexture } from "@react-three/drei";
+import { Canvas, useLoader, useThree } from "@react-three/fiber";
+import React, { Suspense, useContext, useState } from "react";
 import * as THREE from "three";
-import {Canvas, useLoader, useThree} from "@react-three/fiber";
-import {OrbitControls, Center, useTexture} from "@react-three/drei";
-import {TextureLoader} from "three/src/loaders/TextureLoader";
-import {EXRLoader} from "three/examples/jsm/loaders/EXRLoader.js";
-import {Typography} from "@mui/material";
+import { EXRLoader } from "three/examples/jsm/loaders/EXRLoader.js";
+import { TextureLoader } from "three/src/loaders/TextureLoader";
 
-import {ConfigContext} from "../../contexts/ConfigContext";
+import DataPlaceholder from "../../components/DataPlaceholder";
+import { ConfigContext } from "../../contexts/ConfigContext";
 import BuildFileURL from "../../services/BuildFileURL";
 import { clamp } from "../../utils/math";
-import DataPlaceholder from "../../components/DataPlaceholder";
-// import {USDZLoader} from "../../utils/threejsDev/USDLoader";
 
+// import {USDZLoader} from "../../utils/threejsDev/USDLoader";
 
 const style = {
   // border: "solid red 1px",
@@ -58,10 +57,10 @@ const sliderContainerStyle = {
   left: "30px",
   right: "30px",
   bottom: "30px",
-  zIndex: 1
+  zIndex: 1,
 };
 
-function Scene({path}) {
+function Scene({ path }) {
   path = path || "src/assets/no_icon.png";
   const isExr = path.includes(".exr");
   const loader = isExr ? EXRLoader : TextureLoader;
@@ -76,11 +75,11 @@ function Scene({path}) {
   const height = colorMap.source.data.height;
   const ratio = width / height;
 
-  return(
+  return (
     <Center
-      onCentered={({container, width, height}) => container.scale.setScalar(
-        Math.min(viewport.width / width, viewport.height / height)
-      )}
+      onCentered={({ container, width, height }) =>
+        container.scale.setScalar(Math.min(viewport.width / width, viewport.height / height))
+      }
     >
       <mesh>
         <planeGeometry attach="geometry" args={[ratio, 1]} />
@@ -94,13 +93,13 @@ function EXRViewer(props) {
   const [progress, setProgress] = useState(0.5);
   const comp = props.comp;
 
-  const handleFrameChange = value => {
+  const handleFrameChange = (value) => {
     const new_progress = (value - comp.first_frame) / (comp.last_frame - comp.first_frame);
     setProgress(new_progress);
   };
 
   let path = "src/assets/no_icon.png";
-  if (comp.path) path = BuildFileURL(comp.path, props.config, {forceRemote: true});
+  if (comp.path) path = BuildFileURL(comp.path, props.config, { forceRemote: true });
   if (!comp.static) {
     const amount = comp.frames.length;
     const sectionSize = 1 / amount;
@@ -108,22 +107,22 @@ function EXRViewer(props) {
     const frame = comp.frames[section];
     path = path.replace("####", frame);
   }
-  
+
   const mouseButtons = {
     LEFT: THREE.MOUSE.PAN,
     MIDDLE: THREE.MOUSE.PAN,
-    RIGHT: THREE.MOUSE.PAN
+    RIGHT: THREE.MOUSE.PAN,
   };
 
   return (
-    <div style={{position: "relative", height: "100%", width: "100%"}}>
+    <div style={{ position: "relative", height: "100%", width: "100%" }}>
       <div
         style={{
           ...sliderContainerStyle,
-          display: comp.static ? "none" : "inherit"
+          display: comp.static ? "none" : "inherit",
         }}
       >
-        {comp.frames.length > 0 ?
+        {comp.frames.length > 0 ? (
           <Slider
             defaultValue={comp.first}
             valueLabelDisplay="auto"
@@ -134,12 +133,15 @@ function EXRViewer(props) {
             min={parseInt(comp.frames[0])}
             max={parseInt(comp.frames.at(-1))}
           />
-          : null
-        }
+        ) : null}
       </div>
       <Canvas orthographic camera={{ zoom: 350, position: [0, 0, 1] }}>
-        <OrbitControls enableRotate={false} enableDamping={false} zoomSpeed={3}
-          mouseButtons={mouseButtons} />
+        <OrbitControls
+          enableRotate={false}
+          enableDamping={false}
+          zoomSpeed={3}
+          mouseButtons={mouseButtons}
+        />
         {/* <ambientLight intensity={0.75} /> */}
         <Suspense fallback={null}>
           <Scene path={path} />
@@ -171,7 +173,7 @@ function EXRViewer(props) {
 //   let path = "";
 //   if (comp.path) path = BuildFileURL(comp.path, props.config, {forceRemote: true});
 //   path = "test.usdz";
-  
+
 //   return (
 //     <div style={{position: "relative", height: "100%", width: "100%"}}>
 //       <Canvas camera={{ zoom: 100, position: [0, 0, 1] }}>
@@ -187,7 +189,14 @@ function EXRViewer(props) {
 
 function VideoViewer(props) {
   return (
-    <video key={Math.random()} width="100%" height="100%" style={{overflow: "hidden"}} loop controls>
+    <video
+      key={Math.random()}
+      width="100%"
+      height="100%"
+      style={{ overflow: "hidden" }}
+      loop
+      controls
+    >
       <source src={props.path} type="video/mp4" />
     </video>
   );
@@ -211,15 +220,13 @@ function GeoViewer(props) {
 }
 
 function ComponentViewer(props) {
-  const [config] = useContext(ConfigContext);
-  
+  const { config } = useContext(ConfigContext) as ConfigContextType;
+
   const comp = props.comp;
-  if (!comp || !Object.keys(comp).length) return (
-    <DataPlaceholder text="No component selected" />
-  );
+  if (!comp || !Object.keys(comp).length) return <DataPlaceholder text="No component selected" />;
 
   let path = "src/assets/no_icon.png";
-  if (comp.path_nr) path = BuildFileURL(comp.path_nr, config, {forceRemote: true});
+  if (comp.path_nr) path = BuildFileURL(comp.path_nr, config, { forceRemote: true });
   if (!comp.static) {
     const amount = comp.frames.length;
     const frame = comp.frames[Math.round(amount / 2)];
@@ -243,11 +250,7 @@ function ComponentViewer(props) {
     else return <Typography>No file preview for {comp.filename}</Typography>;
   };
 
-  return (
-    <div style={style}>
-      {getViewer(props.comp, path)}
-    </div>
-  );
+  return <div style={style}>{getViewer(props.comp, path)}</div>;
 }
 
 export default ComponentViewer;

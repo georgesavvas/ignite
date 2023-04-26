@@ -1,3 +1,4 @@
+import { OptionsObject, ProviderContext, SnackbarKey } from "notistack";
 import React from "react";
 
 export type UnknownEvent = React.ChangeEvent<unknown>;
@@ -10,6 +11,8 @@ export type TextAreaChangeEvent = React.ChangeEvent<HTMLTextAreaElement>;
 
 export type GenericObject = { [key: string]: any };
 
+export type EnqueueSnackbar = (message: string, options: OptionsObject) => SnackbarKey;
+
 export interface ContextItem {
   label: string;
   fn: () => void;
@@ -19,6 +22,8 @@ export interface ContextItem {
 export interface Directory {
   path: string;
   protected: boolean;
+  repr: string;
+  attributes: IgniteAttribute[];
   dir_kind:
     | "directory"
     | "asset"
@@ -31,10 +36,10 @@ export interface Directory {
     | "sequence"
     | "shot"
     | "task";
-  thumbnail: Component;
+  thumbnail: IgniteComponent;
   anchor: string;
   project: string;
-  tags: string;
+  tags: string[];
   context: string;
   group: string;
   name: string;
@@ -42,6 +47,20 @@ export interface Directory {
   creation_time: string;
   modification_time: string;
 }
+
+export type IgniteAttribute = {
+  id: number;
+  name: string;
+  override: string;
+};
+
+export type IgniteAction = {
+  label: string;
+};
+
+export type IgniteActions = {
+  [name: string]: IgniteAction;
+};
 
 export interface Asset extends Directory {
   versions: string[];
@@ -51,7 +70,7 @@ export interface Asset extends Directory {
 }
 
 export interface AssetVersion extends Directory {
-  components: Component[];
+  components: IgniteComponent[];
   asset: string;
   task: string;
   version: string;
@@ -68,7 +87,7 @@ export interface Scene extends Directory {
   extension: string;
 }
 
-export interface Component {
+export interface IgniteComponent {
   name: string;
   filename: string;
   path: string;
@@ -79,9 +98,24 @@ export interface Component {
   frames: string[];
   uri: string;
   dir_kind: "scene";
+  context: string;
+  protected: boolean;
 }
 
+export type CrateType = {
+  id?: string;
+  entities?: Entity[];
+  label: string;
+};
+
 export type Entity = Directory | Asset | AssetVersion | Scene | Component;
+
+export type Dcc = {
+  scenes: string[];
+  exts: string[];
+  name: string;
+  path: string;
+};
 
 // type Props = React.ComponentPropsWithoutRef<"button">;
 

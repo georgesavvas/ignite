@@ -12,33 +12,53 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-import React, {useState} from "react";
-import styles from "./Component.module.css";
-import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
-import {useSnackbar} from "notistack";
-import {EXTENSIONTYPES} from "../../constants";
-import clientRequest from "../../services/clientRequest";
+import Typography from "@mui/material/Typography";
+import {
+  AssetVersion,
+  ClickEvent,
+  IgniteAction,
+  IgniteActions,
+  IgniteComponent,
+} from "@renderer/types/common";
+import { useSnackbar } from "notistack";
+import React, { useState } from "react";
+
+import ContextMenu, { ContextMenuType, handleContextMenu } from "../../components/ContextMenu";
+import { EXTENSIONTYPES } from "../../constants";
 import CopyIcon from "../../icons/CopyIcon";
-import {CopyToClipboard} from "../ContextActions";
-import ContextMenu, { handleContextMenu } from "../../components/ContextMenu";
+import clientRequest from "../../services/clientRequest";
 import openExplorer from "../../utils/openExplorer";
+import { CopyToClipboard } from "../ContextActions";
+import styles from "./Component.module.css";
 
+interface ComponentProps {
+  selectedComp: IgniteComponent;
+  entity: IgniteComponent;
+  onSelect: (name: string) => void;
+  actions?: IgniteActions;
+  addToCrate: (components: IgniteComponent[]) => void;
+  handleContextMenuSelection: (action: string, data: any) => void;
+  style: React.CSSProperties;
+  asset: AssetVersion;
+}
 
-function Component(props) {
-  const {enqueueSnackbar} = useSnackbar();
-  const [contextMenu, setContextMenu] = useState(null);
+const Component = (props: ComponentProps) => {
+  const { enqueueSnackbar } = useSnackbar();
+  const [contextMenu, setContextMenu] = useState<ContextMenuType | null>(null);
 
   const containerStyle = {
-    borderColor: props.selectedComp && props.entity.filename === props.selectedComp.filename ? "rgb(252, 140, 3)" : "rgb(70,70,70)"
+    borderColor:
+      props.selectedComp && props.entity.filename === props.selectedComp.filename
+        ? "rgb(252, 140, 3)"
+        : "rgb(70,70,70)",
   };
 
-  const handleClick = e => {
+  const handleClick = (e: ClickEvent) => {
     props.onSelect(e.currentTarget.id);
   };
 
-  const handleCopy = (e, path) => {
+  const handleCopy = (e: ClickEvent | undefined, path: string) => {
     if (e) e.stopPropagation();
     CopyToClipboard(path, enqueueSnackbar);
   };
@@ -46,71 +66,69 @@ function Component(props) {
   const dirData = {
     kind: props.entity.dir_kind,
     path: props.entity.path,
-    name: props.entity.name
+    name: props.entity.name,
   };
 
   let contextItems = [
     {
       label: "Copy path",
-      fn: () => handleCopy(undefined, props.entity.path)
+      fn: () => handleCopy(undefined, props.entity.path),
     },
     {
       label: "Copy URI",
       fn: () => handleCopy(undefined, props.entity.uri),
-      divider: true
+      divider: true,
     },
     {
       label: "Open in file explorer",
       fn: () => openExplorer(props.entity.path, enqueueSnackbar),
-      divider: true
+      divider: true,
     },
     {
       label: "Add to crate",
       fn: () => props.addToCrate([props.entity]),
-      divider: true
+      divider: true,
     },
     {
       label: "Rename",
       fn: () => props.handleContextMenuSelection("rename", dirData),
-      disabled: props.entity.protected
+      disabled: props.entity.protected,
     },
     {
       label: "Delete",
       fn: () => props.handleContextMenuSelection("delete", dirData),
       disabled: props.entity.protected,
-      divider: true
-    }
+      divider: true,
+    },
   ];
 
   const data = {
     kind: "component",
-    entity: props.entity
+    entity: props.entity,
   };
 
-  const handleAction = action => {
-    window.services.get_env("IGNITE_SESSION_ID").then(resp => {
+  const handleAction = (action: IgniteAction) => {
+    window.services.get_env("IGNITE_SESSION_ID").then((resp: any) => {
       clientRequest("run_action", {
         ...data,
         action: action.label,
-        session_id: resp
+        session_id: resp,
       });
     });
   };
 
   if (props.actions) {
     contextItems = contextItems.concat(
-      Object.values(props.actions).map(action => (
-        {
-          label: action.label,
-          fn: () => handleAction(action)
-        }
-      ))
+      Object.values(props.actions).map((action) => ({
+        label: action.label,
+        fn: () => handleAction(action),
+      }))
     );
   }
 
   const getIconStyle = () => {
-    const style = {};
-    const extType = EXTENSIONTYPES.find(ext =>
+    const style = {} as React.CSSProperties;
+    const extType = EXTENSIONTYPES.find((ext: keyof typeof EXTENSIONTYPES) =>
       ext.extensions.includes(props.entity.ext)
     );
     const iconName = extType?.name || "file.png";
@@ -119,15 +137,22 @@ function Component(props) {
   };
 
   return (
-    <div onContextMenu={e => handleContextMenu(e, contextMenu, setContextMenu)}
+    <div
+      onContextMenu={(e) => handleContextMenu(e, contextMenu, setContextMenu)}
       style={props.style}
     >
-      <ContextMenu items={contextItems} contextMenu={contextMenu}
-        setContextMenu={setContextMenu} title={props.entity.name}
+      <ContextMenu
+        items={contextItems}
+        contextMenu={contextMenu}
+        setContextMenu={setContextMenu}
+        title={props.entity.name}
         subtitle={props.entity.ext}
       />
-      <div className={styles.compContainer} id={props.entity.filename}
-        onClick={handleClick} style={containerStyle}
+      <div
+        className={styles.compContainer}
+        id={props.entity.filename}
+        onClick={handleClick}
+        style={containerStyle}
       >
         <div className={styles.compIcon} style={getIconStyle()} />
         <div className={styles.textContainer}>
@@ -136,12 +161,12 @@ function Component(props) {
           </Typography>
         </div>
         <div className={styles.spacer} />
-        <IconButton onClick={e => handleCopy(e, props.entity.path)}>
-          <CopyIcon style={{fontSize: "20px"}} />
+        <IconButton onClick={(e) => handleCopy(e, props.entity.path)}>
+          <CopyIcon style={{ fontSize: "20px" }} />
         </IconButton>
       </div>
     </div>
   );
-}
+};
 
 export default Component;

@@ -12,15 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-import React, { useContext, useEffect, useState } from "react";
-
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import Typography from "@mui/material/Typography";
 import { useSnackbar } from "notistack";
+import React, { useContext, useEffect, useState } from "react";
 import { ReflexContainer, ReflexElement, ReflexSplitter } from "react-reflex";
 
 import ContextMenu from "../../components/ContextMenu";
@@ -36,28 +34,27 @@ import ComponentList from "../DetailsView/ComponentList";
 import ComponentViewer from "../DetailsView/ComponentViewer";
 import TagContainer from "../DetailsView/TagContainer";
 
-
 const splitterStyle = {
   borderColor: "rgb(80,80,80)",
-  backgroundColor: "rgb(80,80,80)"
+  backgroundColor: "rgb(80,80,80)",
 };
 
 const versionSelectStyle = {
   minWidth: "150px",
   position: "absolute",
   right: "10px",
-  top: "15px"
+  top: "15px",
 };
 
 const style = {
   width: "100%",
-  height: "100%"
+  height: "100%",
 };
 
 const defaultFlexRations = {
   "vault.details.viewer": 0.4,
   "vault.details.details": 0.25,
-  "vault.details.comps": 0.35
+  "vault.details.comps": 0.35,
 };
 
 const compExtensionPreviewPriority = [
@@ -68,16 +65,16 @@ const compExtensionPreviewPriority = [
   ".png",
   ".tif",
   ".tiff",
-  ".exr"
+  ".exr",
 ];
 
 function AssetDetails(props) {
   const [flexRatios, setFlexRatios] = useState(defaultFlexRations);
-  const [config] = useContext(ConfigContext);
+  const { config } = useContext(ConfigContext) as ConfigContextType;
   const [selectedCompName, setSelectedCompName] = useState("");
-  const {enqueueSnackbar} = useSnackbar();
+  const { enqueueSnackbar } = useSnackbar();
   const [contextMenu, setContextMenu] = useState(null);
-  const [,, refreshVault] = useContext(VaultContext);
+  const [, , refreshVault] = useContext(VaultContext);
 
   useEffect(() => {
     const data = loadReflexLayout();
@@ -96,7 +93,7 @@ function AssetDetails(props) {
     const ratios = {
       "vault.details.viewer": viewer[1] / fullWidth,
       "vault.details.details": details[1] / fullWidth,
-      "vault.details.comps": comps[1] / fullWidth
+      "vault.details.comps": comps[1] / fullWidth,
     };
     setFlexRatios(ratios);
   }, []);
@@ -107,8 +104,8 @@ function AssetDetails(props) {
       setSelectedCompName("");
       return;
     }
-    const found = compExtensionPreviewPriority.some(ext => {
-      const comp = comps.find(comp => comp.ext === ext);
+    const found = compExtensionPreviewPriority.some((ext) => {
+      const comp = comps.find((comp) => comp.ext === ext);
       if (comp) {
         setSelectedCompName(comp.filename);
         return true;
@@ -117,24 +114,23 @@ function AssetDetails(props) {
     if (!found) setSelectedCompName(comps[0].filename);
   }, [props.entity]);
 
-  const handleVersionChange = e => {
+  const handleVersionChange = (e) => {
     const version = e.target.value;
-    const path = BuildFileURL(
-      `${props.entity.asset}/${version}`,
-      config,
-      {reverse: true, pathOnly: true}
-    );
-    serverRequest("get_assetversion", {path: path}).then(resp => {
+    const path = BuildFileURL(`${props.entity.asset}/${version}`, config, {
+      reverse: true,
+      pathOnly: true,
+    });
+    serverRequest("get_assetversion", { path: path }).then((resp) => {
       props.setSelectedEntity(resp.data);
     });
   };
 
-  const handleResized = data => {
+  const handleResized = (data) => {
     saveReflexLayout(data);
   };
 
-  const getComp = compName => {
-    return props.entity.components.find(comp => comp.filename === compName);
+  const getComp = (compName) => {
+    return props.entity.components.find((comp) => comp.filename === compName);
   };
 
   const selectedComp = getComp(selectedCompName);
@@ -142,7 +138,7 @@ function AssetDetails(props) {
   const contextItems = [
     {
       label: "Copy tags",
-      fn: () =>  CopyToClipboard(props.entity.tags.join(", "), enqueueSnackbar)
+      fn: () => CopyToClipboard(props.entity.tags.join(", "), enqueueSnackbar),
     },
     // {
     //   label: "Add tags",
@@ -152,11 +148,13 @@ function AssetDetails(props) {
 
   return (
     <div style={style}>
-      <ContextMenu items={contextItems} contextMenu={contextMenu}
-        setContextMenu={setContextMenu}
-      />
+      <ContextMenu items={contextItems} contextMenu={contextMenu} setContextMenu={setContextMenu} />
       <ReflexContainer orientation="horizontal">
-        <ReflexElement flex={flexRatios["vault.details.viewer"]} name={"vault.details.viewer"} onStopResize={handleResized}>
+        <ReflexElement
+          flex={flexRatios["vault.details.viewer"]}
+          name={"vault.details.viewer"}
+          onStopResize={handleResized}
+        >
           <ComponentViewer comp={selectedComp} />
         </ReflexElement>
         <ReflexSplitter style={splitterStyle} />
@@ -165,29 +163,39 @@ function AssetDetails(props) {
           name={"vault.details.details"}
           onStopResize={handleResized}
         >
-          <div style={{margin: "10px", overflow: "hidden"}}>
-            <div style={{display: "flex", alignItems: "center", minHeight: "50px"}}>
+          <div style={{ margin: "10px", overflow: "hidden" }}>
+            <div style={{ display: "flex", alignItems: "center", minHeight: "50px" }}>
               <FormControl size="small" style={versionSelectStyle}>
                 <InputLabel>Version</InputLabel>
-                <Select
-                  value={props.entity.version}
-                  label="Version"
-                  onChange={handleVersionChange}
-                >
-                  {props.entity.versions.map(ver =>
-                    <MenuItem key={ver} value={ver}>{ver}</MenuItem>
-                  )}
+                <Select value={props.entity.version} label="Version" onChange={handleVersionChange}>
+                  {props.entity.versions.map((ver) => (
+                    <MenuItem key={ver} value={ver}>
+                      {ver}
+                    </MenuItem>
+                  ))}
                 </Select>
               </FormControl>
               <Typography variant="h5">{props.entity.name}</Typography>
             </div>
             <Path path={props.entity.path} />
           </div>
-          <TagContainer entityPath={props.entity.path} tags={props.entity.tags || []} onRefresh={refreshVault} />
+          <TagContainer
+            entityPath={props.entity.path}
+            tags={props.entity.tags || []}
+            onRefresh={refreshVault}
+          />
         </ReflexElement>
         <ReflexSplitter style={splitterStyle} />
-        <ReflexElement flex={flexRatios["vault.details.comps"]} name={"vault.details.comps"} onStopResize={handleResized}>
-          <ComponentList components={props.entity.components || []} selectedComp={selectedComp} onSelect={setSelectedCompName} />
+        <ReflexElement
+          flex={flexRatios["vault.details.comps"]}
+          name={"vault.details.comps"}
+          onStopResize={handleResized}
+        >
+          <ComponentList
+            components={props.entity.components || []}
+            selectedComp={selectedComp}
+            onSelect={setSelectedCompName}
+          />
         </ReflexElement>
       </ReflexContainer>
     </div>

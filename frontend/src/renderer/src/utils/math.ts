@@ -12,11 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+export const clamp = (num: number, min: number, max: number) => Math.min(Math.max(num, min), max);
 
-export const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
-
-export const fit = (value, sourceRangeMin, sourceRangeMax, targetRangeMin, targetRangeMax) => {
+export const fit = (
+  value: number,
+  sourceRangeMin: number,
+  sourceRangeMax: number,
+  targetRangeMin: number,
+  targetRangeMax: number
+) => {
   var targetRange = targetRangeMax - targetRangeMin;
   var sourceRange = sourceRangeMax - sourceRangeMin;
-  return (value - sourceRangeMin) * targetRange / sourceRange + targetRangeMin;
+  return ((value - sourceRangeMin) * targetRange) / sourceRange + targetRangeMin;
 };
