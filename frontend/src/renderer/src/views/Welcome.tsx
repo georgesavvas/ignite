@@ -12,20 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ContextContext, setProject } from "../contexts/ContextContext";
+import CheckIcon from "@mui/icons-material/Check";
+import LoadingButton from "@mui/lab/LoadingButton";
 import { Divider, Typography } from "@mui/material";
+import { InputChangeEvent } from "@renderer/types/common";
+import _ from "lodash";
 import { useContext, useEffect, useState } from "react";
 
-import CheckIcon from "@mui/icons-material/Check";
-import { ConfigContext } from "../contexts/ConfigContext";
 import FileInput from "../components/FileInput";
 import IgnButton from "../components/IgnButton";
 import IgnTextField from "../components/IgnTextField";
-import LoadingButton from "@mui/lab/LoadingButton";
 import Modal from "../components/Modal";
+import { Access, ConfigContext, ConfigContextType } from "../contexts/ConfigContext";
+import { ContextContext, ContextContextType, setProject } from "../contexts/ContextContext";
 import serverRequest from "../services/serverRequest";
-import styles from "./Welcome.module.css";
 import { validateDirName } from "../utils/validateDirName";
+import styles from "./Welcome.module.css";
 
 interface WelcomeProps {
   onClose: Function;
@@ -33,9 +35,12 @@ interface WelcomeProps {
 }
 
 const Welcome = (props: WelcomeProps) => {
-  const [, , setCurrentContext] = useContext(ContextContext);
-  const [config, setConfig] = useContext(ConfigContext);
-  const [access, setAccess] = useState({});
+  const { setCurrentContext } = useContext(ContextContext) as ContextContextType;
+  const { config, setConfig } = useContext(ConfigContext) as ConfigContextType;
+  const [access, setAccess] = useState<Access>({
+    projectsDir: "",
+    serverProjectsDir: "",
+  } as Access);
   const [canSave, setCanSave] = useState(false);
   const [newProjectName, setNewProjectName] = useState("");
   const [projectCreated, setProjectCreated] = useState(false);
@@ -49,29 +54,30 @@ const Welcome = (props: WelcomeProps) => {
   }, [config.access]);
 
   useEffect(() => {
-    let changed = false;
-    const configAccess = { ...config.access };
-    delete configAccess.remote;
-    if (JSON.stringify(configAccess) !== JSON.stringify(access)) changed = true;
-    setCanSave(changed);
+    const configAccess = _.omit(config.access, ["remote"]);
+    const same = _.isEqual(access, config.access);
+    console.log("Comparing access", access, configAccess, "same", same);
+    setCanSave(!same);
   }, [access]);
 
   const isServerLocal =
     config.serverDetails.address && config.serverDetails.address.startsWith("localhost");
 
-  const handleAccessChange = (field: string, value: string) => {
-    setAccess((prevState) => {
-      const existing = { ...prevState };
-      existing[field] = value;
+  const handleAccessChange = (field: keyof Access, value: string | boolean) => {
+    setAccess((prev) => {
+      const existing = { ...prev };
+      if (field === "remote") {
+        existing[field] = value as boolean;
+      } else existing[field] = value as string;
       if (isServerLocal && field === "projectsDir") {
-        existing["serverProjectsDir"] = value;
+        existing["serverProjectsDir"] = value as string;
       }
       return existing;
     });
   };
 
   const handleSave = () => {
-    setConfig("access", { ...access });
+    setConfig("access", { ...access }, "modify");
     setCanSave(false);
   };
 
@@ -92,7 +98,7 @@ const Welcome = (props: WelcomeProps) => {
     setProjectCreated(true);
   };
 
-  const handleProjectNameChange = (e) => {
+  const handleProjectNameChange = (e: InputChangeEvent) => {
     const value = validateDirName(e.target.value);
     setNewProjectName(value);
   };
@@ -123,7 +129,7 @@ const Welcome = (props: WelcomeProps) => {
               fullWidth
               disabled={access.remote}
               value={access.projectsDir || ""}
-              onChange={(_, value) => handleAccessChange("projectsDir", value)}
+              onChange={(_: any, value: string) => handleAccessChange("projectsDir", value)}
               buttonStyle={{ marginTop: "4px" }}
             >
               <IgnButton

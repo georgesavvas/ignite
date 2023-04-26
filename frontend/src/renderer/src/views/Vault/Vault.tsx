@@ -12,38 +12,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-import React, {useState, useEffect, useContext} from "react";
-
-import {ReflexContainer, ReflexSplitter, ReflexElement} from "react-reflex";
-import {DndProvider} from "react-dnd";
-import {HTML5Backend} from "react-dnd-html5-backend";
 import debounce from "lodash.debounce";
+import React, { useContext, useEffect, useState } from "react";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
+import { ReflexContainer, ReflexElement, ReflexSplitter } from "react-reflex";
 
-import serverRequest from "../../services/serverRequest";
-import {ConfigContext} from "../../contexts/ConfigContext";
+import Modal from "../../components/Modal";
+import { ConfigContext } from "../../contexts/ConfigContext";
+import { VaultContext } from "../../contexts/VaultContext";
 import BuildFileURL from "../../services/BuildFileURL";
-import {VaultContext} from "../../contexts/VaultContext";
-import CollectionTree from "./CollectionTree";
-import saveReflexLayout from "../../utils/saveReflexLayout";
+import serverRequest from "../../services/serverRequest";
 import loadReflexLayout from "../../utils/loadReflexLayout";
+import saveReflexLayout from "../../utils/saveReflexLayout";
 import Browser from "./Browser";
+import CollectionTree from "./CollectionTree";
 import Details from "./Details";
 import styles from "./Vault.module.css";
-import Modal from "../../components/Modal";
 
-
-const debounced = debounce(fn => fn(), 500);
+const debounced = debounce((fn) => fn(), 500);
 
 const splitterStyle = {
   borderColor: "rgb(40,40,40)",
-  backgroundColor: "rgb(40,40,40)"
+  backgroundColor: "rgb(40,40,40)",
 };
 
 const defaultFlexRations = {
   "vault.collections": 0.15,
   "vault.browser": 0.6,
-  "vault.details": 0.25
+  "vault.details": 0.25,
 };
 
 function Vault(props) {
@@ -51,13 +48,13 @@ function Vault(props) {
   const [collectionData, setCollectionData] = useState([]);
   const [refreshValue, setRefreshValue] = useState(0);
   const [selectedCollection, setSelectedCollection] = useState();
-  const [query, setQuery] = useState({filter_string: ""});
+  const [query, setQuery] = useState({ filter_string: "" });
   const [isLoading, setIsLoading] = useState(true);
   const [loadedData, setLoadedData] = useState([]);
-  const [pages, setPages] = useState({total: 1, current: 1});
+  const [pages, setPages] = useState({ total: 1, current: 1 });
   const [tilesPerPage, setTilesPerPage] = useState(50);
   const [selectedEntity, setSelectedEntity] = useState({});
-  const [config] = useContext(ConfigContext);
+  const { config } = useContext(ConfigContext) as ConfigContextType;
   const [vaultContext] = useContext(VaultContext);
 
   useEffect(() => {
@@ -77,7 +74,7 @@ function Vault(props) {
     const ratios = {
       "vault.collections": collections[0] / fullWidth,
       "vault.browser": browser[0] / fullWidth,
-      "vault.details": details[0] / fullWidth
+      "vault.details": details[0] / fullWidth,
     };
     setFlexRatios(ratios);
   }, []);
@@ -95,7 +92,7 @@ function Vault(props) {
   useEffect(() => {
     if (!props.open) return;
     if (!Object.entries(config.access).length) return;
-    serverRequest("get_collections", {data: {user: undefined}}).then(resp => {
+    serverRequest("get_collections", { data: { user: undefined } }).then((resp) => {
       const data = resp.data;
       setCollectionData(data && data.studio ? data.studio : []);
     });
@@ -108,60 +105,64 @@ function Vault(props) {
       path: vaultContext.path,
       page: pages.current,
       limit: tilesPerPage,
-      query: {...query, latest: true}
+      query: { ...query, latest: true },
     };
     setIsLoading(true);
-    serverRequest("get_assetversions", data).then(resp => {
+    serverRequest("get_assetversions", data).then((resp) => {
       setIsLoading(false);
       setLoadedData(resp.data);
-      setPages(prevState => ({
+      setPages((prevState) => ({
         ...prevState,
         total: resp.pages?.total,
-        results: resp.pages?.results
+        results: resp.pages?.results,
       }));
     });
-  }, [pages.current, vaultContext, query, tilesPerPage, selectedCollection,
-    refreshValue, props.open, config.ready]);
+  }, [
+    pages.current,
+    vaultContext,
+    query,
+    tilesPerPage,
+    selectedCollection,
+    refreshValue,
+    props.open,
+    config.ready,
+  ]);
 
-  const handleEntitySelected = entity => {
+  const handleEntitySelected = (entity) => {
     setSelectedEntity(entity);
   };
 
   const handleRefresh = () => {
-    setRefreshValue(prevState => (prevState + 1));
+    setRefreshValue((prevState) => prevState + 1);
   };
 
-  const handleResized = data => {
+  const handleResized = (data) => {
     saveReflexLayout(data);
   };
 
-  const handleQueryChange = newQuery => {
+  const handleQueryChange = (newQuery) => {
     setIsLoading(true);
     debounced(() => {
-      setQuery(prevState => ({...prevState, ...newQuery}));
-      setPages(prevState => ({...prevState, current: 1}));
+      setQuery((prevState) => ({ ...prevState, ...newQuery }));
+      setPages((prevState) => ({ ...prevState, current: 1 }));
     });
   };
 
-  const handleFilterChange = data => {
+  const handleFilterChange = (data) => {
     setIsLoading(true);
     debounced(() => {
-      setQuery(
-        prevState => ({...prevState, filters: {...prevState.filters, ...data}})
-      );
-      setPages(prevState => ({...prevState, current: 1}));
+      setQuery((prevState) => ({ ...prevState, filters: { ...prevState.filters, ...data } }));
+      setPages((prevState) => ({ ...prevState, current: 1 }));
     });
   };
 
-  const handleCollectionChange = coll => {
+  const handleCollectionChange = (coll) => {
     setSelectedCollection(coll.path);
     localStorage.setItem("selectedCollection", coll.path);
   };
 
   return (
-    <Modal open={props.open} onClose={props.onClose} title="Vault" fullWidth
-      fullHeight
-    >
+    <Modal open={props.open} onClose={props.onClose} title="Vault" fullWidth fullHeight>
       <ReflexContainer orientation="vertical" className={styles.container}>
         <ReflexElement
           flex={flexRatios["vault.collections"]}
@@ -170,8 +171,10 @@ function Vault(props) {
         >
           <div className={styles.collectionContainer}>
             <DndProvider backend={HTML5Backend}>
-              <CollectionTree collectionData={collectionData}
-                refreshValue={refreshValue} onFilterChange={handleFilterChange}
+              <CollectionTree
+                collectionData={collectionData}
+                refreshValue={refreshValue}
+                onFilterChange={handleFilterChange}
                 selectedCollection={selectedCollection}
                 setSelectedCollection={handleCollectionChange}
                 onRefresh={handleRefresh}
@@ -186,12 +189,19 @@ function Vault(props) {
           onStopResize={handleResized}
         >
           <Browser
-            refreshValue={refreshValue} onRefresh={handleRefresh}
-            selectedCollection={selectedCollection} loadedData={loadedData}
-            pages={pages} handleQueryChange={handleQueryChange} query={query}
-            isLoading={isLoading} setTilesPerPage={setTilesPerPage}
-            handleEntitySelected={handleEntitySelected} setPages={setPages}
-            selectedEntity={selectedEntity} onFilterChange={handleFilterChange}
+            refreshValue={refreshValue}
+            onRefresh={handleRefresh}
+            selectedCollection={selectedCollection}
+            loadedData={loadedData}
+            pages={pages}
+            handleQueryChange={handleQueryChange}
+            query={query}
+            isLoading={isLoading}
+            setTilesPerPage={setTilesPerPage}
+            handleEntitySelected={handleEntitySelected}
+            setPages={setPages}
+            selectedEntity={selectedEntity}
+            onFilterChange={handleFilterChange}
           />
         </ReflexElement>
         <ReflexSplitter style={splitterStyle} />

@@ -74,6 +74,7 @@ const services = {
 };
 
 if (process.contextIsolated) {
+  console.log("pre load is context isolated");
   try {
     // contextBridge.exposeInMainWorld("electron", electronAPI);
     contextBridge.exposeInMainWorld("api", api);
@@ -82,6 +83,7 @@ if (process.contextIsolated) {
     console.error(error);
   }
 } else {
+  console.log("pre load is NOT context isolated");
   // @ts-ignore (define in dts)
   // window.electron = electronAPI;
   // @ts-ignore (define in dts)

@@ -12,43 +12,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { useContext } from "react";
 
-import React, {useContext} from "react";
-
-import {EntityContext} from "../../contexts/EntityContext";
-import DirectoryDetails from "./DirectoryDetails";
-import AssetDetails from "./AssetDetails";
-import SceneDetails from "./SceneDetails";
 import DataPlaceholder from "../../components/DataPlaceholder";
+import { EntityContext, EntityContextType } from "../../contexts/EntityContext";
+import AssetDetails from "./AssetDetails";
+import DirectoryDetails from "./DirectoryDetails";
+import SceneDetails from "./SceneDetails";
 
 const style = {
   width: "100%",
   height: "100%",
   display: "flex",
-  flexDirection: "column"
-};
+  flexDirection: "column",
+} as React.CSSProperties;
 
-function Details() {
-  const [selectedEntity] = useContext(EntityContext);
+const Details = () => {
+  const { selectedEntity } = useContext(EntityContext) as EntityContextType;
 
-  function render() {
+  const render = () => {
     switch (selectedEntity.dir_kind) {
-    case "assetversion":
-      return <AssetDetails entity={selectedEntity} />;
-    case "scene":
-      return <SceneDetails entity={selectedEntity} />;
-    case undefined:
-      return <DataPlaceholder text="Nothing selected" />;
-    default:
-      return <DirectoryDetails entity={selectedEntity} />;
+      case "assetversion":
+        return <AssetDetails entity={selectedEntity} />;
+      case "scene":
+        return <SceneDetails entity={selectedEntity} />;
+      case undefined:
+        return <DataPlaceholder text="Nothing selected" />;
+      default:
+        return <DirectoryDetails entity={selectedEntity} />;
     }
-  }
+  };
 
-  return (
-    <div style={style}>
-      {render()}
-    </div>
-  );
-}
+  return <div style={style}>{render()}</div>;
+};
 
 export default Details;

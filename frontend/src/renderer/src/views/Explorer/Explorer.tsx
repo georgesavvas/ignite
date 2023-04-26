@@ -83,7 +83,7 @@ const defaultQuery = {
 };
 
 function Explorer() {
-  const [config] = useContext(ConfigContext);
+  const { config } = useContext(ConfigContext) as ConfigContextType;
   const [isLoading, setIsLoading] = useState(true);
   const [loadedData, setLoadedData] = useState([]);
   const [pages, setPages] = useState({ total: 1, current: 1 });

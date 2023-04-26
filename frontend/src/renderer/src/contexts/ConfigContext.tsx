@@ -12,27 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { GenericObject } from "@renderer/types/common";
+import { useSnackbar } from "notistack";
 import { PropsWithChildren, createContext, useEffect, useRef, useState } from "react";
 
-import { GenericObject } from "@renderer/types/common";
 import clientRequest from "../services/clientRequest";
 import serverRequest from "../services/serverRequest";
-import { useSnackbar } from "notistack";
 
 type ServerDetails = {
   address: string;
   password: string;
 };
 
-type Access = {
-  remote: boolean;
+export type Access = {
+  remote?: boolean;
   projectsDir: string;
   serverProjectsDir: string;
 };
 
 type DccConfig = any[];
 
-type Config = {
+export type Config = {
   serverDetails: ServerDetails;
   access: Access;
   dccConfig: DccConfig;
@@ -51,7 +51,7 @@ type SetConfig = (
 
 export type ConfigContextType = {
   config: Config;
-  handleSetConfig: SetConfig;
+  setConfig: SetConfig;
 };
 
 export const ConfigContext = createContext<ConfigContextType | undefined>(undefined);
@@ -95,11 +95,11 @@ export const ConfigProvider = ({ children }: PropsWithChildren) => {
         if (!config.connection) return;
         console.log(`Lost connection to ${serverName}...`);
         enqueueSnackbar("Lost connection to server...", { variant: "error" });
-        setConfig((prevState) => {
-          const prev = { ...prevState };
-          prev["connection"] = false;
-          prev["write"] = false;
-          return prev;
+        setConfig((prev) => {
+          const existing = { ...prev };
+          existing["connection"] = false;
+          existing["write"] = false;
+          return existing;
         });
       } else {
         if (config.connection) return;
@@ -110,12 +110,12 @@ export const ConfigProvider = ({ children }: PropsWithChildren) => {
         } else {
           enqueueSnackbar("Connected!", { variant: "success" });
         }
-        setConfig((prevState) => {
-          const prev = { ...prevState };
-          prev["connection"] = true;
-          prev["ready"] = true;
-          prev["write"] = false;
-          return prev;
+        setConfig((prev) => {
+          const existing = { ...prev };
+          existing["connection"] = true;
+          existing["ready"] = true;
+          existing["write"] = false;
+          return existing;
         });
       }
     });
@@ -247,44 +247,44 @@ export const ConfigProvider = ({ children }: PropsWithChildren) => {
   };
 
   const handleSetServerDetails = (data: ServerDetails) => {
-    setConfig((prevState) => ({
-      ...prevState,
+    setConfig((prev) => ({
+      ...prev,
       write: true,
-      serverDetails: { ...prevState.serverDetails, ...data },
+      serverDetails: { ...prev.serverDetails, ...data },
     }));
   };
 
   const handleSetAccess = (data: Access) => {
-    setConfig((prevState) => ({
-      ...prevState,
+    setConfig((prev) => ({
+      ...prev,
       write: true,
-      access: { ...prevState.access, ...data },
+      access: { ...prev.access, ...data },
     }));
   };
 
   const handleSetDccConfig = (data: DccConfig, operation = "modify") => {
     switch (operation) {
       default: {
-        setConfig((prevState) => ({
-          ...prevState,
+        setConfig((prev) => ({
+          ...prev,
           write: true,
           dccConfig: data,
         }));
         break;
       }
       case "add": {
-        setConfig((prevState) => ({
-          ...prevState,
+        setConfig((prev) => ({
+          ...prev,
           write: true,
-          dccConfig: addToDCCConfig(prevState.dccConfig, data),
+          dccConfig: addToDCCConfig(prev.dccConfig, data),
         }));
         break;
       }
       case "remove": {
-        setConfig((prevState) => ({
-          ...prevState,
+        setConfig((prev) => ({
+          ...prev,
           write: true,
-          dccConfig: removeFromDCCConfig(prevState.dccConfig, data),
+          dccConfig: removeFromDCCConfig(prev.dccConfig, data),
         }));
         break;
       }
@@ -315,6 +315,8 @@ export const ConfigProvider = ({ children }: PropsWithChildren) => {
   };
 
   return (
-    <ConfigContext.Provider value={{ config, handleSetConfig }}>{children}</ConfigContext.Provider>
+    <ConfigContext.Provider value={{ config, setConfig: handleSetConfig }}>
+      {children}
+    </ConfigContext.Provider>
   );
 };

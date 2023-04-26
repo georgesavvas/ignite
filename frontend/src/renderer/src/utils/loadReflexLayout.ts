@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 function loadReflexLayout() {
   const data = localStorage.getItem("reflex_layout");
-  return JSON.parse(data);
+  return JSON.parse(data ?? "");
 }
 
 export default loadReflexLayout;

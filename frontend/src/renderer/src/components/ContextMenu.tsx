@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { Typography } from "@mui/material";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import { Typography } from "@mui/material";
 
 const style = {
   display: "flex",
@@ -25,17 +25,17 @@ const style = {
   marginBottom: "2px",
 };
 
-interface ContextMenu {
+export interface ContextMenuType {
   mouseX: number;
   mouseY: number;
   data: any;
 }
 
-type HandleContextMenuFn = (contextMenu: ContextMenu | null) => void;
+type HandleContextMenuFn = (contextMenu: ContextMenuType | null) => void;
 
 export const handleContextMenu = (
   e: React.MouseEvent<HTMLElement>,
-  contextMenu: ContextMenu | null,
+  contextMenu: ContextMenuType | null,
   setContextMenu: (contextMenu: any) => void,
   data?: any
 ) => {
@@ -53,7 +53,7 @@ export const handleContextMenu = (
 };
 
 interface ContextMenuProps {
-  contextMenu: ContextMenu;
+  contextMenu: ContextMenuType | null;
   items: ContextMenuItem[];
   title?: string;
   subtitle?: string;

@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 function loadExplorerSettings() {
   const data = localStorage.getItem("explorer_settings");
-  return JSON.parse(data);
+  return JSON.parse(data ?? "");
 }
 
 export default loadExplorerSettings;

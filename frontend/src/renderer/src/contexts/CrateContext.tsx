@@ -12,25 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ConfigContext, ConfigContextType } from "./ConfigContext";
+import { Entity } from "@renderer/types/common";
 import { PropsWithChildren, createContext, useContext, useEffect, useState } from "react";
 
-import { Entity } from "@renderer/types/common";
 import clientRequest from "../services/clientRequest";
+import { ConfigContext, ConfigContextType } from "./ConfigContext";
 
 type Crate = {
   id: string;
   entities: Entity[];
 };
 
-type CrateContextType = {
-  addCrate: () => void;
-  removeCrate: () => void;
-  addToCrate: () => void;
-  removeFromCrate: () => void;
-  dropFloating: boolean;
-  emptyCrate: () => void;
-  floating: boolean;
+export type CrateContextType = {
+  addCrate: (entities?: Entity[]) => void;
+  removeCrate: (crateId: string) => void;
+  addToCrate: (entities: Entity[]) => void;
+  removeFromCrate: (crateID: string, index: number) => void;
+  dropFloating: (crateID: string) => void;
+  emptyCrate: (crateID: string) => void;
+  floating: Entity[];
   crates: Crate[];
   forceOpen: boolean;
   setForceOpen: (forceOpen: boolean) => void;
@@ -40,8 +40,8 @@ export const CrateContext = createContext<CrateContextType | undefined>(undefine
 
 export const CrateProvider = ({ children }: PropsWithChildren) => {
   const [fetched, setFetched] = useState(false);
-  const [crates, setCrates] = useState<Entity[]>([]);
-  const [floating, setFloating] = useState([]);
+  const [crates, setCrates] = useState<Crate[]>([]);
+  const [floating, setFloating] = useState<Entity[]>([]);
   const { config } = useContext(ConfigContext) as ConfigContextType;
   const [forceOpen, setForceOpen] = useState(false);
 
@@ -63,7 +63,7 @@ export const CrateProvider = ({ children }: PropsWithChildren) => {
     });
   }, [crates, config.ready]);
 
-  const addCrate = async (entities = []) => {
+  const addCrate = async (entities: Entity[] = []) => {
     const crateID = await window.services.uuid();
     setCrates((prev) => {
       let existing = [...prev];
@@ -72,7 +72,7 @@ export const CrateProvider = ({ children }: PropsWithChildren) => {
     });
   };
 
-  const removeCrate = async (crateID) => {
+  const removeCrate = async (crateID: string) => {
     setCrates((prev) => {
       const existing = [...prev];
       const index = existing.findIndex((crate) => crate.id === crateID);
@@ -81,39 +81,42 @@ export const CrateProvider = ({ children }: PropsWithChildren) => {
     });
   };
 
-  const addToCrate = async (entities) => {
+  const addToCrate = async (entities: Entity[]) => {
     if (crates.length) setFloating((prev) => [...prev, ...entities]);
     else addCrate(entities);
   };
 
-  const handleAddToCrate = async (crateID, entities) => {
+  const handleAddToCrate = async (crateID: string, entities: Entity[]) => {
     setCrates((prev) => {
       const existing = [...prev];
       const crate = existing.find((crate) => crate.id === crateID);
+      if (!crate) return existing;
       crate.entities.push(...entities);
       return existing;
     });
   };
 
-  const removeFromCrate = async (crateID, index) => {
+  const removeFromCrate = async (crateID: string, index: number) => {
     setCrates((prev) => {
       const existing = [...prev];
       const crate = existing.find((crate) => crate.id === crateID);
+      if (!crate) return existing;
       crate.entities.splice(index, 1);
       return existing;
     });
   };
 
-  const emptyCrate = async (crateID) => {
+  const emptyCrate = async (crateID: string) => {
     setCrates((prev) => {
       const existing = [...prev];
       const crate = existing.find((crate) => crate.id === crateID);
+      if (!crate) return existing;
       crate.entities = [];
       return existing;
     });
   };
 
-  const dropFloating = async (crateID) => {
+  const dropFloating = async (crateID: string) => {
     setFloating((prev) => {
       crateID ? handleAddToCrate(crateID, prev) : addCrate(prev);
       return [];

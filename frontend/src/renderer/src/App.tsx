@@ -29,9 +29,10 @@ import { ContextProvider } from "./contexts/ContextContext";
 import { CrateProvider } from "./contexts/CrateContext";
 import { EntityProvider } from "./contexts/EntityContext";
 import { VaultProvider } from "./contexts/VaultContext";
-import BuildFileURL from "./services/BuildFileURL";
 import { ClickEvent } from "./types/common";
 import Home from "./views/Home";
+
+// import BuildFileURL from "./services/BuildFileURL";
 
 declare module "@mui/material/styles" {
   interface Palette {
@@ -51,6 +52,15 @@ declare module "@mui/material" {
     lightgrey: true;
   }
   interface LinearProgressPropsColorOverrides {
+    ignite: true;
+  }
+  interface CheckboxPropsColorOverrides {
+    ignite: true;
+  }
+  interface SwitchPropsColorOverrides {
+    ignite: true;
+  }
+  interface CircularProgressPropsColorOverrides {
     ignite: true;
   }
 }
@@ -73,11 +83,11 @@ const darkTheme = createTheme({
   },
 });
 
-BuildFileURL("");
+// BuildFileURL("");
 
 interface ErrorFallbackProps {
   error: Error;
-  resetErrorBoundary: ClickEvent;
+  resetErrorBoundary: (e: ClickEvent) => void;
 }
 
 const ErrorFallback = ({ error, resetErrorBoundary }: ErrorFallbackProps) => {

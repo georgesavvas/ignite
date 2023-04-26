@@ -12,19 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import React, { useContext, useEffect, useState } from "react";
 
-import React, {useEffect, useState, useContext} from "react";
-
-import styles from "./ProjectTree.module.css";
-import serverRequest from "../../services/serverRequest";
-import {ContextContext} from "../../contexts/ContextContext";
-import {ConfigContext} from "../../contexts/ConfigContext";
 import FilterField from "../../components/FilterField";
+import { ConfigContext } from "../../contexts/ConfigContext";
+import { ContextContext } from "../../contexts/ContextContext";
+import serverRequest from "../../services/serverRequest";
+import styles from "./ProjectTree.module.css";
 import ProjectTreeView from "./ProjectTreeView";
 
-
 export default function ProjectTree() {
-  const [config] = useContext(ConfigContext);
+  const { config } = useContext(ConfigContext) as ConfigContextType;
   const [loadedData, setLoadedData] = useState({});
   const [filterValue, setFilterValue] = useState("");
   const [updateTreeView, setUpdateTreeView] = useState(0);
@@ -34,7 +32,7 @@ export default function ProjectTree() {
     if (!config.ready) return;
     if (!Object.entries(config.access).length) return;
     const data = {
-      project: currentContext.project
+      project: currentContext.project,
     };
     serverRequest("get_project_tree", data).then((resp) => {
       setLoadedData(resp.data);
@@ -43,11 +41,9 @@ export default function ProjectTree() {
 
   var content = null;
   if (loadedData && loadedData.children) {
-    content = <ProjectTreeView
-      data={loadedData}
-      shouldUpdate={setUpdateTreeView}
-      filter={filterValue}
-    />;
+    content = (
+      <ProjectTreeView data={loadedData} shouldUpdate={setUpdateTreeView} filter={filterValue} />
+    );
   }
 
   return (

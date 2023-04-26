@@ -14,34 +14,35 @@
 
 import Divider from "@mui/material/Divider";
 import Typography from "@mui/material/Typography";
-import React from "react";
+import { Scene } from "@renderer/types/common.js";
 
 import Path from "../../components/Path.js";
 import DccSelector from "../DccSelector.jsx";
 
 const style = {
   width: "100%",
-  height: "100%"
+  height: "100%",
 };
 
-function SceneDetails(props) {
+interface SceneDetailsProps {
+  entity: Scene;
+}
+
+const SceneDetails = (props: SceneDetailsProps) => {
   return (
     <div style={style}>
-      <div style={{margin: "5px", overflow: "hidden"}}>
-        <DccSelector scene={props.entity} style={{maxHeight: "75vh"}} />
-        <Divider style={{margin: "20px 0 20px 0"}} />
+      <div style={{ margin: "5px", overflow: "hidden" }}>
+        <DccSelector scene={props.entity} style={{ maxHeight: "75vh" }} />
+        <Divider style={{ margin: "20px 0 20px 0" }} />
         <Typography variant="h5">Scene Details ({props.entity.dcc})</Typography>
-        {props.entity.comment ?
-          <Typography variant="body1">
-            Comment: {props.entity.comment}
-          </Typography>
-          : null
-        }
+        {props.entity.comment ? (
+          <Typography variant="body1">Comment: {props.entity.comment}</Typography>
+        ) : null}
         <Path path={props.entity.path} />
         <Path path={props.entity.scene} />
       </div>
     </div>
   );
-}
+};
 
 export default SceneDetails;
