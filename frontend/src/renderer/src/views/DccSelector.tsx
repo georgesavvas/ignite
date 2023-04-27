@@ -28,8 +28,8 @@ import clientRequest from "../services/clientRequest";
 import styles from "./DccSelector.module.css";
 
 interface DccSelectorProps {
-  scene: Scene;
-  style: React.CSSProperties;
+  scene?: Scene;
+  style?: React.CSSProperties;
   onClose?: () => void;
   newScene?: boolean;
   task?: string;

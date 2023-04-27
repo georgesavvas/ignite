@@ -46,6 +46,7 @@ export interface Directory {
   uri: string;
   creation_time: string;
   modification_time: string;
+  task?: string;
 }
 
 export type IgniteAttribute = {
@@ -83,8 +84,9 @@ export interface Scene extends Directory {
   vsn: string;
   attributes: any;
   comment: string;
-  thumbnail: string;
+  thumbnail: IgniteComponent;
   extension: string;
+  task: string;
 }
 
 export interface IgniteComponent {
@@ -115,7 +117,10 @@ export type Dcc = {
   exts: string[];
   name: string;
   path: string;
+  keywords: string[];
 };
+
+// React.ComponentType<SvgIconProps>
 
 // type Props = React.ComponentPropsWithoutRef<"button">;
 

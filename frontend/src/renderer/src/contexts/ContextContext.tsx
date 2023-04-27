@@ -20,14 +20,19 @@ import { serverSocket } from "../services/serverWebSocket";
 import { ConfigContext, ConfigContextType } from "./ConfigContext";
 
 type Context = {
+  root: string;
+  name: string;
   path: string;
+  posix: string;
   path_nr: string;
+  dir_kind: string;
   project: string;
+  ancestor_kinds: { [key: string]: string };
 };
 
 export type ContextContextType = {
   currentContext: Context;
-  setCurrentContext: (path: string) => void;
+  setCurrentContext: (path: string) => Promise<boolean>;
   refresh: () => void;
 };
 
