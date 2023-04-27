@@ -15,18 +15,23 @@
 import Divider from "@mui/material/Divider";
 import LinearProgress from "@mui/material/LinearProgress";
 import Typography from "@mui/material/Typography";
-import debounce from "lodash.debounce";
+import { EnqueueSnackbar, Entity, IgniteComponent, InputChangeEvent } from "@renderer/types/common";
+import { debounce } from "lodash";
 import { useSnackbar } from "notistack";
-import React, { useContext, useEffect, useState } from "react";
+import React, { ChangeEvent, ClipboardEvent, useContext, useEffect, useState } from "react";
 
-import ContextMenu, { handleContextMenu } from "../../components/ContextMenu";
+import ContextMenu, {
+  ContextMenuItem,
+  ContextMenuType,
+  handleContextMenu,
+} from "../../components/ContextMenu";
 import DataPlaceholder from "../../components/DataPlaceholder";
 import DragOverlay from "../../components/DragOverlay";
 import Modal from "../../components/Modal";
-import { DIRCONTEXTOPTIONS } from "../../constants";
-import { ConfigContext } from "../../contexts/ConfigContext";
-import { ContextContext } from "../../contexts/ContextContext";
-import { EntityContext } from "../../contexts/EntityContext";
+import { DIRCONTEXTOPTIONS } from "../../constants/directoryContextOptions";
+import { ConfigContext, ConfigContextType } from "../../contexts/ConfigContext";
+import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
+import { EntityContext, EntityContextType } from "../../contexts/EntityContext";
 import BuildFileURL from "../../services/BuildFileURL";
 import serverRequest from "../../services/serverRequest";
 import loadExplorerSettings from "../../utils/loadExplorerSettings";
@@ -42,7 +47,7 @@ import ExplorerBar from "./ExplorerBar";
 import RowView from "./RowView";
 import SceneDrop from "./SceneDrop";
 
-const debounced = debounce((fn) => fn(), 500);
+const debounced = debounce((fn: Function) => fn(), 500);
 
 const defaultExplorerSettings = {
   currentResultType: "dynamic",
@@ -82,7 +87,7 @@ const defaultQuery = {
   },
 };
 
-function Explorer() {
+const Explorer = () => {
   const { config } = useContext(ConfigContext) as ConfigContextType;
   const [isLoading, setIsLoading] = useState(true);
   const [loadedData, setLoadedData] = useState([]);
@@ -95,10 +100,10 @@ function Explorer() {
   const [tiles, setTiles] = useState([]);
   const [modalData, setModalData] = useState({});
   const [dropData, setDropData] = useState({ visible: false });
-  const [selectedEntity, setSelectedEntity] = useContext(EntityContext);
-  const [currentContext, , refreshContext] = useContext(ContextContext);
+  const { selectedEntity, setSelectedEntity } = useContext(EntityContext) as EntityContextType;
+  const { currentContext, refresh } = useContext(ContextContext) as ContextContextType;
   const [newSceneOpen, setNewSceneOpen] = useState(false);
-  const [contextMenu, setContextMenu] = useState(null);
+  const [contextMenu, setContextMenu] = useState<ContextMenuType | null>(null);
   const { enqueueSnackbar } = useSnackbar();
 
   const methods = {
@@ -108,11 +113,11 @@ function Explorer() {
     scenes: "get_scenes",
   };
 
-  const handleEntitySelection = (entity) => {
+  const handleEntitySelection = (entity: Entity) => {
     setSelectedEntity(entity);
   };
 
-  const handleContextMenuSelection = (action, _data) => {
+  const handleContextMenuSelection = (action: string, _data: any) => {
     const data = { ..._data };
     data[`${action}Open`] = true;
     setModalData(data);
@@ -130,7 +135,7 @@ function Explorer() {
       path: BuildFileURL(currentContext.path, config, { reverse: true, pathOnly: true }),
       query: query,
     };
-    const method = methods[explorerSettings.currentResultType];
+    const method = methods[explorerSettings.currentResultType as keyof typeof methods];
     setIsLoading(true);
     setDropData({ visible: false });
     serverRequest(method, data).then((resp) => {
@@ -149,13 +154,15 @@ function Explorer() {
 
   useEffect(() => {
     if (!loadedData) return;
-    const fetchedSelected = loadedData.find((entity) => entity.path === selectedEntity.path);
+    const fetchedSelected = loadedData.find(
+      (entity: Entity) => entity.path === selectedEntity.path
+    );
     if (fetchedSelected) setSelectedEntity(fetchedSelected);
     if (explorerSettings.currentViewType !== "grid") return;
-    const _tiles = loadedData.reduce(function (obj, entity) {
+    const _tiles = loadedData.reduce((obj, entity: Entity) => {
       entity.path = BuildFileURL(entity.path, config, { pathOnly: true });
       if (entity.components) {
-        entity.components.forEach((comp) => {
+        entity.components.forEach((comp: IgniteComponent) => {
           comp.path = BuildFileURL(comp.path, config, { pathOnly: true });
         });
       }
@@ -171,7 +178,7 @@ function Explorer() {
             key={entity.path}
             entity={entity}
             onSelected={handleEntitySelection}
-            refreshContext={refreshContext}
+            refreshContext={refresh}
             size={explorerSettings.currentTileSize * 40}
             viewType={explorerSettings.currentViewType}
             selected={selectedEntity.path === entity.path}
@@ -187,7 +194,7 @@ function Explorer() {
             selected={selectedEntity.path === entity.path}
             handleContextMenuSelection={handleContextMenuSelection}
             size={explorerSettings.currentTileSize * 40}
-            refreshContext={refreshContext}
+            refreshContext={refresh}
             viewType={explorerSettings.currentViewType}
           />
         );
@@ -206,28 +213,28 @@ function Explorer() {
     setPages((prevPages) => ({ ...prevPages, current: 1 }));
   }, [query, explorerSettings.tilesPerPage]);
 
-  const handlePageChange = (e, value) => {
+  const handlePageChange = (e: ChangeEvent<unknown>, value: number) => {
     setPages((prevPages) => ({ ...prevPages, current: value }));
   };
 
-  const handleFilterChange = (value) => {
+  const handleFilterChange = (value: string) => {
     setIsLoading(true);
-    debounced(() => setQuery((prevState) => ({ ...prevState, filter_string: value })));
+    debounced(() => setQuery((prev) => ({ ...prev, filter_string: value })));
   };
 
-  const handleTilesPerPageChange = (value) => {
-    setExplorerSettings((prevState) => ({
-      ...prevState,
+  const handleTilesPerPageChange = (value: string) => {
+    setExplorerSettings((prev: typeof defaultExplorerSettings) => ({
+      ...prev,
       tilesPerPage: parseInt(value) || 50,
     }));
   };
 
-  const handleResultTypeChange = (value) => {
+  const handleResultTypeChange = (value: string) => {
     const savedViewType = explorerSettings.saved[value]?.current || "grid";
     const savedTileSize = explorerSettings.saved[value]?.[savedViewType] || 5;
-    setExplorerSettings((prevState) => {
+    setExplorerSettings((prev: typeof defaultExplorerSettings) => {
       return {
-        ...prevState,
+        ...prev,
         currentResultType: value,
         currentViewType: savedViewType,
         currentTileSize: savedTileSize,
@@ -235,14 +242,14 @@ function Explorer() {
     });
   };
 
-  const handleViewTypeChange = (value) => {
+  const handleViewTypeChange = (value: string) => {
     const currentResultType = explorerSettings.currentResultType || "grid";
     const savedTileSize = explorerSettings.saved[currentResultType]?.[value] || 5;
-    setExplorerSettings((prevState) => {
-      const saved = prevState.saved ?? defaultExplorerSettings.saved;
-      saved[currentResultType].current = value;
+    setExplorerSettings((prev: typeof defaultExplorerSettings) => {
+      const saved = prev.saved ?? defaultExplorerSettings.saved;
+      saved[currentResultType as keyof typeof saved].current = value;
       return {
-        ...prevState,
+        ...prev,
         saved: saved,
         currentViewType: value,
         currentTileSize: savedTileSize,
@@ -250,21 +257,21 @@ function Explorer() {
     });
   };
 
-  const handleTileSizeChange = (value) => {
+  const handleTileSizeChange = (value: string) => {
     const currentResultType = explorerSettings.currentResultType;
     const currentViewType = explorerSettings.currentViewType;
-    setExplorerSettings((prevState) => {
-      const saved = prevState.saved;
-      saved[currentResultType][currentViewType] = value;
+    setExplorerSettings((prev: typeof defaultExplorerSettings) => {
+      const saved = prev.saved;
+      saved[currentResultType as keyof typeof saved][currentViewType] = value;
       return {
-        ...prevState,
+        ...prev,
         currentTileSize: value,
       };
     });
   };
 
   const handleLatestChange = (e) => {
-    setQuery((prevState) => ({ ...prevState, latest: e.target.checked }));
+    setQuery((prev) => ({ ...prev, latest: e.target.checked }));
   };
 
   const tileContainerStyle = {
@@ -276,13 +283,13 @@ function Explorer() {
     `,
     gridGap: "3px",
     padding: "0px 5px",
-  };
+  } as React.CSSProperties;
 
   if (explorerSettings.currentViewType === "row") {
     tileContainerStyle.gridTemplateColumns = "repeat(1, 1fr)";
   }
 
-  function getGenericContextItems(data, enqueueSnackbar) {
+  function getGenericContextItems(data: any, enqueueSnackbar: EnqueueSnackbar) {
     return [
       {
         label: "Copy path",
@@ -310,7 +317,7 @@ function Explorer() {
     ];
   }
 
-  const handleClick = (action, data) => {
+  const handleClick = (action: string, data: any) => {
     handleContextMenuSelection(action, data);
     handleClose();
   };
@@ -319,9 +326,9 @@ function Explorer() {
     setContextMenu(null);
   };
 
-  function getSpecificContextItems(data) {
+  function getSpecificContextItems(data: any) {
     if (!(data.kind in DIRCONTEXTOPTIONS)) return [];
-    const kindOptions = DIRCONTEXTOPTIONS[data.kind];
+    const kindOptions = DIRCONTEXTOPTIONS[data.kind as keyof typeof DIRCONTEXTOPTIONS];
     const namedOptions = kindOptions[data.name] || kindOptions.default;
     return namedOptions.map((contextOption) => ({
       label: contextOption.label,
@@ -391,17 +398,18 @@ function Explorer() {
 
   const handleNewScene = () => setNewSceneOpen(true);
 
-  const handleDeleteDir = (deletedEntityPath) => {
+  const handleDeleteDir = (deletedEntityPath: string) => {
     if (deletedEntityPath === selectedEntity.path) setSelectedEntity({});
-    refreshContext();
+    refresh();
   };
 
-  const handlePaste = (e) => {
+  const handlePaste = (e: ClipboardEvent<HTMLDivElement>) => {
     if (currentContext.dir_kind != "task") {
       setDropData({ visible: false });
       return;
     }
     const cb = e.clipboardData;
+    if (cb === null) return;
     const files = cb.files;
     if (!files) return;
     const sceneFiles = filterScenesFromFiles(files);
@@ -412,13 +420,13 @@ function Explorer() {
     setDropData({ visible: false, files: files });
   };
 
-  const handleDragEnd = (e) => {
+  const handleDragEnd = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setDropData({ visible: false });
   };
 
-  const handleDragOver = (e) => {
+  const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     const dt = e.dataTransfer;
@@ -431,17 +439,17 @@ function Explorer() {
     setDropData(data);
   };
 
-  const fileInDCCConfig = (file) => {
+  const fileInDCCConfig = (file: File) => {
     return config.dccConfig.some((dcc) =>
-      dcc.scenes.some((ext) => file.path.endsWith(`.${ext.trim()}`))
+      dcc.scenes.some((ext: string) => file.path.endsWith(`.${ext.trim()}`))
     );
   };
 
-  const filterScenesFromFiles = (files) => {
+  const filterScenesFromFiles = (files: FileList) => {
     return [...files].filter((file) => fileInDCCConfig(file));
   };
 
-  const handleDrop = (e) => {
+  const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (currentContext.dir_kind != "task") {
@@ -461,7 +469,7 @@ function Explorer() {
     setDropData({ visible: false });
   };
 
-  const handleSceneDropClose = (remaining) => {
+  const handleSceneDropClose = (remaining: FileList) => {
     if (!remaining || remaining.length === 0) setDropData({ visible: false });
     else
       setDropData((prev) => {
@@ -485,37 +493,37 @@ function Explorer() {
       <CreateDir
         open={modalData.createOpen}
         enqueueSnackbar={enqueueSnackbar}
-        onClose={() => setModalData((prevState) => ({ ...prevState, createOpen: false }))}
+        onClose={() => setModalData((prev) => ({ ...prev, createOpen: false }))}
         data={modalData}
-        fn={refreshContext}
+        fn={refresh}
       />
       <DeleteDir
         open={modalData.deleteOpen}
         enqueueSnackbar={enqueueSnackbar}
-        onClose={() => setModalData((prevState) => ({ ...prevState, deleteOpen: false }))}
+        onClose={() => setModalData((prev) => ({ ...prev, deleteOpen: false }))}
         data={modalData}
         fn={() => handleDeleteDir(modalData.path)}
       />
       <RenameDir
         open={modalData.renameOpen}
         enqueueSnackbar={enqueueSnackbar}
-        onClose={() => setModalData((prevState) => ({ ...prevState, renameOpen: false }))}
+        onClose={() => setModalData((prev) => ({ ...prev, renameOpen: false }))}
         data={modalData}
-        fn={refreshContext}
+        fn={refresh}
       />
       <VaultImport
         open={modalData.vaultImportOpen}
         enqueueSnackbar={enqueueSnackbar}
-        onClose={() => setModalData((prevState) => ({ ...prevState, vaultImportOpen: false }))}
+        onClose={() => setModalData((prev) => ({ ...prev, vaultImportOpen: false }))}
         data={modalData}
-        fn={refreshContext}
+        fn={refresh}
       />
       <VaultExport
         open={modalData.vaultExportOpen}
         enqueueSnackbar={enqueueSnackbar}
-        onClose={() => setModalData((prevState) => ({ ...prevState, vaultExportOpen: false }))}
+        onClose={() => setModalData((prev) => ({ ...prev, vaultExportOpen: false }))}
         data={modalData}
-        fn={refreshContext}
+        fn={refresh}
       />
       <ContextMenu
         items={contextItems}
@@ -581,6 +589,6 @@ function Explorer() {
       />
     </div>
   );
-}
+};
 
 export default Explorer;

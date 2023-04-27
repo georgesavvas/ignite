@@ -12,68 +12,79 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-import React, {useContext} from "react";
-
-import Typography from "@mui/material/Typography";
-import { useSnackbar } from "notistack";
-
-import {CopyToClipboard, ShowInExplorer, clearRepr} from "../ContextActions";
-import {setReprForProject, setReprForParent} from "../ContextActions";
-import {DIRECTORYICONS, DIRCONTEXTOPTIONS, DCCINFO} from "../../constants";
-import Tile from "../../components/Tile";
-import {ContextContext} from "../../contexts/ContextContext";
-import {CrateContext} from "../../contexts/CrateContext";
 import { Box } from "@mui/material";
+import Typography from "@mui/material/Typography";
+import { DCCINFO } from "@renderer/constants/dccInfo";
+import { DIRCONTEXTOPTIONS } from "@renderer/constants/directoryContextOptions";
+import { DIRECTORYICONS } from "@renderer/constants/directoryIcons";
+import { ClickEvent, Directory, Scene } from "@renderer/types/common";
+import { useSnackbar } from "notistack";
+import React, { useContext } from "react";
 
+import Tile from "../../components/Tile";
+import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
+import { CrateContext, CrateContextType } from "../../contexts/CrateContext";
+import { CopyToClipboard, ShowInExplorer, clearRepr } from "../ContextActions";
+import { setReprForParent, setReprForProject } from "../ContextActions";
 
-const folderIcon = new URL("@assets/folder_icon.png", import.meta.url).href; 
+const folderIcon = new URL("@assets/folder_icon.png", import.meta.url).href;
 const dccUnknownIcon = new URL("@assets/dcc/unknown.png", import.meta.url).href;
 
-const getDccIcon = name => {
-  if (!name) return;
-  const dcc = DCCINFO.find(dcc =>
-    dcc.keywords.some(keyword => 
-      name.toLowerCase().replaceAll(" ", "").includes(keyword)
-    )
+const getDccIcon = (name: string) => {
+  if (!name) return "";
+  const dcc = DCCINFO.find((dcc) =>
+    dcc.keywords.some((keyword: string) => name.toLowerCase().replaceAll(" ", "").includes(keyword))
   );
   return `src/assets/${dcc?.icon}`;
 };
 
-function DirectoryTile(props) {
-  const {enqueueSnackbar} = useSnackbar();
-  const {addToCrate} = useContext(CrateContext);
-  const [currentContext, setCurrentContext] = useContext(ContextContext);
+const isDirectoryScene = (entity: Directory | Scene): entity is Scene => {
+  return entity.dir_kind === "scene";
+};
+
+interface DirectoryTileProps {
+  entity: Directory | Scene;
+  size: number;
+  selected: boolean;
+  viewType: "dynamic" | "tasks" | "assets" | "scenes";
+  onSelected: (entity: Directory) => void;
+  refreshContext: () => void;
+  handleContextMenuSelection: (action: string, data: any) => void;
+}
+
+const DirectoryTile = (props: DirectoryTileProps) => {
+  const { enqueueSnackbar } = useSnackbar();
+  const { addToCrate } = useContext(CrateContext) as CrateContextType;
+  const { currentContext, setCurrentContext } = useContext(ContextContext) as ContextContextType;
   const hasThumbnail = props.entity.thumbnail?.filename !== undefined;
-  const isScene = props.entity.dir_kind === "scene";
-  const sceneIcon = isScene ? getDccIcon(props.entity.dcc) : undefined;
+  const isScene = isDirectoryScene(props.entity);
+  let sceneIcon = isDirectoryScene(props.entity) ? getDccIcon(props.entity.dcc) : undefined;
   const thumbnailWidth = sceneIcon || hasThumbnail ? "100%" : "30%";
-  const currentPath = currentContext.path_nr
-    ?.replace(currentContext.project + "/", "");
+  const currentPath = currentContext.path_nr?.replace(currentContext.project + "/", "");
   let contextPath = props.entity.context.replace(currentPath, "");
   if (contextPath.startsWith("/")) contextPath = contextPath.slice(1);
 
   const dirData = {
     path: props.entity.path,
     kind: props.entity.dir_kind,
-    name: props.entity.name
+    name: props.entity.name,
   };
 
-  function getGenericContextItems(entity) {
+  function getGenericContextItems(entity: Directory | Scene) {
     return [
       {
         label: "Copy path",
-        fn: () =>  CopyToClipboard(entity.path, enqueueSnackbar)
+        fn: () => CopyToClipboard(entity.path, enqueueSnackbar),
       },
       {
         label: "Open in file explorer",
         fn: () => ShowInExplorer(entity.path, enqueueSnackbar),
-        divider: true
+        divider: true,
       },
       {
         label: "Add to crate",
         fn: () => addToCrate([entity]),
-        divider: true
+        divider: true,
       },
       // {
       //   label: "Import asset from Vault",
@@ -82,57 +93,63 @@ function DirectoryTile(props) {
       // },
       {
         label: "Clear thumbnail asset",
-        fn: () => clearRepr(entity.path, enqueueSnackbar)
+        fn: () => clearRepr(entity.path, enqueueSnackbar, props.refreshContext),
       },
       {
         label: "Use thumbnail for project",
-        fn: () => setReprForProject(entity.path, enqueueSnackbar)
+        fn: () => setReprForProject(entity.path, enqueueSnackbar),
       },
       {
         label: "Use representative for parent",
         fn: () => setReprForParent(entity.path, enqueueSnackbar),
-        divider: true
+        divider: true,
       },
       {
         label: `Rename ${entity.dir_kind}`,
-        fn: () => props.handleContextMenuSelection("rename", dirData)
+        fn: () => props.handleContextMenuSelection("rename", dirData),
       },
       {
         label: `Delete ${entity.dir_kind}`,
         fn: () => props.handleContextMenuSelection("delete", dirData),
-        divider: true
-      }
+        divider: true,
+      },
     ];
   }
 
-  function getSpecificContextItems(entity) {
-    if (!DIRCONTEXTOPTIONS[entity.dir_kind]) return [];
-    const kindOptions = DIRCONTEXTOPTIONS[entity.dir_kind];
-    const namedOptions = kindOptions[entity.name] || kindOptions.default;
-    return namedOptions.map(contextOption => ({
+  function getSpecificContextItems(entity: Directory | Scene) {
+    if (!DIRCONTEXTOPTIONS[entity.dir_kind as keyof typeof DIRCONTEXTOPTIONS]) return [];
+    const kindOptions = DIRCONTEXTOPTIONS[entity.dir_kind as keyof typeof DIRCONTEXTOPTIONS];
+    const namedOptions =
+      kindOptions[entity.name as keyof typeof kindOptions] || kindOptions.default;
+    return namedOptions.map((contextOption) => ({
       label: contextOption.label,
       value: contextOption.name,
       dir_path: entity.path,
-      fn: () => props.handleContextMenuSelection(
-        "create", {...entity, method: contextOption.name, kind: contextOption.dir_kind}
-      )
+      fn: () =>
+        props.handleContextMenuSelection("create", {
+          ...entity,
+          method: contextOption.name,
+          kind: contextOption.dir_kind,
+        }),
     }));
   }
 
-  const handleClick = e => {
+  const handleClick = (e: ClickEvent) => {
     if (e.detail === 2) {
       var path = props.entity.path;
       if (props.entity.task) {
-        path = props.entity.task.path;
+        path = props.entity.task;
       }
       setCurrentContext(path);
     }
   };
 
-  const name = isScene ? props.entity.dcc : props.entity.name;
+  const name = isDirectoryScene(props.entity) ? props.entity.dcc : props.entity.name;
 
-  let Icon = props.entity.icon && props.entity.icon in DIRECTORYICONS ?
-    DIRECTORYICONS[props.entity.icon] : undefined;
+  let Icon =
+    props.entity.icon && props.entity.icon in DIRECTORYICONS
+      ? DIRECTORYICONS[props.entity.icon]
+      : undefined;
 
   const getBadge = () => {
     if (!hasThumbnail) return null;
@@ -143,24 +160,22 @@ function DirectoryTile(props) {
       height: "25px",
       width: "25px",
       borderRadius: "2px",
-      color: "rgb(150, 150, 150)"
-    };
-    if (isScene && sceneIcon) return (
-      <img src={sceneIcon} style={style} />
-    );
+      color: "rgb(150, 150, 150)",
+    } as React.CSSProperties;
+    if (isScene && sceneIcon) return <img src={sceneIcon} style={style} />;
     return <Box component={Icon} style={style} />;
   };
 
   function details() {
     return (
       <>
-        <Typography style={{position: "absolute", top: "5px", left: "10px"}}>
+        <Typography style={{ position: "absolute", top: "5px", left: "10px" }}>
           {contextPath || props.entity.dir_kind}
         </Typography>
-        <Typography style={{position: "absolute", bottom: "5px", left: "10px"}}>
+        <Typography style={{ position: "absolute", bottom: "5px", left: "10px" }}>
           {name}
         </Typography>
-        <Typography style={{position: "absolute", bottom: "5px", right: "10px"}}>
+        <Typography style={{ position: "absolute", bottom: "5px", right: "10px" }}>
           {props.entity.version}
         </Typography>
         {getBadge()}
@@ -173,20 +188,20 @@ function DirectoryTile(props) {
   if (isScene) {
     const goToTaskItem = {
       label: "Go to task",
-      fn: () =>  setCurrentContext(props.entity.task),
-      divider: true
+      fn: () => setCurrentContext(props.entity.task),
+      divider: true,
     };
     contextItems.splice(2, 0, goToTaskItem);
   } else if (props.entity.dir_kind === "task") {
     const goToTaskItem = {
       label: "Go to task",
-      fn: () =>  setCurrentContext(props.entity.path),
-      divider: true
+      fn: () => setCurrentContext(props.entity.path),
+      divider: true,
     };
     contextItems.splice(2, 0, goToTaskItem);
   }
 
-  const handleDragStart = e => {
+  const handleDragStart = (e: React.DragEvent) => {
     e.dataTransfer.setData("text/plain", props.entity.uri);
     e.dataTransfer.setData("ignite/kind", props.entity.kind);
     e.dataTransfer.setData("ignite/path", props.entity.path);
@@ -207,9 +222,8 @@ function DirectoryTile(props) {
         thumbnailWidth={thumbnailWidth}
         onClick={handleClick}
         contextItems={contextItems}
-        columnWidths={isScene ?
-          ["100px", "100px", "100px", "200px"] :
-          ["100px", "100px", "100px", "200px"]
+        columnWidths={
+          isScene ? ["100px", "100px", "100px", "200px"] : ["100px", "100px", "100px", "200px"]
         }
         draggable={true}
         onDragStart={handleDragStart}
@@ -218,6 +232,6 @@ function DirectoryTile(props) {
       </Tile>
     </>
   );
-}
+};
 
 export default DirectoryTile;

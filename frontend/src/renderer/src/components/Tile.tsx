@@ -12,35 +12,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ClickEvent, ContextItem, Directory } from "@renderer/types/common";
+import { SvgIconProps } from "@mui/material";
+import { ClickEvent, ContextItem, Directory, Entity } from "@renderer/types/common";
 import { useContext, useRef, useState } from "react";
 
-import { ConfigContext } from "../contexts/ConfigContext";
+import { ConfigContext, ConfigContextType } from "../contexts/ConfigContext";
 import BuildFileURL from "../services/BuildFileURL";
 import { clamp } from "../utils/math";
-import ContextMenu, { handleContextMenu } from "./ContextMenu";
+import ContextMenu, { ContextMenuType, handleContextMenu } from "./ContextMenu";
 import styles from "./Tile.module.css";
 
 type TileProps = React.PropsWithChildren<{
-  thumbnailComp: JSX.Element;
-  noOverlay: boolean;
-  thumbnail: string;
-  noBorder: boolean;
-  selected: boolean;
-  onSelected: (entity: Directory) => void;
+  thumbnailComp?: React.ComponentType<SvgIconProps>;
+  noOverlay?: boolean;
+  thumbnail?: string;
+  noBorder?: boolean;
+  selected?: boolean;
+  onSelected?: (entity: Entity) => void;
   thumbnailWidth: string;
   entity: Directory;
-  onClick: (e: ClickEvent) => void;
+  onClick?: (e: ClickEvent) => void;
   contextItems: ContextItem[];
-  noInfo: boolean;
-  onDragStart: () => void;
+  noInfo?: boolean;
+  onDragStart: (e: React.DragEvent) => void;
   draggable: boolean;
-  noTopGradient: boolean;
-  noBottomGradient: boolean;
+  noTopGradient?: boolean;
+  noBottomGradient?: boolean;
+  columnWidths?: string[];
 }>;
 
 export const Tile = (props: TileProps) => {
-  const [contextMenu, setContextMenu] = useState(null);
+  const [contextMenu, setContextMenu] = useState<ContextMenuType | null>(null);
   const { config } = useContext(ConfigContext) as ConfigContextType;
   const [progress, setProgress] = useState(0);
   const hoverArea = useRef<HTMLInputElement>(null);

@@ -12,54 +12,63 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-import React, {useState} from "react";
-
+import { SvgIconProps } from "@mui/material";
 import Link from "@mui/material/Link";
-import {useSnackbar} from "notistack";
+import { ClickEvent } from "@renderer/types/common";
+import { useSnackbar } from "notistack";
+import { useState } from "react";
 
-import {CopyToClipboard} from "../ContextActions";
-import ContextMenu, {handleContextMenu} from "../../components/ContextMenu";
+import ContextMenu, { ContextMenuType, handleContextMenu } from "../../components/ContextMenu";
 import openExplorer from "../../utils/openExplorer";
+import { CopyToClipboard } from "../ContextActions";
 
+interface ContextBarLinkProps {
+  root: string;
+  path: string;
+  icon: React.ComponentType<SvgIconProps>;
+  setCurrentContext: (path: string) => void;
+  children: React.ReactNode[];
+}
 
-function ContextBarLink(props) {
-  const {enqueueSnackbar} = useSnackbar();
-  const [contextMenu, setContextMenu] = useState(null);
+const ContextBarLink = (props: ContextBarLinkProps) => {
+  const { enqueueSnackbar } = useSnackbar();
+  const [contextMenu, setContextMenu] = useState<ContextMenuType | null>(null);
   const Icon = props.icon;
   const contextItems = [
     {
-      "label": "Copy path",
-      "fn": () =>  CopyToClipboard(`${props.root}/${props.path}`, enqueueSnackbar),
-      "divider": true
+      label: "Copy path",
+      fn: () => CopyToClipboard(`${props.root}/${props.path}`, enqueueSnackbar),
+      divider: true,
     },
     {
-      "label": "Open in file explorer",
-      "fn": () => openExplorer(`${props.root}/${props.path}`, enqueueSnackbar)
+      label: "Open in file explorer",
+      fn: () => openExplorer(`${props.root}/${props.path}`, enqueueSnackbar),
     },
   ];
 
-  const _handleContextMenu = e => {
+  const _handleContextMenu = (e: ClickEvent) => {
     handleContextMenu(e, contextMenu, setContextMenu);
   };
 
   return (
     <>
-      <ContextMenu items={contextItems} contextMenu={contextMenu}
-        setContextMenu={setContextMenu}
-      />
-      <Link underline="hover" style={{cursor: "pointer"}}
-        onClick={e => {
+      <ContextMenu items={contextItems} contextMenu={contextMenu} setContextMenu={setContextMenu} />
+      <Link
+        underline="hover"
+        style={{ cursor: "pointer" }}
+        onClick={(e) => {
           e.stopPropagation();
           props.setCurrentContext(props.path);
-        }} onContextMenu={_handleContextMenu}
-        sx={{ display: "flex", alignItems: "center" }}  color="inherit"
+        }}
+        onContextMenu={_handleContextMenu}
+        sx={{ display: "flex", alignItems: "center" }}
+        color="inherit"
       >
         <Icon sx={{ mr: 0.5 }} fontSize="inherit" />
         {props.children}
       </Link>
     </>
   );
-}
+};
 
 export default ContextBarLink;

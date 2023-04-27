@@ -23,7 +23,7 @@ import styles from "./PageBar.module.css";
 interface PageBarProps {
   pages: number;
   onChange: PaginationProps["onChange"];
-  tilesPerPage: number;
+  tilesPerPage?: number;
   onTilesPerPageChange: (e: InputChangeEvent) => void;
   tileSize: number;
   onTileSizeChange: SliderProps["onChange"];
