@@ -12,35 +12,46 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import ClearIcon from "@mui/icons-material/Clear";
 import { Checkbox, FormControlLabel } from "@mui/material";
-import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
-import { useContext, useEffect, useState } from "react";
-
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import ClearIcon from "@mui/icons-material/Clear";
-import DynamicList from "../../components/DynamicList";
 import { EnqueueSnackbar } from "@renderer/types/common";
+import { useContext, useEffect, useState } from "react";
+
+import DynamicList from "../../components/DynamicList";
 import FileInput from "../../components/FileInput";
 import IgnTextField from "../../components/IgnTextField";
 import Modal from "../../components/Modal";
-import TagContainer from "../DetailsView/TagContainer";
+import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
 import clientRequest from "../../services/clientRequest";
+import TagContainer from "../DetailsView/TagContainer";
 import styles from "./NewAsset.module.css";
+
+type NewIgniteComponent = {
+  name?: string;
+  source?: string;
+  sequence?: boolean;
+  info?: {
+    path?: string;
+    sequence_expr?: string;
+  };
+};
 
 interface NewAssetProps {
   droppedFiles: File[];
   clearDroppedFiles: () => void;
   enqueueSnackbar: EnqueueSnackbar;
   path: string;
+  open: boolean;
   onClose: () => void;
 }
 
 const NewAsset = (props: NewAssetProps) => {
   const [name, setName] = useState("");
   const [nameError, setNameError] = useState(false);
-  const [comps, setComps] = useState([{}, {}]);
-  const [tags, setTags] = useState([]);
+  const [comps, setComps] = useState<NewIgniteComponent[]>([{}, {}]);
+  const [tags, setTags] = useState<string[]>([]);
   const { currentContext, refresh } = useContext(ContextContext) as ContextContextType;
 
   useEffect(() => {
@@ -99,8 +110,8 @@ const NewAsset = (props: NewAssetProps) => {
     });
   };
 
-  const handleCompChange = async (index: s, field, value) => {
-    let info = undefined;
+  const handleCompChange = async (index: number, field: "name" | "source", value: string) => {
+    let info: NewIgniteComponent["info"];
     if (field == "source" && value) {
       info = await clientRequest("process_filepath", { path: value }).then((resp) => resp.data);
     }
@@ -116,7 +127,7 @@ const NewAsset = (props: NewAssetProps) => {
     });
   };
 
-  const handleSequenceChange = (index, value) => {
+  const handleSequenceChange = (index: number, value: boolean) => {
     setComps((prev) => {
       const existing = [...prev];
       const comp = existing[index];
@@ -126,19 +137,19 @@ const NewAsset = (props: NewAssetProps) => {
     });
   };
 
-  const handleCompSequence = (comp) => {
+  const handleCompSequence = (comp: NewIgniteComponent) => {
     if (!comp.info) return comp;
     if (comp.sequence) comp.source = comp.info.sequence_expr;
     else comp.source = comp.info.path;
     return comp;
   };
 
-  const handleAddTags = (tags) => {
+  const handleAddTags = (tags: string) => {
     const processed = tags.split(",").map((tag) => tag.trim());
     setTags((prev) => Array.from(new Set(prev.concat(processed))));
   };
 
-  const handleRemoveTag = (tag) => {
+  const handleRemoveTag = (tag: string) => {
     setTags((prev) => prev.filter((t) => t !== tag));
   };
 
@@ -201,7 +212,7 @@ const NewAsset = (props: NewAssetProps) => {
                     fullWidth
                     size="small"
                     value={comp.source || ""}
-                    onChange={(_, value) => handleCompChange(index, "source", value)}
+                    onChange={(_: any, value: string) => handleCompChange(index, "source", value)}
                   />
                 </div>
               </div>

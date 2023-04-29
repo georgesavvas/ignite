@@ -12,30 +12,41 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-import React, {useState} from "react";
-
 import Typography from "@mui/material/Typography";
-import {useXarrow} from "react-xarrows";
-
-import styles from "./Files.module.css";
-import DynamicList from "../../components/DynamicList";
-import IgnTextField from "../../components/IgnTextField";
-import IgnButton from "../../components/IgnButton";
+import { useState } from "react";
 import { useEffect } from "react";
+import { useXarrow } from "react-xarrows";
 
+import DynamicList from "../../components/DynamicList";
+import IgnButton from "../../components/IgnButton";
+import IgnTextField from "../../components/IgnTextField";
+import styles from "./Files.module.css";
 
-function File({filepath, id, number}) {
+interface FileProps {
+  filepath: string;
+  id: string;
+  number: number;
+}
+
+function File({ filepath, id, number }: FileProps) {
   const fileId = `[${number}] `;
   return (
     <div className={styles.fileContainer}>
-      <Typography variant="caption">{fileId}{filepath}</Typography>
+      <Typography variant="caption">
+        {fileId}
+        {filepath}
+      </Typography>
       <div className={styles.connector} id={id} />
     </div>
   );
 }
 
-function Files(props) {
+interface FilesProps {
+  files: string[];
+  onDirsChange: (dirs: string) => void;
+}
+
+const Files = (props: FilesProps) => {
   const updateXarrow = useXarrow();
   const [sources, setSources] = useState("");
 
@@ -43,19 +54,19 @@ function Files(props) {
     props.onDirsChange(sources);
   }, [sources]);
 
-  const handleSourceChange = value => {
+  const handleSourceChange = (value: string) => {
     const list = value.split("\n");
     setSources(list.join("\n"));
   };
 
-  const handleAddFiles = async dir => {
-    const resp = dir ?
-      await window.api.dirInput(["multiSelections"]) :
-      await window.api.fileInput(["multiSelections"]);
+  const handleAddFiles = async (dir?: boolean) => {
+    const resp = dir
+      ? await window.api.dirInput(["multiSelections"])
+      : await window.api.fileInput(["multiSelections"]);
     if (resp.cancelled) return;
     const filePaths = resp.filePaths;
     if (!filePaths?.length) return;
-    setSources(prev => {
+    setSources((prev) => {
       let existing = prev ? prev.split("\n") : [];
       existing = existing.concat(filePaths);
       const unique = Array.from(new Set(existing)).join("\n");
@@ -66,16 +77,12 @@ function Files(props) {
   return (
     <div className={styles.container}>
       <Typography variant="h6">Incoming files</Typography>
-      <div style={{alignSelf: "stretch", display: "flex", flexDirection: "column", gap: "5px"}}>
-        <div style={{display: "flex", gap: "5px"}}>
-          <IgnButton variant="outlined" fullWidth
-            onClick={() => handleAddFiles(true)}
-          >
+      <div style={{ alignSelf: "stretch", display: "flex", flexDirection: "column", gap: "5px" }}>
+        <div style={{ display: "flex", gap: "5px" }}>
+          <IgnButton variant="outlined" fullWidth onClick={() => handleAddFiles(true)}>
             Add dirs
           </IgnButton>
-          <IgnButton variant="outlined" fullWidth
-            onClick={() => handleAddFiles()}
-          >
+          <IgnButton variant="outlined" fullWidth onClick={() => handleAddFiles()}>
             Add files
           </IgnButton>
         </div>
@@ -85,26 +92,19 @@ function Files(props) {
           multiline
           maxRows={5}
           value={sources}
-          onChange={e => handleSourceChange(e.target.value)}
-          onBlur={e => handleSourceChange(e.target.value)}
+          onChange={(e) => handleSourceChange(e.target.value)}
+          onBlur={(e) => handleSourceChange(e.target.value)}
         />
       </div>
       <DynamicList dense noButtons onScroll={updateXarrow}>
-        {
-          props.files ?
-            props.files.map((child, index) =>
-              <File
-                filepath={child}
-                key={index}
-                number={index}
-                id={"file-" + index}
-              />
-            )
-            : null
-        }
+        {props.files
+          ? props.files.map((child, index) => (
+              <File filepath={child} key={index} number={index} id={"file-" + index} />
+            ))
+          : null}
       </DynamicList>
     </div>
   );
-}
+};
 
 export default Files;

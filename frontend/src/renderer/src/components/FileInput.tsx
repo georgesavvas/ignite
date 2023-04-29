@@ -21,11 +21,11 @@ import styles from "./FileInput.module.css";
 import IgnButton from "./IgnButton";
 
 type FileInputProps = React.PropsWithChildren<{
-  label: string;
+  label?: string;
   size: string;
   fullWidth?: boolean;
   disabled?: boolean;
-  onChange?: Function;
+  onChange?: (e: InputChangeEvent, value: string) => void;
   multiline?: boolean;
   style?: React.CSSProperties;
   value?: any;
@@ -33,6 +33,7 @@ type FileInputProps = React.PropsWithChildren<{
   multi?: boolean;
   buttonLabel?: string;
   directory?: boolean;
+  placeholder: string;
 }>;
 
 export const FileInput = (props: FileInputProps) => {

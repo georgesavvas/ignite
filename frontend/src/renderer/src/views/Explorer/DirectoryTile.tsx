@@ -21,7 +21,7 @@ import { ClickEvent, Directory, Scene } from "@renderer/types/common";
 import { useSnackbar } from "notistack";
 import React, { useContext } from "react";
 
-import Tile from "../../components/Tile";
+import Tile, { TileProps } from "../../components/Tile";
 import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
 import { CrateContext, CrateContextType } from "../../contexts/CrateContext";
 import { CopyToClipboard, ShowInExplorer, clearRepr } from "../ContextActions";
@@ -42,13 +42,12 @@ const isDirectoryScene = (entity: Directory | Scene): entity is Scene => {
   return entity.dir_kind === "scene";
 };
 
-interface DirectoryTileProps {
+interface DirectoryTileProps extends TileProps {
   entity: Directory | Scene;
-  size: number;
-  selected: boolean;
-  viewType: "dynamic" | "tasks" | "assets" | "scenes";
-  onSelected: (entity: Directory) => void;
-  refreshContext: () => void;
+  onSelected?: (entity: Directory) => void;
+  viewType?: "dynamic" | "tasks" | "assets" | "scenes";
+  refreshContext?: () => void;
+  onContextMenu: () => void;
   handleContextMenuSelection: (action: string, data: any) => void;
 }
 

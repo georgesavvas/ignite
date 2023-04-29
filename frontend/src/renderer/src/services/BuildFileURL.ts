@@ -20,8 +20,8 @@ interface Options {
   forceRemote?: Boolean;
 }
 
-function BuildFileURL(filepath: string, config: Config, options: Options = {}): string {
-  if (!filepath || filepath === undefined) return "";
+function BuildFileURL(filepath: string | undefined, config: Config, options: Options = {}): string {
+  if (!filepath) return "";
   const address = config.serverDetails.address;
   const remote = config.access.remote;
 

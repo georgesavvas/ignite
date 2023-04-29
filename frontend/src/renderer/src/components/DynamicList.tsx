@@ -31,8 +31,8 @@ const createListItem = (child: React.ReactNode, index: number, dense?: boolean) 
 
 interface ButtonProps {
   title?: string;
-  onAdd: Function;
-  onRemove: Function;
+  onAdd?: Function;
+  onRemove?: Function;
 }
 
 const buttons = (props: ButtonProps) => {
@@ -54,11 +54,11 @@ interface DynamicListProps {
   onScroll?: React.UIEventHandler<HTMLUListElement>;
   style?: React.CSSProperties;
   title?: string;
-  onAdd: Function;
-  onRemove: Function;
+  onAdd?: Function;
+  onRemove?: Function;
   dense?: boolean;
   innerRef?: any;
-  children: React.ReactNode[];
+  children: React.ReactNode | React.ReactNode[];
 }
 
 const DynamicList = (props: DynamicListProps) => {

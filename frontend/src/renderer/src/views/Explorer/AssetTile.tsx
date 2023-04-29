@@ -17,19 +17,18 @@ import { AssetVersion } from "@renderer/types/common";
 import { useSnackbar } from "notistack";
 import { useContext } from "react";
 
-import Tile from "../../components/Tile";
+import Tile, { TileProps } from "../../components/Tile";
 import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
 import { CrateContext, CrateContextType } from "../../contexts/CrateContext";
 import { CopyToClipboard, ShowInExplorer } from "../ContextActions";
 import { setReprForParent, setReprForProject } from "../ContextActions";
 
-interface AssetTileProps {
+interface AssetTileProps extends TileProps {
   entity: AssetVersion;
-  size: number;
-  viewType: "dynamic" | "tasks" | "assets" | "scenes";
-  selected: boolean;
-  refreshContext: () => void;
-  onSelected: (entity: AssetVersion) => void;
+  onSelected?: (entity: AssetVersion) => void;
+  viewType?: "dynamic" | "tasks" | "assets" | "scenes";
+  refreshContext?: () => void;
+  onContextMenu: () => void;
   handleContextMenuSelection: (action: string, data: any) => void;
 }
 

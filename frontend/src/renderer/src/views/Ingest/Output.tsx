@@ -12,56 +12,69 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-import React from "react";
-
-import Typography from "@mui/material/Typography";
-import {useXarrow} from "react-xarrows";
 import Divider from "@mui/material/Divider";
+import Typography from "@mui/material/Typography";
+import { useXarrow } from "react-xarrows";
 
-import styles from "./Output.module.css";
 import DynamicList from "../../components/DynamicList";
+import styles from "./Output.module.css";
 
+type NewAsset = {
+  name: string;
+  valid: boolean;
+  task: string;
+  comps: {
+    name: string;
+    source: string;
+    trimmed: string;
+  }[];
+};
 
-function Asset({data, id}) {
+interface AssetProps {
+  data: NewAsset;
+  id: string;
+}
+
+const Asset = ({ data, id }: AssetProps) => {
   return (
-    <div
-      className={`${styles.assetContainer} ${data.valid ? "" : styles.invalid}`}
-    >
+    <div className={`${styles.assetContainer} ${data.valid ? "" : styles.invalid}`}>
       <Typography variant="h6">{data.name}</Typography>
       <Typography variant="caption">Ingest in Task: {data.task}</Typography>
-      <Divider textAlign="left" sx={{margin: "5px 0 5px 0"}}>Components</Divider>
-      {data.comps.map((comp, index) => 
+      <Divider textAlign="left" sx={{ margin: "5px 0 5px 0" }}>
+        Components
+      </Divider>
+      {data.comps.map((comp, index) => (
         <div className={styles.compContainer} key={index}>
-          <Typography variant="caption">
-            {comp.name || "[No component name]"}
-          </Typography>
-          <Typography variant="caption" style={{color: "rgb(150, 150, 150)"}}>
+          <Typography variant="caption">{comp.name || "[No component name]"}</Typography>
+          <Typography variant="caption" style={{ color: "rgb(150, 150, 150)" }}>
             ({comp.trimmed})
           </Typography>
         </div>
-      )}
+      ))}
       <div className={styles.connector} id={id} />
     </div>
   );
+};
+
+interface OutputProps {
+  assets: NewAsset[];
 }
 
-function Output(props) {
+const Output = (props: OutputProps) => {
   const updateXarrow = useXarrow();
 
   return (
     <div className={styles.container}>
       <Typography variant="h6">Output Preview</Typography>
-      <DynamicList noButtons onScroll={updateXarrow} style={{marginTop: "34px"}}>
-        {
-          props.assets ?
-            props.assets.map((child, index) =>
-              <Asset data={child} key={index}id={"asset-" + index} />)
-            : null
-        }
+      <DynamicList noButtons onScroll={updateXarrow} style={{ marginTop: "34px" }}>
+        {props.assets
+          ? props.assets.map((child, index) => (
+              <Asset data={child} key={index} id={"asset-" + index} />
+            ))
+          : null}
       </DynamicList>
     </div>
   );
-}
+};
 
 export default Output;
