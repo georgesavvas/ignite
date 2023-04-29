@@ -12,48 +12,59 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { ClickEvent, EnqueueSnackbar, InputChangeEvent } from "@renderer/types/common";
+import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
+import ContextMenu, { ContextMenuType, handleContextMenu } from "../../components/ContextMenu";
+import { useContext, useEffect, useState } from "react";
 
-import React, {useState, useContext, useEffect} from "react";
-
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import Checkbox from "@mui/material/Checkbox";
+import ContextBar from "./ContextBar";
+import FilterField from "../../components/FilterField";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import GridViewIcon from "../../icons/GridViewIcon";
+import IconButton from "@mui/material/IconButton";
+import IgnButton from "../../components/IgnButton";
+import Ingest from "../Ingest/Ingest";
+import NewAsset from "./NewAsset";
+import RowViewIcon from "../../icons/RowViewIcon";
+import SortIcon from "@mui/icons-material/Sort";
 import Stack from "@mui/material/Stack";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
-import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
-import SortIcon from "@mui/icons-material/Sort";
-import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 
-import IgnButton from "../../components/IgnButton";
-import ContextMenu, { handleContextMenu } from "../../components/ContextMenu";
-import FilterField from "../../components/FilterField";
-import GridViewIcon from "../../icons/GridViewIcon";
-import RowViewIcon from "../../icons/RowViewIcon";
-import {ContextContext} from "../../contexts/ContextContext";
-import Ingest from "../Ingest/Ingest";
-import ContextBar from "./ContextBar";
-import NewAsset from "./NewAsset";
-
-const style = { 
+const style = {
   display: "flex",
   justifyContent: "space-between",
   padding: "1px",
   alignItems: "center",
-  gap: "5px"
+  gap: "5px",
 };
 
-const iconButtonStyle = {height: "34.25px", width: "34.25px"};
+const iconButtonStyle = { height: "34.25px", width: "34.25px" };
 
-function ExplorerBar(props) {
+interface ExplorerBarProps {
+  droppedFiles: File[];
+  clearDroppedFiles: () => void;
+  enqueueSnackbar: EnqueueSnackbar;
+  resultType: string;
+  onResultTypeChange: (value: string) => void;
+  viewType: string;
+  onViewTypeChange: (value: string) => void;
+  setQuery: Function;
+  onFilterChange: (value: string) => void;
+  onNewScene: () => void;
+  onLatestChange: () => void;
+}
+
+const ExplorerBar = (props: ExplorerBarProps) => {
   const [ingestOpen, setIngestOpen] = useState(false);
   const [newAssetOpen, setNewAssetOpen] = useState(false);
-  const [filterMenu, setFilterMenu] = useState(null);
-  const [
-    currentContext,
-    setCurrentContext,
-    refreshContext
-  ] = useContext(ContextContext);
+  const [filterMenu, setFilterMenu] = useState<ContextMenuType | null>(null);
+  const { currentContext, setCurrentContext, refresh } = useContext(
+    ContextContext
+  ) as ContextContextType;
   const [filterValue, setFilterValue] = useState("");
 
   useEffect(() => {
@@ -62,11 +73,11 @@ function ExplorerBar(props) {
     }
   }, [props.droppedFiles]);
 
-  const handleResultTypeChange = (e, value) => {
+  const handleResultTypeChange = (e: InputChangeEvent, value: string) => {
     if (value !== null) props.onResultTypeChange(value);
   };
 
-  const handleViewTypeChange = (e, value) => {
+  const handleViewTypeChange = (e: InputChangeEvent, value: string) => {
     if (value !== null) props.onViewTypeChange(value);
   };
 
@@ -74,13 +85,16 @@ function ExplorerBar(props) {
     setCurrentContext(currentContext.parent);
   };
 
-  const handleFilterChange = value => {
+  const handleFilterChange = (value: string) => {
     setFilterValue(value);
     props.onFilterChange(value);
   };
 
-  const handleSortChange = (field, reverse, label) => {
-    props.setQuery(prevState => ({...prevState, sort: {field: field, reverse: reverse, label: label}}));
+  const handleSortChange = (field: string, reverse: boolean, label: string) => {
+    props.setQuery((prevState) => ({
+      ...prevState,
+      sort: { field: field, reverse: reverse, label: label },
+    }));
   };
 
   const filterOptions = [
@@ -107,10 +121,10 @@ function ExplorerBar(props) {
     {
       label: "Version (Lowest first)",
       fn: () => handleSortChange("version", false, "Version (Lowest first)"),
-    }
+    },
   ];
 
-  const handleSortClicked = e => {
+  const handleSortClicked = (e: ClickEvent) => {
     handleContextMenu(e, filterMenu, setFilterMenu);
   };
 
@@ -123,20 +137,22 @@ function ExplorerBar(props) {
   };
 
   return (
-    <div style={{padding: "0 5px 3px 5px", display: "flex", flexDirection: "column"}}>
-      <ContextMenu items={filterOptions} contextMenu={filterMenu}
-        setContextMenu={setFilterMenu}
-      />
+    <div style={{ padding: "0 5px 3px 5px", display: "flex", flexDirection: "column" }}>
+      <ContextMenu items={filterOptions} contextMenu={filterMenu} setContextMenu={setFilterMenu} />
       <div style={style}>
-        <Ingest open={ingestOpen} onClose={() => setIngestOpen(false)}
+        <Ingest
+          open={ingestOpen}
+          onClose={() => setIngestOpen(false)}
           enqueueSnackbar={props.enqueueSnackbar}
         />
-        <NewAsset open={newAssetOpen} onClose={() => setNewAssetOpen(false)}
+        <NewAsset
+          open={newAssetOpen}
+          onClose={() => setNewAssetOpen(false)}
           enqueueSnackbar={props.enqueueSnackbar}
           droppedFiles={props.droppedFiles}
           clearDroppedFiles={props.clearDroppedFiles}
         />
-        <Stack direction="row" spacing={1} >
+        <Stack direction="row" spacing={1}>
           <ToggleButtonGroup
             color="primary"
             value={props.resultType}
@@ -144,16 +160,16 @@ function ExplorerBar(props) {
             onChange={handleResultTypeChange}
             size="small"
           >
-            <ToggleButton value="dynamic" style={{height: "34.25px"}}>
+            <ToggleButton value="dynamic" style={{ height: "34.25px" }}>
               <Typography variant="button">Dynamic</Typography>
             </ToggleButton>
-            <ToggleButton value="tasks" style={{height: "34.25px"}}>
+            <ToggleButton value="tasks" style={{ height: "34.25px" }}>
               <Typography variant="button">Tasks</Typography>
             </ToggleButton>
-            <ToggleButton value="assets" style={{height: "34.25px"}}>
+            <ToggleButton value="assets" style={{ height: "34.25px" }}>
               <Typography variant="button">Assets</Typography>
             </ToggleButton>
-            <ToggleButton value="scenes" style={{height: "34.25px"}}>
+            <ToggleButton value="scenes" style={{ height: "34.25px" }}>
               <Typography variant="button">Scenes</Typography>
             </ToggleButton>
           </ToggleButtonGroup>
@@ -163,26 +179,24 @@ function ExplorerBar(props) {
             exclusive
             size="small"
           >
-            <ToggleButton value="grid" style={{height: "34.25px"}}>
+            <ToggleButton value="grid" style={{ height: "34.25px" }}>
               <GridViewIcon />
             </ToggleButton>
-            <ToggleButton value="row" style={{height: "34.25px"}}>
+            <ToggleButton value="row" style={{ height: "34.25px" }}>
               <RowViewIcon />
             </ToggleButton>
           </ToggleButtonGroup>
         </Stack>
-        <FilterField filterValue={filterValue}
-          setFilterValue={handleFilterChange}
-        />
+        <FilterField filterValue={filterValue} setFilterValue={handleFilterChange} />
         <IconButton onClick={handleSortClicked} style={iconButtonStyle}>
           <SortIcon />
         </IconButton>
-        <FormControlLabel style={{height: "34.25px"}} label="Latest"
+        <FormControlLabel
+          style={{ height: "34.25px" }}
+          label="Latest"
           control={<Checkbox defaultChecked onChange={props.onLatestChange} />}
         />
-        <IgnButton variant="outlined" style={{minWidth: "90px"}}
-          onClick={refreshContext}
-        >
+        <IgnButton variant="outlined" style={{ minWidth: "90px" }} onClick={refresh}>
           Refresh
         </IgnButton>
       </div>
@@ -192,14 +206,14 @@ function ExplorerBar(props) {
           onClick={handleGoBack}
           disabled={currentContext.dir_kind === "project"}
           size="small"
-          style={{minWidth: "35px"}}
+          style={{ minWidth: "35px" }}
         >
           <ArrowUpwardIcon />
         </IgnButton>
         <ContextBar />
         <IgnButton
-          style={{minWidth: "80px"}}
-          color="ignite" 
+          style={{ minWidth: "80px" }}
+          color="ignite"
           variant="outlined"
           disabled={currentContext.dir_kind !== "task"}
           onClick={openIngest}
@@ -207,8 +221,8 @@ function ExplorerBar(props) {
           Ingest
         </IgnButton>
         <IgnButton
-          style={{minWidth: "120px"}}
-          color="ignite" 
+          style={{ minWidth: "120px" }}
+          color="ignite"
           variant="outlined"
           disabled={currentContext.dir_kind !== "task"}
           onClick={openNewAsset}
@@ -216,7 +230,7 @@ function ExplorerBar(props) {
           New Asset
         </IgnButton>
         <IgnButton
-          style={{minWidth: "120px"}}
+          style={{ minWidth: "120px" }}
           color="ignite"
           variant="outlined"
           disabled={currentContext.dir_kind !== "task"}
@@ -227,6 +241,6 @@ function ExplorerBar(props) {
       </div>
     </div>
   );
-}
+};
 
 export default ExplorerBar;
