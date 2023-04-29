@@ -12,29 +12,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { Checkbox, FormControlLabel } from "@mui/material";
+import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
+import { useContext, useEffect, useState } from "react";
 
-import React, { useContext, useEffect, useState } from "react";
-
-import styles from "./NewAsset.module.css";
-import {Checkbox, FormControlLabel} from "@mui/material";
-import {ContextContext} from "../../contexts/ContextContext";
-import Modal from "../../components/Modal";
-import IgnTextField from "../../components/IgnTextField";
-import DynamicList from "../../components/DynamicList";
-import ClearIcon from "@mui/icons-material/Clear";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import clientRequest from "../../services/clientRequest";
-import TagContainer from "../DetailsView/TagContainer";
+import ClearIcon from "@mui/icons-material/Clear";
+import DynamicList from "../../components/DynamicList";
+import { EnqueueSnackbar } from "@renderer/types/common";
 import FileInput from "../../components/FileInput";
+import IgnTextField from "../../components/IgnTextField";
+import Modal from "../../components/Modal";
+import TagContainer from "../DetailsView/TagContainer";
+import clientRequest from "../../services/clientRequest";
+import styles from "./NewAsset.module.css";
 
+interface NewAssetProps {
+  droppedFiles: File[];
+  clearDroppedFiles: () => void;
+  enqueueSnackbar: EnqueueSnackbar;
+  path: string;
+  onClose: () => void;
+}
 
-const NewAsset = props => {
+const NewAsset = (props: NewAssetProps) => {
   const [name, setName] = useState("");
   const [nameError, setNameError] = useState(false);
   const [comps, setComps] = useState([{}, {}]);
   const [tags, setTags] = useState([]);
-  const [currentContext,, refreshContext] = useContext(ContextContext);
+  const { currentContext, refresh } = useContext(ContextContext) as ContextContextType;
 
   useEffect(() => {
     if (!nameError || !name) return;
@@ -45,9 +52,7 @@ const NewAsset = props => {
     if (!props.droppedFiles) return;
     const fileList = [...props.droppedFiles];
     if (!fileList.length) return;
-    setComps(fileList.map(
-      file => ({name: file.name.split(".")[0], source: file.path}))
-    );
+    setComps(fileList.map((file) => ({ name: file.name.split(".")[0], source: file.path })));
     props.clearDroppedFiles();
   }, [props.droppedFiles]);
 
@@ -57,18 +62,12 @@ const NewAsset = props => {
     setTags([]);
   };
 
-  // useEffect(() => {
-  //   comps.forEach(comp => {
-  //     if (comp)
-  //   })
-  // }, [comps]);
-
   const handleCompAdd = () => {
-    setComps(prevState => [...prevState, {}]);
+    setComps((prevState) => [...prevState, {}]);
   };
 
-  const handleCompRemove = (index=-1) => {
-    setComps(prevState => {
+  const handleCompRemove = (index = -1) => {
+    setComps((prevState) => {
       const dirs = [...prevState];
       if (index < 0) dirs.pop();
       else dirs.splice(index, 1);
@@ -79,34 +78,33 @@ const NewAsset = props => {
   const handleCreate = () => {
     if (!name) {
       setNameError(true);
-      props.enqueueSnackbar("Asset name is required.", {variant: "error"});
+      props.enqueueSnackbar("Asset name is required.", { variant: "error" });
       return;
     }
     const data = {
       name: name,
       comps: comps,
       tags: tags,
-      task: props.path || currentContext.path
+      task: props.path || currentContext.path,
     };
-    clientRequest("ingest_asset", {data: data}).then(resp => {
+    clientRequest("ingest_asset", { data: data }).then((resp) => {
       if (resp.ok) {
-        props.enqueueSnackbar("Asset created!", {variant: "success"});
+        props.enqueueSnackbar("Asset created!", { variant: "success" });
         props.onClose();
-        refreshContext();
+        refresh();
         reset();
       } else {
-        props.enqueueSnackbar("Failed to create asset.", {variant: "error"});
+        props.enqueueSnackbar("Failed to create asset.", { variant: "error" });
       }
     });
   };
 
-  const handleCompChange = async (index, field, value) => {
+  const handleCompChange = async (index: s, field, value) => {
     let info = undefined;
     if (field == "source" && value) {
-      info = await clientRequest("process_filepath", {path: value})
-        .then(resp => resp.data);
+      info = await clientRequest("process_filepath", { path: value }).then((resp) => resp.data);
     }
-    setComps(prev => {
+    setComps((prev) => {
       const existing = [...prev];
       const comp = existing[index];
       comp[field] = value;
@@ -119,7 +117,7 @@ const NewAsset = props => {
   };
 
   const handleSequenceChange = (index, value) => {
-    setComps(prev => {
+    setComps((prev) => {
       const existing = [...prev];
       const comp = existing[index];
       comp.sequence = value;
@@ -128,30 +126,33 @@ const NewAsset = props => {
     });
   };
 
-  const handleCompSequence = comp => {
+  const handleCompSequence = (comp) => {
     if (!comp.info) return comp;
     if (comp.sequence) comp.source = comp.info.sequence_expr;
     else comp.source = comp.info.path;
     return comp;
   };
 
-  const handleAddTags = tags => {
-    const processed = tags.split(",").map(tag => tag.trim());
-    setTags(prev => Array.from(new Set(prev.concat(processed))));
+  const handleAddTags = (tags) => {
+    const processed = tags.split(",").map((tag) => tag.trim());
+    setTags((prev) => Array.from(new Set(prev.concat(processed))));
   };
 
-  const handleRemoveTag = tag => {
-    setTags(prev => prev.filter(t => t !== tag));
+  const handleRemoveTag = (tag) => {
+    setTags((prev) => prev.filter((t) => t !== tag));
   };
 
   return (
-    <Modal open={props.open} maxWidth="md" onClose={() => props.onClose()}
-      style={{minHeight: "50vh"}}
+    <Modal
+      open={props.open}
+      maxWidth="md"
+      onClose={() => props.onClose()}
+      style={{ minHeight: "50vh" }}
       title="New Asset"
       buttons={[
         <Button key="create" color="ignite" onClick={handleCreate}>
           Create
-        </Button>
+        </Button>,
       ]}
     >
       <div className={styles.container}>
@@ -160,21 +161,13 @@ const NewAsset = props => {
             label="Asset name"
             value={name}
             error={nameError}
-            onChange={e => setName(e.target.value)}
-            style={{minWidth: "300px", alignSelf: "flex-start"}}
+            onChange={(e) => setName(e.target.value)}
+            style={{ minWidth: "300px", alignSelf: "flex-start" }}
           />
-          <TagContainer
-            tags={tags}
-            onAdd={handleAddTags}
-            onRemove={handleRemoveTag}
-          />
+          <TagContainer tags={tags} onAdd={handleAddTags} onRemove={handleRemoveTag} />
         </div>
-        <DynamicList
-          title="Components"
-          onAdd={handleCompAdd}
-          onRemove={() => handleCompRemove(-1)}
-        >
-          {comps.map((comp, index) =>
+        <DynamicList title="Components" onAdd={handleCompAdd} onRemove={() => handleCompRemove(-1)}>
+          {comps.map((comp, index) => (
             <div className={styles.compContainer} key={index}>
               <Box
                 component={ClearIcon}
@@ -185,21 +178,17 @@ const NewAsset = props => {
                 <div className={styles.compRow}>
                   <IgnTextField
                     placeholder="Component name"
-                    style={{minWidth: "300px"}}
+                    style={{ minWidth: "300px" }}
                     value={comp.name || ""}
-                    onChange={
-                      e => handleCompChange(index, "name", e.target.value)
-                    }
+                    onChange={(e) => handleCompChange(index, "name", e.target.value)}
                   />
                   <FormControlLabel
                     label="File sequence"
-                    style={{marginLeft: "0px"}}
+                    style={{ marginLeft: "0px" }}
                     control={
                       <Checkbox
                         checked={comp.sequence || false}
-                        onChange={
-                          e => handleSequenceChange(index, e.target.checked)
-                        }
+                        onChange={(e) => handleSequenceChange(index, e.target.checked)}
                       />
                     }
                   />
@@ -208,18 +197,16 @@ const NewAsset = props => {
                   <FileInput
                     placeholder="Source file"
                     buttonLabel="Browse"
-                    style={{minWidth: "300px"}}
+                    style={{ minWidth: "300px" }}
                     fullWidth
                     size="small"
                     value={comp.source || ""}
-                    onChange={
-                      (_, value) => handleCompChange(index, "source", value)
-                    }
+                    onChange={(_, value) => handleCompChange(index, "source", value)}
                   />
                 </div>
               </div>
             </div>
-          )}
+          ))}
         </DynamicList>
       </div>
     </Modal>

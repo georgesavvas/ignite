@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { ConfigContext, ConfigContextType } from "./ConfigContext";
 import { PropsWithChildren, createContext, useContext, useEffect, useState } from "react";
 
 import BuildFileURL from "../services/BuildFileURL";
 import serverRequest from "../services/serverRequest";
 import { serverSocket } from "../services/serverWebSocket";
-import { ConfigContext, ConfigContextType } from "./ConfigContext";
 
 type Context = {
   root: string;
@@ -27,6 +27,7 @@ type Context = {
   path_nr: string;
   dir_kind: string;
   project: string;
+  parent: string;
   ancestor_kinds: { [key: string]: string };
 };
 
