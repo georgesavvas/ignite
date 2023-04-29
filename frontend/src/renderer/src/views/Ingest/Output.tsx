@@ -13,13 +13,12 @@
 // limitations under the License.
 
 import Divider from "@mui/material/Divider";
+import DynamicList from "../../components/DynamicList";
 import Typography from "@mui/material/Typography";
+import styles from "./Output.module.css";
 import { useXarrow } from "react-xarrows";
 
-import DynamicList from "../../components/DynamicList";
-import styles from "./Output.module.css";
-
-type NewAsset = {
+type NewAssetType = {
   name: string;
   valid: boolean;
   task: string;
@@ -31,7 +30,7 @@ type NewAsset = {
 };
 
 interface AssetProps {
-  data: NewAsset;
+  data: NewAssetType;
   id: string;
 }
 
@@ -57,7 +56,7 @@ const Asset = ({ data, id }: AssetProps) => {
 };
 
 interface OutputProps {
-  assets: NewAsset[];
+  assets: NewAssetType[];
 }
 
 const Output = (props: OutputProps) => {

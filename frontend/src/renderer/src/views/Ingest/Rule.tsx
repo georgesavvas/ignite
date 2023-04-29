@@ -12,25 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { Divider, IconButton, Switch } from "@mui/material";
+import { useDrag, useDrop } from "react-dnd";
+import { useRef, useState } from "react";
 
-import React, {useRef, useState} from "react";
-
-import Typography from "@mui/material/Typography";
-import Select from "@mui/material/Select";
-import TextField from "@mui/material/TextField";
-import {Divider, IconButton, Switch} from "@mui/material";
+import ClearIcon from "@mui/icons-material/Clear";
+import FormControl from "@mui/material/FormControl";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import { InputChangeEvent } from "@renderer/types/common";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import {useDrag, useDrop} from "react-dnd";
-import ClearIcon from "@mui/icons-material/Clear";
-import FormControlLabel from "@mui/material/FormControlLabel";
-
+import { RuleType } from "./Ingest";
+import Select from "@mui/material/Select";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
 import styles from "./Rules.module.css";
-import {useEffect} from "react";
+import { useEffect } from "react";
 
+interface RuleProps {
+  id: string;
+  index: number;
+  origIndex: number;
+  rule: RuleType;
+  onRuleChange: (index: number, field: string, value: string | boolean) => void;
+  moveRule: (origIndex: number, newIndex: number) => void;
+}
 
-export const Rule = props => {
+export const Rule = (props: RuleProps) => {
   const [rule, setRule] = useState(props.rule || {});
 
   const ref = useRef(null);
@@ -42,39 +50,37 @@ export const Rule = props => {
     item: () => {
       return { id, index, origIndex };
     },
-    collect: monitor => ({
+    collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
   });
-  const [, drop] = useDrop(
-    () => ({
-      accept: "rule",
-      collect(monitor) {
-        return {
-          handlerId: monitor.getHandlerId(),
-        };
-      },
-      hover(item) {
-        if (!ref.current) {
-          return;
-        }
-        const dragIndex = item.origIndex;
-        const hoverIndex = props.index;
-        if (item.id === id) return;
-        props.moveRule(dragIndex, hoverIndex);
-        // const hoverBoundingRect = ref.current?.getBoundingClientRect();
-      },
-      drop(item) {
-        if (!ref.current) {
-          return;
-        }
-        props.moveRule(item.origIndex, index, true);
+  const [, drop] = useDrop(() => ({
+    accept: "rule",
+    collect(monitor) {
+      return {
+        handlerId: monitor.getHandlerId(),
+      };
+    },
+    hover(item) {
+      if (!ref.current) {
+        return;
       }
-    })
-  );
-  
+      const dragIndex = item.origIndex;
+      const hoverIndex = props.index;
+      if (item.id === id) return;
+      props.moveRule(dragIndex, hoverIndex);
+      // const hoverBoundingRect = ref.current?.getBoundingClientRect();
+    },
+    drop(item) {
+      if (!ref.current) {
+        return;
+      }
+      props.moveRule(item.origIndex, index, true);
+    },
+  }));
+
   useEffect(() => {
-    props.setRules(prev => {
+    props.setRules((prev) => {
       const existing = [...prev];
       existing[props.index] = rule;
       return existing;
@@ -82,12 +88,11 @@ export const Rule = props => {
   }, [rule]);
 
   // const handleChanged = e => props.onRulesChange(e, "modify");
-  const handleChanged = e => {
+  const handleChanged = (e: InputChangeEvent) => {
     const [field] = e.target.name.split("-");
-    const value = e.target.type === "checkbox" ?
-      e.target.checked : e.target.value;
-    setRule(prevState => {
-      const existing = {...prevState};
+    const value = e.target.type === "checkbox" ? e.target.checked : e.target.value;
+    setRule((prevState) => {
+      const existing = { ...prevState };
       existing[field] = value;
       return existing;
     });
@@ -96,7 +101,7 @@ export const Rule = props => {
   const style = {
     backgroundColor: rule.colour,
     opacity: isDragging ? 0 : 1,
-    overflow: "clip"
+    overflow: "clip",
   };
 
   drag(drop(ref));
@@ -105,7 +110,7 @@ export const Rule = props => {
     <div ref={ref} className={styles.expand}>
       <div className={styles.ruleContainer} style={style}>
         <div className={styles.topBar}>
-          <FormControlLabel 
+          <FormControlLabel
             control={
               <Switch
                 checked={rule.show_connections ?? true}
@@ -117,13 +122,15 @@ export const Rule = props => {
             label="Show connections"
             labelPlacement="end"
           />
-          <Typography variant="h6" style={{margin: "auto"}}>{"Rule " + (origIndex + 1)}</Typography>
+          <Typography variant="h6" style={{ margin: "auto" }}>
+            {"Rule " + (origIndex + 1)}
+          </Typography>
           <IconButton
             className={styles.button}
             size="small"
             name="delete"
-            onClick={() => props.onRulesChange(null, "remove", origIndex)}
-            color="lightgrey"
+            onClick={() => props.onRuleChange(null, "remove", origIndex)}
+            sx={{ color: "lightgrey" }}
           >
             <ClearIcon />
           </IconButton>
@@ -144,38 +151,73 @@ export const Rule = props => {
               <MenuItem value="filename">Filename</MenuItem>
             </Select>
           </FormControl>
-          <TextField sx={{ m: "5px", minWidth: 120 }} label="Target"
-            value={rule.file_target || ""} size="small" style={{flexGrow: 1}}
-            name={"file_target-" + origIndex} onChange={handleChanged}
+          <TextField
+            sx={{ m: "5px", minWidth: 120 }}
+            label="Target"
+            value={rule.file_target || ""}
+            size="small"
+            style={{ flexGrow: 1 }}
+            name={"file_target-" + origIndex}
+            onChange={handleChanged}
           />
         </div>
         <Divider />
-        <TextField sx={{ m: "5px", minWidth: 120 }} label="Filepath structure"
-          style={{flexGrow: 1}} size="small" value={rule.rule || ""}
-          name={"rule-" + origIndex} onChange={handleChanged}
+        <TextField
+          sx={{ m: "5px", minWidth: 120 }}
+          label="Filepath structure"
+          style={{ flexGrow: 1 }}
+          size="small"
+          value={rule.rule || ""}
+          name={"rule-" + origIndex}
+          onChange={handleChanged}
         />
-        <TextField sx={{ m: "5px", minWidth: 120 }} label="Task"
-          value={rule.task || ""} size="small" style={{flexGrow: 1}}
-          name={"task-" + origIndex} onChange={handleChanged}
+        <TextField
+          sx={{ m: "5px", minWidth: 120 }}
+          label="Task"
+          value={rule.task || ""}
+          size="small"
+          style={{ flexGrow: 1 }}
+          name={"task-" + origIndex}
+          onChange={handleChanged}
         />
         <div className={styles.ruleRow}>
-          <TextField sx={{ m: "5px", minWidth: 120 }} label="Asset name"
-            value={rule.name || ""} size="small" style={{flexGrow: 1}}
-            name={"name-" + origIndex} onChange={handleChanged}
+          <TextField
+            sx={{ m: "5px", minWidth: 120 }}
+            label="Asset name"
+            value={rule.name || ""}
+            size="small"
+            style={{ flexGrow: 1 }}
+            name={"name-" + origIndex}
+            onChange={handleChanged}
           />
-          <TextField sx={{ m: "5px", minWidth: 120 }} label="Component name"
-            value={rule.comp || ""} size="small" style={{flexGrow: 1}}
-            name={"comp-" + origIndex} onChange={handleChanged}
+          <TextField
+            sx={{ m: "5px", minWidth: 120 }}
+            label="Component name"
+            value={rule.comp || ""}
+            size="small"
+            style={{ flexGrow: 1 }}
+            name={"comp-" + origIndex}
+            onChange={handleChanged}
           />
         </div>
         <div className={styles.ruleRow}>
-          <TextField sx={{ m: "5px", minWidth: 120 }} label="Replace text"
-            value={rule.replace_target || ""} size="small" style={{flexGrow: 1}}
-            name={"replace_target-" + origIndex} onChange={handleChanged}
+          <TextField
+            sx={{ m: "5px", minWidth: 120 }}
+            label="Replace text"
+            value={rule.replace_target || ""}
+            size="small"
+            style={{ flexGrow: 1 }}
+            name={"replace_target-" + origIndex}
+            onChange={handleChanged}
           />
-          <TextField sx={{ m: "5px", minWidth: 120 }} label="With"
-            value={rule.replace_value || ""} size="small" style={{flexGrow: 1}}
-            name={"replace_value-" + origIndex} onChange={handleChanged}
+          <TextField
+            sx={{ m: "5px", minWidth: 120 }}
+            label="With"
+            value={rule.replace_value || ""}
+            size="small"
+            style={{ flexGrow: 1 }}
+            name={"replace_value-" + origIndex}
+            onChange={handleChanged}
           />
         </div>
         <div className={styles.connector} id={id} />
