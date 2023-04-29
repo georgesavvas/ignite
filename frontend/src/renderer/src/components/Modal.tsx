@@ -36,6 +36,7 @@ type ModalProps = React.PropsWithChildren<{
   onClose: () => void;
   maxWidth: Breakpoint;
   buttons?: ReactNode[];
+  style?: React.CSSProperties;
 }>;
 
 const Modal = ({ maxWidth = "xs", ...props }: ModalProps) => {

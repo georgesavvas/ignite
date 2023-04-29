@@ -12,79 +12,91 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-import React, { useState, useMemo, useContext } from "react";
-
-import {DataGrid} from "@mui/x-data-grid";
 import { Typography } from "@mui/material";
-
-import DataPlaceholder from "../../components/DataPlaceholder";
-import AssetTile from "./AssetTile";
-import URI from "../../components/URI";
-import DirectoryTile from "./DirectoryTile";
-import {ContextContext} from "../../contexts/ContextContext";
+import { DataGrid, GridCellParams, GridRowParams } from "@mui/x-data-grid";
+import { ClickEvent, Entity } from "@renderer/types/common";
+import { useContext, useMemo, useState } from "react";
 import { useEffect } from "react";
 
+import DataPlaceholder from "../../components/DataPlaceholder";
+import URI from "../../components/URI";
+import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
+import AssetTile from "./AssetTile";
+import DirectoryTile from "./DirectoryTile";
 
-const RowView = props => {
-  const [, setCurrentContext] = useContext(ContextContext);
-  const [selectionModel, setSelectionModel] = useState([]);
+interface RowViewProps {
+  data: Entity[];
+  selectedEntityPath: string;
+  resultType: "dynamic" | "tasks" | "assets" | "scenes";
+  onContextMenu: () => void;
+  handleContextMenuSelection: () => void;
+  tileSize: number;
+  onSelected: (entity: Entity) => void;
+  page: number;
+  pageSize: number;
+}
+
+const RowView = (props: RowViewProps) => {
+  const { setCurrentContext } = useContext(ContextContext) as ContextContextType;
+  const [selectionModel, setSelectionModel] = useState<number[]>([]);
 
   useEffect(() => {
     const selectedIndex = props.data.findIndex(
-      entity => entity.path === props.selectedEntityPath
+      (entity) => entity.path === props.selectedEntityPath
     );
     setSelectionModel(selectedIndex > -1 ? [selectedIndex] : []);
   }, [props.data]);
 
-  const renderEntity = params => {
-    const entity = params.value;
-    const handleDragStart = e => {
+  const renderEntity = (params: GridCellParams) => {
+    const entity = params.value as Entity;
+    const handleDragStart = (e: React.DragEvent) => {
       e.dataTransfer.setData("text/plain", entity.uri);
       e.dataTransfer.setData("ignite/kind", entity.kind);
       e.dataTransfer.setData("ignite/path", entity.path);
       e.dataTransfer.setData("ignite/uri", entity.uri);
     };
     switch (entity.dir_kind) {
-    default:
-      return useMemo(() =>
-        <DirectoryTile
-          onContextMenu={props.onContextMenu}
-          handleContextMenuSelection={props.handleContextMenuSelection}
-          entity={entity}
-          noInfo
-          noBorder
-          noOverlay
-          draggable={true}
-          onDragStart={handleDragStart}
-        />, [params.value]
-      );
-    case "assetversion":
-      return useMemo(() =>
-        <AssetTile
-          onContextMenu={props.onContextMenu}
-          handleContextMenuSelection={props.handleContextMenuSelection}
-          entity={entity}
-          noInfo
-          noBorder
-          noOverlay
-          draggable={true}
-          onDragStart={handleDragStart}
-        />, [params.value]
-      );
+      default:
+        return useMemo(
+          () => (
+            <DirectoryTile
+              onContextMenu={props.onContextMenu}
+              handleContextMenuSelection={props.handleContextMenuSelection}
+              entity={entity}
+              noInfo
+              noBorder
+              noOverlay
+              draggable={true}
+              onDragStart={handleDragStart}
+            />
+          ),
+          [params.value]
+        );
+      case "assetversion":
+        return useMemo(
+          () => (
+            <AssetTile
+              onContextMenu={props.onContextMenu}
+              handleContextMenuSelection={props.handleContextMenuSelection}
+              entity={entity}
+              noInfo
+              noBorder
+              noOverlay
+              draggable={true}
+              onDragStart={handleDragStart}
+            />
+          ),
+          [params.value]
+        );
     }
   };
 
-  const renderUri = params => {
-    return (
-      <URI uri={params.value} style={{pointerEvents: "none"}} />
-    );
+  const renderUri = (params: GridCellParams) => {
+    return <URI uri={params.value as string} style={{ pointerEvents: "none" }} />;
   };
 
-  const renderText = params => {
-    return (
-      <Typography>{params.value}</Typography>
-    );
+  const renderText = (params: GridCellParams) => {
+    return <Typography>{params.value as string}</Typography>;
   };
 
   const specificColumns = {
@@ -94,29 +106,29 @@ const RowView = props => {
         field: "name",
         headerName: "Name",
         flex: 0.1,
-        renderCell: renderText
+        renderCell: renderText,
       },
       {
         index: 2,
         field: "version",
         headerName: "Version",
         flex: 0.1,
-        renderCell: renderText
+        renderCell: renderText,
       },
       {
         index: 3,
         field: "dir_kind",
         headerName: "Dir Kind",
         flex: 0.1,
-        renderCell: renderText
+        renderCell: renderText,
       },
       {
         index: 4,
         field: "dcc",
         headerName: "DCC",
         flex: 0.1,
-        renderCell: renderText
-      }
+        renderCell: renderText,
+      },
     ],
     assets: [
       {
@@ -124,30 +136,30 @@ const RowView = props => {
         field: "name",
         headerName: "Name",
         flex: 0.25,
-        renderCell: renderText
+        renderCell: renderText,
       },
       {
         index: 2,
         field: "version",
         headerName: "Version",
         flex: 0.08,
-        renderCell: renderText
+        renderCell: renderText,
       },
       {
-        index: 3, 
-        field: "uri", 
-        headerName: "URI", 
+        index: 3,
+        field: "uri",
+        headerName: "URI",
         flex: 0.4,
         renderCell: renderUri,
-        sortComparator: (r1, r2) => r1.uri < r2.uri
+        sortComparator: (r1: Entity, r2: Entity) => r1.uri < r2.uri,
       },
       {
         index: 4,
         field: "context",
         headerName: "Context",
         flex: 0.2,
-        renderCell: renderText
-      }
+        renderCell: renderText,
+      },
     ],
     tasks: [
       {
@@ -155,15 +167,15 @@ const RowView = props => {
         field: "name",
         headerName: "Name",
         flex: 0.1,
-        renderCell: renderText
+        renderCell: renderText,
       },
       {
         index: 2,
         field: "context",
         headerName: "Context",
         flex: 0.2,
-        renderCell: renderText
-      }
+        renderCell: renderText,
+      },
     ],
     scenes: [
       {
@@ -171,29 +183,29 @@ const RowView = props => {
         field: "version",
         headerName: "Version",
         flex: 0.08,
-        renderCell: renderText
+        renderCell: renderText,
       },
       {
         index: 2,
         field: "dcc",
         headerName: "DCC",
         flex: 0.1,
-        renderCell: renderText
+        renderCell: renderText,
       },
       {
         index: 3,
         field: "context",
         headerName: "Context",
         flex: 0.2,
-        renderCell: renderText
-      }
-    ]
+        renderCell: renderText,
+      },
+    ],
   };
 
-  const addSpecificColumns = columns => {
-    const toAdd = specificColumns[props.resultType];
+  const addSpecificColumns = (columns: any[]) => {
+    const toAdd = specificColumns[props.resultType as keyof typeof specificColumns];
     if (!toAdd) return columns;
-    toAdd.forEach(columnData => {
+    toAdd.forEach((columnData) => {
       columns.splice(columnData.index, 0, columnData);
     });
     return columns;
@@ -206,38 +218,35 @@ const RowView = props => {
       minWidth: props.tileSize * 16,
       maxWidth: props.tileSize * 16,
       renderCell: renderEntity,
-      sortComparator: (r1, r2) => r1.name < r2.name,
-      cellClassName: () => "thumbnailColumn"
+      sortComparator: (r1: Entity, r2: Entity) => r1.name < r2.name,
+      cellClassName: () => "thumbnailColumn",
     },
     {
       field: "modificationTime",
       headerName: "Modified",
       flex: 0.11,
-      renderCell: renderText
+      renderCell: renderText,
     },
-    // {field: "creationTime", headerName: "Created", flex: 0.1}
   ];
 
   const getRows = () => {
-    return (
-      props.data.map((entity, index) => {
-        return {
-          id: index,
-          thumbnail: entity,
-          name: entity.name,
-          dir_kind: entity.dir_kind,
-          dcc: entity.dcc,
-          version: entity.version,
-          uri: entity.uri,
-          context: entity.context,
-          creationTime: entity.creation_time,
-          modificationTime: entity.modification_time
-        };
-      })
-    );
+    return props.data.map((entity, index) => {
+      return {
+        id: index,
+        thumbnail: entity,
+        name: entity.name,
+        dir_kind: entity.dir_kind,
+        dcc: entity.dcc,
+        version: entity.version,
+        uri: entity.uri,
+        context: entity.context,
+        creationTime: entity.creation_time,
+        modificationTime: entity.modification_time,
+      };
+    });
   };
 
-  const handleRowClick = (params, e) => {
+  const handleRowClick = (params: GridRowParams, e: ClickEvent) => {
     if (e.detail === 2) {
       var path = params.row.thumbnail.path;
       if (params.row.thumbnail.task) {
@@ -248,12 +257,13 @@ const RowView = props => {
     props.onSelected(params.row.thumbnail);
   };
 
-  const handleRowContextMenu = e => {
+  const handleRowContextMenu = (e: ClickEvent) => {
     // Bit ugly but upon right click on any point on a row, it finds the
     // thumbnail element and triggers onContextMenu()
     e.preventDefault();
-    const row = e.target.dataset.field ?
-      e.target.parentElement : e.target.parentElement.parentElement;
+    const row = e.target.dataset.field
+      ? e.target.parentElement
+      : e.target.parentElement.parentElement;
     const tile = row.firstChild.firstChild;
     for (const key in tile) {
       if (key.startsWith("__reactProps$")) {
@@ -263,12 +273,12 @@ const RowView = props => {
   };
 
   return (
-    <div style={{height: "100%"}} onContextMenu={props.onContextMenu}>
+    <div style={{ height: "100%" }} onContextMenu={props.onContextMenu}>
       <DataGrid
         onRowClick={handleRowClick}
         componentsProps={{
           row: {
-            onContextMenu: handleRowContextMenu
+            onContextMenu: handleRowContextMenu,
           },
         }}
         page={props.page - 1}
@@ -277,25 +287,25 @@ const RowView = props => {
         sx={{
           border: "none",
           "& .MuiDataGrid-virtualScrollerRenderZone": {
-            marginTop: "1px!important"
+            marginTop: "1px!important",
           },
           "& .MuiDataGrid-row": {
             boxSizing: "border-box",
-            cursor: "pointer"
+            cursor: "pointer",
           },
           "& .MuiDataGrid-row.Mui-selected": {
             outline: "1px solid rgb(252, 140, 3)",
-            background: "rgb(40, 40, 40)"
+            background: "rgb(40, 40, 40)",
           },
           // "& .MuiDataGrid-cell": {
           //   borderLeft: "1px solid rgb(30, 30, 30)"
           // },
           "& .MuiDataGrid-cell:focus": {
-            outline: "none"
+            outline: "none",
           },
           "& .thumbnailColumn": {
-            padding: "1px 0px"
-          }
+            padding: "1px 0px",
+          },
         }}
         rowHeight={props.tileSize * 9}
         // getRowHeight={() => "auto"}
@@ -305,10 +315,10 @@ const RowView = props => {
         onSelectionModelChange={setSelectionModel}
         columns={addSpecificColumns(columns)}
         components={{
-          NoRowsOverlay: () => <DataPlaceholder text="No data" />
+          NoRowsOverlay: () => <DataPlaceholder text="No data" />,
         }}
         options={{
-          customHeadRender: () => null
+          customHeadRender: () => null,
         }}
       />
     </div>

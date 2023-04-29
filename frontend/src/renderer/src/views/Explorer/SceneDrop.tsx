@@ -1,39 +1,46 @@
-import React, {useEffect, useState, useContext} from "react";
-import {Typography} from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
-import {useSnackbar} from "notistack";
+import { Typography } from "@mui/material";
+import { useSnackbar } from "notistack";
+import { useContext, useEffect, useState } from "react";
 
 import Modal from "../../components/Modal";
+import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
 import clientRequest from "../../services/clientRequest";
-import {ContextContext} from "../../contexts/ContextContext";
 import styles from "./SceneDrop.module.css";
 
+interface SceneDropProps {
+  files: {
+    all: File[];
+    scenes: File[];
+  };
+  onClose: (files?: File[]) => void;
+}
 
-const SceneDrop = props => {
-  const [selected, setSelected] = useState();
+const SceneDrop = (props: SceneDropProps) => {
+  const [selected, setSelected] = useState("");
   const [loading, setLoading] = useState(false);
-  const {enqueueSnackbar} = useSnackbar();
-  const [currentContext,, refreshContext] = useContext(ContextContext);
+  const { enqueueSnackbar } = useSnackbar();
+  const { currentContext, refresh } = useContext(ContextContext) as ContextContextType;
 
   useEffect(() => {
     setLoading(false);
-    setSelected();
+    setSelected("");
   }, [props.files]);
 
   if (!props.files?.scenes) return null;
 
-  const ingestScene = scenePath => {
+  const ingestScene = (scenePath: string) => {
     const data = {
       scene: scenePath,
-      task: currentContext.path
+      task: currentContext.path,
     };
-    clientRequest("ingest_scene", {data: data}).then(resp => {
+    clientRequest("ingest_scene", { data: data }).then((resp) => {
       if (resp.ok) {
-        enqueueSnackbar("Scene created!", {variant: "success"});
+        enqueueSnackbar("Scene created!", { variant: "success" });
       } else {
-        enqueueSnackbar("Failed to create scene.", {variant: "error"});
+        enqueueSnackbar("Failed to create scene.", { variant: "error" });
       }
-      refreshContext();
+      refresh();
     });
   };
 
@@ -44,7 +51,7 @@ const SceneDrop = props => {
       props.onClose();
       return;
     }
-    const index = files.findIndex(file => file.name === selected);
+    const index = files.findIndex((file) => file.name === selected);
     if (index < -1) {
       props.onClose();
       return;
@@ -55,7 +62,7 @@ const SceneDrop = props => {
   };
 
   const style = {
-    border: "solid 2px rgb(0, 150, 0)"
+    border: "solid 2px rgb(0, 150, 0)",
   };
 
   return (
@@ -65,38 +72,29 @@ const SceneDrop = props => {
       onClose={() => props.onClose()}
       title="Your dropped files contain one or more scenes"
       buttons={[
-        <LoadingButton key="confirm"
-          loading={loading}
-          color="ignite"
-          onClick={handleConfirm}
-        >
+        <LoadingButton key="confirm" loading={loading} color="ignite" onClick={handleConfirm}>
           Confirm
-        </LoadingButton>
+        </LoadingButton>,
       ]}
     >
       <Typography variant="subtitle1">
-        Would you like to ingest one of them as an actual scene? Any remaining
-        ones will carry over to the New Asset stage to be treated as components
+        Would you like to ingest one of them as an actual scene? Any remaining ones will carry over
+        to the New Asset stage to be treated as components
       </Typography>
       <div className={styles.container}>
-        <div
-          className={styles.file}
-          style={!selected ? style : null}
-          onClick={() => setSelected()}
-        >
+        <div className={styles.file} style={!selected ? style : {}} onClick={() => setSelected("")}>
           <Typography>None</Typography>
         </div>
-        {props.files?.scenes.map(file =>
-          <div key={file.name}
+        {props.files?.scenes.map((file) => (
+          <div
+            key={file.name}
             className={styles.file}
-            style={selected === file.name ? style : null}
+            style={selected === file.name ? style : {}}
             onClick={() => setSelected(file.name)}
           >
-            <Typography>
-              {file.name}
-            </Typography>
+            <Typography>{file.name}</Typography>
           </div>
-        )}
+        ))}
       </div>
     </Modal>
   );

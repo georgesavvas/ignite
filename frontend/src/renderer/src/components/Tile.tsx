@@ -22,17 +22,17 @@ import { clamp } from "../utils/math";
 import ContextMenu, { ContextMenuType, handleContextMenu } from "./ContextMenu";
 import styles from "./Tile.module.css";
 
-type TileProps = React.PropsWithChildren<{
+export type TileProps = React.PropsWithChildren<{
   thumbnailComp?: React.ComponentType<SvgIconProps>;
   noOverlay?: boolean;
   thumbnail?: string;
   noBorder?: boolean;
   selected?: boolean;
   onSelected?: (entity: Entity) => void;
-  thumbnailWidth: string;
+  thumbnailWidth?: string;
   entity: Directory;
   onClick?: (e: ClickEvent) => void;
-  contextItems: ContextItem[];
+  contextItems?: ContextItem[];
   noInfo?: boolean;
   onDragStart: (e: React.DragEvent) => void;
   draggable: boolean;

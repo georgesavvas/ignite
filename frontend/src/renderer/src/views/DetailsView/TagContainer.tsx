@@ -45,7 +45,7 @@ const namedStyles = {
 
 interface TagContainerProps {
   tags: string[];
-  entityPath: string;
+  entityPath?: string;
   onAdd?: (tags: string) => void;
   onRemove?: (tag: string) => void;
 }
