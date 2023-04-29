@@ -82,6 +82,20 @@ const ingestDialogStyle = {
   },
 };
 
+export type RuleType {
+  colour: string,
+  file_target: string,
+  file_target_type: string,
+  show_connections: boolean,
+  task: string,
+  name: string,
+  comp: string,
+  rule: string,
+  replace_target: string,
+  replace_value: string,
+  origIndex: number,
+}
+
 interface IngestProps {
   open: boolean;
   path: string;

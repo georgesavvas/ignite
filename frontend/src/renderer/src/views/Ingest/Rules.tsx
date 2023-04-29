@@ -12,32 +12,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { useCallback, useEffect, useState } from "react";
 
-import React, { useState, useEffect, useCallback } from "react";
-
-import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import ClearIcon from "@mui/icons-material/Clear";
+import DataPlaceholder from "../../components/DataPlaceholder";
+import { DndProvider } from "react-dnd";
+import DynamicList from "../../components/DynamicList";
+import FormControl from "@mui/material/FormControl";
+import { HTML5Backend } from "react-dnd-html5-backend";
+import IconButton from "@mui/material/IconButton";
+import IgnTextField from "../../components/IgnTextField";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import Select from "@mui/material/Select";
-import {useXarrow} from "react-xarrows";
-import Button from "@mui/material/Button";
-import {DndProvider} from "react-dnd";
-import {HTML5Backend} from "react-dnd-html5-backend";
-import {useDrop} from "react-dnd";
-import IconButton from "@mui/material/IconButton";
-import ClearIcon from "@mui/icons-material/Clear";
-
-import serverRequest from "../../services/serverRequest";
-import DataPlaceholder from "../../components/DataPlaceholder";
 import Modal from "../../components/Modal";
+import { Rule } from "./Rule";
+import { RuleType } from "./Ingest";
+import Select from "@mui/material/Select";
+import Typography from "@mui/material/Typography";
+import serverRequest from "../../services/serverRequest";
 import styles from "./Rules.module.css";
-import DynamicList from "../../components/DynamicList";
-import {Rule} from "./Rule";
-import IgnTextField from "../../components/IgnTextField";
+import { useDrop } from "react-dnd";
+import { useXarrow } from "react-xarrows";
 
+interface RuleNameINputModalProps {
+  onSubmit: (name: string) => void;
+  open: boolean;
+  onClose: () => void;
+}
 
-const RuleNameInputModal = ({onSubmit, open, onClose}) => {
+const RuleNameInputModal = ({ onSubmit, open, onClose }: RuleNameINputModalProps) => {
   const [name, setName] = useState("");
 
   const handleSubmit = () => {
@@ -50,45 +54,64 @@ const RuleNameInputModal = ({onSubmit, open, onClose}) => {
     <Modal
       maxWidth="sm"
       title="Rule template name"
-      onSubmit={handleSubmit}
+      onFormSubmit={handleSubmit}
       open={open}
       onClose={onClose}
-      buttons={[<Button key="Confirm" type="submit">Create</Button>]}
+      buttons={[
+        <Button key="Confirm" type="submit">
+          Create
+        </Button>,
+      ]}
     >
-      <IgnTextField placeholder="Template Name" fullWidth value={name} onChange={e => setName(e.target.value)} />
+      <IgnTextField
+        placeholder="Template Name"
+        fullWidth
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+      />
     </Modal>
   );
 };
 
-const RuleTemplates = props => {
-  const [templates, setTemplates] = useState([]);
+type RuleTemplateType = {
+  name: string;
+  data: RuleType;
+};
+
+interface RuleTemplatesProps {
+  onTemplateSelect: (data: RuleTemplateType["data"]) => void;
+  onSaveCurrent: (templateName: string) => void;
+}
+
+const RuleTemplates = (props: RuleTemplatesProps) => {
+  const [templates, setTemplates] = useState<RuleTemplateType[]>([]);
   const [managerOpen, setManagerOpen] = useState(false);
   const [ruleNameInputModalOpen, setRuleNameInputModalOpen] = useState(false);
   const [ruleTemplateSelectOpen, setRuleTemplateSelectOpen] = useState(false);
 
-  const getRuleTemplates = (fn=undefined) => {
-    serverRequest("get_rule_templates").then(resp => {
+  const getRuleTemplates = (fn?: () => void) => {
+    serverRequest("get_rule_templates").then((resp) => {
       setTemplates(resp.data || []);
       if (fn) fn();
     });
   };
 
-  const handleChange = e => {
+  const handleChange = (e) => {
     const value = e.target.value;
-    const template = templates.filter(template => template.name === value)[0];
+    const template = templates.filter((template) => template.name === value)[0];
     props.onTemplateSelect(template.data);
   };
 
-  const handleSaveCurrent = ruleTemplateName => {
+  const handleSaveCurrent = (ruleTemplateName: string) => {
     props.onSaveCurrent(ruleTemplateName);
   };
 
   const handleRuleTemplateSelectOpen = () => {
-    getRuleTemplates(setRuleTemplateSelectOpen(true));
+    getRuleTemplates(() => setRuleTemplateSelectOpen(true));
   };
 
-  const handleRemoveRule = name => {
-    serverRequest("remove_rule_template", {data: name}).then(resp => {
+  const handleRemoveRule = (name: string) => {
+    serverRequest("remove_rule_template", { data: name }).then((resp) => {
       setTemplates(resp.data);
     });
   };
@@ -106,14 +129,18 @@ const RuleTemplates = props => {
         onClose={() => setManagerOpen(false)}
         title="Manage rule templates"
       >
-        {templates ? templates.map((template, index) => 
-          <div className={styles.manageRuleContainer} key={index}>
-            <Typography>{template.name}</Typography>
-            <IconButton onClick={() => handleRemoveRule(template.name)}>
-              <ClearIcon style={{color: "red"}} />
-            </IconButton>
-          </div>
-        ) : <DataPlaceholder text="No templates saved yet" style={{position: "relative"}} />}
+        {templates ? (
+          templates.map((template, index) => (
+            <div className={styles.manageRuleContainer} key={index}>
+              <Typography>{template.name}</Typography>
+              <IconButton onClick={() => handleRemoveRule(template.name)}>
+                <ClearIcon style={{ color: "red" }} />
+              </IconButton>
+            </div>
+          ))
+        ) : (
+          <DataPlaceholder text="No templates saved yet" style={{ position: "relative" }} />
+        )}
       </Modal>
       <div className={styles.ruleTemplatesBar}>
         <FormControl sx={{ m: 1, minWidth: 250 }} size="small">
@@ -129,15 +156,13 @@ const RuleTemplates = props => {
             onOpen={handleRuleTemplateSelectOpen}
             onChange={handleChange}
           >
-            {templates ? templates.map((template, index) => 
-              <MenuItem
-                value={template.name}
-                data={template.data}
-                key={index}
-              >
-                {template.name}
-              </MenuItem>
-            ) : null}
+            {templates
+              ? templates.map((template, index) => (
+                  <MenuItem value={template.name} data={template.data} key={index}>
+                    {template.name}
+                  </MenuItem>
+                ))
+              : null}
           </Select>
         </FormControl>
         <Button variant="outlined" onClick={() => setManagerOpen(true)}>
@@ -145,7 +170,7 @@ const RuleTemplates = props => {
         </Button>
         <Button
           variant="outlined"
-          style={{minWidth: "130px"}}
+          style={{ minWidth: "130px" }}
           onClick={() => setRuleNameInputModalOpen(true)}
         >
           Save current
@@ -155,83 +180,97 @@ const RuleTemplates = props => {
   );
 };
 
-function RuleList(props) {
+interface RuleListProps {
+  rules: RuleType[];
+  setRules: (rules: RuleType[]) => void;
+  onRulesChange: () => void;
+}
+
+function RuleList(props: RuleListProps) {
   const updateXarrow = useXarrow();
   const [, drop] = useDrop(() => ({ accept: "rule" }));
-  const [tempRules, setTempRules] = useState({rules: [], reorder: false});
+  const [tempRules, setTempRules] = useState({ rules: [] as RuleType[], reorder: false });
 
   useEffect(() => {
-    let rules = [];
+    let rules = [] as RuleType[];
     props.rules.forEach((rule, index) => {
-      rules.push({...rule, origIndex: index});
+      rules.push({ ...rule, origIndex: index });
     });
-    setTempRules({rules: rules, reorder: false});
+    setTempRules({ rules: rules, reorder: false });
   }, [props.rules]);
 
   useEffect(() => {
     if (!tempRules.reorder) return;
     props.setRules(tempRules.rules);
-    setTempRules(prevState => ({...prevState, reorder: false}));
+    setTempRules((prevState) => ({ ...prevState, reorder: false }));
   }, [tempRules.reorder]);
 
   const moveRule = useCallback(
-    (index, index2, dropped=false) => {
+    (index: number, index2: number, dropped = false) => {
       if (dropped) {
-        setTempRules(prevState => ({...prevState, reorder: true}));
-      } else setTempRules(prevState => {
-        const rules = [...prevState.rules];
-        const ruleToMove = rules.splice(index, 1)[0];
-        rules.splice(index2, 0, ruleToMove);
-        return {rules: rules, reorder: false};
-      });
-    }, [tempRules]);
+        setTempRules((prevState) => ({ ...prevState, reorder: true }));
+      } else
+        setTempRules((prevState) => {
+          const rules = [...prevState.rules];
+          const ruleToMove = rules.splice(index, 1)[0];
+          rules.splice(index2, 0, ruleToMove);
+          return { rules: rules, reorder: false };
+        });
+    },
+    [tempRules]
+  );
 
-  const renderRule = (rule, index) => {
-    return(
+  const renderRule = (rule: RuleType, index: number) => {
+    return (
       <Rule
         key={"rule-" + rule.origIndex}
         index={index}
         rule={rule}
-        onRulesChange={props.onRulesChange}
+        onRuleChange={props.onRuleChange}
         id={"rule-" + rule.origIndex}
         moveRule={moveRule}
         setRules={props.setRules}
-      />);
+      />
+    );
   };
 
   return (
-    <DynamicList innerRef={drop} onAdd={() => props.onRulesChange(null, "add")}
+    <DynamicList
+      innerRef={drop}
+      onAdd={() => props.onRulesChange(null, "add")}
       onScroll={updateXarrow}
       onRemove={() => props.onRulesChange(null, "remove", -1)}
     >
-      {tempRules.rules ?
-        tempRules.rules.map((rule, index) => renderRule(rule, index)) : null
-      }
+      {tempRules.rules ? tempRules.rules.map((rule, index) => renderRule(rule, index)) : null}
     </DynamicList>
   );
 }
 
-function Rules(props) {
-  const handleTemplateSelect = data => {
+interface RulesProps {
+  rules: RuleType[];
+  onAddRules: (data: RuleTemplateType["data"]) => void;
+  setRules: (rules: RuleType[]) => void;
+  onRulesChange: () => void;
+}
+
+const Rules = (props: RulesProps) => {
+  const handleTemplateSelect = (data: RuleTemplateType["data"]) => {
     props.onAddRules(data);
   };
 
-  const handleSaveCurrent = name => {
-    serverRequest("add_rule_template", {data: props.rules, name: name});
+  const handleSaveCurrent = (name: string) => {
+    serverRequest("add_rule_template", { data: props.rules, name: name });
   };
 
   return (
     <div className={styles.container}>
       <Typography variant="h6">Ingest Rules</Typography>
-      <RuleTemplates
-        onTemplateSelect={handleTemplateSelect}
-        onSaveCurrent={handleSaveCurrent}
-      />
+      <RuleTemplates onTemplateSelect={handleTemplateSelect} onSaveCurrent={handleSaveCurrent} />
       <DndProvider backend={HTML5Backend}>
         <RuleList {...props} />
       </DndProvider>
     </div>
   );
-}
+};
 
 export default Rules;
