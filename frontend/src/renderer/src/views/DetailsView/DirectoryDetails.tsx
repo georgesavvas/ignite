@@ -49,10 +49,10 @@ const rowStyle = {
 } as React.CSSProperties;
 
 interface DirectoryDetailsProps {
-  entity: Directory;
+  entity: IgniteDirectory;
 }
 
-const DirectoryDetails = (props: DirectoryDetailsProps) => {
+const DirectoryDetails = (props: IgniteDirectoryDetailsProps) => {
   const [reprValue, setReprValue] = useState("");
   const [reptEdit, setReptEdit] = useState(false);
   const { refresh } = useContext(ContextContext) as ContextContextType;

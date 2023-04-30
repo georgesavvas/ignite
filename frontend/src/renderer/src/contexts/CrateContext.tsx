@@ -20,17 +20,17 @@ import { ConfigContext, ConfigContextType } from "./ConfigContext";
 
 type Crate = {
   id: string;
-  entities: Entity[];
+  entities: IgniteEntity[];
 };
 
 export type CrateContextType = {
-  addCrate: (entities?: Entity[]) => void;
+  addCrate: (entities?: IgniteEntity[]) => void;
   removeCrate: (crateId: string) => void;
-  addToCrate: (entities: Entity[]) => void;
+  addToCrate: (entities: IgniteEntity[]) => void;
   removeFromCrate: (crateID: string, index: number) => void;
   dropFloating: (crateID: string) => void;
   emptyCrate: (crateID: string) => void;
-  floating: Entity[];
+  floating: IgniteEntity[];
   crates: Crate[];
   forceOpen: boolean;
   setForceOpen: (forceOpen: boolean) => void;
@@ -63,7 +63,7 @@ export const CrateProvider = ({ children }: PropsWithChildren) => {
     });
   }, [crates, config.ready]);
 
-  const addCrate = async (entities: Entity[] = []) => {
+  const addCrate = async (entities: IgniteEntity[] = []) => {
     const crateID = await window.services.uuid();
     setCrates((prev) => {
       let existing = [...prev];
@@ -81,12 +81,12 @@ export const CrateProvider = ({ children }: PropsWithChildren) => {
     });
   };
 
-  const addToCrate = async (entities: Entity[]) => {
+  const addToCrate = async (entities: IgniteEntity[]) => {
     if (crates.length) setFloating((prev) => [...prev, ...entities]);
     else addCrate(entities);
   };
 
-  const handleAddToCrate = async (crateID: string, entities: Entity[]) => {
+  const handleAddToCrate = async (crateID: string, entities: IgniteEntity[]) => {
     setCrates((prev) => {
       const existing = [...prev];
       const crate = existing.find((crate) => crate.id === crateID);

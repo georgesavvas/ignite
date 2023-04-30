@@ -178,7 +178,7 @@ export const VaultImport = ({
     setNameValue(data.name);
   }, [open]);
 
-  function handleSubmit() {
+  const handleSubmit = () => {
     setLoading(true);
     serverRequest("vault_import", { ...data, name: nameValue }).then((resp) => {
       if (resp.ok) enqueueSnackbar("Done", { variant: "success" });
@@ -188,7 +188,7 @@ export const VaultImport = ({
     onClose();
     setNameValue("");
     setLoading(false);
-  }
+  };
 
   return (
     <Modal
@@ -245,7 +245,7 @@ export const VaultExport = ({
     setNameValue(data.name);
   }, [open]);
 
-  function handleSubmit() {
+  const handleSubmit = () => {
     setLoading(true);
     serverRequest("vault_export", { ...data, name: nameValue }).then((resp) => {
       if (resp.ok) enqueueSnackbar("Done", { variant: "success" });
@@ -255,7 +255,7 @@ export const VaultExport = ({
     onClose();
     setNameValue("");
     setLoading(false);
-  }
+  };
 
   return (
     <Modal
@@ -306,7 +306,7 @@ export const RenameDir = ({ data, open = false, onClose, enqueueSnackbar, fn }: 
     setNameValue(data.name);
   }, [open]);
 
-  function handleRenameDir() {
+  const handleRenameDir = () => {
     if (nameValue === data.name) {
       onClose();
       return;
@@ -324,7 +324,7 @@ export const RenameDir = ({ data, open = false, onClose, enqueueSnackbar, fn }: 
     onClose();
     setNameValue("");
     setLoading(true);
-  }
+  };
 
   return (
     <Modal
@@ -384,7 +384,7 @@ export const ChangeTaskType = (props: ChangeTaskTypeProps) => {
   const types = KINDTYPES[kind].sort((a: string[], b: string[]) => a[1].localeCompare(b[1]));
   const Icon = DIRECTORYICONS[`${kind}_${type}` as keyof typeof DIRECTORYICONS];
 
-  function handleChangeTaskType() {
+  const handleChangeTaskType = () => {
     if (type === data.name && name === data.name) {
       onClose();
       return;
@@ -405,7 +405,7 @@ export const ChangeTaskType = (props: ChangeTaskTypeProps) => {
         setLoading(false);
       }
     );
-  }
+  };
 
   const handleTaskChange = (e: InputChangeEvent) => {
     const value = e.target.value;

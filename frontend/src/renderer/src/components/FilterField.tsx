@@ -20,7 +20,7 @@ import styles from "./FilterField.module.css";
 
 interface FilterFieldProps {
   filterValue: string;
-  setFilterValue: Function;
+  setFilterValue: () => void;
   children?: React.ReactNode | React.ReactNode[];
 }
 

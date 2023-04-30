@@ -31,6 +31,7 @@ import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
+import { InputChangeEvent } from "@renderer/types/common";
 import { useEffect, useRef, useState } from "react";
 
 import DataPlaceholder from "../../components/DataPlaceholder";
@@ -38,7 +39,6 @@ import IgnButton from "../../components/IgnButton";
 import Modal from "../../components/Modal";
 import serverRequest from "../../services/serverRequest";
 import styles from "./FilterBuilder.module.css";
-import { InputChangeEvent } from "@renderer/types/common";
 
 const fields = [
   { label: "", value: "filter_string" },
@@ -56,7 +56,7 @@ const getFieldFromValue = (value: string) => {
 interface PlaceholderProps {
   filter?: boolean;
   name: string;
-  onChange: (name: string, field: string, value: string);
+  onChange: (name: string, field: string, value: string) => void;
   disableDelete?: boolean;
 }
 
@@ -234,14 +234,14 @@ const safeJsonParse = (data: string) => {
 
 const defaultExpr = '{ "condition": "and", "filters": [{ "": "" }, { "": "" }]}';
 
-type ExpressionType = {
-  condition?: "and" | "or",
+export type ExpressionType = {
+  condition?: "and" | "or";
   filters?: ExpressionType[];
-}
+};
 
 interface FilterBuilderProps {
   default: string;
-  expression: ExpressionType;
+  expression?: ExpressionType;
   onChange: (expression: ExpressionType) => void;
 }
 

@@ -42,7 +42,7 @@ const style = {
   display: grid,
 };
 
-// function ImgViewer(props) {
+// const ImgViewer = (props) => {
 //   return (
 //     <TransformWrapper limitToBounds={false}>
 //       <TransformComponent>
@@ -60,7 +60,7 @@ const sliderContainerStyle = {
   zIndex: 1,
 };
 
-function Scene({ path }) {
+const Scene = ({ path }) => {
   path = path || "src/assets/no_icon.png";
   const isExr = path.includes(".exr");
   const loader = isExr ? EXRLoader : TextureLoader;
@@ -87,9 +87,9 @@ function Scene({ path }) {
       </mesh>
     </Center>
   );
-}
+};
 
-function EXRViewer(props) {
+const EXRViewer = (props) => {
   const [progress, setProgress] = useState(0.5);
   const comp = props.comp;
 
@@ -149,9 +149,9 @@ function EXRViewer(props) {
       </Canvas>
     </div>
   );
-}
+};
 
-// function UsdScene({path}) {
+// const UsdScene = ({path}) => {
 //   const usd = useLoader(USDZLoader, path);
 //   console.log(usd);
 //   // extend(usd)
@@ -167,7 +167,7 @@ function EXRViewer(props) {
 //   );
 // }
 
-// function UsdViewer(props) {
+// const UsdViewer = (props) => {
 //   const comp = props.comp;
 
 //   let path = "";
@@ -187,7 +187,7 @@ function EXRViewer(props) {
 //   );
 // }
 
-function VideoViewer(props) {
+const VideoViewer = (props) => {
   return (
     <video
       key={Math.random()}
@@ -200,9 +200,9 @@ function VideoViewer(props) {
       <source src={props.path} type="video/mp4" />
     </video>
   );
-}
+};
 
-function GeoViewer(props) {
+const GeoViewer = (props) => {
   const loader = props.comp.ext === ".exr" ? EXRLoader : TextureLoader;
   const colorMap = useLoader(loader, props.path);
   return (
@@ -217,9 +217,9 @@ function GeoViewer(props) {
       </Suspense>
     </Canvas>
   );
-}
+};
 
-function ComponentViewer(props) {
+const ComponentViewer = (props) => {
   const { config } = useContext(ConfigContext) as ConfigContextType;
 
   const comp = props.comp;
@@ -251,6 +251,6 @@ function ComponentViewer(props) {
   };
 
   return <div style={style}>{getViewer(props.comp, path)}</div>;
-}
+};
 
 export default ComponentViewer;

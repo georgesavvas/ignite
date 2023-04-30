@@ -12,42 +12,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-import React from "react";
-
 import styles from "./FilterBar.module.css";
-import FilterBuilder from "./FilterBuilder";
-
+import FilterBuilder, { ExpressionType } from "./FilterBuilder";
 
 const openStyle = {
   minHeight: "fit-content",
-  maxHeight: "500px"
+  maxHeight: "500px",
 };
 
 const closedStyle = {
   minHeight: 0,
-  maxHeight: 0
+  maxHeight: 0,
 };
 
-const defaultExpr = "{ \"condition\": \"and\", \"filters\": [{ \"\": \"\" }, { \"\": \"\" }]}";
+const defaultExpr = '{ "condition": "and", "filters": [{ "": "" }, { "": "" }]}';
 
 interface FilterBarProps {
   open: boolean;
-  onFilterChange(value: string) => void;
+  onFilterChange: (value: ExpressionType) => void;
 }
 
 export const FilterBar = (props: FilterBarProps) => {
   return (
-    <div
-      className={styles.filterBar}
-      style={props.open ? openStyle : closedStyle}
-    >
+    <div className={styles.filterBar} style={props.open ? openStyle : closedStyle}>
       <FilterBuilder
         default={defaultExpr}
-        onChange={value => props.onFilterChange({"search": value})}
+        onChange={(value) => props.onFilterChange({ search: value })}
       />
     </div>
   );
-}
+};
 
 export default FilterBar;

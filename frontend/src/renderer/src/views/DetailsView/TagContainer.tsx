@@ -57,7 +57,7 @@ export const TagContainer = (props: TagContainerProps) => {
   const { config } = useContext(ConfigContext) as ConfigContextType as ConfigContextType;
   const { enqueueSnackbar } = useSnackbar();
   const newTagsRef = useRef();
-  console.log("Not sure if this is a list or string", props.tags);
+
   const contextItems = [
     {
       label: "Copy tags",

@@ -20,6 +20,7 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
+import { ClickEvent, DccType, InputChangeEvent } from "@renderer/types/common";
 import { debounce } from "lodash";
 import { useContext, useEffect, useRef, useState } from "react";
 
@@ -27,7 +28,6 @@ import FileInput from "../../components/FileInput";
 import { ConfigContext, ConfigContextType, DccConfig } from "../../contexts/ConfigContext";
 import clientRequest from "../../services/clientRequest";
 import styles from "./Dcc.module.css";
-import { ClickEvent, Dcc, InputChangeEvent } from "@renderer/types/common";
 
 const debounced = debounce((fn) => fn(), 1000);
 
@@ -64,7 +64,7 @@ const Dcc = () => {
     });
   }, [dcc]);
 
-  const handleDccAdd = (data?: Dcc[]) => {
+  const handleDccAdd = (data?: DccType[]) => {
     if (!data || !data.length) {
       setDcc((prev) => [placeholder_config, ...prev]);
       return;
@@ -142,7 +142,9 @@ const Dcc = () => {
       config.dccConfig.forEach((config) => {
         existing_paths.push(config.path);
       });
-      const filtered = new_config.filter((config: Dcc) => !existing_paths.includes(config.path));
+      const filtered = new_config.filter(
+        (config: DccType) => !existing_paths.includes(config.path)
+      );
       console.log(
         `Previously had ${existing_paths.length} configs,
         discovered ${new_config.length}, adding ${filtered.length}`
@@ -152,7 +154,7 @@ const Dcc = () => {
     });
   };
 
-  function renderDcc(dcc_: Dcc, index: number) {
+  const renderDcc = (dcc_: DccType, index: number) => {
     return (
       <ListItem key={index}>
         <IconButton
@@ -227,7 +229,7 @@ const Dcc = () => {
         </div>
       </ListItem>
     );
-  }
+  };
 
   return (
     <div className={styles.container}>

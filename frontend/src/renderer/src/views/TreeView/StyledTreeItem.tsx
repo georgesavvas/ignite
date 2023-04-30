@@ -18,7 +18,10 @@ type DirectoryDataType = {
   handleClick: (action: string, data: any) => void;
 };
 
-const getGenericContextItems = (data: DirectoryDataType, enqueueSnackbar: EnqueueSnackbar) => {
+const getGenericContextItems = (
+  data: IgniteDirectoryDataType,
+  enqueueSnackbar: EnqueueSnackbar
+) => {
   return [
     {
       label: "Copy path",
@@ -41,7 +44,7 @@ const getGenericContextItems = (data: DirectoryDataType, enqueueSnackbar: Enqueu
   ];
 };
 
-function getSpecificContextItems(data: DirectoryDataType) {
+const getSpecificContextItems = (data: IgniteDirectoryDataType) => {
   const kindOptions = DIRCONTEXTOPTIONS[data.kind];
   const namedOptions =
     (kindOptions && kindOptions[data.name as keyof typeof kindOptions]) || kindOptions.default;
@@ -56,7 +59,7 @@ function getSpecificContextItems(data: DirectoryDataType) {
         kind: contextOption.dir_kind,
       }),
   }));
-}
+};
 
 const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
   color: theme.palette.text.secondary,

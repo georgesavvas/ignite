@@ -12,27 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ClickEvent, EnqueueSnackbar, InputChangeEvent } from "@renderer/types/common";
-import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
-import ContextMenu, { ContextMenuType, handleContextMenu } from "../../components/ContextMenu";
-import { useContext, useEffect, useState } from "react";
-
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
-import Checkbox from "@mui/material/Checkbox";
-import ContextBar from "./ContextBar";
-import FilterField from "../../components/FilterField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import GridViewIcon from "../../icons/GridViewIcon";
-import IconButton from "@mui/material/IconButton";
-import IgnButton from "../../components/IgnButton";
-import Ingest from "../Ingest/Ingest";
-import NewAsset from "./NewAsset";
-import RowViewIcon from "../../icons/RowViewIcon";
 import SortIcon from "@mui/icons-material/Sort";
+import Checkbox from "@mui/material/Checkbox";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import Typography from "@mui/material/Typography";
+import { ClickEvent, EnqueueSnackbar, InputChangeEvent } from "@renderer/types/common";
+import { useContext, useEffect, useState } from "react";
+
+import ContextMenu, { ContextMenuType, handleContextMenu } from "../../components/ContextMenu";
+import FilterField from "../../components/FilterField";
+import IgnButton from "../../components/IgnButton";
+import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
+import GridViewIcon from "../../icons/GridViewIcon";
+import RowViewIcon from "../../icons/RowViewIcon";
+import Ingest from "../Ingest/Ingest";
+import ContextBar from "./ContextBar";
+import NewAsset from "./NewAsset";
 
 const style = {
   display: "flex",
@@ -52,7 +52,7 @@ interface ExplorerBarProps {
   onResultTypeChange: (value: string) => void;
   viewType: string;
   onViewTypeChange: (value: string) => void;
-  setQuery: Function;
+  setQuery: () => void;
   onFilterChange: (value: string) => void;
   onNewScene: () => void;
   onLatestChange: () => void;

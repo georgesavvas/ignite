@@ -46,16 +46,16 @@ const defaultFlexRations = {
   "ingest.output": 0.35,
 };
 
-function rand(min: number, max: number) {
+const rand = (min: number, max: number) => {
   return min + Math.random() * (max - min);
-}
+};
 
-function getRandomColour() {
+const getRandomColour = () => {
   var h = rand(1, 36) * 10;
   var s = rand(20, 50);
   var l = rand(10, 30);
   return `hsl(${h},${s}%,${l}%)`;
-}
+};
 
 const getFilesDebounced = debounce((data: any, callback: (resp: any) => void) => {
   clientRequest("ingest_get_files", data).then((resp) => {
@@ -82,19 +82,19 @@ const ingestDialogStyle = {
   },
 };
 
-export type RuleType {
-  colour: string,
-  file_target: string,
-  file_target_type: string,
-  show_connections: boolean,
-  task: string,
-  name: string,
-  comp: string,
-  rule: string,
-  replace_target: string,
-  replace_value: string,
-  origIndex: number,
-}
+export type RuleType = {
+  colour: string;
+  file_target: string;
+  file_target_type: string;
+  show_connections: boolean;
+  task: string;
+  name: string;
+  comp: string;
+  rule: string;
+  replace_target: string;
+  replace_value: string;
+  origIndex: number;
+};
 
 interface IngestProps {
   open: boolean;
@@ -246,7 +246,7 @@ const Ingest = (props: IngestProps) => {
     }
   };
 
-  function handleCreate() {
+  const handleCreate = () => {
     setLoading(true);
     const data = {
       dirs: ingestDirs,
@@ -263,7 +263,7 @@ const Ingest = (props: IngestProps) => {
       refresh();
       props.onClose();
     });
-  }
+  };
 
   const getConnectionArrows = (side: string) => {
     if (loading) return [];

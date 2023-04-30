@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export async function serverSocket(endpoint: string, sessionID: string, address: string) {
+export const serverSocket = async (endpoint: string, sessionID: string, address: string) => {
   const ws = new WebSocket(`ws://${address}/api/v1/ws/${endpoint}/${sessionID}`);
   return ws;
-}
+};

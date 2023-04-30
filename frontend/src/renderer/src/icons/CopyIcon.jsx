@@ -1,9 +1,7 @@
+import SvgIcon from "@mui/material/SvgIcon";
 import React from "react";
 
-import SvgIcon from "@mui/material/SvgIcon";
-
-
-export default function CopyIcon(props) {
+export const CopyIcon = (props) => {
   return (
     <SvgIcon width={1024} height={1024} viewBox="0 0 1024 1024" {...props}>
       <path
@@ -12,3 +10,5 @@ export default function CopyIcon(props) {
     </SvgIcon>
   );
 }
+
+export default CopyIcon;

@@ -14,7 +14,7 @@
     gap: 8px;
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-rows: auto;
-    grid-template-areas: 
+    grid-template-areas:
         "name scenes exts"
         "path path path"
 }
@@ -31,7 +31,7 @@
 }
 
 .gridItemScenes {
-    grid-area: scenes;
+    grid-area: IgniteScenes;
 }
 
 .gridItemExts {

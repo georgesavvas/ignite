@@ -67,10 +67,10 @@ const compExtensionPreviewPriority = [
 ];
 
 interface AssetDetailsProps {
-  entity: AssetVersion;
+  entity: IgniteAssetVersion;
 }
 
-function AssetDetails(props: AssetDetailsProps) {
+const AssetDetails = (props: IgniteAssetDetailsProps) => {
   const [flexRatios, setFlexRatios] = useState(defaultFlexRations);
   const { config } = useContext(ConfigContext) as ConfigContextType;
   const [selectedCompName, setSelectedCompName] = useState("");
@@ -273,6 +273,6 @@ function AssetDetails(props: AssetDetailsProps) {
       </ReflexContainer>
     </div>
   );
-}
+};
 
 export default AssetDetails;

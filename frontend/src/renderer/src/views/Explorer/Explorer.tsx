@@ -47,7 +47,7 @@ import ExplorerBar from "./ExplorerBar";
 import RowView from "./RowView";
 import SceneDrop from "./SceneDrop";
 
-const debounced = debounce((fn: Function) => fn(), 500);
+const debounced = debounce((fn: () => void) => fn(), 500);
 
 const defaultExplorerSettings = {
   currentResultType: "dynamic",
@@ -113,7 +113,7 @@ const Explorer = () => {
     scenes: "get_scenes",
   };
 
-  const handleEntitySelection = (entity: Entity) => {
+  const handleEntitySelection = (entity: IgniteEntity) => {
     setSelectedEntity(entity);
   };
 
@@ -155,11 +155,11 @@ const Explorer = () => {
   useEffect(() => {
     if (!loadedData) return;
     const fetchedSelected = loadedData.find(
-      (entity: Entity) => entity.path === selectedEntity.path
+      (entity: IgniteEntity) => entity.path === selectedEntity.path
     );
     if (fetchedSelected) setSelectedEntity(fetchedSelected);
     if (explorerSettings.currentViewType !== "grid") return;
-    const _tiles = loadedData.reduce((obj, entity: Entity) => {
+    const _tiles = loadedData.reduce((obj, entity: IgniteEntity) => {
       entity.path = BuildFileURL(entity.path, config, { pathOnly: true });
       if (entity.components) {
         entity.components.forEach((comp: IgniteComponent) => {
@@ -289,7 +289,7 @@ const Explorer = () => {
     tileContainerStyle.gridTemplateColumns = "repeat(1, 1fr)";
   }
 
-  function getGenericContextItems(data: any, enqueueSnackbar: EnqueueSnackbar) {
+  const getGenericContextItems = (data: any, enqueueSnackbar: EnqueueSnackbar) => {
     return [
       {
         label: "Copy path",
@@ -315,7 +315,7 @@ const Explorer = () => {
         divider: true,
       },
     ];
-  }
+  };
 
   const handleClick = (action: string, data: any) => {
     handleContextMenuSelection(action, data);
@@ -326,7 +326,7 @@ const Explorer = () => {
     setContextMenu(null);
   };
 
-  function getSpecificContextItems(data: any) {
+  const getSpecificContextItems = (data: any) => {
     if (!(data.kind in DIRCONTEXTOPTIONS)) return [];
     const kindOptions = DIRCONTEXTOPTIONS[data.kind as keyof typeof DIRCONTEXTOPTIONS];
     const namedOptions = kindOptions[data.name] || kindOptions.default;
@@ -341,7 +341,7 @@ const Explorer = () => {
           kind: contextOption.dir_kind,
         }),
     }));
-  }
+  };
 
   const itemData = {
     path: currentContext.path,
@@ -414,7 +414,7 @@ const Explorer = () => {
     if (!files) return;
     const sceneFiles = filterScenesFromFiles(files);
     if (sceneFiles.length) {
-      setDropData({ visible: false, scenes: sceneFiles });
+      setDropData({ visible: false, scenes: IgniteSceneFiles });
       return;
     }
     setDropData({ visible: false, files: files });
@@ -459,7 +459,7 @@ const Explorer = () => {
     const dt = e.dataTransfer;
     const sceneFiles = filterScenesFromFiles(dt.files);
     if (sceneFiles.length > 0) {
-      setDropData({ visible: false, scenes: sceneFiles, all: [...dt.files] });
+      setDropData({ visible: false, scenes: IgniteSceneFiles, all: [...dt.files] });
       return;
     }
     setDropData({ visible: false, files: dt.files });

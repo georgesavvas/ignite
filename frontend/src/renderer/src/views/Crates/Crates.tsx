@@ -28,7 +28,7 @@ import styles from "./Crates.module.css";
 interface CrateProps {
   id?: string;
   index: number;
-  entities?: Entity[];
+  entities?: IgniteEntity[];
   handleContextMenu?: (e: React.MouseEvent<HTMLElement>, crate: CrateType) => void;
 }
 
@@ -56,7 +56,7 @@ const Crate = (props: CrateProps) => {
     dropFloating(crate.id);
   };
 
-  const getEntityCrate = (entity: Entity) => {
+  const getEntityCrate = (entity: IgniteEntity) => {
     console.log(entity.uri);
     if (["asset", "assetversion"].includes(entity.dir_kind)) {
       return <AssetTile key={entity.uri} entity={entity} noOverlay noInfo />;

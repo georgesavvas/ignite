@@ -29,7 +29,7 @@ interface PageBarProps {
   onTileSizeChange: SliderProps["onChange"];
 }
 
-function PageBar(props: PageBarProps) {
+const PageBar = (props: PageBarProps) => {
   return (
     <Container className={styles.container}>
       <div style={{ width: "200px", display: "flex", justifyContent: "flex-start" }}>
@@ -66,6 +66,6 @@ function PageBar(props: PageBarProps) {
       </div>
     </Container>
   );
-}
+};
 
 export default PageBar;

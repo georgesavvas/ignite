@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import ContextMenu, { handleContextMenu } from "./ContextMenu";
+import Typography from "@mui/material/Typography";
+import { useSnackbar } from "notistack";
 import React, { useContext, useState } from "react";
 
-import { ContextContext } from "../contexts/ContextContext";
+import { ContextContext, ContextContextType } from "../contexts/ContextContext";
 import { CopyToClipboard } from "../views/ContextActions";
-import Typography from "@mui/material/Typography";
+import ContextMenu, { ContextMenuType, handleContextMenu } from "./ContextMenu";
 import styles from "./URI.module.css";
-import { useSnackbar } from "notistack";
 
 interface URIProps {
   uri: string;
@@ -27,8 +27,8 @@ interface URIProps {
 }
 
 const URI = (props: URIProps) => {
-  const [, setCurrentContext] = useContext(ContextContext);
-  const [contextMenu, setContextMenu] = useState(null);
+  const { setCurrentContext } = useContext(ContextContext) as ContextContextType;
+  const [contextMenu, setContextMenu] = useState<ContextMenuType | null>(null);
   const { enqueueSnackbar } = useSnackbar();
 
   const contextItems = [

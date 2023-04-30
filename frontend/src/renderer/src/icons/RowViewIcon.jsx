@@ -1,9 +1,7 @@
+import SvgIcon from "@mui/material/SvgIcon";
 import React from "react";
 
-import SvgIcon from "@mui/material/SvgIcon";
-
-
-export default function RowViewIcon(props) {
+export const RowViewIcon = (props) => {
   return (
     <SvgIcon width={32} height={32} viewBox="0 0 32 32" {...props}>
       <path
@@ -18,3 +16,5 @@ export default function RowViewIcon(props) {
     </SvgIcon>
   );
 }
+
+export default RowViewIcon;

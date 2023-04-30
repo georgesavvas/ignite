@@ -41,7 +41,7 @@ export type ProcessType = {
   state: keyof typeof COLOURS;
   progress: number;
   name: string;
-  entity: Directory;
+  entity: IgniteDirectory;
 };
 
 interface ProcessProps {

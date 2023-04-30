@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-function saveExplorerSettings(data) {
+const saveExplorerSettings = (data: any) => {
   if (!data || data == null) return;
   localStorage.setItem("explorer_settings", JSON.stringify(data));
-}
+};
 
 export default saveExplorerSettings;

@@ -20,7 +20,11 @@ interface Options {
   forceRemote?: Boolean;
 }
 
-function BuildFileURL(filepath: string | undefined, config: Config, options: Options = {}): string {
+const BuildFileURL = (
+  filepath: string | undefined,
+  config: Config,
+  options: Options = {}
+): string => {
   if (!filepath) return "";
   const address = config.serverDetails.address;
   const remote = config.access.remote;
@@ -64,6 +68,6 @@ function BuildFileURL(filepath: string | undefined, config: Config, options: Opt
     const value = `ign://${output}${unix_path}`;
     return value;
   }
-}
+};
 
 export default BuildFileURL;

@@ -16,8 +16,8 @@ import { Entity } from "@renderer/types/common";
 import { PropsWithChildren, createContext, useState } from "react";
 
 export type EntityContextType = {
-  selectedEntity: Entity;
-  setSelectedEntity: (entity: Entity) => void;
+  selectedEntity: IgniteEntity;
+  setSelectedEntity: (entity: IgniteEntity) => void;
 };
 
 export const EntityContext = createContext<EntityContextType | undefined>(undefined);

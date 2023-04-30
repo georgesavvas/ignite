@@ -165,8 +165,8 @@ const dialogueContents = {
 
 interface CreateDialogueProps {
   meta: { dirKind: string; modalTitle: string };
-  onCreate: Function;
-  onClose: Function;
+  onCreate: () => void;
+  onClose: () => void;
   open: boolean;
 }
 
