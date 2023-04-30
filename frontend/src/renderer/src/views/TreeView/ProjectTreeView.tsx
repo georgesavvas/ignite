@@ -14,17 +14,10 @@
 
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import TreeItem, { TreeItemProps, treeItemClasses } from "@mui/lab/TreeItem";
 import TreeView from "@mui/lab/TreeView";
-import Box, { BoxProps } from "@mui/material/Box";
-import { styled } from "@mui/material/styles";
-import Typography from "@mui/material/Typography";
-import { EnqueueSnackbar } from "@renderer/types/common";
 import { useSnackbar } from "notistack";
-import PropTypes from "prop-types";
 import { useContext, useEffect, useState } from "react";
 
-import ContextMenu, { ContextMenuType, handleContextMenu } from "../../components/ContextMenu";
 import DataPlaceholder from "../../components/DataPlaceholder";
 import { DIRCONTEXTOPTIONS } from "../../constants/directoryContextOptions";
 import { DIRECTORYICONS } from "../../constants/directoryIcons";
@@ -33,176 +26,10 @@ import { ContextContext, ContextContextType } from "../../contexts/ContextContex
 import { EntityContext, EntityContextType } from "../../contexts/EntityContext";
 import BuildFileURL from "../../services/BuildFileURL";
 import serverRequest from "../../services/serverRequest";
-import { CopyToClipboard, ShowInExplorer } from "../ContextActions";
 import { CreateDir, DeleteDir, RenameDir } from "../ContextActions";
 import { ChangeTaskType } from "../ContextActions";
 import styles from "./ProjectTreeView.module.css";
-
-const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
-  color: theme.palette.text.secondary,
-  [`& .${treeItemClasses.content}`]: {
-    color: theme.palette.text.secondary,
-    paddingRight: theme.spacing(0),
-    paddingLeft: theme.spacing(0),
-    fontWeight: theme.typography.fontWeightMedium,
-    "&.Mui-expanded": {
-      fontWeight: theme.typography.fontWeightRegular,
-    },
-    "&:hover": {
-      backgroundColor: theme.palette.action.hover,
-    },
-    "&.Mui-focused, &.Mui-selected, &.Mui-selected.Mui-focused": {
-      backgroundColor: `var(--tree-view-bg-color, ${theme.palette.action.selected})`,
-      color: "var(--tree-view-color)",
-    },
-    [`& .${treeItemClasses.label}`]: {
-      fontWeight: "inherit",
-      color: "inherit",
-    },
-  },
-}));
-
-type DirectoryDataType = {
-  id: string;
-  path: string;
-  kind: keyof typeof DIRCONTEXTOPTIONS;
-  name: string;
-  handleClick: (action: string, data: any) => void;
-};
-
-const getGenericContextItems = (data: DirectoryDataType, enqueueSnackbar: EnqueueSnackbar) => {
-  return [
-    {
-      label: "Copy path",
-      fn: () => CopyToClipboard(data.path, enqueueSnackbar),
-    },
-    {
-      label: "Open in file explorer",
-      fn: () => ShowInExplorer(data.path, enqueueSnackbar),
-      divider: true,
-    },
-    {
-      label: "Rename",
-      fn: () => data.handleClick("rename", data),
-    },
-    {
-      label: "Delete",
-      fn: () => data.handleClick("delete", data),
-      divider: true,
-    },
-  ];
-};
-
-function getSpecificContextItems(data: DirectoryDataType) {
-  const kindOptions = DIRCONTEXTOPTIONS[data.kind];
-  const namedOptions =
-    (kindOptions && kindOptions[data.name as keyof typeof kindOptions]) || kindOptions.default;
-  return namedOptions.map((contextOption: any) => ({
-    label: contextOption.label,
-    value: contextOption.name,
-    dir_path: data.path,
-    fn: () =>
-      data.handleClick(contextOption.action || "create", {
-        ...data,
-        method: contextOption.name,
-        kind: contextOption.dir_kind,
-      }),
-  }));
-}
-
-interface StyledTreeItemProps extends TreeItemProps {
-  bgColor?: string;
-  labelIcon: BoxProps["component"];
-  labelInfo: string;
-  labelText: string;
-  handleContextMenuSelection: (action: string, data: any) => void;
-  dirpath: string;
-  dirkind: keyof typeof DIRCONTEXTOPTIONS;
-  tasktype: string;
-}
-
-const StyledTreeItem = (props: StyledTreeItemProps) => {
-  const [contextMenu, setContextMenu] = useState<ContextMenuType | null>(null);
-  const { enqueueSnackbar } = useSnackbar();
-
-  const {
-    bgColor,
-    color,
-    labelIcon: LabelIcon,
-    labelInfo,
-    labelText,
-    handleContextMenuSelection,
-    ...other
-  } = props;
-
-  const handleClick = (action: string, data: any) => {
-    handleContextMenuSelection(action, data);
-    handleClose();
-  };
-
-  const handleClose = () => {
-    setContextMenu(null);
-  };
-
-  const itemData = {
-    path: props.dirpath,
-    kind: props.dirkind,
-    taskType: props.tasktype,
-    name: labelText,
-    handleClick: handleClick,
-  };
-
-  let contextItems = getGenericContextItems(itemData, enqueueSnackbar);
-  contextItems = contextItems.concat(getSpecificContextItems(itemData));
-
-  return (
-    <div>
-      <ContextMenu
-        items={contextItems}
-        contextMenu={contextMenu}
-        setContextMenu={setContextMenu}
-        title={props.labelText}
-        subtitle={props.dirkind}
-      />
-      <StyledTreeItemRoot
-        label={
-          <Box
-            onContextMenu={(e) => handleContextMenu(e, contextMenu, setContextMenu)}
-            sx={{ display: "flex", alignItems: "center", p: 0.1, pr: 0.8 }}
-          >
-            <Box
-              component={LabelIcon}
-              color="inherit"
-              sx={{ height: "20px", width: "20px", mr: 1 }}
-            />
-            <Typography
-              variant="body2"
-              sx={{ textAlign: "left", fontWeight: "inherit", flexGrow: 1 }}
-            >
-              {labelText}
-            </Typography>
-            <Typography variant="caption" color="rgb(100,100,100)">
-              {labelInfo}
-            </Typography>
-          </Box>
-        }
-        style={{
-          "--tree-view-color": color,
-          "--tree-view-bg-color": bgColor,
-        }}
-        {...other}
-      />
-    </div>
-  );
-};
-
-StyledTreeItem.propTypes = {
-  bgColor: PropTypes.string,
-  color: PropTypes.string,
-  labelIcon: PropTypes.elementType,
-  labelInfo: PropTypes.string,
-  labelText: PropTypes.string.isRequired,
-};
+import StyledTreeItem from "./StyledTreeItem";
 
 type ModalDataType = {
   createOpen?: boolean;
@@ -260,7 +87,7 @@ const ProjectTreeView = (props: ProjectTreeViewProps) => {
 
     const newPath = currentContext.path;
     if (!newPath) return;
-    let result = [] as DirectoryDataType[];
+    let result = [] as TreeNodeType[];
     let parents = [] as string[];
     findNodeByPath(props.data.children, result, newPath, parents);
     const firstResult = result[0];

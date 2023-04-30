@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import debounce from "lodash.debounce";
-import React, { useContext, useEffect, useState } from "react";
+import { AssetVersion } from "@renderer/types/common";
+import { debounce } from "lodash";
+import { useContext, useEffect, useState } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { ReflexContainer, ReflexElement, ReflexSplitter } from "react-reflex";
+import { HandlerProps, ReflexContainer, ReflexElement, ReflexSplitter } from "react-reflex";
 
 import Modal from "../../components/Modal";
-import { ConfigContext } from "../../contexts/ConfigContext";
-import { VaultContext } from "../../contexts/VaultContext";
-import BuildFileURL from "../../services/BuildFileURL";
+import { ConfigContext, ConfigContextType } from "../../contexts/ConfigContext";
+import { VaultContext, VaultContextType } from "../../contexts/VaultContext";
 import serverRequest from "../../services/serverRequest";
 import loadReflexLayout from "../../utils/loadReflexLayout";
 import saveReflexLayout from "../../utils/saveReflexLayout";
@@ -43,19 +43,39 @@ const defaultFlexRations = {
   "vault.details": 0.25,
 };
 
-function Vault(props) {
+export type QueryType = {
+  filter_string: string;
+  filters?: {};
+};
+
+export type CollectionType = {
+  path: string;
+};
+
+export type PagesType = {
+  total: number;
+  current: number;
+  results: number;
+};
+
+interface VaultProps {
+  open: boolean;
+  onClose: () => void;
+}
+
+const Vault = (props: VaultProps) => {
   const [flexRatios, setFlexRatios] = useState(defaultFlexRations);
   const [collectionData, setCollectionData] = useState([]);
   const [refreshValue, setRefreshValue] = useState(0);
-  const [selectedCollection, setSelectedCollection] = useState();
-  const [query, setQuery] = useState({ filter_string: "" });
+  const [selectedCollection, setSelectedCollection] = useState("");
+  const [query, setQuery] = useState<QueryType>({ filter_string: "" });
   const [isLoading, setIsLoading] = useState(true);
   const [loadedData, setLoadedData] = useState([]);
-  const [pages, setPages] = useState({ total: 1, current: 1 });
+  const [pages, setPages] = useState<PagesType>({ total: 1, current: 1, results: 0 });
   const [tilesPerPage, setTilesPerPage] = useState(50);
-  const [selectedEntity, setSelectedEntity] = useState({});
+  const [selectedEntity, setSelectedEntity] = useState<AssetVersion>();
   const { config } = useContext(ConfigContext) as ConfigContextType;
-  const [vaultContext] = useContext(VaultContext);
+  const { vaultContext } = useContext(VaultContext) as VaultContextType;
 
   useEffect(() => {
     const data = loadReflexLayout();
@@ -86,7 +106,7 @@ function Vault(props) {
 
   useEffect(() => {
     if (!props.open) return;
-    setSelectedEntity("");
+    setSelectedEntity(undefined);
   }, [props.open]);
 
   useEffect(() => {
@@ -111,8 +131,8 @@ function Vault(props) {
     serverRequest("get_assetversions", data).then((resp) => {
       setIsLoading(false);
       setLoadedData(resp.data);
-      setPages((prevState) => ({
-        ...prevState,
+      setPages((prev) => ({
+        ...prev,
         total: resp.pages?.total,
         results: resp.pages?.results,
       }));
@@ -128,35 +148,35 @@ function Vault(props) {
     config.ready,
   ]);
 
-  const handleEntitySelected = (entity) => {
+  const handleEntitySelected = (entity: AssetVersion) => {
     setSelectedEntity(entity);
   };
 
   const handleRefresh = () => {
-    setRefreshValue((prevState) => prevState + 1);
+    setRefreshValue((prev) => prev + 1);
   };
 
-  const handleResized = (data) => {
+  const handleResized = (data: HandlerProps) => {
     saveReflexLayout(data);
   };
 
-  const handleQueryChange = (newQuery) => {
+  const handleQueryChange = (newQuery: QueryType) => {
     setIsLoading(true);
     debounced(() => {
-      setQuery((prevState) => ({ ...prevState, ...newQuery }));
-      setPages((prevState) => ({ ...prevState, current: 1 }));
+      setQuery((prev) => ({ ...prev, ...newQuery }));
+      setPages((prev) => ({ ...prev, current: 1 }));
     });
   };
 
-  const handleFilterChange = (data) => {
+  const handleFilterChange = (data: any) => {
     setIsLoading(true);
     debounced(() => {
-      setQuery((prevState) => ({ ...prevState, filters: { ...prevState.filters, ...data } }));
-      setPages((prevState) => ({ ...prevState, current: 1 }));
+      setQuery((prev) => ({ ...prev, filters: { ...prev.filters, ...data } }));
+      setPages((prev) => ({ ...prev, current: 1 }));
     });
   };
 
-  const handleCollectionChange = (coll) => {
+  const handleCollectionChange = (coll: CollectionType) => {
     setSelectedCollection(coll.path);
     localStorage.setItem("selectedCollection", coll.path);
   };
@@ -189,7 +209,6 @@ function Vault(props) {
           onStopResize={handleResized}
         >
           <Browser
-            refreshValue={refreshValue}
             onRefresh={handleRefresh}
             selectedCollection={selectedCollection}
             loadedData={loadedData}
@@ -219,6 +238,6 @@ function Vault(props) {
       </ReflexContainer>
     </Modal>
   );
-}
+};
 
 export default Vault;

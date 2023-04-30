@@ -39,10 +39,10 @@ type NewIgniteComponent = {
 };
 
 interface NewAssetProps {
-  droppedFiles: File[];
-  clearDroppedFiles: () => void;
+  droppedFiles?: File[];
+  clearDroppedFiles?: () => void;
   enqueueSnackbar: EnqueueSnackbar;
-  path: string;
+  path?: string;
   open: boolean;
   onClose: () => void;
 }
@@ -64,7 +64,7 @@ const NewAsset = (props: NewAssetProps) => {
     const fileList = [...props.droppedFiles];
     if (!fileList.length) return;
     setComps(fileList.map((file) => ({ name: file.name.split(".")[0], source: file.path })));
-    props.clearDroppedFiles();
+    if (props.clearDroppedFiles) props.clearDroppedFiles();
   }, [props.droppedFiles]);
 
   const reset = () => {
