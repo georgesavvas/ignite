@@ -1,25 +1,30 @@
 .container {
-    margin: 0px;
-    padding: 0px;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    box-sizing: border-box;
-    overflow: hidden;
-    gap: 3px;
+  margin: 0px;
+  padding: 0px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  gap: 3px;
+  border: solid red 2px;
 }
 
 .tileContainer {
-    box-sizing: border-box;
-    flex-grow: 1;
+  flex-grow: 1;
+  height: 100%;
+  display: grid;
+  overflow-y: auto;
+  gap: 3px;
+  padding: 0 5px;
 }
 
 .layoutHelper {
-    flex-grow: 100;
+  flex-grow: 100;
 }
 
 .helperTextContainer {
-    display: flex;
-    padding-left: 10px;
-    /* padding-top: 5px; */
+  display: flex;
+  padding-left: 10px;
+  /* padding-top: 5px; */
 }

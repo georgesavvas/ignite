@@ -12,17 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { AssetVersion, IgniteActions, IgniteComponent } from "@renderer/types/common";
-import { useSnackbar } from "notistack";
-import { useContext, useEffect, useState } from "react";
-
-import FilterField from "../../components/FilterField";
 import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
 import { CrateContext, CrateContextType } from "../../contexts/CrateContext";
-import clientRequest from "../../services/clientRequest";
 import { DeleteDir, RenameDir } from "../ContextActions";
+import { IgniteActions, IgniteAssetVersion, IgniteComponent } from "@renderer/types/common";
+import { useContext, useEffect, useState } from "react";
+
 import Component from "./Component";
+import FilterField from "../../components/FilterField";
+import clientRequest from "../../services/clientRequest";
 import styles from "./ComponentList.module.css";
+import { useSnackbar } from "notistack";
 
 interface ComponentList {
   project: string;
@@ -71,7 +71,6 @@ const ComponentList = (props: ComponentList) => {
       <FilterField filterValue={filterValue} setFilterValue={setFilterValue} />
       <div className={styles.compList}>
         {props.components.map((comp, index) => {
-          console.log("This comp should have a path", comp);
           const filterString = `${comp.name}${comp.path}`;
           const hide = filterValue && !filterString.includes(filterValue);
           return (

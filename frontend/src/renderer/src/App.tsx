@@ -13,24 +13,23 @@
 // limitations under the License.
 
 import "react-reflex/styles.css";
-
 import "./App.css";
 
-import darkScrollbar from "@mui/material/darkScrollbar";
-import GlobalStyles from "@mui/material/GlobalStyles";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import Typography from "@mui/material/Typography";
-import { SnackbarProvider } from "notistack";
-import { ErrorBoundary } from "react-error-boundary";
 
-import IgnButton from "./components/IgnButton";
+import { ClickEvent } from "./types/common";
 import { ConfigProvider } from "./contexts/ConfigContext";
 import { ContextProvider } from "./contexts/ContextContext";
 import { CrateProvider } from "./contexts/CrateContext";
 import { EntityProvider } from "./contexts/EntityContext";
-import { VaultProvider } from "./contexts/VaultContext";
-import { ClickEvent } from "./types/common";
+import { ErrorBoundary } from "react-error-boundary";
+import GlobalStyles from "@mui/material/GlobalStyles";
 import Home from "./views/Home";
+import IgnButton from "./components/IgnButton";
+import { SnackbarProvider } from "notistack";
+import Typography from "@mui/material/Typography";
+import { VaultProvider } from "./contexts/VaultContext";
+import darkScrollbar from "@mui/material/darkScrollbar";
 
 // import BuildFileURL from "./services/BuildFileURL";
 

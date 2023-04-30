@@ -1,4 +1,5 @@
-import { OptionsObject, ProviderContext, SnackbarKey } from "notistack";
+import { OptionsObject, SnackbarKey } from "notistack";
+
 import React from "react";
 
 export type UnknownEvent = React.ChangeEvent<unknown>;
