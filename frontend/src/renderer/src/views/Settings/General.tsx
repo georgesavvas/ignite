@@ -12,84 +12,90 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-import React, {useEffect, useState, useContext} from "react";
-
+import { Divider, Typography } from "@mui/material";
 import TextField from "@mui/material/TextField";
-import {Divider, Typography} from "@mui/material";
+import { useContext, useEffect, useState } from "react";
 
-import styles from "./General.module.css";
-import {ConfigContext} from "../../contexts/ConfigContext";
 import FileInput from "../../components/FileInput";
 import IgnButton from "../../components/IgnButton";
+import {
+  Access,
+  ConfigContext,
+  ConfigContextType,
+  ServerDetails,
+} from "../../contexts/ConfigContext";
+import styles from "./General.module.css";
 
+type SettingsType = {
+  serverDetails: ServerDetails;
+  access: Access;
+};
 
 const General = () => {
-  const [config, setConfig] = useContext(ConfigContext);
-  const [settings, setSettings] = useState({serverDetails: {}, access: {}});
+  const { config, setConfig } = useContext(ConfigContext) as ConfigContextType;
+  const [settings, setSettings] = useState<SettingsType>({
+    serverDetails: { address: "", password: "" },
+    access: { projectsDir: "", serverProjectsDir: "" },
+  });
   const [canSave, setCanSave] = useState(false);
 
   useEffect(() => {
     setSettings({
       serverDetails: {
         address: config.serverDetails.address,
-        password: config.serverDetails.password
+        password: config.serverDetails.password,
       },
       access: {
         projectsDir: config.access.projectsDir,
-        serverProjectsDir: config.access.serverProjectsDir
-      }
+        serverProjectsDir: config.access.serverProjectsDir,
+      },
     });
   }, [config.serverDetails, config.access]);
 
   useEffect(() => {
     let changed = false;
-    if (
-      JSON.stringify(config.serverDetails) !==
-      JSON.stringify(settings.serverDetails)
-    ) changed = true;
-    const configAccess = {...config.access};
+    if (JSON.stringify(config.serverDetails) !== JSON.stringify(settings.serverDetails))
+      changed = true;
+    const configAccess = { ...config.access };
     delete configAccess.remote;
-    if (
-      JSON.stringify(configAccess) !==
-      JSON.stringify(settings.access)
-    ) changed = true;
+    if (JSON.stringify(configAccess) !== JSON.stringify(settings.access)) changed = true;
     setCanSave(changed);
   }, [settings]);
 
-  const isServerLocal = settings.serverDetails.address &&
+  const isServerLocal =
+    !!settings.serverDetails.address &&
     (settings.serverDetails.address.startsWith("localhost") ||
-    settings.serverDetails.address.startsWith("0.0.0.0"));
+      settings.serverDetails.address.startsWith("0.0.0.0"));
 
-  const handleServerDetailsChange = (field, value) => {
-    setSettings(prevState => {
-      const existing = {...prevState};
-      existing["serverDetails"][field] = value;
+  const handleServerDetailsChange = (field: keyof ServerDetails, value: string) => {
+    setSettings((prevState) => {
+      const existing = { ...prevState };
+      existing.serverDetails[field] = value;
       return existing;
     });
   };
 
-  const handleAccessChange = (field, value) => {
-    setSettings(prevState => {
-      const existing = {...prevState};
-      existing["access"][field] = value;
+  const handleAccessChange = (field: "projectsDir" | "serverProjectsDir", value: string) => {
+    setSettings((prevState) => {
+      const existing = { ...prevState };
+      existing.access[field] = value;
       if (isServerLocal && field === "projectsDir") {
-        existing["access"]["serverProjectsDir"] = value;
+        existing.access.serverProjectsDir = value;
       }
       return existing;
     });
   };
 
   const handleSave = () => {
-    setConfig("serverDetails", {...settings.serverDetails});
-    setConfig("access", {...settings.access});
+    setConfig("serverDetails", { ...settings.serverDetails });
+    setConfig("access", { ...settings.access });
     setCanSave(false);
   };
 
   return (
     <div className={styles.container}>
       <div className={styles.serverDetails}>
-        <Typography variant="h5" style={{marginBottom: "10px"}}>
+        <Typography variant="h5" style={{ marginBottom: "10px" }}>
           Server Details
         </Typography>
         <div className={styles.row}>
@@ -99,7 +105,7 @@ const General = () => {
             size="small"
             label="Address"
             value={settings.serverDetails.address || ""}
-            onChange={e => handleServerDetailsChange("address", e.target.value)}
+            onChange={(e) => handleServerDetailsChange("address", e.target.value)}
           />
           <TextField
             margin="dense"
@@ -108,13 +114,13 @@ const General = () => {
             type="password"
             size="small"
             value={settings.serverDetails.password || ""}
-            onChange={e => handleServerDetailsChange("password", e.target.value)}
+            onChange={(e) => handleServerDetailsChange("password", e.target.value)}
           />
         </div>
       </div>
-      <Divider flexItem style={{margin: "20px 0px"}} />
+      <Divider flexItem style={{ margin: "20px 0px" }} />
       <div className={styles.access}>
-        <Typography variant="h5" style={{marginBottom: "10px"}}>
+        <Typography variant="h5" style={{ marginBottom: "10px" }}>
           Access
         </Typography>
         <FileInput
@@ -127,7 +133,7 @@ const General = () => {
           disabled={settings.access.remote}
           value={settings.access.projectsDir || ""}
           onChange={(_, value) => handleAccessChange("projectsDir", value)}
-          buttonStyle={{marginTop: "4px"}}
+          buttonStyle={{ marginTop: "4px" }}
         />
         <FileInput
           margin="dense"
@@ -137,15 +143,13 @@ const General = () => {
           fullWidth
           disabled={isServerLocal}
           value={settings.access.serverProjectsDir || ""}
-          onChange={value => handleAccessChange("serverProjectsDir", value)}
-          style={{alignSelf: "stretch"}}
-          buttonStyle={{marginTop: "4px"}}
+          onChange={(_, value) => handleAccessChange("serverProjectsDir", value)}
+          style={{ alignSelf: "stretch" }}
+          buttonStyle={{ marginTop: "4px" }}
         />
       </div>
-      <div className={styles.centered} style={{marginTop: "20px"}}>
-        <IgnButton disabled={!canSave} color="ignite"
-          onClick={() => handleSave()}
-        >
+      <div className={styles.centered} style={{ marginTop: "20px" }}>
+        <IgnButton disabled={!canSave} color="ignite" onClick={() => handleSave()}>
           Save
         </IgnButton>
       </div>

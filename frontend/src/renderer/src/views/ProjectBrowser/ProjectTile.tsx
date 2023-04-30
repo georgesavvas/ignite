@@ -12,30 +12,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-import React from "react";
-
-import Typography from "@mui/material/Typography";
-import {useSnackbar} from "notistack";
 import AddIcon from "@mui/icons-material/Add";
+import Typography from "@mui/material/Typography";
+import { ClickEvent, Directory } from "@renderer/types/common";
+import { useSnackbar } from "notistack";
 
-import {CopyToClipboard, ShowInExplorer, clearRepr} from "../ContextActions";
+import Tile, { TileProps } from "../../components/Tile";
+import { CopyToClipboard, ShowInExplorer, clearRepr } from "../ContextActions";
 import styles from "./ProjectTile.module.css";
-import Tile from "../../components/Tile";
 
+const folderIcon = new URL("@assets/folder_icon.png", import.meta.url).href;
 
-const folderIcon = new URL("@assets/folder_icon.png", import.meta.url).href; 
-
-export function NewProjectTile(props) {
-  return (
-    <div className={styles.newProjectTile} onClick={props.onClick}>
-      <AddIcon className={styles.button} style={{fontSize: "48px"}} />
-    </div>
-  );
+interface NewProjectTileProps {
+  onClick: (e: ClickEvent) => void;
 }
 
-function ProjectTile(props) {
-  const {enqueueSnackbar} = useSnackbar();
+export const NewProjectTile = (props: NewProjectTileProps) => {
+  return (
+    <div className={styles.newProjectTile} onClick={props.onClick}>
+      <AddIcon className={styles.button} style={{ fontSize: "48px" }} />
+    </div>
+  );
+};
+
+interface ProjectTileProps extends TileProps {
+  entity: Directory;
+  viewType: "grid" | "row";
+  onRefresh: () => void;
+  onContextMenu: (action: string, data: any) => void;
+}
+
+const ProjectTile = (props: ProjectTileProps) => {
+  const { enqueueSnackbar } = useSnackbar();
 
   const hasThumbnail = props.entity.thumbnail && props.entity.thumbnail.filename;
   const thumbnailWidth = hasThumbnail ? "100%" : "50%";
@@ -43,38 +51,38 @@ function ProjectTile(props) {
   const dirData = {
     path: props.entity.path,
     kind: props.entity.dir_kind,
-    name: props.entity.name
+    name: props.entity.name,
   };
 
-  function getGenericContextItems(entity) {
+  function getGenericContextItems(entity: Directory) {
     return [
       {
         label: "Copy path",
-        fn: () =>  CopyToClipboard(entity.path, enqueueSnackbar)
+        fn: () => CopyToClipboard(entity.path, enqueueSnackbar),
       },
       {
         label: "Open in file explorer",
         fn: () => ShowInExplorer(entity.path, enqueueSnackbar),
-        divider: true
+        divider: true,
       },
       {
         label: "Clear representative",
         fn: () => clearRepr(entity.path, enqueueSnackbar, props.onRefresh),
-        divider: true
+        divider: true,
       },
       {
         label: `Rename ${entity.dir_kind}`,
-        fn: () => props.onContextMenu("rename", dirData)
+        fn: () => props.onContextMenu("rename", dirData),
       },
       {
         label: `Delete ${entity.dir_kind}`,
-        fn: () => props.onContextMenu("delete", dirData)
-      }
+        fn: () => props.onContextMenu("delete", dirData),
+      },
     ];
   }
 
   const handleClick = () => {
-    props.onSelected(props.entity);
+    if (props.onSelected) props.onSelected(props.entity);
   };
 
   function thumbnailPath() {
@@ -83,17 +91,20 @@ function ProjectTile(props) {
   }
 
   function details() {
-    if (props.viewType === "grid") return(
-      <>
-        <Typography style={{position: "absolute", bottom: "5px", left: "10px"}}>
-          {props.entity.name}
-        </Typography>
-      </>
-    ); else return(
-      <>
-        <Typography align="left">{props.entity.name}</Typography>
-      </>
-    );
+    if (props.viewType === "grid")
+      return (
+        <>
+          <Typography style={{ position: "absolute", bottom: "5px", left: "10px" }}>
+            {props.entity.name}
+          </Typography>
+        </>
+      );
+    else
+      return (
+        <>
+          <Typography align="left">{props.entity.name}</Typography>
+        </>
+      );
   }
 
   let contextItems = getGenericContextItems(props.entity);
@@ -111,6 +122,6 @@ function ProjectTile(props) {
       </Tile>
     </>
   );
-}
+};
 
 export default ProjectTile;

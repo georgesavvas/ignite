@@ -13,17 +13,26 @@
 // limitations under the License.
 
 import Typography from "@mui/material/Typography";
+import { AssetVersion } from "@renderer/types/common";
 import { useSnackbar } from "notistack";
 import React, { useContext } from "react";
 
-import Tile from "../../components/Tile";
-import { ConfigContext } from "../../contexts/ConfigContext";
-import { ContextContext } from "../../contexts/ContextContext";
+import Tile, { TileProps } from "../../components/Tile";
+import { ConfigContext, ConfigContextType } from "../../contexts/ConfigContext";
+import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
 import BuildFileURL from "../../services/BuildFileURL";
 import { CopyToClipboard, ShowInExplorer } from "../ContextActions";
 
-function AssetTile(props) {
-  const [currentContext] = useContext(ContextContext);
+interface AssetTileProps extends TileProps {
+  entity: AssetVersion;
+  onSelected?: (entity: AssetVersion) => void;
+  refreshContext?: () => void;
+  onContextMenu?: () => void;
+  handleContextMenuSelection: (action: string, data: any) => void;
+}
+
+const AssetTile = (props: AssetTileProps) => {
+  const { currentContext } = useContext(ContextContext) as ContextContextType;
   const { config } = useContext(ConfigContext) as ConfigContextType;
   const { enqueueSnackbar } = useSnackbar();
 
@@ -53,14 +62,14 @@ function AssetTile(props) {
     },
     {
       label: "Delete asset version",
-      fn: () => props.onContextMenu("delete", dirData),
+      fn: () => props.handleContextMenuSelection("delete", dirData),
     },
   ];
 
   const vaultExportItem = {
     label: "Import to current task",
     fn: () =>
-      props.onContextMenu("vaultExport", {
+      props.handleContextMenuSelection("vaultExport", {
         ...dirData,
         task: BuildFileURL(currentContext.path, config, { pathOnly: true }),
       }),
@@ -81,9 +90,9 @@ function AssetTile(props) {
     );
   }
 
-  const handleDragStart = (e) => {
+  const handleDragStart = (e: React.DragEvent) => {
     e.dataTransfer.setData("text/plain", props.entity.uri);
-    e.dataTransfer.setData("ignite/kind", props.entity.kind);
+    e.dataTransfer.setData("ignite/kind", props.entity.dir_kind);
     e.dataTransfer.setData("ignite/path", props.entity.path);
     e.dataTransfer.setData("ignite/uri", props.entity.uri);
   };
@@ -103,6 +112,6 @@ function AssetTile(props) {
       </Tile>
     </>
   );
-}
+};
 
 export default AssetTile;

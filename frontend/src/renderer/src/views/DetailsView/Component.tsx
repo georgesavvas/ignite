@@ -25,7 +25,7 @@ import { useSnackbar } from "notistack";
 import React, { useState } from "react";
 
 import ContextMenu, { ContextMenuType, handleContextMenu } from "../../components/ContextMenu";
-import { EXTENSIONTYPES } from "../../constants";
+import { EXTENSIONTYPES } from "../../constants/extensionTypes";
 import CopyIcon from "../../icons/CopyIcon";
 import clientRequest from "../../services/clientRequest";
 import openExplorer from "../../utils/openExplorer";
@@ -33,7 +33,7 @@ import { CopyToClipboard } from "../ContextActions";
 import styles from "./Component.module.css";
 
 interface ComponentProps {
-  selectedComp: IgniteComponent;
+  selectedComp?: IgniteComponent;
   entity: IgniteComponent;
   onSelect: (name: string) => void;
   actions?: IgniteActions;
@@ -128,9 +128,7 @@ const Component = (props: ComponentProps) => {
 
   const getIconStyle = () => {
     const style = {} as React.CSSProperties;
-    const extType = EXTENSIONTYPES.find((ext: keyof typeof EXTENSIONTYPES) =>
-      ext.extensions.includes(props.entity.ext)
-    );
+    const extType = EXTENSIONTYPES.find((ext) => ext.extensions.includes(props.entity.ext));
     const iconName = extType?.name || "file.png";
     style.backgroundImage = `url(src/assets/components/${iconName})`;
     return style;

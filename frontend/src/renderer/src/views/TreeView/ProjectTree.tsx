@@ -12,21 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import FilterField from "../../components/FilterField";
-import { ConfigContext } from "../../contexts/ConfigContext";
-import { ContextContext } from "../../contexts/ContextContext";
+import { ConfigContext, ConfigContextType } from "../../contexts/ConfigContext";
+import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
 import serverRequest from "../../services/serverRequest";
 import styles from "./ProjectTree.module.css";
-import ProjectTreeView from "./ProjectTreeView";
+import ProjectTreeView, { TreeNodeType } from "./ProjectTreeView";
 
-export default function ProjectTree() {
+export const ProjectTree = () => {
   const { config } = useContext(ConfigContext) as ConfigContextType;
-  const [loadedData, setLoadedData] = useState({});
+  const [loadedData, setLoadedData] = useState<TreeNodeType>();
   const [filterValue, setFilterValue] = useState("");
-  const [updateTreeView, setUpdateTreeView] = useState(0);
-  const [currentContext] = useContext(ContextContext);
+  const { currentContext } = useContext(ContextContext) as ContextContextType;
 
   useEffect(() => {
     if (!config.ready) return;
@@ -37,13 +36,11 @@ export default function ProjectTree() {
     serverRequest("get_project_tree", data).then((resp) => {
       setLoadedData(resp.data);
     });
-  }, [currentContext, config.access, updateTreeView]);
+  }, [currentContext, config.access]);
 
   var content = null;
   if (loadedData && loadedData.children) {
-    content = (
-      <ProjectTreeView data={loadedData} shouldUpdate={setUpdateTreeView} filter={filterValue} />
-    );
+    content = <ProjectTreeView data={loadedData} filter={filterValue} />;
   }
 
   return (
@@ -52,4 +49,6 @@ export default function ProjectTree() {
       {content}
     </div>
   );
-}
+};
+
+export default ProjectTree;

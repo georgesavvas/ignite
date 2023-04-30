@@ -12,22 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-import React, {useRef, useState, useContext, useEffect} from "react";
-
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
-import {useSnackbar} from "notistack";
+import { Directory, InputChangeEvent } from "@renderer/types/common";
+import { useSnackbar } from "notistack";
+import React, { useContext, useEffect, useRef, useState } from "react";
 
-import {validateDirName} from "../../utils/validateDirName";
 import DataPlaceholder from "../../components/DataPlaceholder";
-import { DeleteDir, RenameDir } from "../ContextActions";
-import serverRequest from "../../services/serverRequest";
 import Modal from "../../components/Modal";
-import ProjectTile, {NewProjectTile} from "./ProjectTile";
+import { ContextContext, ContextContextType, setProject } from "../../contexts/ContextContext";
+import serverRequest from "../../services/serverRequest";
+import { validateDirName } from "../../utils/validateDirName";
+import { DeleteDir, RenameDir } from "../ContextActions";
 import styles from "./ProjectBrowser.module.css";
-import {setProject, ContextContext} from "../../contexts/ContextContext";
-
+import ProjectTile, { NewProjectTile } from "./ProjectTile";
 
 const tileContainerStyle = {
   flexGrow: 1,
@@ -35,53 +33,72 @@ const tileContainerStyle = {
   overflowY: "auto",
   gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
   gridGap: "5px",
-  padding: "5px"
-};
+  padding: "5px",
+} as React.CSSProperties;
 
-const Browser = props => {
-  const [tiles, setTiles] = useState([]);
+interface BrowserProps {
+  loadedData: Directory[];
+  modalData: ModalDataType;
+  handleContextMenuSelection: (action: string, data: any) => void;
+  onRefresh: () => void;
+  onProjectSelect: (entity: Directory) => void;
+  onNewProjectClicked: () => void;
+}
+
+const Browser = (props: BrowserProps) => {
+  const [tiles, setTiles] = useState<JSX.Element[]>([]);
 
   useEffect(() => {
-    const _tiles = props.loadedData.reduce(function(obj, entity) {
-      obj[entity.result_id] = <ProjectTile key={entity.result_id}
-        viewType="grid"
-        entity={entity}
-        onContextMenu={props.handleContextMenuSelection}
-        onRefresh={props.onRefresh}
-        onSelected={props.onProjectSelect}
-        selected={""}
-      />;
-      return obj;
-    }, {});
-    setTiles(_tiles);
+    setTiles(
+      props.loadedData.map((entity: Directory) => (
+        <ProjectTile
+          key={entity.project}
+          viewType="grid"
+          entity={entity}
+          onContextMenu={props.handleContextMenuSelection}
+          onRefresh={props.onRefresh}
+          onSelected={props.onProjectSelect}
+        />
+      ))
+    );
   }, [props]);
 
   return (
     <div className={styles.container}>
       <div style={tileContainerStyle}>
-        <NewProjectTile
-          onClick={props.onNewProjectClicked}
-        />
-        {Object.keys(tiles).map((k) => tiles[k])}
+        <NewProjectTile onClick={props.onNewProjectClicked} />
+        {Object.values(tiles)}
       </div>
     </div>
   );
 };
 
-export default function ProjectBrowser(props) {
-  const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
+type ModalDataType = {
+  deleteOpen?: boolean;
+  renameOpen?: boolean;
+};
+
+interface ProjectBrowserProps {
+  open: boolean;
+  onClose: () => void;
+}
+
+export const ProjectBrowser = (props: ProjectBrowserProps) => {
+  const { currentContext, setCurrentContext, refresh } = useContext(
+    ContextContext
+  ) as ContextContextType;
   const [newProjectOpen, setNewProjectOpen] = useState(false);
   const [newProjectName, setNewProjectName] = useState("");
-  const [modalData, setModalData] = useState({});
+  const [modalData, setModalData] = useState<ModalDataType>({});
   const [isLoading, setIsLoading] = useState(false);
   const [loadedData, setLoadedData] = useState([]);
   const newProjectNameRef = useRef();
-  const {enqueueSnackbar} = useSnackbar();
+  const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
     if (!props.open) return;
     setIsLoading(true);
-    serverRequest("get_projects").then(resp => {
+    serverRequest("get_projects").then((resp) => {
       setIsLoading(false);
       setLoadedData(resp.data || []);
     });
@@ -89,73 +106,95 @@ export default function ProjectBrowser(props) {
 
   const handleNewProject = () => {
     const data = {
-      name: newProjectName
+      name: newProjectName,
     };
-    serverRequest("create_project", data).then(resp => {
+    serverRequest("create_project", data).then((resp) => {
       if (resp.ok) {
         setProject(newProjectName, setCurrentContext);
         props.onClose();
         setNewProjectName("");
         setNewProjectOpen(false);
-        enqueueSnackbar("Project created!", {variant: "success"});
+        enqueueSnackbar("Project created!", { variant: "success" });
         return;
       }
-      enqueueSnackbar(
-        `Couldn't create project - ${resp.error}`, {variant: "error"}
-      );
+      enqueueSnackbar(`Couldn't create project - ${resp.error}`, { variant: "error" });
     });
   };
 
-  const handleContextMenuSelection = (action, _data) => {
-    const data = {..._data};
+  const handleContextMenuSelection = (action: string, _data: any) => {
+    const data = { ..._data };
     data[`${action}Open`] = true;
     setModalData(data);
   };
 
-  const handleProjectSelect = entity => {
+  const handleProjectSelect = (entity: Directory) => {
     if (entity.name !== currentContext.project) {
       setProject(entity.name, setCurrentContext);
     }
     props.onClose();
   };
 
-  const handleProjectNameChange = e => {
+  const handleProjectNameChange = (e: InputChangeEvent) => {
     const value = validateDirName(e.target.value);
     setNewProjectName(value);
   };
 
   return (
-    <Modal open={props.open} onClose={props.onClose} title="Project Browser"
-      maxWidth="xl"
-    >
-      <Modal focusRef={newProjectNameRef} open={newProjectOpen} onClose={() => setNewProjectOpen(false)} maxWidth="sm"
-        buttons={[<Button key="create" type="submit">Create</Button>]}
-        title="New project name" autoFocus={false} onFormSubmit={handleNewProject}
+    <Modal open={props.open} onClose={props.onClose} title="Project Browser" maxWidth="xl">
+      <Modal
+        focusRef={newProjectNameRef}
+        open={newProjectOpen}
+        onClose={() => setNewProjectOpen(false)}
+        maxWidth="sm"
+        buttons={[
+          <Button key="create" type="submit">
+            Create
+          </Button>,
+        ]}
+        title="New project name"
+        autoFocus={false}
+        onFormSubmit={handleNewProject}
       >
-        <TextField onChange={handleProjectNameChange} value={newProjectName} 
-          size="small" fullWidth autoFocus label="New project name" inputRef={newProjectNameRef}
-          style={{marginTop: "15px"}}
+        <TextField
+          onChange={handleProjectNameChange}
+          value={newProjectName}
+          size="small"
+          fullWidth
+          autoFocus
+          label="New project name"
+          inputRef={newProjectNameRef}
+          style={{ marginTop: "15px" }}
         />
       </Modal>
-      <DeleteDir open={modalData.deleteOpen} enqueueSnackbar={enqueueSnackbar}
-        onClose={() => setModalData(prevState => ({...prevState, deleteOpen: false}))}
-        data={modalData} fn={refreshContext}
+      <DeleteDir
+        open={modalData.deleteOpen}
+        enqueueSnackbar={enqueueSnackbar}
+        onClose={() => setModalData((prevState) => ({ ...prevState, deleteOpen: false }))}
+        data={modalData}
+        fn={refresh}
       />
-      <RenameDir open={modalData.renameOpen} enqueueSnackbar={enqueueSnackbar}
-        onClose={() => setModalData(prevState => ({...prevState, renameOpen: false}))}
-        data={modalData} fn={refreshContext}
+      <RenameDir
+        open={modalData.renameOpen}
+        enqueueSnackbar={enqueueSnackbar}
+        onClose={() => setModalData((prevState) => ({ ...prevState, renameOpen: false }))}
+        data={modalData}
+        fn={refresh}
       />
-      {isLoading && !loadedData ? <DataPlaceholder /> :
+      {isLoading && !loadedData ? (
+        <DataPlaceholder />
+      ) : (
         <Browser
           {...props}
           onNewProjectClicked={() => setNewProjectOpen(true)}
           onProjectSelect={handleProjectSelect}
-          onRefresh={refreshContext}
+          onRefresh={refresh}
           modalData={modalData}
           loadedData={loadedData}
           handleContextMenuSelection={handleContextMenuSelection}
         />
-      }
+      )}
     </Modal>
   );
-}
+};
+
+export default ProjectBrowser;

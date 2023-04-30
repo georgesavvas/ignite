@@ -24,7 +24,6 @@ import ContextMenu, { ContextMenuType, handleContextMenu } from "../../component
 import DataPlaceholder from "../../components/DataPlaceholder";
 import Modal from "../../components/Modal";
 import { ConfigContext, ConfigContextType } from "../../contexts/ConfigContext";
-import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
 import BuildFileURL from "../../services/BuildFileURL";
 import serverRequest from "../../services/serverRequest";
 import { hexToHsl } from "../../utils/hexToHsl";
@@ -48,6 +47,7 @@ interface TagContainerProps {
   entityPath?: string;
   onAdd?: (tags: string) => void;
   onRemove?: (tag: string) => void;
+  onRefresh?: () => void;
 }
 
 export const TagContainer = (props: TagContainerProps) => {
@@ -55,7 +55,6 @@ export const TagContainer = (props: TagContainerProps) => {
   const [newTags, setNewTags] = useState("");
   const [contextMenu, setContextMenu] = useState<ContextMenuType | null>(null);
   const { config } = useContext(ConfigContext) as ConfigContextType as ConfigContextType;
-  const { refresh } = useContext(ContextContext) as ContextContextType;
   const { enqueueSnackbar } = useSnackbar();
   const newTagsRef = useRef();
   console.log("Not sure if this is a list or string", props.tags);
@@ -83,7 +82,9 @@ export const TagContainer = (props: TagContainerProps) => {
       path: BuildFileURL(props.entityPath, config, { pathOnly: true, reverse: true }),
       tags: newTags,
     };
-    serverRequest("add_tags", data).then(() => refresh());
+    serverRequest("add_tags", data).then(() => {
+      if (props.onRefresh) props.onRefresh();
+    });
     setNewTagsOpen(false);
   };
 
@@ -97,7 +98,9 @@ export const TagContainer = (props: TagContainerProps) => {
       path: BuildFileURL(props.entityPath, config, { pathOnly: true, reverse: true }),
       tags: tag,
     };
-    serverRequest("remove_tags", data).then(() => refresh());
+    serverRequest("remove_tags", data).then(() => {
+      if (props.onRefresh) props.onRefresh();
+    });
   };
 
   return (

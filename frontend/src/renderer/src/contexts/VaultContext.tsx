@@ -22,7 +22,7 @@ type Context = {
   path?: string;
 };
 
-type VaultContextType = {
+export type VaultContextType = {
   vaultContext: Context;
   setVaultContext: (context: Context) => void;
   refreshVault: () => void;

@@ -14,21 +14,23 @@
 
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import TreeItem, { treeItemClasses } from "@mui/lab/TreeItem";
+import TreeItem, { TreeItemProps, treeItemClasses } from "@mui/lab/TreeItem";
 import TreeView from "@mui/lab/TreeView";
-import Box from "@mui/material/Box";
+import Box, { BoxProps } from "@mui/material/Box";
 import { styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
+import { EnqueueSnackbar } from "@renderer/types/common";
 import { useSnackbar } from "notistack";
 import PropTypes from "prop-types";
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
-import ContextMenu, { handleContextMenu } from "../../components/ContextMenu";
+import ContextMenu, { ContextMenuType, handleContextMenu } from "../../components/ContextMenu";
 import DataPlaceholder from "../../components/DataPlaceholder";
-import { DIRCONTEXTOPTIONS, DIRECTORYICONS } from "../../constants";
-import { ConfigContext } from "../../contexts/ConfigContext";
-import { ContextContext } from "../../contexts/ContextContext";
-import { EntityContext } from "../../contexts/EntityContext";
+import { DIRCONTEXTOPTIONS } from "../../constants/directoryContextOptions";
+import { DIRECTORYICONS } from "../../constants/directoryIcons";
+import { ConfigContext, ConfigContextType } from "../../contexts/ConfigContext";
+import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
+import { EntityContext, EntityContextType } from "../../contexts/EntityContext";
 import BuildFileURL from "../../services/BuildFileURL";
 import serverRequest from "../../services/serverRequest";
 import { CopyToClipboard, ShowInExplorer } from "../ContextActions";
@@ -60,7 +62,15 @@ const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
   },
 }));
 
-function getGenericContextItems(data, enqueueSnackbar) {
+type DirectoryDataType = {
+  id: string;
+  path: string;
+  kind: keyof typeof DIRCONTEXTOPTIONS;
+  name: string;
+  handleClick: (action: string, data: any) => void;
+};
+
+const getGenericContextItems = (data: DirectoryDataType, enqueueSnackbar: EnqueueSnackbar) => {
   return [
     {
       label: "Copy path",
@@ -81,12 +91,13 @@ function getGenericContextItems(data, enqueueSnackbar) {
       divider: true,
     },
   ];
-}
+};
 
-function getSpecificContextItems(data) {
+function getSpecificContextItems(data: DirectoryDataType) {
   const kindOptions = DIRCONTEXTOPTIONS[data.kind];
-  const namedOptions = (kindOptions && kindOptions[data.name]) || kindOptions.default;
-  return namedOptions.map((contextOption) => ({
+  const namedOptions =
+    (kindOptions && kindOptions[data.name as keyof typeof kindOptions]) || kindOptions.default;
+  return namedOptions.map((contextOption: any) => ({
     label: contextOption.label,
     value: contextOption.name,
     dir_path: data.path,
@@ -99,8 +110,19 @@ function getSpecificContextItems(data) {
   }));
 }
 
-function StyledTreeItem(props) {
-  const [contextMenu, setContextMenu] = useState(null);
+interface StyledTreeItemProps extends TreeItemProps {
+  bgColor?: string;
+  labelIcon: BoxProps["component"];
+  labelInfo: string;
+  labelText: string;
+  handleContextMenuSelection: (action: string, data: any) => void;
+  dirpath: string;
+  dirkind: keyof typeof DIRCONTEXTOPTIONS;
+  tasktype: string;
+}
+
+const StyledTreeItem = (props: StyledTreeItemProps) => {
+  const [contextMenu, setContextMenu] = useState<ContextMenuType | null>(null);
   const { enqueueSnackbar } = useSnackbar();
 
   const {
@@ -113,7 +135,7 @@ function StyledTreeItem(props) {
     ...other
   } = props;
 
-  const handleClick = (action, data) => {
+  const handleClick = (action: string, data: any) => {
     handleContextMenuSelection(action, data);
     handleClose();
   };
@@ -172,7 +194,7 @@ function StyledTreeItem(props) {
       />
     </div>
   );
-}
+};
 
 StyledTreeItem.propTypes = {
   bgColor: PropTypes.string,
@@ -182,85 +204,115 @@ StyledTreeItem.propTypes = {
   labelText: PropTypes.string.isRequired,
 };
 
-function ProjectTreeView(props) {
+type ModalDataType = {
+  createOpen?: boolean;
+  deleteOpen?: boolean;
+  renameOpen?: boolean;
+  changeTaskTypeOpen?: boolean;
+};
+
+export type TreeNodeType = {
+  id: string;
+  filter_strings: string[];
+  icon: keyof typeof DIRECTORYICONS;
+  dir_kind: keyof typeof DIRCONTEXTOPTIONS;
+  task_type: string;
+  path: string;
+  name: string;
+  children: TreeNodeType;
+};
+
+interface ProjectTreeViewProps {
+  filter: string;
+  data: TreeNodeType;
+}
+
+const ProjectTreeView = (props: ProjectTreeViewProps) => {
   const { config } = useContext(ConfigContext) as ConfigContextType;
-  const [, setSelectedEntity] = useContext(EntityContext);
+  const { setSelectedEntity } = useContext(EntityContext) as EntityContextType;
   const [expandedItems, setExpandedItems] = useState(["root"]);
-  const [modalData, setModalData] = useState({});
+  const [modalData, setModalData] = useState<ModalDataType>({});
   const [selectedItems, setSelectedItems] = useState("root");
-  const [currentContext, setCurrentContext, refreshContext] = useContext(ContextContext);
+  const { currentContext, setCurrentContext, refresh } = useContext(
+    ContextContext
+  ) as ContextContextType;
   const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
-    function findNodeByPath(object, result, value, parents) {
+    const findNodeByPath = (
+      object: TreeNodeType,
+      result: TreeNodeType[],
+      value: string,
+      parents: string[]
+    ) => {
       if (object.path && object.path === value) {
         result.push(object);
         return;
       }
       for (var i = 0; i < Object.keys(object).length; i++) {
-        const child = object[Object.keys(object)[i]];
+        const child = object[Object.keys(object)[i] as keyof TreeNodeType];
         if (child !== null && typeof child === "object") {
           if (value.includes(child.path)) parents.push(child.id);
-          findNodeByPath(object[Object.keys(object)[i]], result, value, parents);
+          findNodeByPath(child, result, value, parents);
         }
       }
-    }
+    };
 
     const newPath = currentContext.path;
     if (!newPath) return;
-    let result = [];
-    let parents = [];
+    let result = [] as DirectoryDataType[];
+    let parents = [] as string[];
     findNodeByPath(props.data.children, result, newPath, parents);
-    result = result[0];
+    const firstResult = result[0];
     if (result) {
-      const nodeId = result.id;
+      const nodeId = firstResult.id;
       setSelectedItems(nodeId);
       if (!expandedItems.includes(nodeId)) {
-        setExpandedItems((prevState) => [...prevState, ...parents, nodeId]);
+        setExpandedItems((prev) => [...prev, ...parents, nodeId]);
       }
     }
   }, [currentContext]);
 
-  const handleNodeSelect = (event, nodeId) => {
-    function findNodeById(object, result, value) {
+  const handleNodeSelect = (e: React.SyntheticEvent<Element, Event>, nodeId: string) => {
+    const findNodeById = (object: TreeNodeType, result: TreeNodeType[], value: string) => {
       if (object.id && object.id === value) {
         result.push(object);
         return;
       }
       for (var i = 0; i < Object.keys(object).length; i++) {
-        const child = object[Object.keys(object)[i]];
+        const child = object[Object.keys(object)[i] as keyof TreeNodeType];
         if (child !== null && typeof child === "object") {
-          findNodeById(object[Object.keys(object)[i]], result, value);
+          findNodeById(child, result, value);
         }
       }
-    }
+    };
 
-    let iconClicked = event.target.closest(".MuiTreeItem-iconContainer");
+    let iconClicked = (e.target as HTMLElement).closest(".MuiTreeItem-iconContainer");
     if (iconClicked) return;
 
-    var result = [];
+    let result = [] as TreeNodeType[];
     findNodeById(props.data, result, nodeId);
-    result = result[0];
-    setCurrentContext(result.path);
+    const firstResult = result[0];
+    setCurrentContext(firstResult.path);
     setSelectedItems(nodeId);
-    serverRequest("find", { path: result.path }).then((resp) => {
+    serverRequest("find", { path: firstResult.path }).then((resp) => {
       if (resp.data) setSelectedEntity(resp.data);
     });
   };
 
-  const handleNodeToggle = (event, nodeIds) => {
-    let iconClicked = event.target.closest(".MuiTreeItem-iconContainer");
+  const handleNodeToggle = (e: React.SyntheticEvent<Element, Event>, nodeIds: string[]) => {
+    let iconClicked = (e.target as HTMLElement).closest(".MuiTreeItem-iconContainer");
     if (iconClicked || nodeIds.length > expandedItems.length) {
       setExpandedItems(nodeIds);
     }
   };
 
-  const handleContextMenuSelection = (action, data) => {
+  const handleContextMenuSelection = (action: string, data: any) => {
     data[`${action}Open`] = true;
     setModalData(data);
   };
 
-  const renderTree = (nodes) => {
+  const renderTree = (nodes: TreeNodeType) => {
     const filterString = nodes.filter_strings.join(" ");
     const hide = props.filter && !filterString.includes(props.filter);
     const path = BuildFileURL(nodes.path, config, { pathOnly: true });
@@ -276,7 +328,7 @@ function ProjectTreeView(props) {
         tasktype={nodes.task_type}
         dirpath={path}
         handleContextMenuSelection={handleContextMenuSelection}
-        style={hide ? { display: "none" } : null}
+        style={hide ? { display: "none" } : {}}
       >
         {Array.isArray(nodes.children) ? nodes.children.map((node) => renderTree(node)) : null}
       </StyledTreeItem>
@@ -288,30 +340,30 @@ function ProjectTreeView(props) {
       <CreateDir
         open={modalData.createOpen}
         enqueueSnackbar={enqueueSnackbar}
-        onClose={() => setModalData((prevState) => ({ ...prevState, createOpen: false }))}
+        onClose={() => setModalData((prev) => ({ ...prev, createOpen: false }))}
         data={modalData}
-        fn={refreshContext}
+        fn={refresh}
       />
       <DeleteDir
         open={modalData.deleteOpen}
         enqueueSnackbar={enqueueSnackbar}
-        onClose={() => setModalData((prevState) => ({ ...prevState, deleteOpen: false }))}
+        onClose={() => setModalData((prev) => ({ ...prev, deleteOpen: false }))}
         data={modalData}
-        fn={refreshContext}
+        fn={refresh}
       />
       <RenameDir
         open={modalData.renameOpen}
         enqueueSnackbar={enqueueSnackbar}
-        onClose={() => setModalData((prevState) => ({ ...prevState, renameOpen: false }))}
+        onClose={() => setModalData((prev) => ({ ...prev, renameOpen: false }))}
         data={modalData}
-        fn={refreshContext}
+        fn={refresh}
       />
       <ChangeTaskType
         open={modalData.changeTaskTypeOpen}
         enqueueSnackbar={enqueueSnackbar}
-        onClose={() => setModalData((prevState) => ({ ...prevState, changeTaskTypeOpen: false }))}
+        onClose={() => setModalData((prev) => ({ ...prev, changeTaskTypeOpen: false }))}
         data={modalData}
-        fn={refreshContext}
+        fn={refresh}
       />
       <div className={styles.treeContainer}>
         <TreeView
@@ -336,6 +388,6 @@ function ProjectTreeView(props) {
       </div>
     </div>
   );
-}
+};
 
 export default ProjectTreeView;

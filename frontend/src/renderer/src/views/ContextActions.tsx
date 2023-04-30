@@ -23,7 +23,8 @@ import { EnqueueSnackbar, InputChangeEvent } from "@renderer/types/common";
 import { useEffect, useRef, useState } from "react";
 
 import Modal from "../components/Modal";
-import { DIRECTORYICONS, KINDTYPES } from "../constants";
+import { DIRECTORYICONS } from "../constants/directoryIcons";
+import { KINDTYPES } from "../constants/kindTypes";
 import clientRequest from "../services/clientRequest";
 import serverRequest from "../services/serverRequest";
 import CreateDirModal from "./CreateDirModal";
@@ -78,7 +79,7 @@ export const setReprForParent = (repr: string, enqueueSnackbar: EnqueueSnackbar)
 
 interface DeleteDirProps {
   data: any;
-  open: boolean;
+  open?: boolean;
   onClose: () => void;
   enqueueSnackbar: EnqueueSnackbar;
   fn: () => void;
@@ -221,7 +222,7 @@ export const VaultImport = ({
 
 interface VaultExportProps {
   data: any;
-  open: boolean;
+  open?: boolean;
   onClose: () => void;
   enqueueSnackbar: EnqueueSnackbar;
   fn: () => void;
@@ -288,7 +289,7 @@ export const VaultExport = ({
 
 interface RenameDirProps {
   data: any;
-  open: boolean;
+  open?: boolean;
   onClose: () => void;
   enqueueSnackbar: EnqueueSnackbar;
   fn: () => void;
@@ -357,7 +358,7 @@ export const RenameDir = ({ data, open = false, onClose, enqueueSnackbar, fn }: 
 
 interface ChangeTaskTypeProps {
   data: any;
-  open: boolean;
+  open?: boolean;
   onClose: () => void;
   enqueueSnackbar: EnqueueSnackbar;
   fn: () => void;
@@ -370,7 +371,7 @@ export const ChangeTaskType = (props: ChangeTaskTypeProps) => {
   const [loading, setLoading] = useState(false);
   const textFieldRef = useRef();
   const { data, open = false, onClose, enqueueSnackbar, fn } = props;
-  const kind = data.kind;
+  const kind = data.kind as keyof typeof KINDTYPES;
 
   useEffect(() => {
     if (!open) return;
@@ -380,8 +381,8 @@ export const ChangeTaskType = (props: ChangeTaskTypeProps) => {
 
   if (!KINDTYPES[kind]) return null;
 
-  const types = KINDTYPES[kind].sort((a: string, b: string) => a[1].localeCompare(b[1]));
-  const Icon = DIRECTORYICONS[`${kind}_${type}`];
+  const types = KINDTYPES[kind].sort((a: string[], b: string[]) => a[1].localeCompare(b[1]));
+  const Icon = DIRECTORYICONS[`${kind}_${type}` as keyof typeof DIRECTORYICONS];
 
   function handleChangeTaskType() {
     if (type === data.name && name === data.name) {
@@ -475,7 +476,7 @@ export const ChangeTaskType = (props: ChangeTaskTypeProps) => {
 
 interface CreateDirProps {
   data: any;
-  open: boolean;
+  open?: boolean;
   onClose: () => void;
   enqueueSnackbar: EnqueueSnackbar;
   fn: () => void;

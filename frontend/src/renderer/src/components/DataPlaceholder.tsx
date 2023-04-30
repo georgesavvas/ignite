@@ -36,7 +36,7 @@ const typeStyle = {
 };
 
 interface DataPlaceholderProps {
-  text: string;
+  text?: string;
   style?: React.CSSProperties;
   variant?: Variant;
 }

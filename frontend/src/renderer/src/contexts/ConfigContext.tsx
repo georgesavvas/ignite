@@ -19,7 +19,7 @@ import { PropsWithChildren, createContext, useEffect, useRef, useState } from "r
 import clientRequest from "../services/clientRequest";
 import serverRequest from "../services/serverRequest";
 
-type ServerDetails = {
+export type ServerDetails = {
   address: string;
   password: string;
 };
@@ -30,7 +30,7 @@ export type Access = {
   serverProjectsDir: string;
 };
 
-type DccConfig = any[];
+export type DccConfig = any[];
 
 export type Config = {
   serverDetails: ServerDetails;
@@ -46,7 +46,7 @@ export type Config = {
 type SetConfig = (
   setting: "serverDetails" | "access" | "dccConfig",
   data: ServerDetails | Access | DccConfig,
-  operation: "modify" | "add" | "remove"
+  operation?: "modify" | "add" | "remove"
 ) => void;
 
 export type ConfigContextType = {
@@ -294,7 +294,7 @@ export const ConfigProvider = ({ children }: PropsWithChildren) => {
   const handleSetConfig = (
     setting: "serverDetails" | "access" | "dccConfig",
     data: ServerDetails | Access | DccConfig,
-    operation: "add" | "remove" | "modify"
+    operation: "add" | "remove" | "modify" = "modify"
   ) => {
     switch (setting) {
       case "serverDetails": {

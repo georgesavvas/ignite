@@ -15,16 +15,17 @@
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
-import Select from "@mui/material/Select";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
 import Typography from "@mui/material/Typography";
+import { AssetVersion } from "@renderer/types/common";
 import { useSnackbar } from "notistack";
-import React, { useContext, useEffect, useState } from "react";
-import { ReflexContainer, ReflexElement, ReflexSplitter } from "react-reflex";
+import { useContext, useEffect, useState } from "react";
+import { HandlerProps, ReflexContainer, ReflexElement, ReflexSplitter } from "react-reflex";
 
-import ContextMenu from "../../components/ContextMenu";
+import ContextMenu, { ContextMenuType } from "../../components/ContextMenu";
 import Path from "../../components/Path";
-import { ConfigContext } from "../../contexts/ConfigContext";
-import { VaultContext } from "../../contexts/VaultContext";
+import { ConfigContext, ConfigContextType } from "../../contexts/ConfigContext";
+import { VaultContext, VaultContextType } from "../../contexts/VaultContext";
 import BuildFileURL from "../../services/BuildFileURL";
 import serverRequest from "../../services/serverRequest";
 import loadReflexLayout from "../../utils/loadReflexLayout";
@@ -44,7 +45,7 @@ const versionSelectStyle = {
   position: "absolute",
   right: "10px",
   top: "15px",
-};
+} as React.CSSProperties;
 
 const style = {
   width: "100%",
@@ -68,13 +69,18 @@ const compExtensionPreviewPriority = [
   ".exr",
 ];
 
-function AssetDetails(props) {
+interface AssetDetailsProps {
+  entity: AssetVersion;
+  setSelectedEntity: (entity: AssetVersion) => void;
+}
+
+const AssetDetails = (props: AssetDetailsProps) => {
   const [flexRatios, setFlexRatios] = useState(defaultFlexRations);
   const { config } = useContext(ConfigContext) as ConfigContextType;
   const [selectedCompName, setSelectedCompName] = useState("");
   const { enqueueSnackbar } = useSnackbar();
-  const [contextMenu, setContextMenu] = useState(null);
-  const [, , refreshVault] = useContext(VaultContext);
+  const [contextMenu, setContextMenu] = useState<ContextMenuType | null>(null);
+  const { refreshVault } = useContext(VaultContext) as VaultContextType;
 
   useEffect(() => {
     const data = loadReflexLayout();
@@ -110,11 +116,12 @@ function AssetDetails(props) {
         setSelectedCompName(comp.filename);
         return true;
       }
+      return false;
     });
     if (!found) setSelectedCompName(comps[0].filename);
   }, [props.entity]);
 
-  const handleVersionChange = (e) => {
+  const handleVersionChange = (e: SelectChangeEvent<string>) => {
     const version = e.target.value;
     const path = BuildFileURL(`${props.entity.asset}/${version}`, config, {
       reverse: true,
@@ -125,11 +132,11 @@ function AssetDetails(props) {
     });
   };
 
-  const handleResized = (data) => {
+  const handleResized = (data: HandlerProps) => {
     saveReflexLayout(data);
   };
 
-  const getComp = (compName) => {
+  const getComp = (compName: string) => {
     return props.entity.components.find((comp) => comp.filename === compName);
   };
 
@@ -192,14 +199,16 @@ function AssetDetails(props) {
           onStopResize={handleResized}
         >
           <ComponentList
+            project={"__vault__"}
             components={props.entity.components || []}
             selectedComp={selectedComp}
             onSelect={setSelectedCompName}
+            asset={props.entity}
           />
         </ReflexElement>
       </ReflexContainer>
     </div>
   );
-}
+};
 
 export default AssetDetails;

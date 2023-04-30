@@ -16,11 +16,12 @@ import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
 import LinearProgress from "@mui/material/LinearProgress";
 import Typography from "@mui/material/Typography";
+import { AssetVersion } from "@renderer/types/common";
 import { useSnackbar } from "notistack";
 import React, { useContext, useEffect, useState } from "react";
 
 import DataPlaceholder from "../../components/DataPlaceholder";
-import { ConfigContext } from "../../contexts/ConfigContext";
+import { ConfigContext, ConfigContextType } from "../../contexts/ConfigContext";
 import BuildFileURL from "../../services/BuildFileURL";
 import { DeleteDir, RenameDir, VaultExport } from "../ContextActions";
 import PageBar from "../PageBar";
@@ -34,42 +35,47 @@ const defaultExplorerSettings = {
   tilesPerPage: 50,
 };
 
-function Browser(props) {
+interface BrowserProps {
+  loadedData: AssetVersion[];
+  selectedEntity: AssetVersion;
+  onRefresh: () => void;
+  handleEntitySelected: (entity: AssetVersion) => void;
+}
+
+const Browser = (props: BrowserProps) => {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [explorerSettings] = useState(defaultExplorerSettings);
   const [tileSize, setTileSize] = useState(200);
-  const [tiles, setTiles] = useState([]);
+  const [tiles, setTiles] = useState<JSX.Element[]>([]);
   const { config } = useContext(ConfigContext) as ConfigContextType;
   const [modalData, setModalData] = useState({});
   const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
     if (!props.loadedData) return;
-    const _tiles = props.loadedData.reduce(function (obj, entity) {
-      if (entity.path === props.selectedEntity.path) {
-        props.handleEntitySelected(entity);
-      }
-      entity.path = BuildFileURL(entity.path, config, { pathOnly: true });
-      if (entity.components) {
-        entity.components.forEach((comp) => {
-          comp.path = BuildFileURL(comp.path, config, { pathOnly: true });
-        });
-      }
-      obj[entity.result_id] = (
-        <AssetTile
-          key={entity.result_id}
-          entity={entity}
-          onSelected={props.handleEntitySelected}
-          size={explorerSettings.currentTileSize * 40}
-          viewType="grid"
-          selected={props.selectedEntity.path === entity.path}
-          refreshContext={props.onRefresh}
-          handleContextMenuSelection={handleContextMenuSelection}
-        />
-      );
-      return obj;
-    }, {});
-    setTiles(_tiles);
+    setTiles(
+      props.loadedData.map((entity) => {
+        if (entity.path === props.selectedEntity.path) {
+          props.handleEntitySelected(entity);
+        }
+        entity.path = BuildFileURL(entity.path, config, { pathOnly: true });
+        if (entity.components) {
+          entity.components.forEach((comp) => {
+            comp.path = BuildFileURL(comp.path, config, { pathOnly: true });
+          });
+        }
+        return (
+          <AssetTile
+            key={entity.path}
+            entity={entity}
+            onSelected={props.handleEntitySelected}
+            selected={props.selectedEntity.path === entity.path}
+            refreshContext={props.onRefresh}
+            handleContextMenuSelection={handleContextMenuSelection}
+          />
+        );
+      })
+    );
   }, [
     props.loadedData,
     props.selectedEntity.path,
@@ -192,6 +198,6 @@ function Browser(props) {
       />
     </div>
   );
-}
+};
 
 export default Browser;
