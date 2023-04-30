@@ -16,7 +16,7 @@ import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
 import LinearProgress from "@mui/material/LinearProgress";
 import Typography from "@mui/material/Typography";
-import { AssetVersion } from "@renderer/types/common";
+import { AssetVersion, InputChangeEvent } from "@renderer/types/common";
 import { useSnackbar } from "notistack";
 import React, { useContext, useEffect, useState } from "react";
 
@@ -29,17 +29,32 @@ import AssetTile from "./AssetTile";
 import styles from "./Browser.module.css";
 import FilterBar from "./FilterBar";
 import TopBar from "./TopBar";
+import { PagesType } from "./Vault";
 
 const defaultExplorerSettings = {
   currentTileSize: 5,
   tilesPerPage: 50,
 };
 
+type ModalDataType = {
+  deleteOpen?: boolean;
+  renameOpen?: boolean;
+  vaultExportOpen?: boolean;
+};
+
 interface BrowserProps {
   loadedData: AssetVersion[];
-  selectedEntity: AssetVersion;
+  selectedEntity?: AssetVersion;
   onRefresh: () => void;
   handleEntitySelected: (entity: AssetVersion) => void;
+  onFilterChange: (data: any) => void;
+  setTilesPerPage: (number: number) => void;
+  handleQueryChange: (query: any) => void;
+  pages: { total: number; results: number };
+  setPages: (pages: PagesType) => void;
+  isLoading: boolean;
+  selectedCollection: string;
+  query: any;
 }
 
 const Browser = (props: BrowserProps) => {
@@ -48,7 +63,7 @@ const Browser = (props: BrowserProps) => {
   const [tileSize, setTileSize] = useState(200);
   const [tiles, setTiles] = useState<JSX.Element[]>([]);
   const { config } = useContext(ConfigContext) as ConfigContextType;
-  const [modalData, setModalData] = useState({});
+  const [modalData, setModalData] = useState<ModalDataType>({});
   const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
@@ -83,7 +98,7 @@ const Browser = (props: BrowserProps) => {
     explorerSettings.currentTileSize,
   ]);
 
-  const handleContextMenuSelection = (action, _data) => {
+  const handleContextMenuSelection = (action: string, _data: any) => {
     const data = { ..._data };
     data[`${action}Open`] = true;
     setModalData(data);
@@ -93,16 +108,16 @@ const Browser = (props: BrowserProps) => {
     props.onFilterChange(data);
   };
 
-  const handlePageChange = (event, value) => {
-    props.setPages((prevPages) => ({ ...prevPages, current: value }));
+  const handlePageChange = (_, value: number) => {
+    props.setPages((prev) => ({ ...prev, current: value }));
   };
 
-  const handleTilesPerPageChange = (event) => {
-    props.setTilesPerPage(parseInt(event.target.value) || 50);
+  const handleTilesPerPageChange = (e: InputChangeEvent) => {
+    props.setTilesPerPage(parseInt(e.target.value) || 50);
   };
 
-  const handleTileSizeChange = (event) => {
-    setTileSize(event.target.value * 40);
+  const handleTileSizeChange = (e: InputChangeEvent) => {
+    setTileSize(e.target.value * 40);
   };
 
   const tileContainerStyle = {
@@ -113,9 +128,9 @@ const Browser = (props: BrowserProps) => {
     gridGap: "5px",
     padding: "5px",
     paddingTop: "5px",
-  };
+  } as React.CSSProperties;
 
-  const handleFilterStringChange = (value) => {
+  const handleFilterStringChange = (value: string) => {
     props.handleQueryChange({ filter_string: value });
   };
 
@@ -190,7 +205,6 @@ const Browser = (props: BrowserProps) => {
       <Divider />
       <PageBar
         pages={props.pages?.total}
-        currentPage={props.pages.current}
         onChange={handlePageChange}
         tileSize={explorerSettings.currentTileSize}
         onTilesPerPageChange={handleTilesPerPageChange}

@@ -22,7 +22,7 @@ import IgnButton from "./IgnButton";
 
 type FileInputProps = React.PropsWithChildren<{
   id?: string;
-  margin: string;
+  margin?: string;
   className?: string;
   label?: string;
   size: string;

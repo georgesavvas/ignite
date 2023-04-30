@@ -31,7 +31,12 @@ const closedStyle = {
 
 const defaultExpr = "{ \"condition\": \"and\", \"filters\": [{ \"\": \"\" }, { \"\": \"\" }]}";
 
-export default function FilterBar(props) {
+interface FilterBarProps {
+  open: boolean;
+  onFilterChange(value: string) => void;
+}
+
+export const FilterBar = (props: FilterBarProps) => {
   return (
     <div
       className={styles.filterBar}
@@ -44,3 +49,5 @@ export default function FilterBar(props) {
     </div>
   );
 }
+
+export default FilterBar;

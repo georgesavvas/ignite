@@ -30,11 +30,11 @@ type ModalProps = React.PropsWithChildren<{
   dialogContentProps?: DialogContentProps;
   focusRef?: any;
   focusDelay?: number;
-  fullHeight?: string;
+  fullHeight?: boolean;
   fullWidth?: boolean;
   onFormSubmit?: () => void;
   onClose: () => void;
-  maxWidth: Breakpoint;
+  maxWidth?: Breakpoint;
   buttons?: ReactNode[];
   style?: React.CSSProperties;
   autoFocus?: boolean;

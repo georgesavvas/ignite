@@ -98,7 +98,7 @@ export type RuleType {
 
 interface IngestProps {
   open: boolean;
-  path: string;
+  path?: string;
   enqueueSnackbar: EnqueueSnackbar;
   onClose: () => void;
 }

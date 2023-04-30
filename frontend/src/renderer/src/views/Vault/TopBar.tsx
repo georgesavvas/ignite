@@ -12,56 +12,62 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-import React, {useEffect, useState, useContext} from "react";
-
-import Stack from "@mui/material/Stack";
-import IconButton from "@mui/material/IconButton";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import SortIcon from "@mui/icons-material/Sort";
+import IconButton from "@mui/material/IconButton";
+import Stack from "@mui/material/Stack";
+import { ClickEvent, EnqueueSnackbar } from "@renderer/types/common";
+import { useContext, useEffect, useState } from "react";
 
-import ContextMenu, {handleContextMenu} from "../../components/ContextMenu";
+import ContextMenu, { ContextMenuType, handleContextMenu } from "../../components/ContextMenu";
 import FilterField from "../../components/FilterField";
 import IgnButton from "../../components/IgnButton";
-import Ingest from "../Ingest/Ingest";
+import { VaultContext, VaultContextType } from "../../contexts/VaultContext";
 import NewAsset from "../Explorer/NewAsset";
-import {VaultContext} from "../../contexts/VaultContext";
-
+import Ingest from "../Ingest/Ingest";
 
 const style = {
   display: "flex",
   justifyContent: "space-between",
   padding: "0px 5px",
   alignItems: "center",
-  gap: "5px"
+  gap: "5px",
 };
 
-const iconButtonStyle = {height: "34.25px", width: "34.25px"};
+const iconButtonStyle = { height: "34.25px", width: "34.25px" };
 
-function TopBar(props) {
-  const [sortMenu, setSortMenu] = useState(null);
+interface TopBarProps {
+  setQuery: (query: any) => void;
+  onFilterStringChange: (value: string) => void;
+  enqueueSnackbar: EnqueueSnackbar;
+  onFiltersToggle: () => void;
+  onRefresh: () => void;
+}
+
+const TopBar = (props: TopBarProps) => {
+  const [sortMenu, setSortMenu] = useState<ContextMenuType | null>(null);
   const [filterValue, setFilterValue] = useState("");
   const [ingestOpen, setIngestOpen] = useState(false);
   const [newAssetOpen, setNewAssetOpen] = useState(false);
-  const [vaultContext] = useContext(VaultContext);
+  const { vaultContext } = useContext(VaultContext) as VaultContextType;
 
   useEffect(() => {
     const sortData = localStorage.getItem("sortData");
     if (!sortData) return;
-    props.setQuery({sort: JSON.parse(sortData)});
+    props.setQuery({ sort: JSON.parse(sortData) });
   }, []);
 
   useEffect(() => {
     props.onFilterStringChange(filterValue);
   }, [filterValue]);
 
-  const handleSortClicked = e => {
+  const handleSortClicked = (e: ClickEvent) => {
     handleContextMenu(e, sortMenu, setSortMenu);
   };
 
-  const handleSortChange = (field, reverse, label) => {
-    const sortData = {field: field, reverse: reverse, label: label};
-    props.setQuery({sort: sortData});
+  const handleSortChange = (field: string, reverse: boolean, label: string) => {
+    const sortData = { field: field, reverse: reverse, label: label };
+    props.setQuery({ sort: sortData });
     localStorage.setItem("sortData", JSON.stringify(sortData));
   };
 
@@ -89,39 +95,46 @@ function TopBar(props) {
     {
       label: "Date modified (Oldest first)",
       fn: () => handleSortChange("date_modified", false, "Date modified (Oldest first)"),
-    }
+    },
   ];
 
   return (
     <div style={style}>
-      <ContextMenu items={sortOptions} contextMenu={sortMenu}
-        setContextMenu={setSortMenu} title="Sort By"
+      <ContextMenu
+        items={sortOptions}
+        contextMenu={sortMenu}
+        setContextMenu={setSortMenu}
+        title="Sort By"
       />
-      <Ingest open={ingestOpen} onClose={() => setIngestOpen(false)}
-        enqueueSnackbar={props.enqueueSnackbar} path={vaultContext.path}
+      <Ingest
+        open={ingestOpen}
+        onClose={() => setIngestOpen(false)}
+        enqueueSnackbar={props.enqueueSnackbar}
+        path={vaultContext.path}
       />
-      <NewAsset open={newAssetOpen} onClose={() => setNewAssetOpen(false)}
-        enqueueSnackbar={props.enqueueSnackbar} path={vaultContext.path}
+      <NewAsset
+        open={newAssetOpen}
+        onClose={() => setNewAssetOpen(false)}
+        enqueueSnackbar={props.enqueueSnackbar}
+        path={vaultContext.path}
       />
       <IgnButton
-        style={{minWidth: "80px"}}
-        color="ignite" 
+        style={{ minWidth: "80px" }}
+        color="ignite"
         variant="outlined"
         onClick={() => setIngestOpen(true)}
       >
         Ingest
       </IgnButton>
       <IgnButton
-        style={{minWidth: "120px"}}
-        color="ignite" 
+        style={{ minWidth: "120px" }}
+        color="ignite"
         variant="outlined"
         onClick={() => setNewAssetOpen(true)}
       >
         New Asset
       </IgnButton>
-      <Stack direction="row" spacing={1}
-        style={{width: "100%", alignItems: "center"}}
-      >
+      <Stack direction="row" spacing={1} style={{ width: "100%", alignItems: "center" }}>
         {/* <FormControlLabel control={<Switch checked={props.autoPlay} onChange={props.onAutoPlayChange} />} label="Autoplay" /> */}
         <FilterField filterValue={filterValue} setFilterValue={setFilterValue} />
         <IconButton onClick={handleSortClicked} style={iconButtonStyle}>
@@ -131,13 +144,11 @@ function TopBar(props) {
           <FilterAltIcon />
         </IconButton>
       </Stack>
-      <IgnButton variant="outlined" style={{minWidth: "90px"}}
-        onClick={props.onRefresh}
-      >
+      <IgnButton variant="outlined" style={{ minWidth: "90px" }} onClick={props.onRefresh}>
         Refresh
       </IgnButton>
     </div>
   );
-}
+};
 
 export default TopBar;
