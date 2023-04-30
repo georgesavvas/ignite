@@ -27,8 +27,8 @@ import styles from "./ComponentList.module.css";
 interface ComponentList {
   project: string;
   components: IgniteComponent[];
-  onSelect: () => void;
-  selectedComp: IgniteComponent;
+  onSelect: (compId: string) => void;
+  selectedComp?: IgniteComponent;
   asset: AssetVersion;
 }
 

@@ -12,80 +12,88 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-import React, {useState, useEffect, useRef} from "react";
-
-import Divider from "@mui/material/Divider";
-import IconButton from "@mui/material/IconButton";
-import TextField from "@mui/material/TextField";
-import Typography from "@mui/material/Typography";
-import Button  from "@mui/material/Button";
-import GroupWorkIcon from "@mui/icons-material/GroupWork";
-import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
-import ToggleButton from "@mui/material/ToggleButton";
-import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
+import ClearIcon from "@mui/icons-material/Clear";
 import DeleteIcon from "@mui/icons-material/Delete";
+import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
+import GroupWorkIcon from "@mui/icons-material/GroupWork";
 import Autocomplete from "@mui/material/Autocomplete";
-import Switch from "@mui/material/Switch";
+import Button from "@mui/material/Button";
+import Divider from "@mui/material/Divider";
+import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
+import IconButton from "@mui/material/IconButton";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
+import Switch from "@mui/material/Switch";
+import TextField from "@mui/material/TextField";
+import ToggleButton from "@mui/material/ToggleButton";
+import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import Tooltip from "@mui/material/Tooltip";
-import ClearIcon from "@mui/icons-material/Clear";
+import Typography from "@mui/material/Typography";
+import { useEffect, useRef, useState } from "react";
 
-import IgnButton from "../../components/IgnButton";
 import DataPlaceholder from "../../components/DataPlaceholder";
-import styles from "./FilterBuilder.module.css";
-import serverRequest from "../../services/serverRequest";
+import IgnButton from "../../components/IgnButton";
 import Modal from "../../components/Modal";
-
+import serverRequest from "../../services/serverRequest";
+import styles from "./FilterBuilder.module.css";
+import { InputChangeEvent } from "@renderer/types/common";
 
 const fields = [
-  {label: "", value: "filter_string"},
-  {label: "Name", value: "name"},
-  // {label: "Description", value: "description"},
-  {label: "Tags", value: "tags.ARRAY."},
-  {label: "Project", value: "project"},
-  {label: "Component name", value: "components.ARRAY.name"},
-  // {label: "Component source", value: "components.ARRAY.source"},
-  // {label: "Component filepath", value: "components.ARRAY.file"}
+  { label: "", value: "filter_string" },
+  { label: "Name", value: "name" },
+  { label: "Tags", value: "tags.ARRAY." },
+  { label: "Project", value: "project" },
+  { label: "Component name", value: "components.ARRAY.name" },
 ];
 
-const getFieldFromValue = value => {
+const getFieldFromValue = (value: string) => {
   if (!value) return fields[0];
-  return fields.filter(f => f.value === value)[0];
+  return fields.filter((f) => f.value === value)[0];
 };
 
-const Placeholder = props => {
+interface PlaceholderProps {
+  filter?: boolean;
+  name: string;
+  onChange: (name: string, field: string, value: string);
+  disableDelete?: boolean;
+}
 
-  // const style = {
-  //   flexDirection: props.filter ? "column" : "row"
-  // }
-
+const Placeholder = (props: PlaceholderProps) => {
   return (
     <div className={styles.placeholderContainer}>
       <div className={styles.placeholderOption}>
         {
-          props.filter ?
+          props.filter ? (
             <Tooltip title="Create group around filter">
-              <GroupWorkIcon className={styles.icon} onClick={() => props.onChange(props.name, "group_filter", "")} />
-            </Tooltip> :
-            <Tooltip title="Insert filter">
-              <FilterAltOutlinedIcon className={styles.icon} onClick={() => props.onChange(props.name, "insert_filter", "")} />
+              <GroupWorkIcon
+                className={styles.icon}
+                onClick={() => props.onChange(props.name, "group_filter", "")}
+              />
             </Tooltip>
+          ) : (
+            <Tooltip title="Insert filter">
+              <FilterAltOutlinedIcon
+                className={styles.icon}
+                onClick={() => props.onChange(props.name, "insert_filter", "")}
+              />
+            </Tooltip>
+          )
           // <GroupWorkIcon className={styles.icon} onClick={() => props.onChange(props.name, "insert_group", "")} />
         }
       </div>
       <Divider />
       <div className={styles.placeholderOption}>
-        <Tooltip title={`Delete ${props.filter ? "filter": "group"}`}>
-          {
-            props.disableDelete ?
-              <DeleteIcon style={{color: "rgb(50, 50, 50)"}} /> :
-              <DeleteIcon className={styles.icon} onClick={() => props.onChange(props.name, "delete", "")} />
-          }
+        <Tooltip title={`Delete ${props.filter ? "filter" : "group"}`}>
+          {props.disableDelete ? (
+            <DeleteIcon style={{ color: "rgb(50, 50, 50)" }} />
+          ) : (
+            <DeleteIcon
+              className={styles.icon}
+              onClick={() => props.onChange(props.name, "delete", "")}
+            />
+          )}
         </Tooltip>
         {/* {
           props.filter ?
@@ -97,30 +105,31 @@ const Placeholder = props => {
   );
 };
 
-const Filter = props => {
+interface FilterProps {
+  field: string;
+  name: string;
+  value: string;
+  onChange: (name: string, field: string, value: string) => void;
+}
+
+const Filter = (props: FilterProps) => {
   return (
     <div className={styles.filterContainer}>
       <div className={styles.fieldsContainer}>
         <Autocomplete
           id="combo-box-demo"
           options={fields}
-          getOptionLabel={option => option.label}
-          sx={{width: "100%"}}
+          getOptionLabel={(option) => option.label}
+          sx={{ width: "100%" }}
           value={getFieldFromValue(props.field)}
           onChange={(_, value) => props.onChange(props.name, "key", value ? value.value : "")}
-          renderInput={params =>
-            <TextField
-              {...params}
-              placeholder="Everything"
-              size="small"
-            />
-          }
+          renderInput={(params) => <TextField {...params} placeholder="Everything" size="small" />}
         />
         <TextField
           size="small"
           placeholder="Value"
           value={props.value}
-          onChange={e => props.onChange(props.name, "value", e.target.value)}
+          onChange={(e) => props.onChange(props.name, "value", e.target.value)}
         />
       </div>
       <Placeholder filter {...props} />
@@ -128,11 +137,20 @@ const Filter = props => {
   );
 };
 
-const Group = props => {
+interface GroupProps {
+  name: string;
+  condition: string;
+  children: React.ReactNode[];
+  onChange: (name: string, field: string, value: string) => void;
+}
 
+const Group = (props: GroupProps) => {
   const level = props.name.split(props.condition).length - 1;
   const style = {
-    backgroundColor: props.condition === "and" ? `hsl(120, 40%, ${20 - level * 4}%)` : `hsl(240, 40%, ${20 - level * 4}%)`
+    backgroundColor:
+      props.condition === "and"
+        ? `hsl(120, 40%, ${20 - level * 4}%)`
+        : `hsl(240, 40%, ${20 - level * 4}%)`,
   };
 
   return (
@@ -141,11 +159,11 @@ const Group = props => {
       <Placeholder disableDelete={!props.name.includes("-")} {...props} />
       <ToggleButtonGroup
         value={props.condition}
-        onChange={e => props.onChange(props.name, "condition", e.target.value)}
+        onChange={(e) => props.onChange(props.name, "condition", e.target.value)}
         size="small"
         color="success"
         orientation="vertical"
-        style={{height: "100%"}}
+        style={{ height: "100%" }}
       >
         <ToggleButton value="and">AND</ToggleButton>
         <ToggleButton value="or">OR</ToggleButton>
@@ -154,7 +172,7 @@ const Group = props => {
   );
 };
 
-const validateExpression = expr => {
+const validateExpression = (expr: string) => {
   try {
     JSON.parse(expr);
     return true;
@@ -163,7 +181,13 @@ const validateExpression = expr => {
   }
 };
 
-const TemplateNameInputModal = ({onSubmit, open, onClose}) => {
+interface TemplateNameInputModalProps {
+  onSubmit: () => void;
+  open: boolean;
+  onClose: () => void;
+}
+
+const TemplateNameInputModal = ({ onSubmit, open, onClose }: TemplateNameInputModalProps) => {
   const [name, setName] = useState("");
   const textfieldRef = useRef();
 
@@ -177,20 +201,30 @@ const TemplateNameInputModal = ({onSubmit, open, onClose}) => {
     <Modal
       maxWidth="xs"
       title="Filter template name"
-      onSubmit={handleSubmit}
+      onFormSubmit={handleSubmit}
       open={open}
       onClose={onClose}
-      buttons={[<IgnButton key="create" type="submit">Confirm</IgnButton>]}
+      buttons={[
+        <IgnButton key="create" type="submit">
+          Confirm
+        </IgnButton>,
+      ]}
       focusRef={textfieldRef}
     >
-      <TextField fullWidth value={name} onChange={e => setName(e.target.value)}
-        size="small" autoFocus label="Filter name" inputRef={textfieldRef}
+      <TextField
+        fullWidth
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        size="small"
+        autoFocus
+        label="Filter name"
+        inputRef={textfieldRef}
       />
     </Modal>
   );
 };
 
-const safeJsonParse = data => {
+const safeJsonParse = (data: string) => {
   try {
     return JSON.parse(data);
   } catch (error) {
@@ -198,9 +232,20 @@ const safeJsonParse = data => {
   }
 };
 
-const defaultExpr = "{ \"condition\": \"and\", \"filters\": [{ \"\": \"\" }, { \"\": \"\" }]}";
+const defaultExpr = '{ "condition": "and", "filters": [{ "": "" }, { "": "" }]}';
 
-export default function FilterBuilder(props) {
+type ExpressionType = {
+  condition?: "and" | "or",
+  filters?: ExpressionType[];
+}
+
+interface FilterBuilderProps {
+  default: string;
+  expression: ExpressionType;
+  onChange: (expression: ExpressionType) => void;
+}
+
+export const FilterBuilder = (props: FilterBuilderProps) => {
   const [expression, setExpression] = useState(props.default);
   const [isValid, setIsValid] = useState(true);
   const [showExpr, setShowExpr] = useState(false);
@@ -218,14 +263,14 @@ export default function FilterBuilder(props) {
     setExpression(props.default);
   }, [props.expression]);
 
-  const handleExpressionChange = e => {
+  const handleExpressionChange = (e) => {
     const value = e.target.value;
     if (validateExpression(value)) setIsValid(true);
     else setIsValid(false);
     setExpression(value);
   };
 
-  const findGroupOrFilter = (expr, name) => {
+  const findGroupOrFilter = (expr: string, name: string) => {
     const indices = name.split("-");
     const amount = indices.length;
     let parent = {};
@@ -238,26 +283,26 @@ export default function FilterBuilder(props) {
         parent = previous;
         parent_index = nameIndex;
       }
-      return(block[nameIndex]);
+      return block[nameIndex];
     }, expr);
     return [block, parent, parent_index];
   };
 
-  const getTemplates = (fn=undefined) => {
-    serverRequest("get_filter_templates").then(resp => {
+  const getTemplates = (fn = undefined) => {
+    serverRequest("get_filter_templates").then((resp) => {
       setTemplates(resp.data || []);
       if (fn) fn();
     });
   };
 
-  const handleTemplateChange = e => {
+  const handleTemplateChange = (e: InputChangeEvent) => {
     const value = e.target.value;
-    const template = templates.filter(template => template.name === value)[0];
+    const template = templates.filter((template) => template.name === value)[0];
     setExpression(template.data);
   };
 
-  const handleSaveCurrent = name => {
-    serverRequest("add_filter_template", {data: expression, name: name});
+  const handleSaveCurrent = (name) => {
+    serverRequest("add_filter_template", { data: expression, name: name });
   };
 
   const handleTemplateSelectOpen = () => {
@@ -268,58 +313,71 @@ export default function FilterBuilder(props) {
     getTemplates(setManagerOpen(true));
   };
 
-  const handleRemoveTemplate = name => {
-    serverRequest("remove_filter_template", {data: name}).then(resp => {
+  const handleRemoveTemplate = (name) => {
+    serverRequest("remove_filter_template", { data: name }).then((resp) => {
       setTemplates(resp.data);
     });
   };
 
-  const handleChange = (name, change, value) => {
-    setExpression(prevState => {
+  const handleChange = (name: string, change: string, value: string) => {
+    setExpression((prevState) => {
       const expr = JSON.parse(prevState);
       const [block, parent, index] = findGroupOrFilter(expr, name);
       const key = Object.keys(block)[0];
       switch (change) {
-      case "value": block[key] = value; break;
-      case "condition": block["condition"] = value; break;
-      case "key": 
-        block[value] = block[key];
-        delete block[key];
-        break;
-      case "insert_group": block.filters.push({condition: "and", filters: [{"": ""}]}); break;
-      case "insert_filter": block.filters.push({"": ""}); break;
-      case "delete":
-        if (!parent.filters) {console.log(name, "parent has no filter", parent); break;}
-        else if (block.condition) {
-          parent.filters.splice(index, 1);
-          parent.filters = parent.filters.concat(block.filters);
+        case "value":
+          block[key] = value;
           break;
-        }
-        else if (parent.filters.length > 1) {
-          parent.filters.splice(index, 1);
+        case "condition":
+          block["condition"] = value;
           break;
-        }
-        else {
-          // parent.filters.push(block.filters);
-          console.log("nope can't");
+        case "key":
+          block[value] = block[key];
+          delete block[key];
           break;
-        }
-      case "group_filter": parent.filters[index] = {condition: "and", filters: [block]}; break;
+        case "insert_group":
+          block.filters.push({ condition: "and", filters: [{ "": "" }] });
+          break;
+        case "insert_filter":
+          block.filters.push({ "": "" });
+          break;
+        case "delete":
+          if (!parent.filters) {
+            console.log(name, "parent has no filter", parent);
+            break;
+          } else if (block.condition) {
+            parent.filters.splice(index, 1);
+            parent.filters = parent.filters.concat(block.filters);
+            break;
+          } else if (parent.filters.length > 1) {
+            parent.filters.splice(index, 1);
+            break;
+          } else {
+            // parent.filters.push(block.filters);
+            console.log("nope can't");
+            break;
+          }
+        case "group_filter":
+          parent.filters[index] = { condition: "and", filters: [block] };
+          break;
       }
       return JSON.stringify(expr);
     });
   };
 
-  const renderFilters = (expr, prefix, disableDelete=true) => {
+  const renderFilters = (expr: string, prefix: string, disableDelete = true) => {
     if (Array.isArray(expr)) {
-      return (
-        expr.map((f, i) => renderFilters(f, `${prefix}-${i}`, disableDelete))
-      );
+      return expr.map((f, i) => renderFilters(f, `${prefix}-${i}`, disableDelete));
     } else if (expr.condition) {
       const prefix_safe = prefix ? prefix + expr.condition : `0${expr.condition}`;
       const singleChild = expr.filters.length === 1;
       return (
-        <Group key={prefix_safe} name={prefix_safe} condition={expr.condition} onChange={handleChange}>
+        <Group
+          key={prefix_safe}
+          name={prefix_safe}
+          condition={expr.condition}
+          onChange={handleChange}
+        >
           {renderFilters(expr.filters, `${prefix_safe}`, singleChild)}
         </Group>
       );
@@ -345,7 +403,11 @@ export default function FilterBuilder(props) {
         open={templateNameInputModalOpen}
         onClose={() => setTemplateNameInputModalOpen(false)}
         onSubmit={handleSaveCurrent}
-        buttons={[<IgnButton key="create" type="submit">Confirm</IgnButton>]}
+        buttons={[
+          <IgnButton key="create" type="submit">
+            Confirm
+          </IgnButton>,
+        ]}
       />
       <Modal
         maxWidth="xs"
@@ -353,24 +415,30 @@ export default function FilterBuilder(props) {
         onClose={() => setManagerOpen(false)}
         title="Manage filter templates"
       >
-        {templates.length ? templates.map((template, index) => 
-          <div className={styles.manageTemplatesContainer} key={index}>
-            <Typography>{template.name}</Typography>
-            <IconButton onClick={() => handleRemoveTemplate(template.name)}>
-              <ClearIcon style={{color: "red"}} />
-            </IconButton>
-          </div>
-        ) : <DataPlaceholder text="No filters saved yet" style={{position: "relative"}} />}
+        {templates.length ? (
+          templates.map((template, index) => (
+            <div className={styles.manageTemplatesContainer} key={index}>
+              <Typography>{template.name}</Typography>
+              <IconButton onClick={() => handleRemoveTemplate(template.name)}>
+                <ClearIcon style={{ color: "red" }} />
+              </IconButton>
+            </div>
+          ))
+        ) : (
+          <DataPlaceholder text="No filters saved yet" style={{ position: "relative" }} />
+        )}
       </Modal>
       <div className={styles.topBar}>
-        <Button variant="outlined" onClick={() => setExpression(defaultExpr)}>Reset Filters</Button>
+        <Button variant="outlined" onClick={() => setExpression(defaultExpr)}>
+          Reset Filters
+        </Button>
         <FormControlLabel
-          control={<Switch color="primary" onChange={e => setShowExpr(e.target.checked)} />}
+          control={<Switch color="primary" onChange={(e) => setShowExpr(e.target.checked)} />}
           label="Show expression"
           labelPlacement="start"
           // style={{minWidth: "200px"}}
         />
-        <FormControl sx={{m: 1, minWidth: 250}} size="small">
+        <FormControl sx={{ m: 1, minWidth: 250 }} size="small">
           <InputLabel id="template-select-label">Templates...</InputLabel>
           <Select
             labelId="template-label"
@@ -383,21 +451,23 @@ export default function FilterBuilder(props) {
             onOpen={handleTemplateSelectOpen}
             onChange={handleTemplateChange}
           >
-            {templates ? templates.map((template, index) => 
-              <MenuItem
-                value={template.name}
-                data={template.data}
-                key={index}
-              >
-                {template.name}
-              </MenuItem>
-            ) : null}
+            {templates
+              ? templates.map((template, index) => (
+                  <MenuItem value={template.name} data={template.data} key={index}>
+                    {template.name}
+                  </MenuItem>
+                ))
+              : null}
           </Select>
         </FormControl>
-        <Button variant="outlined" onClick={handleManagerOpen}>Manage</Button>
-        <Button variant="outlined" onClick={() => setTemplateNameInputModalOpen(true)}>Save current</Button>
+        <Button variant="outlined" onClick={handleManagerOpen}>
+          Manage
+        </Button>
+        <Button variant="outlined" onClick={() => setTemplateNameInputModalOpen(true)}>
+          Save current
+        </Button>
       </div>
-      {showExpr ?
+      {showExpr ? (
         <TextField
           fullWidth
           placeholder="Filter expression"
@@ -406,11 +476,13 @@ export default function FilterBuilder(props) {
           value={expression}
           onChange={handleExpressionChange}
           color={isValid ? "success" : "error"}
-        /> :
-        null}
+        />
+      ) : null}
       <div className={styles.filtersContainer}>
         {isValid ? renderFilters(safeJsonParse(expression), "") : null}
       </div>
     </div>
   );
-}
+};
+
+export default FilterBuilder;

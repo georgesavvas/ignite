@@ -14,21 +14,22 @@
 
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import Sockette from "sockette";
 
 import DataPlaceholder from "../../components/DataPlaceholder";
 import FilterField from "../../components/FilterField";
-import { ConfigContext } from "../../contexts/ConfigContext";
+import { Config, ConfigContext, ConfigContextType } from "../../contexts/ConfigContext";
 import clientRequest from "../../services/clientRequest";
 import { clientSocket } from "../../services/clientWebSocket";
-import Process from "./Process";
+import Process, { ProcessType } from "./Process";
 import styles from "./ProcessManager.module.css";
 
-const createProcessesSocket = (config, sessionID, websocketConfig) => {
+const createProcessesSocket = (config: Config, sessionID: string, websocketConfig: {}) => {
   return clientSocket("processes", config, sessionID, websocketConfig);
 };
 
-const destroySocket = (socket) => {
+const destroySocket = (socket: WebSocket) => {
   if (!socket) return;
   socket.close();
 };
@@ -64,7 +65,7 @@ const destroySocket = (socket) => {
 // ];
 
 const processStateOrder = ["running", "error", "paused", "waiting", "finished"];
-const sortProcesses = (processes) => {
+const sortProcesses = (processes: ProcessType[]) => {
   const _processes = [...processes];
   _processes.sort((a, b) => {
     const indexA = processStateOrder.indexOf(a.state);
@@ -75,21 +76,21 @@ const sortProcesses = (processes) => {
 };
 
 export default function ProcessManager() {
-  const [socket, setSocket] = useState();
+  const [socket, setSocket] = useState<Sockette | undefined>(undefined);
   const { config } = useContext(ConfigContext) as ConfigContextType;
-  const [processes, setProcesses] = useState([]);
+  const [processes, setProcesses] = useState<ProcessType[]>([]);
   const [autoClear, setAutoClear] = useState(false);
   const [filterValue, setFilterValue] = useState("");
 
   useEffect(() => {
     if (!config.clientAddress) return;
     if (socket) return;
-    window.services.get_env("IGNITE_SESSION_ID").then((resp) => {
+    window.services.get_env("IGNITE_SESSION_ID").then((resp: any) => {
       const websocketConfig = {
         onmessage: (e) => {
           const data = JSON.parse(e.data).data;
-          setProcesses((prevState) => {
-            const existing = [...prevState];
+          setProcesses((prev) => {
+            const existing = [...prev];
             const index = existing.findIndex((process) => process.id === data.id);
             if (index >= 0) existing[index] = { ...existing[index], ...data };
             else if (data.name && data.entity) existing.push(data);
@@ -100,10 +101,10 @@ export default function ProcessManager() {
       const ws = createProcessesSocket(config, resp, websocketConfig);
       clientRequest("get_processes", { session_id: resp }).then((resp2) => {
         if (!resp2) return;
-        setProcesses((prevState) => {
+        setProcesses((prev) => {
           const incoming = resp2.data || [];
-          const incomingIds = incoming.map((t) => t.id);
-          const existing = prevState.filter((t) => !incomingIds.includes(t.id));
+          const incomingIds = incoming.map((t: ProcessType) => t.id);
+          const existing = prev.filter((t) => !incomingIds.includes(t.id));
           return sortProcesses([...existing, ...incoming]);
         });
       });
@@ -111,25 +112,26 @@ export default function ProcessManager() {
       setSocket(ws);
     });
     return () => {
+      if (!socket) return;
       destroySocket(socket);
-      setSocket();
+      setSocket(undefined);
     };
   }, [config.clientAddress]);
 
   useEffect(() => {
     if (!autoClear) return;
-    setProcesses((prevState) => prevState.filter((process) => process.state !== "finished"));
+    setProcesses((prev) => prev.filter((process) => process.state !== "finished"));
   }, [autoClear]);
 
-  const handleClear = (processID) => {
-    setProcesses((prevState) => prevState.filter((process) => process.id !== processID));
+  const handleClear = (processID: string) => {
+    setProcesses((prev) => prev.filter((process) => process.id !== processID));
   };
 
-  const handleKill = (processID) => {
-    setProcesses((prevState) => {
-      const existing = [...prevState];
+  const handleKill = (processID: string) => {
+    setProcesses((prev) => {
+      const existing = [...prev];
       const index = existing.findIndex((process) => process.id === processID);
-      if (index < 0) return prevState;
+      if (index < 0) return prev;
       existing[index] = { ...existing[index], state: "error" };
       return sortProcesses(existing);
     });
@@ -170,7 +172,7 @@ export default function ProcessManager() {
                 process={process}
                 onClear={handleClear}
                 forceKill={handleKill}
-                style={hide ? { display: "none" } : null}
+                style={hide ? { display: "none" } : {}}
               />
             );
           })}

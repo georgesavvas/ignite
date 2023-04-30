@@ -37,6 +37,7 @@ type ModalProps = React.PropsWithChildren<{
   maxWidth: Breakpoint;
   buttons?: ReactNode[];
   style?: React.CSSProperties;
+  autoFocus?: boolean;
 }>;
 
 const Modal = ({ maxWidth = "xs", ...props }: ModalProps) => {

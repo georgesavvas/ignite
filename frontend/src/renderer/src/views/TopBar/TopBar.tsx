@@ -20,7 +20,7 @@ import { useContext, useEffect, useState } from "react";
 
 import IgnButton from "../../components/IgnButton.js";
 import Modal from "../../components/Modal.js";
-import { ContextContext } from "../../contexts/ContextContext.js";
+import { ContextContext, ContextContextType } from "../../contexts/ContextContext.js";
 import CratesDropdown from "../Crates/CratesDropdown.js";
 import DccSelector from "../DccSelector.jsx";
 import Feedback from "../Feedback.jsx";
@@ -35,25 +35,22 @@ export const TopBar = () => {
   const [vaultOpen, setVaultOpen] = useState(false);
   const [dccOpen, setDccOpen] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
-  const [, , refreshContext] = useContext(ContextContext);
+  const { refresh } = useContext(ContextContext) as ContextContextType;
   const [appVersion, setAppVersion] = useState("");
 
   useEffect(() => {
-    window.services.get_version().then((resp) => setAppVersion(resp));
+    window.services.get_version().then((resp: any) => setAppVersion(resp));
   }, []);
 
   const handleVaultClose = () => {
     setVaultOpen(false);
-    refreshContext();
+    refresh();
   };
 
   return (
     <>
       <Vault open={vaultOpen} onClose={handleVaultClose} />
-      <ProjectBrowser
-        open={projectBrowserOpen}
-        onClose={() => setProjectBrowserOpen(false)}
-      />
+      <ProjectBrowser open={projectBrowserOpen} onClose={() => setProjectBrowserOpen(false)} />
       <Modal open={dccOpen} onClose={() => setDccOpen(false)} maxWidth="xs">
         <DccSelector onClose={() => setDccOpen(false)} />
       </Modal>
@@ -69,11 +66,7 @@ export const TopBar = () => {
           >
             Project Browser
           </IgnButton>
-          <IgnButton
-            variant="outlined"
-            color="ignite"
-            onClick={() => setVaultOpen(true)}
-          >
+          <IgnButton variant="outlined" color="ignite" onClick={() => setVaultOpen(true)}>
             Vault
           </IgnButton>
           <IgnButton
@@ -87,28 +80,19 @@ export const TopBar = () => {
         </div>
         <div className={styles.logoContainer}>
           <img src="src/assets/ignite_logo.png" className={styles.logo} />
-          <Typography
-            style={{ color: "rgb(60,60,60)", alignSelf: "flex-end" }}
-            variant="caption"
-          >
+          <Typography style={{ color: "rgb(60,60,60)", alignSelf: "flex-end" }} variant="caption">
             v{appVersion}
           </Typography>
         </div>
         <div className={styles.rightSide}>
           <CratesDropdown />
           <div style={{ flexGrow: 1 }} />
-          <IconButton
-            size="small"
-            style={{ padding: 0 }}
-            onClick={() => setFeedbackOpen(true)}
-          >
+          <IconButton size="small" style={{ padding: 0 }} onClick={() => setFeedbackOpen(true)}>
             <div className={styles.feedbackIcon} />
           </IconButton>
           <IconButton
             size="small"
-            onClick={() =>
-              window.services.open_url("https://docs.ignitevfx.co.uk/")
-            }
+            onClick={() => window.services.open_url("https://docs.ignitevfx.co.uk/")}
           >
             <HelpIcon style={{ fontSize: "30px" }} />
           </IconButton>

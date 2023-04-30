@@ -122,7 +122,7 @@ const DirectoryDetails = (props: DirectoryDetailsProps) => {
             </>
           )}
         </div>
-        <TagContainer entityPath={props.entity.path} tags={props.entity.tags} />
+        <TagContainer entityPath={props.entity.path} tags={props.entity.tags} onRefresh={refresh} />
       </div>
       <Attributes entityPath={props.entity.path} attributes={props.entity.attributes} />
     </div>

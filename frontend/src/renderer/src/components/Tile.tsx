@@ -34,8 +34,8 @@ export type TileProps = React.PropsWithChildren<{
   onClick?: (e: ClickEvent) => void;
   contextItems?: ContextItem[];
   noInfo?: boolean;
-  onDragStart: (e: React.DragEvent) => void;
-  draggable: boolean;
+  onDragStart?: (e: React.DragEvent) => void;
+  draggable?: boolean;
   noTopGradient?: boolean;
   noBottomGradient?: boolean;
   columnWidths?: string[];

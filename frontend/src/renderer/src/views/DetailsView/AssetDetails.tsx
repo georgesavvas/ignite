@@ -249,7 +249,11 @@ function AssetDetails(props: AssetDetailsProps) {
             <Path path={props.entity.path} />
           </div>
           <div style={{ padding: "5px" }}>
-            <TagContainer entityPath={props.entity.path} tags={props.entity.tags} />
+            <TagContainer
+              entityPath={props.entity.path}
+              tags={props.entity.tags}
+              onRefresh={refresh}
+            />
           </div>
         </ReflexElement>
         <ReflexSplitter style={splitterStyle} />

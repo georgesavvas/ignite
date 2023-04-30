@@ -12,32 +12,43 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-import React, {useState} from "react";
-
 import Typography from "@mui/material/Typography";
+import { useState } from "react";
 
 import styles from "./SystemResources.module.css";
 
+interface ResourceBoxProps {
+  label: string;
+  value: number;
+}
 
-const ResourceBox = props => {
+const ResourceBox = (props: ResourceBoxProps) => {
   const style = {
-    right: `${100 - props.value}%`
+    right: `${100 - props.value}%`,
   };
   return (
     <div className={styles.resourceBoxContainer}>
-      <Typography variant="caption" className={styles.type}>{props.label}:</Typography>
-      <Typography variant="caption" className={styles.type}>{Math.round(props.value)}%</Typography>
+      <Typography variant="caption" className={styles.type}>
+        {props.label}:
+      </Typography>
+      <Typography variant="caption" className={styles.type}>
+        {Math.round(props.value)}%
+      </Typography>
       <div className={styles.resourceBoxBackground} style={style} />
       <div className={styles.resourceBoxBackgroundFilled} />
     </div>
   );
 };
 
-export default function SystemResources() {
-  const [usageData, setUsageData] = useState({});
+type UsageDataType = {
+  cpu: number;
+  mem: number;
+};
 
-  window.services.onResourceUsage((_event, data) => {
+export const SystemResources = () => {
+  const [usageData, setUsageData] = useState<UsageDataType>({ cpu: 0, mem: 0 });
+
+  window.services.onResourceUsage((_, data: UsageDataType) => {
     setUsageData(data);
   });
 
@@ -48,4 +59,6 @@ export default function SystemResources() {
       <ResourceBox label="RAM" value={usageData.mem} />
     </div>
   );
-}
+};
+
+export default SystemResources;

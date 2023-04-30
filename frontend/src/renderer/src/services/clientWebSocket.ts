@@ -15,12 +15,12 @@
 import { Config } from "@renderer/contexts/ConfigContext";
 import Sockette from "sockette";
 
-export function clientSocket(
+export const clientSocket = (
   endpoint: string,
   config: Config,
   sessionID: string,
   websocketConfig = {}
-) {
+) => {
   const address = config.clientAddress;
   const defaultWebsocketConfig = {
     // onopen: e => console.log(e),
@@ -35,4 +35,4 @@ export function clientSocket(
     ...websocketConfig,
   });
   return ws;
-}
+};

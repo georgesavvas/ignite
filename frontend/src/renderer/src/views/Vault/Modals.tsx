@@ -12,50 +12,59 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-import React, {useEffect, useRef, useState} from "react";
-
 import TextField from "@mui/material/TextField";
+import { useEffect, useRef, useState } from "react";
 
-import FilterBuilder from "./FilterBuilder";
 import IgnButton from "../../components/IgnButton";
 import Modal from "../../components/Modal";
 import serverRequest from "../../services/serverRequest";
+import FilterBuilder from "./FilterBuilder";
 
+interface EditCollProps {}
 
-export function EditColl({data, open=false, onClose, enqueueSnackbar, fn}) {
+export const EditColl = ({ data, open = false, onClose, enqueueSnackbar, fn }: EditCollProps) => {
   const [filterData, setFilterData] = useState({});
 
   useEffect(() => {
-    if (data.expression) setFilterData({...data["expression"]});
+    if (data.expression) setFilterData({ ...data["expression"] });
     else setFilterData({});
   }, [data.path]);
 
   function handleConfirm() {
-    serverRequest("edit_collection", {data: {...data, expression: filterData.expression}}).then(resp => {
-      if (resp.ok) enqueueSnackbar("Success!", {variant: "success"});
-      else enqueueSnackbar("Couldn't edit collection.", {variant: "error"});
-    });
+    serverRequest("edit_collection", { data: { ...data, expression: filterData.expression } }).then(
+      (resp) => {
+        if (resp.ok) enqueueSnackbar("Success!", { variant: "success" });
+        else enqueueSnackbar("Couldn't edit collection.", { variant: "error" });
+      }
+    );
     if (fn) fn();
     onClose();
   }
 
-  const defaultExpr = "{ \"condition\": \"and\", \"filters\": [{ \"\": \"\" }, { \"\": \"\" }]}";
+  const defaultExpr = '{ "condition": "and", "filters": [{ "": "" }, { "": "" }]}';
 
   return (
-    <Modal open={open} onFormSubmit={handleConfirm} onClose={onClose}
-      maxWidth="xl" title={`Editing ${data.name}`}
-      buttons={[<IgnButton key="create" type="submit">Confirm</IgnButton>]}
+    <Modal
+      open={open}
+      onFormSubmit={handleConfirm}
+      onClose={onClose}
+      maxWidth="xl"
+      title={`Editing ${data.name}`}
+      buttons={[
+        <IgnButton key="create" type="submit">
+          Confirm
+        </IgnButton>,
+      ]}
     >
       <FilterBuilder
         default={JSON.stringify(data.expression) || defaultExpr}
-        onChange={value => setFilterData({expression: value})}
+        onChange={(value) => setFilterData({ expression: value })}
       />
     </Modal>
   );
-}
+};
 
-export function RenameColl({data, open=false, onClose, enqueueSnackbar, fn}) {
+export function RenameColl({ data, open = false, onClose, enqueueSnackbar, fn }) {
   const [nameValue, setNameValue] = useState("");
   const textFieldRef = useRef();
 
@@ -64,55 +73,67 @@ export function RenameColl({data, open=false, onClose, enqueueSnackbar, fn}) {
   }, [data.name]);
 
   function handleConfirm() {
-    serverRequest("rename_collection", {data: {...data, name: nameValue}}).then(resp => {
-      if (resp.ok) enqueueSnackbar("Renamed!", {variant: "success"});
-      else enqueueSnackbar("Couldn't rename collection.", {variant: "error"});
+    serverRequest("rename_collection", { data: { ...data, name: nameValue } }).then((resp) => {
+      if (resp.ok) enqueueSnackbar("Renamed!", { variant: "success" });
+      else enqueueSnackbar("Couldn't rename collection.", { variant: "error" });
     });
     if (fn) fn();
     onClose();
   }
 
   return (
-    <Modal open={open} focusRef={textFieldRef} maxWidth="sm" onClose={onClose}
-      onFormSubmit={handleConfirm} title={`Renaming ${data.name}`}
-      buttons={[<IgnButton key="create" type="submit">Confirm</IgnButton>]}
+    <Modal
+      open={open}
+      focusRef={textFieldRef}
+      maxWidth="sm"
+      onClose={onClose}
+      onFormSubmit={handleConfirm}
+      title={`Renaming ${data.name}`}
+      buttons={[
+        <IgnButton key="create" type="submit">
+          Confirm
+        </IgnButton>,
+      ]}
     >
       <TextField
         id="name"
         label="Name"
         variant="outlined"
         value={nameValue}
-        onChange={e => setNameValue(e.target.value)}
+        onChange={(e) => setNameValue(e.target.value)}
         size="small"
         fullWidth
         autoFocus
         inputRef={textFieldRef}
-        style={{marginTop: "10px"}}
+        style={{ marginTop: "10px" }}
       />
     </Modal>
   );
 }
-  
-export function DeleteColl({data, open=false, onClose, enqueueSnackbar, fn}) {
+
+export function DeleteColl({ data, open = false, onClose, enqueueSnackbar, fn }) {
   const handleConfirm = () => {
-    serverRequest("delete_collection", {data: data}).then(resp => {
-      if (resp.ok) enqueueSnackbar("Successfully deleted!", {variant: "success"});
-      else enqueueSnackbar("There was an issue with deleting this.", {variant: "error"}
-      );
+    serverRequest("delete_collection", { data: data }).then((resp) => {
+      if (resp.ok) enqueueSnackbar("Successfully deleted!", { variant: "success" });
+      else enqueueSnackbar("There was an issue with deleting this.", { variant: "error" });
     });
     if (fn) fn();
     onClose();
   };
 
   return (
-    <Modal open={open} onButtonClicked={handleConfirm} onClose={onClose}
+    <Modal
+      open={open}
+      onButtonClicked={handleConfirm}
+      onClose={onClose}
       text={`This will permanently delete the ${data.name} collection!`}
-      title="Are you sure?" maxWidth="sm"
+      title="Are you sure?"
+      maxWidth="sm"
     />
   );
 }
 
-export function CreateColl({data, open=false, onClose, enqueueSnackbar, fn}) {
+export function CreateColl({ data, open = false, onClose, enqueueSnackbar, fn }) {
   const [nameValue, setNameValue] = useState("");
   const textFieldRef = useRef();
 
@@ -122,30 +143,40 @@ export function CreateColl({data, open=false, onClose, enqueueSnackbar, fn}) {
 
   const handleConfirm = () => {
     data.name = nameValue;
-    serverRequest("create_collection", {data: data}).then((resp => {
-      enqueueSnackbar(resp.text, {variant: resp.ok ? "success" : "error"});
+    serverRequest("create_collection", { data: data }).then((resp) => {
+      enqueueSnackbar(resp.text, { variant: resp.ok ? "success" : "error" });
       onClose();
       if (fn) fn();
-    }));
+    });
   };
 
   return (
-    <Modal open={open} buttonLabel="Create" focusRef={textFieldRef}
-      maxWidth="sm" closeButton onClose={onClose}
-      onFormSubmit={handleConfirm} title="Create"
-      buttons={[<IgnButton key="create" type="submit">Confirm</IgnButton>]}
+    <Modal
+      open={open}
+      buttonLabel="Create"
+      focusRef={textFieldRef}
+      maxWidth="sm"
+      closeButton
+      onClose={onClose}
+      onFormSubmit={handleConfirm}
+      title="Create"
+      buttons={[
+        <IgnButton key="create" type="submit">
+          Confirm
+        </IgnButton>,
+      ]}
     >
       <TextField
         id="name"
         label="Name"
         variant="outlined"
         value={nameValue}
-        onChange={e => setNameValue(e.target.value)}
+        onChange={(e) => setNameValue(e.target.value)}
         size="small"
         fullWidth
         autoFocus
         inputRef={textFieldRef}
-        style={{marginTop: "10px"}}
+        style={{ marginTop: "10px" }}
       />
     </Modal>
   );
