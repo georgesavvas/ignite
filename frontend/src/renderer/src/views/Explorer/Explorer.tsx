@@ -12,40 +12,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import Divider from "@mui/material/Divider";
-import LinearProgress from "@mui/material/LinearProgress";
-import Typography from "@mui/material/Typography";
-import { EnqueueSnackbar, Entity, IgniteComponent, InputChangeEvent } from "@renderer/types/common";
-import { debounce } from "lodash";
-import { useSnackbar } from "notistack";
-import React, { ChangeEvent, ClipboardEvent, useContext, useEffect, useState } from "react";
-
-import ContextMenu, {
-  ContextMenuItem,
-  ContextMenuType,
-  handleContextMenu,
-} from "../../components/ContextMenu";
-import DataPlaceholder from "../../components/DataPlaceholder";
-import DragOverlay from "../../components/DragOverlay";
-import Modal from "../../components/Modal";
-import { DIRCONTEXTOPTIONS } from "../../constants/directoryContextOptions";
 import { ConfigContext, ConfigContextType } from "../../contexts/ConfigContext";
 import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
-import { EntityContext, EntityContextType } from "../../contexts/EntityContext";
-import BuildFileURL from "../../services/BuildFileURL";
-import serverRequest from "../../services/serverRequest";
-import loadExplorerSettings from "../../utils/loadExplorerSettings";
-import saveExplorerSettings from "../../utils/saveExplorerSettings";
+import ContextMenu, { ContextMenuType, handleContextMenu } from "../../components/ContextMenu";
 import { CopyToClipboard, ShowInExplorer, VaultExport, VaultImport } from "../ContextActions";
 import { CreateDir, DeleteDir, RenameDir } from "../ContextActions";
-import DccSelector from "../DccSelector";
-import PageBar from "../PageBar";
+import { EnqueueSnackbar, IgniteComponent, IgniteEntity } from "@renderer/types/common";
+import { EntityContext, EntityContextType } from "../../contexts/EntityContext";
+import React, { ChangeEvent, ClipboardEvent, useContext, useEffect, useState } from "react";
+
 import AssetTile from "./AssetTile";
+import BuildFileURL from "../../services/BuildFileURL";
+import { DIRCONTEXTOPTIONS } from "../../constants/directoryContextOptions";
+import DataPlaceholder from "../../components/DataPlaceholder";
+import DccSelector from "../DccSelector";
 import DirectoryTile from "./DirectoryTile";
-import classes from "./Explorer.module.css";
+import Divider from "@mui/material/Divider";
+import DragOverlay from "../../components/DragOverlay";
 import ExplorerBar from "./ExplorerBar";
+import LinearProgress from "@mui/material/LinearProgress";
+import Modal from "../../components/Modal";
+import PageBar from "../PageBar";
 import RowView from "./RowView";
 import SceneDrop from "./SceneDrop";
+import Typography from "@mui/material/Typography";
+import { debounce } from "lodash";
+import loadExplorerSettings from "../../utils/loadExplorerSettings";
+import saveExplorerSettings from "../../utils/saveExplorerSettings";
+import serverRequest from "../../services/serverRequest";
+import styles from "./Explorer.module.css";
+import { useSnackbar } from "notistack";
 
 const debounced = debounce((fn: () => void) => fn(), 500);
 
@@ -275,14 +271,9 @@ const Explorer = () => {
   };
 
   const tileContainerStyle = {
-    flexGrow: 1,
-    display: "grid",
-    overflowY: "auto",
     gridTemplateColumns: `
       repeat(auto-fill, minmax(${explorerSettings.currentTileSize * 40}px, 1fr))
     `,
-    gridGap: "3px",
-    padding: "0px 5px",
   } as React.CSSProperties;
 
   if (explorerSettings.currentViewType === "row") {
@@ -388,6 +379,7 @@ const Explorer = () => {
       );
     return (
       <div
+        className={styles.tileContainer}
         style={tileContainerStyle}
         onContextMenu={(e) => handleContextMenu(e, contextMenu, setContextMenu)}
       >
@@ -481,7 +473,7 @@ const Explorer = () => {
   };
 
   return (
-    <div className={classes.container}>
+    <div className={styles.container}>
       <Modal maxWidth="xs" open={newSceneOpen} onClose={() => setNewSceneOpen(false)}>
         <DccSelector
           newScene={true}
@@ -554,7 +546,7 @@ const Explorer = () => {
           visibility: isLoading ? "visible" : "hidden",
         }}
       />
-      <div className={classes.helperTextContainer}>
+      <div className={styles.helperTextContainer}>
         <Typography variant="caption" style={{ color: "grey" }}>
           {getBrowserHelperText()}
         </Typography>
@@ -571,7 +563,7 @@ const Explorer = () => {
         {getView()}
       </div>
       <div
-        className={classes.layoutHelper}
+        className={styles.layoutHelper}
         onContextMenu={(e) => handleContextMenu(e, contextMenu, setContextMenu)}
         onPaste={handlePaste}
         onDragLeave={handleDragEnd}

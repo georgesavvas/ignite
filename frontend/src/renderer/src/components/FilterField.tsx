@@ -15,12 +15,11 @@
 import FormControl from "@mui/material/FormControl";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import Typography from "@mui/material/Typography";
-
 import styles from "./FilterField.module.css";
 
 interface FilterFieldProps {
   filterValue: string;
-  setFilterValue: () => void;
+  setFilterValue: (value: string) => void;
   children?: React.ReactNode | React.ReactNode[];
 }
 

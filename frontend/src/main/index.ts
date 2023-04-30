@@ -12,21 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import axios from "axios";
+import { BrowserWindow, Menu, Tray, app, dialog, ipcMain, protocol, shell } from "electron";
 import { ChildProcess, spawn } from "child_process";
-import {
-  app,
-  BrowserWindow,
-  dialog,
-  ipcMain,
-  Menu,
-  protocol,
-  shell,
-  Tray
-} from "electron";
 // require("v8-compile-cache");
 import { electronApp, is, optimizer } from "@electron-toolkit/utils";
+
 import { autoUpdater } from "electron-updater";
+import axios from "axios";
 import fs from "fs";
 import getPort from "get-port";
 import os from "os";
@@ -56,13 +48,13 @@ interface Platforms {
 const iconPaths: Platforms = {
   win32: "/media/desktop_icon/win/icon.ico",
   darwin: "/media/desktop_icon/mac/icon.icns",
-  linux: "/media/desktop_icon/linux/icon.png"
+  linux: "/media/desktop_icon/linux/icon.png",
 };
 
 const backendPaths: Platforms = {
   win32: "IgniteBackend.exe",
   darwin: "IgniteBackend",
-  linux: "IgniteBackend"
+  linux: "IgniteBackend",
 };
 
 const sessionID = uuid4();
@@ -92,10 +84,7 @@ const backendPath = path.join(
   process.env.NODE_ENV === "dev" ? backendPathDev : backendPaths[platformName]
 );
 
-const clientRequest = async (
-  method: string,
-  data?: object
-): Promise<ClientResponse> => {
+const clientRequest = async (method: string, data?: object): Promise<ClientResponse> => {
   console.log(`http://localhost:${port}/api/v1/${method}`);
   try {
     const resp = await axios({
@@ -103,9 +92,9 @@ const clientRequest = async (
       method: !data ? "get" : "post",
       headers: {
         Accept: "application/json, text/plain, */*",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      data: JSON.stringify(data)
+      data: JSON.stringify(data),
     });
     return await resp.data;
   } catch {
@@ -118,13 +107,13 @@ const launchBackend = (): ChildProcess => {
   const backendCmd = {
     darwin: `sudo ${backendPath}`,
     linux: `sudo ${backendPath}`,
-    win32: `${backendPath}`
+    win32: `${backendPath}`,
   }[platformName];
   console.log("Launching backend...", backendCmd);
   return spawn(backendCmd, {
     shell: true,
     stdio: "pipe",
-    env: { IGNITE_CLIENT_ADDRESS: process.env.IGNITE_CLIENT_ADDRESS }
+    env: { IGNITE_CLIENT_ADDRESS: process.env.IGNITE_CLIENT_ADDRESS },
   });
 };
 
@@ -151,16 +140,12 @@ const checkBackend = async (): Promise<void> => {
   let existingPort = -1;
   let existingPid = -1;
   try {
-    existingPid = parseInt(
-      fs.readFileSync(path.join(configPath, "ignite.pid"), "utf8")
-    );
+    existingPid = parseInt(fs.readFileSync(path.join(configPath, "ignite.pid"), "utf8"));
     // eslint-disable-next-line no-empty
   } catch (err) {}
   if (existingPid >= 0 && isPidAlive(existingPid)) {
     try {
-      existingPort = parseInt(
-        fs.readFileSync(path.join(configPath, "ignite.port"), "utf8")
-      );
+      existingPort = parseInt(fs.readFileSync(path.join(configPath, "ignite.port"), "utf8"));
       // eslint-disable-next-line no-empty
     } catch (err) {}
   }
@@ -182,7 +167,7 @@ const checkBackend = async (): Promise<void> => {
     return;
   }
   port = await getPort({
-    port: getPort.makeRange(9070, 9999)
+    port: getPort.makeRange(9070, 9999),
   });
   process.env.IGNITE_CLIENT_ADDRESS = `localhost:${port}`;
   backend = launchBackend();
@@ -200,8 +185,8 @@ const createWindow = (show = true): BrowserWindow => {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
-      preload: path.join(__dirname, "../preload/index.js")
-    }
+      preload: path.join(__dirname, "../preload/index.js"),
+    },
   });
 
   if (isDev) {
@@ -269,7 +254,7 @@ const createWindow = (show = true): BrowserWindow => {
   ipcMain.on("ondragstart", (e, filePath: string) => {
     e.sender.startDrag({
       file: path.join(__dirname, filePath),
-      icon: ""
+      icon: "",
     });
   });
 
@@ -302,9 +287,9 @@ const createSplash = (): BrowserWindow => {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
-      preload: path.join(__dirname, "../preload/index.js")
+      preload: path.join(__dirname, "../preload/index.js"),
     },
-    icon: path.join(__dirname, iconPaths[platformName])
+    icon: path.join(__dirname, iconPaths[platformName]),
   });
   win.loadFile(`${publicPath}/splash.html`);
   autoUpdater.on("checking-for-update", () => {
@@ -313,7 +298,7 @@ const createSplash = (): BrowserWindow => {
   autoUpdater.on("download-progress", (data) => {
     win.webContents.send("autoUpdater", {
       status: "Downloading update",
-      progress: data.percent
+      progress: data.percent,
     });
   });
   autoUpdater.on("update-downloaded", () => {
@@ -383,7 +368,7 @@ if (!gotTheLock) {
         console.log(env);
         const proc = spawn(cmd, args, {
           env: { ALLUSERSPROFILE: process.env.ALLUSERSPROFILE, ...env },
-          detached: true
+          detached: true,
         });
         if (proc) return true;
         return false;
@@ -398,25 +383,28 @@ if (!gotTheLock) {
       checkBackend();
     });
 
-    if (tray === null) tray = new Tray(`${publicPath}/media/icon.png`);
-    const contextMenu = Menu.buildFromTemplate([
-      { label: "Show", click: () => window.show() },
-      {
-        label: "Exit",
-        click: () => {
-          if (!isDev) {
-            console.log("Attempting to kill backend...");
-            if (backend) backend.kill("SIGINT");
-            clientRequest("quit");
-          } else console.log("not bye!");
-          app.quit();
-        }
-      }
-    ]);
-    tray.setToolTip("Ignite");
-    tray.setContextMenu(contextMenu);
-    tray.on("click", () => window.show());
-    tray.on("double-click", () => window.show());
+    // TODO: Might have to disable tray on macos as it's not succeeding.
+    if (tray === null) {
+      tray = new Tray(`${publicPath}/media/icon.png`);
+      const contextMenu = Menu.buildFromTemplate([
+        { label: "Show", click: () => window.show() },
+        {
+          label: "Exit",
+          click: () => {
+            if (!isDev) {
+              console.log("Attempting to kill backend...");
+              if (backend) backend.kill("SIGINT");
+              clientRequest("quit");
+            } else console.log("not bye!");
+            app.quit();
+          },
+        },
+      ]);
+      tray.setToolTip("Ignite");
+      tray.setContextMenu(contextMenu);
+      tray.on("click", () => window.show());
+      tray.on("double-click", () => window.show());
+    }
   });
 }
 

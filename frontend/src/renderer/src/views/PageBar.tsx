@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import Container from "@mui/material/Container";
 import Pagination, { PaginationProps } from "@mui/material/Pagination";
 import Slider, { SliderProps } from "@mui/material/Slider";
-import { InputChangeEvent } from "@renderer/types/common";
 
 import IgnTextField from "../components/IgnTextField";
+import { InputChangeEvent } from "@renderer/types/common";
 import styles from "./PageBar.module.css";
 
 interface PageBarProps {
@@ -31,8 +30,8 @@ interface PageBarProps {
 
 const PageBar = (props: PageBarProps) => {
   return (
-    <Container className={styles.container}>
-      <div style={{ width: "200px", display: "flex", justifyContent: "flex-start" }}>
+    <div className={styles.container}>
+      <div className={styles.left}>
         <IgnTextField
           id="tilesPerPage"
           inputProps={{
@@ -53,7 +52,7 @@ const PageBar = (props: PageBarProps) => {
         variant="outlined"
         shape="rounded"
       />
-      <div style={{ width: "200px", height: "30px" }}>
+      <div className={styles.right}>
         <Slider
           size="small"
           value={props.tileSize}
@@ -64,7 +63,7 @@ const PageBar = (props: PageBarProps) => {
           onChange={props.onTileSizeChange}
         />
       </div>
-    </Container>
+    </div>
   );
 };
 

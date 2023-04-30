@@ -12,17 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Typography } from "@mui/material";
-import { DataGrid, GridCellParams, GridRowParams } from "@mui/x-data-grid";
-import { ClickEvent, Entity } from "@renderer/types/common";
-import { useContext, useMemo, useState } from "react";
-import { useEffect } from "react";
-
-import DataPlaceholder from "../../components/DataPlaceholder";
-import URI from "../../components/URI";
+import { ClickEvent, IgniteEntity } from "@renderer/types/common";
 import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
+import { DataGrid, GridCellParams, GridRowParams } from "@mui/x-data-grid";
+import { useContext, useMemo, useState } from "react";
+
 import AssetTile from "./AssetTile";
+import DataPlaceholder from "../../components/DataPlaceholder";
 import DirectoryTile from "./DirectoryTile";
+import { Typography } from "@mui/material";
+import URI from "../../components/URI";
+import { useEffect } from "react";
 
 interface RowViewProps {
   data: IgniteEntity[];
