@@ -64,7 +64,7 @@ interface ContextMenuItem {
   divider?: boolean;
   args?: any[];
   disabled?: boolean;
-  fn: Function;
+  fn: () => void;
   label: string;
 }
 
@@ -73,7 +73,7 @@ export const ContextMenu = (props: ContextMenuProps) => {
     props.setContextMenu(null);
   };
 
-  function formatItem(item: ContextMenuItem, index: number) {
+  const formatItem = (item: ContextMenuItem, index: number) => {
     return (
       <MenuItem
         key={index}
@@ -94,7 +94,7 @@ export const ContextMenu = (props: ContextMenuProps) => {
         {item.label}
       </MenuItem>
     );
-  }
+  };
   return (
     <Menu
       open={props.contextMenu !== null}

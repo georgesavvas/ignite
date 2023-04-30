@@ -30,7 +30,7 @@ export const EditColl = ({ data, open = false, onClose, enqueueSnackbar, fn }: E
     else setFilterData({});
   }, [data.path]);
 
-  function handleConfirm() {
+  const handleConfirm = () => {
     serverRequest("edit_collection", { data: { ...data, expression: filterData.expression } }).then(
       (resp) => {
         if (resp.ok) enqueueSnackbar("Success!", { variant: "success" });
@@ -39,7 +39,7 @@ export const EditColl = ({ data, open = false, onClose, enqueueSnackbar, fn }: E
     );
     if (fn) fn();
     onClose();
-  }
+  };
 
   const defaultExpr = '{ "condition": "and", "filters": [{ "": "" }, { "": "" }]}';
 
@@ -64,7 +64,7 @@ export const EditColl = ({ data, open = false, onClose, enqueueSnackbar, fn }: E
   );
 };
 
-export function RenameColl({ data, open = false, onClose, enqueueSnackbar, fn }) {
+export const RenameColl = ({ data, open = false, onClose, enqueueSnackbar, fn }) => {
   const [nameValue, setNameValue] = useState("");
   const textFieldRef = useRef();
 
@@ -72,14 +72,14 @@ export function RenameColl({ data, open = false, onClose, enqueueSnackbar, fn })
     setNameValue(data.name);
   }, [data.name]);
 
-  function handleConfirm() {
+  const handleConfirm = () => {
     serverRequest("rename_collection", { data: { ...data, name: nameValue } }).then((resp) => {
       if (resp.ok) enqueueSnackbar("Renamed!", { variant: "success" });
       else enqueueSnackbar("Couldn't rename collection.", { variant: "error" });
     });
     if (fn) fn();
     onClose();
-  }
+  };
 
   return (
     <Modal
@@ -109,9 +109,9 @@ export function RenameColl({ data, open = false, onClose, enqueueSnackbar, fn })
       />
     </Modal>
   );
-}
+};
 
-export function DeleteColl({ data, open = false, onClose, enqueueSnackbar, fn }) {
+export const DeleteColl = ({ data, open = false, onClose, enqueueSnackbar, fn }) => {
   const handleConfirm = () => {
     serverRequest("delete_collection", { data: data }).then((resp) => {
       if (resp.ok) enqueueSnackbar("Successfully deleted!", { variant: "success" });
@@ -131,9 +131,9 @@ export function DeleteColl({ data, open = false, onClose, enqueueSnackbar, fn })
       maxWidth="sm"
     />
   );
-}
+};
 
-export function CreateColl({ data, open = false, onClose, enqueueSnackbar, fn }) {
+export const CreateColl = ({ data, open = false, onClose, enqueueSnackbar, fn }) => {
   const [nameValue, setNameValue] = useState("");
   const textFieldRef = useRef();
 
@@ -180,4 +180,4 @@ export function CreateColl({ data, open = false, onClose, enqueueSnackbar, fn })
       />
     </Modal>
   );
-}
+};

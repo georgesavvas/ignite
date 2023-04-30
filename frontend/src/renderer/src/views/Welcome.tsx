@@ -30,7 +30,7 @@ import { validateDirName } from "../utils/validateDirName";
 import styles from "./Welcome.module.css";
 
 interface WelcomeProps {
-  onClose: Function;
+  onClose: () => void;
   open: boolean;
 }
 

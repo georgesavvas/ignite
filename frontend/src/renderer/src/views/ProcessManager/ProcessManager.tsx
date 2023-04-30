@@ -75,7 +75,7 @@ const sortProcesses = (processes: ProcessType[]) => {
   return _processes;
 };
 
-export default function ProcessManager() {
+export const ProcessManager = () => {
   const [socket, setSocket] = useState<Sockette | undefined>(undefined);
   const { config } = useContext(ConfigContext) as ConfigContextType;
   const [processes, setProcesses] = useState<ProcessType[]>([]);
@@ -180,4 +180,6 @@ export default function ProcessManager() {
       )}
     </div>
   );
-}
+};
+
+export default ProcessManager;

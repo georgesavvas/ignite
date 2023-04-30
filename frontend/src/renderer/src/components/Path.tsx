@@ -12,19 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import ContextMenu, { handleContextMenu } from "./ContextMenu";
-
-import { CopyToClipboard } from "../views/ContextActions";
 import Typography from "@mui/material/Typography";
-import styles from "./Path.module.css";
 import { useSnackbar } from "notistack";
 import { useState } from "react";
+
+import { CopyToClipboard } from "../views/ContextActions";
+import ContextMenu, { handleContextMenu } from "./ContextMenu";
+import styles from "./Path.module.css";
 
 interface PathProps {
   path: string;
 }
 
-function Path(props: PathProps) {
+const Path = (props: PathProps) => {
   const [contextMenu, setContextMenu] = useState(null);
   const { enqueueSnackbar } = useSnackbar();
 
@@ -54,6 +54,6 @@ function Path(props: PathProps) {
       </div>
     </>
   );
-}
+};
 
 export default Path;

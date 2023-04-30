@@ -43,10 +43,10 @@ type ModalDataType = {
 };
 
 interface BrowserProps {
-  loadedData: AssetVersion[];
-  selectedEntity?: AssetVersion;
+  loadedData: IgniteAssetVersion[];
+  selectedEntity?: IgniteAssetVersion;
   onRefresh: () => void;
-  handleEntitySelected: (entity: AssetVersion) => void;
+  handleEntitySelected: (entity: IgniteAssetVersion) => void;
   onFilterChange: (data: any) => void;
   setTilesPerPage: (number: number) => void;
   handleQueryChange: (query: any) => void;

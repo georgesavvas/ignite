@@ -29,7 +29,7 @@ interface ComponentList {
   components: IgniteComponent[];
   onSelect: (compId: string) => void;
   selectedComp?: IgniteComponent;
-  asset: AssetVersion;
+  asset: IgniteAssetVersion;
 }
 
 const ComponentList = (props: ComponentList) => {

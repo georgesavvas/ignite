@@ -24,15 +24,15 @@ import { CopyToClipboard, ShowInExplorer } from "../ContextActions";
 import { setReprForParent, setReprForProject } from "../ContextActions";
 
 interface AssetTileProps extends TileProps {
-  entity: AssetVersion;
-  onSelected?: (entity: AssetVersion) => void;
+  entity: IgniteAssetVersion;
+  onSelected?: (entity: IgniteAssetVersion) => void;
   viewType?: "dynamic" | "tasks" | "assets" | "scenes";
   refreshContext?: () => void;
   onContextMenu: () => void;
   handleContextMenuSelection: (action: string, data: any) => void;
 }
 
-const AssetTile = (props: AssetTileProps) => {
+const AssetTile = (props: IgniteAssetTileProps) => {
   const { enqueueSnackbar } = useSnackbar();
   const { addToCrate } = useContext(CrateContext) as CrateContextType;
   const { currentContext, setCurrentContext } = useContext(ContextContext) as ContextContextType;
@@ -119,7 +119,7 @@ const AssetTile = (props: AssetTileProps) => {
     },
   ];
 
-  function details() {
+  const details = () => {
     return (
       <>
         <Typography style={{ position: "absolute", top: "5px", left: "10px" }}>
@@ -158,7 +158,7 @@ const AssetTile = (props: AssetTileProps) => {
         )}
       </>
     );
-  }
+  };
 
   const handleDragStart = (e: React.DragEvent) => {
     e.dataTransfer.setData("text/plain", props.entity.uri);

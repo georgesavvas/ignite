@@ -37,11 +37,11 @@ const tileContainerStyle = {
 } as React.CSSProperties;
 
 interface BrowserProps {
-  loadedData: Directory[];
+  loadedData: IgniteDirectory[];
   modalData: ModalDataType;
   handleContextMenuSelection: (action: string, data: any) => void;
   onRefresh: () => void;
-  onProjectSelect: (entity: Directory) => void;
+  onProjectSelect: (entity: IgniteDirectory) => void;
   onNewProjectClicked: () => void;
 }
 
@@ -50,7 +50,7 @@ const Browser = (props: BrowserProps) => {
 
   useEffect(() => {
     setTiles(
-      props.loadedData.map((entity: Directory) => (
+      props.loadedData.map((entity: IgniteDirectory) => (
         <ProjectTile
           key={entity.project}
           viewType="grid"
@@ -127,7 +127,7 @@ export const ProjectBrowser = (props: ProjectBrowserProps) => {
     setModalData(data);
   };
 
-  const handleProjectSelect = (entity: Directory) => {
+  const handleProjectSelect = (entity: IgniteDirectory) => {
     if (entity.name !== currentContext.project) {
       setProject(entity.name, setCurrentContext);
     }

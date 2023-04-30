@@ -25,10 +25,10 @@ const style = {
 };
 
 interface SceneDetailsProps {
-  entity: Scene;
+  entity: IgniteScene;
 }
 
-const SceneDetails = (props: SceneDetailsProps) => {
+const SceneDetails = (props: IgniteSceneDetailsProps) => {
   return (
     <div style={style}>
       <div style={{ margin: "5px", overflow: "hidden" }}>

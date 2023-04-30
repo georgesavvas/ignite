@@ -17,7 +17,7 @@ import LoadingButton from "@mui/lab/LoadingButton";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import Typography from "@mui/material/Typography";
-import { ClickEvent, Dcc, Scene } from "@renderer/types/common";
+import { ClickEvent, DccType, IgniteScene } from "@renderer/types/common";
 import { useSnackbar } from "notistack";
 import React, { useContext, useEffect, useState } from "react";
 
@@ -28,7 +28,7 @@ import clientRequest from "../services/clientRequest";
 import styles from "./DccSelector.module.css";
 
 interface DccSelectorProps {
-  scene?: Scene;
+  scene?: IgniteScene;
   style?: React.CSSProperties;
   onClose?: () => void;
   newScene?: boolean;
@@ -72,7 +72,7 @@ const DccSelector = (props: DccSelectorProps) => {
     return defaultPath;
   };
 
-  function formatDcc(dcc: Dcc, index: number) {
+  const formatDcc = (dcc: DccType, index: number) => {
     const dccIcon = getDccIcon(dcc.path);
     const relevant =
       props.scene?.name &&
@@ -96,9 +96,9 @@ const DccSelector = (props: DccSelectorProps) => {
         </Typography>
       </div>
     );
-  }
+  };
 
-  async function handleLaunchClick() {
+  const handleLaunchClick = async () => {
     setIsLoading(true);
     const dcc = getDcc();
     const data = {
@@ -118,10 +118,12 @@ const DccSelector = (props: DccSelectorProps) => {
     refresh();
     if (props.onClose) props.onClose();
     setIsLoading(false);
-  }
+  };
 
-  let dccConfigSorted = config.dccConfig.filter((dcc: Dcc) => [dcc.name, dcc.path].every(Boolean));
-  dccConfigSorted.sort((a: Dcc, b: Dcc) => a.name.localeCompare(b.name));
+  let dccConfigSorted = config.dccConfig.filter((dcc: DccType) =>
+    [dcc.name, dcc.path].every(Boolean)
+  );
+  dccConfigSorted.sort((a: DccType, b: DccType) => a.name.localeCompare(b.name));
 
   return (
     <div className={styles.container} style={props.style}>

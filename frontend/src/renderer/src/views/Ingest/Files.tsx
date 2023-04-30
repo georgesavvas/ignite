@@ -28,7 +28,7 @@ interface FileProps {
   number: number;
 }
 
-function File({ filepath, id, number }: FileProps) {
+const File = ({ filepath, id, number }: FileProps) => {
   const fileId = `[${number}] `;
   return (
     <div className={styles.fileContainer}>
@@ -39,7 +39,7 @@ function File({ filepath, id, number }: FileProps) {
       <div className={styles.connector} id={id} />
     </div>
   );
-}
+};
 
 interface FilesProps {
   files: string[];

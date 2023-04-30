@@ -25,13 +25,13 @@ import AssetTile from "./AssetTile";
 import DirectoryTile from "./DirectoryTile";
 
 interface RowViewProps {
-  data: Entity[];
+  data: IgniteEntity[];
   selectedEntityPath: string;
   resultType: "dynamic" | "tasks" | "assets" | "scenes";
   onContextMenu: () => void;
   handleContextMenuSelection: () => void;
   tileSize: number;
-  onSelected: (entity: Entity) => void;
+  onSelected: (entity: IgniteEntity) => void;
   page: number;
   pageSize: number;
 }
@@ -151,7 +151,7 @@ const RowView = (props: RowViewProps) => {
         headerName: "URI",
         flex: 0.4,
         renderCell: renderUri,
-        sortComparator: (r1: Entity, r2: Entity) => r1.uri < r2.uri,
+        sortComparator: (r1: IgniteEntity, r2: IgniteEntity) => r1.uri < r2.uri,
       },
       {
         index: 4,
@@ -218,7 +218,7 @@ const RowView = (props: RowViewProps) => {
       minWidth: props.tileSize * 16,
       maxWidth: props.tileSize * 16,
       renderCell: renderEntity,
-      sortComparator: (r1: Entity, r2: Entity) => r1.name < r2.name,
+      sortComparator: (r1: IgniteEntity, r2: IgniteEntity) => r1.name < r2.name,
       cellClassName: () => "thumbnailColumn",
     },
     {
@@ -233,15 +233,15 @@ const RowView = (props: RowViewProps) => {
     return props.data.map((entity, index) => {
       return {
         id: index,
-        thumbnail: entity,
-        name: entity.name,
-        dir_kind: entity.dir_kind,
-        dcc: entity.dcc,
-        version: entity.version,
-        uri: entity.uri,
-        context: entity.context,
-        creationTime: entity.creation_time,
-        modificationTime: entity.modification_time,
+        thumbnail: IgniteEntity,
+        name: IgniteEntity.name,
+        dir_kind: IgniteEntity.dir_kind,
+        dcc: IgniteEntity.dcc,
+        version: IgniteEntity.version,
+        uri: IgniteEntity.uri,
+        context: IgniteEntity.context,
+        creationTime: IgniteEntity.creation_time,
+        modificationTime: IgniteEntity.modification_time,
       };
     });
   };

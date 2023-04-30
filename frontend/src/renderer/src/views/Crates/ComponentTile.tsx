@@ -95,7 +95,7 @@ const ComponentTile = (props: ComponentTileProps) => {
     },
   ];
 
-  function details() {
+  const details = () => {
     return (
       <>
         <Typography style={{ position: "absolute", top: "5px", left: "10px" }}>
@@ -109,7 +109,7 @@ const ComponentTile = (props: ComponentTileProps) => {
         </Typography>
       </>
     );
-  }
+  };
 
   return (
     <>

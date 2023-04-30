@@ -19,7 +19,7 @@ export interface ContextItem {
   divider?: boolean;
 }
 
-export interface Directory {
+export interface IgniteDirectory {
   path: string;
   protected: boolean;
   repr: string;
@@ -63,14 +63,14 @@ export type IgniteActions = {
   [name: string]: IgniteAction;
 };
 
-export interface Asset extends Directory {
+export interface IgniteAsset extends IgniteDirectory {
   versions: string[];
   latest_v: string;
   best_v: string;
   next_path: string;
 }
 
-export interface AssetVersion extends Directory {
+export interface IgniteAssetVersion extends IgniteDirectory {
   components: IgniteComponent[];
   asset: string;
   task: string;
@@ -78,7 +78,7 @@ export interface AssetVersion extends Directory {
   versions: string[];
 }
 
-export interface Scene extends Directory {
+export interface IgniteScene extends IgniteDirectory {
   dcc: string;
   scene: string;
   vsn: string;
@@ -106,13 +106,18 @@ export interface IgniteComponent {
 
 export type CrateType = {
   id?: string;
-  entities?: Entity[];
+  entities?: IgniteEntity[];
   label: string;
 };
 
-export type Entity = Directory | Asset | AssetVersion | Scene | Component;
+export type IgniteEntity =
+  | IgniteDirectory
+  | IgniteAsset
+  | IgniteAssetVersion
+  | IgniteScene
+  | IgniteComponent;
 
-export type Dcc = {
+export type DccType = {
   scenes: string[];
   exts: string[];
   name: string;

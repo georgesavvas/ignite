@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import { SvgIconProps } from "@mui/material";
-import { ClickEvent, ContextItem, Directory, Entity } from "@renderer/types/common";
+import { ClickEvent, ContextItem, IgniteDirectory, IgniteEntity } from "@renderer/types/common";
 import { useContext, useRef, useState } from "react";
 
 import { ConfigContext, ConfigContextType } from "../contexts/ConfigContext";
@@ -28,9 +28,9 @@ export type TileProps = React.PropsWithChildren<{
   thumbnail?: string;
   noBorder?: boolean;
   selected?: boolean;
-  onSelected?: (entity: Entity) => void;
+  onSelected?: (entity: IgniteEntity) => void;
   thumbnailWidth?: string;
-  entity: Directory;
+  entity: IgniteDirectory;
   onClick?: (e: ClickEvent) => void;
   contextItems?: ContextItem[];
   noInfo?: boolean;
@@ -79,7 +79,7 @@ export const Tile = (props: TileProps) => {
     setProgress(clamp(width, 0, 1));
   };
 
-  function getSeqThumbnail() {
+  const getSeqThumbnail = () => {
     const thumbnail = props.entity.thumbnail;
     const hasThumbnail = thumbnail?.path;
     let thumbnailPath = thumbnail.path;
@@ -92,7 +92,7 @@ export const Tile = (props: TileProps) => {
     }
     if (!hasThumbnail) return "";
     return BuildFileURL(thumbnailPath, config);
-  }
+  };
   const thumbnailURL = props.thumbnail || getSeqThumbnail();
 
   const handleClick = (e: ClickEvent) => {

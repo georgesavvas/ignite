@@ -70,11 +70,11 @@ const compExtensionPreviewPriority = [
 ];
 
 interface AssetDetailsProps {
-  entity: AssetVersion;
-  setSelectedEntity: (entity: AssetVersion) => void;
+  entity: IgniteAssetVersion;
+  setSelectedEntity: (entity: IgniteAssetVersion) => void;
 }
 
-const AssetDetails = (props: AssetDetailsProps) => {
+const AssetDetails = (props: IgniteAssetDetailsProps) => {
   const [flexRatios, setFlexRatios] = useState(defaultFlexRations);
   const { config } = useContext(ConfigContext) as ConfigContextType;
   const [selectedCompName, setSelectedCompName] = useState("");

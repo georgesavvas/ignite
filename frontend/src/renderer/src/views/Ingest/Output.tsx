@@ -13,10 +13,11 @@
 // limitations under the License.
 
 import Divider from "@mui/material/Divider";
-import DynamicList from "../../components/DynamicList";
 import Typography from "@mui/material/Typography";
-import styles from "./Output.module.css";
 import { useXarrow } from "react-xarrows";
+
+import DynamicList from "../../components/DynamicList";
+import styles from "./Output.module.css";
 
 type NewAssetType = {
   name: string;
@@ -34,7 +35,7 @@ interface AssetProps {
   id: string;
 }
 
-const Asset = ({ data, id }: AssetProps) => {
+const Asset = ({ data, id }: IgniteAssetProps) => {
   return (
     <div className={`${styles.assetContainer} ${data.valid ? "" : styles.invalid}`}>
       <Typography variant="h6">{data.name}</Typography>

@@ -12,20 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import * as THREE from "three";
-
 import { Environment, OrbitControls, useGLTF } from "@react-three/drei";
-import { Suspense, useEffect, useState } from "react";
-
-import { Asset } from "@renderer/types/common";
 import { Canvas } from "@react-three/fiber";
+import { Asset } from "@renderer/types/common";
+import { Suspense, useEffect, useState } from "react";
+import * as THREE from "three";
 
 // import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
 
 const GLTF_PLACEHOLDER = "/asset_library/3d/asset_library/common/model_placeholder.gltf";
 
 interface ModelProps {
-  asset: Asset;
+  asset: IgniteAsset;
 }
 
 const Model = (props: ModelProps) => {
@@ -79,7 +77,7 @@ const mouseButtons = {
 };
 
 interface ModelViewerProps {
-  asset: Asset;
+  asset: IgniteAsset;
 }
 
 const ModelViewer = ({ asset }: ModelViewerProps) => {

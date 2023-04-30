@@ -36,7 +36,7 @@ export const NewProjectTile = (props: NewProjectTileProps) => {
 };
 
 interface ProjectTileProps extends TileProps {
-  entity: Directory;
+  entity: IgniteDirectory;
   viewType: "grid" | "row";
   onRefresh: () => void;
   onContextMenu: (action: string, data: any) => void;
@@ -54,7 +54,7 @@ const ProjectTile = (props: ProjectTileProps) => {
     name: props.entity.name,
   };
 
-  function getGenericContextItems(entity: Directory) {
+  const getGenericContextItems = (entity: IgniteDirectory) => {
     return [
       {
         label: "Copy path",
@@ -79,18 +79,18 @@ const ProjectTile = (props: ProjectTileProps) => {
         fn: () => props.onContextMenu("delete", dirData),
       },
     ];
-  }
+  };
 
   const handleClick = () => {
     if (props.onSelected) props.onSelected(props.entity);
   };
 
-  function thumbnailPath() {
+  const thumbnailPath = () => {
     let path = folderIcon;
     return path;
-  }
+  };
 
-  function details() {
+  const details = () => {
     if (props.viewType === "grid")
       return (
         <>
@@ -105,7 +105,7 @@ const ProjectTile = (props: ProjectTileProps) => {
           <Typography align="left">{props.entity.name}</Typography>
         </>
       );
-  }
+  };
 
   let contextItems = getGenericContextItems(props.entity);
 

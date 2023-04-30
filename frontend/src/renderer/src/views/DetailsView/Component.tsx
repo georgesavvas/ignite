@@ -40,7 +40,7 @@ interface ComponentProps {
   addToCrate: (components: IgniteComponent[]) => void;
   handleContextMenuSelection: (action: string, data: any) => void;
   style: React.CSSProperties;
-  asset: AssetVersion;
+  asset: IgniteAssetVersion;
 }
 
 const Component = (props: ComponentProps) => {

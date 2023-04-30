@@ -17,7 +17,7 @@ import Typography from "@mui/material/Typography";
 import { DCCINFO } from "@renderer/constants/dccInfo";
 import { DIRCONTEXTOPTIONS } from "@renderer/constants/directoryContextOptions";
 import { DIRECTORYICONS } from "@renderer/constants/directoryIcons";
-import { ClickEvent, Directory, Scene } from "@renderer/types/common";
+import { ClickEvent, IgniteDirectory, IgniteScene } from "@renderer/types/common";
 import { useSnackbar } from "notistack";
 import React, { useContext } from "react";
 
@@ -38,13 +38,13 @@ const getDccIcon = (name: string) => {
   return `src/assets/${dcc?.icon}`;
 };
 
-const isDirectoryScene = (entity: Directory | Scene): entity is Scene => {
+const isDirectoryScene = (entity: IgniteDirectory | IgniteScene): entity is IgniteScene => {
   return entity.dir_kind === "scene";
 };
 
 interface DirectoryTileProps extends TileProps {
-  entity: Directory | Scene;
-  onSelected?: (entity: Directory) => void;
+  entity: IgniteDirectory | IgniteScene;
+  onSelected?: (entity: IgniteDirectory) => void;
   viewType?: "dynamic" | "tasks" | "assets" | "scenes";
   refreshContext?: () => void;
   onContextMenu: () => void;
@@ -69,7 +69,7 @@ const DirectoryTile = (props: DirectoryTileProps) => {
     name: props.entity.name,
   };
 
-  function getGenericContextItems(entity: Directory | Scene) {
+  const getGenericContextItems = (entity: IgniteDirectory | IgniteScene) => {
     return [
       {
         label: "Copy path",
@@ -113,9 +113,9 @@ const DirectoryTile = (props: DirectoryTileProps) => {
         divider: true,
       },
     ];
-  }
+  };
 
-  function getSpecificContextItems(entity: Directory | Scene) {
+  const getSpecificContextItems = (entity: IgniteDirectory | IgniteScene) => {
     if (!DIRCONTEXTOPTIONS[entity.dir_kind as keyof typeof DIRCONTEXTOPTIONS]) return [];
     const kindOptions = DIRCONTEXTOPTIONS[entity.dir_kind as keyof typeof DIRCONTEXTOPTIONS];
     const namedOptions =
@@ -131,7 +131,7 @@ const DirectoryTile = (props: DirectoryTileProps) => {
           kind: contextOption.dir_kind,
         }),
     }));
-  }
+  };
 
   const handleClick = (e: ClickEvent) => {
     if (e.detail === 2) {
@@ -165,7 +165,7 @@ const DirectoryTile = (props: DirectoryTileProps) => {
     return <Box component={Icon} style={style} />;
   };
 
-  function details() {
+  const details = () => {
     return (
       <>
         <Typography style={{ position: "absolute", top: "5px", left: "10px" }}>
@@ -180,7 +180,7 @@ const DirectoryTile = (props: DirectoryTileProps) => {
         {getBadge()}
       </>
     );
-  }
+  };
 
   let contextItems = getGenericContextItems(props.entity);
   contextItems = contextItems.concat(getSpecificContextItems(props.entity));
@@ -202,7 +202,7 @@ const DirectoryTile = (props: DirectoryTileProps) => {
 
   const handleDragStart = (e: React.DragEvent) => {
     e.dataTransfer.setData("text/plain", props.entity.uri);
-    e.dataTransfer.setData("ignite/kind", props.entity.kind);
+    e.dataTransfer.setData("ignite/kind", props.entity.dir_kind);
     e.dataTransfer.setData("ignite/path", props.entity.path);
     e.dataTransfer.setData("ignite/uri", props.entity.uri);
   };

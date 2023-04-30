@@ -16,7 +16,7 @@ interface SceneDropProps {
   onClose: (files?: File[]) => void;
 }
 
-const SceneDrop = (props: SceneDropProps) => {
+const SceneDrop = (props: IgniteSceneDropProps) => {
   const [selected, setSelected] = useState("");
   const [loading, setLoading] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
@@ -31,7 +31,7 @@ const SceneDrop = (props: SceneDropProps) => {
 
   const ingestScene = (scenePath: string) => {
     const data = {
-      scene: scenePath,
+      scene: IgniteScenePath,
       task: currentContext.path,
     };
     clientRequest("ingest_scene", { data: data }).then((resp) => {

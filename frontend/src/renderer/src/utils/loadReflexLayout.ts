@@ -12,9 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-function loadReflexLayout() {
+const loadReflexLayout = () => {
   const data = localStorage.getItem("reflex_layout");
-  return JSON.parse(data ?? "");
-}
+  if (!data || data === null) return;
+  try {
+    return JSON.parse(data ?? "");
+  } catch (error) {
+    console.log(error);
+    return;
+  }
+};
 
 export default loadReflexLayout;

@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ConfigContext, ConfigContextType } from "./ConfigContext";
 import { PropsWithChildren, createContext, useContext, useEffect, useState } from "react";
 
 import BuildFileURL from "../services/BuildFileURL";
 import serverRequest from "../services/serverRequest";
 import { serverSocket } from "../services/serverWebSocket";
+import { ConfigContext, ConfigContextType } from "./ConfigContext";
 
 type Context = {
   root: string;
@@ -80,7 +80,7 @@ export const ContextProvider = ({ children }: PropsWithChildren) => {
     if (!config.lostConnection) refresh();
   }, [config.lostConnection]);
 
-  async function handleContextChange(path: string) {
+  const handleContextChange = async (path: string) => {
     if (!path) return false;
     let path_processed = path;
     if (!path_processed.startsWith("ign:"))
@@ -100,11 +100,11 @@ export const ContextProvider = ({ children }: PropsWithChildren) => {
     localStorage.setItem("context", JSON.stringify(data));
     success = true;
     return success;
-  }
+  };
 
-  function refresh() {
+  const refresh = () => {
     setCurrentContext((prevState) => ({ ...prevState, update: prevState.update + 1 }));
-  }
+  };
 
   return (
     <ContextContext.Provider

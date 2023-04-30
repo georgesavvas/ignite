@@ -12,32 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 import React from "react";
 
-import AssetDetails from "./AssetDetails";
 import DataPlaceholder from "../../components/DataPlaceholder";
-
+import AssetDetails from "./AssetDetails";
 
 const style = {
   width: "100%",
   height: "100%",
   display: "flex",
-  flexDirection: "column"
+  flexDirection: "column",
 };
 
-function Details(props) {
+const Details = (props) => {
   const entity = props.entity;
 
   return (
     <div style={style}>
-      {
-        entity && Object.keys(entity).length ?
-          <AssetDetails {...props} /> :
-          <DataPlaceholder text="Nothing selected" />
-      }
+      {entity && Object.keys(entity).length ? (
+        <AssetDetails {...props} />
+      ) : (
+        <DataPlaceholder text="Nothing selected" />
+      )}
     </div>
   );
-}
+};
 
 export default Details;

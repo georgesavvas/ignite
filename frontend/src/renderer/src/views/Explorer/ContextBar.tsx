@@ -23,7 +23,7 @@ import { ContextContext, ContextContextType } from "../../contexts/ContextContex
 import styles from "./ContextBar.module.css";
 import ContextBarLink from "./ContextBarLink";
 
-export default function ContextBar() {
+export const ContextBar = () => {
   const { currentContext, setCurrentContext } = useContext(ContextContext) as ContextContextType;
   const [contextPath, setContextPath] = useState("");
   const [isTextField, setIsTextField] = useState(false);
@@ -109,4 +109,6 @@ export default function ContextBar() {
       )}
     </div>
   );
-}
+};
+
+export default ContextBar;

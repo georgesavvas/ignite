@@ -148,7 +148,7 @@ const Vault = (props: VaultProps) => {
     config.ready,
   ]);
 
-  const handleEntitySelected = (entity: AssetVersion) => {
+  const handleEntitySelected = (entity: IgniteAssetVersion) => {
     setSelectedEntity(entity);
   };
 

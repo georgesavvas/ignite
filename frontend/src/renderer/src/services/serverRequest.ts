@@ -14,7 +14,7 @@
 
 import fetch from "./fetch";
 
-async function serverRequest(method: string, data?: any) {
+const serverRequest = async (method: string, data?: any) => {
   const address = await window.services.get_env("IGNITE_SERVER_ADDRESS");
   if (!address) {
     // console.log("Invalid server address, aborting...");
@@ -22,9 +22,9 @@ async function serverRequest(method: string, data?: any) {
   }
   // if (method !== "ping") console.log("Server request:", address, method, data);
   return await request(address, method, data);
-}
+};
 
-async function request(address: string, method: string, data: object) {
+const request = async (address: string, method: string, data: object) => {
   try {
     const resp = (await fetch(`http://${address}/api/v1/${method}`, {
       method: !data ? "GET" : "POST",
@@ -52,6 +52,6 @@ async function request(address: string, method: string, data: object) {
     //     setTimeout(request, 2000, address, method, data, attempt += 1);
     //   } else return {ok: false, msg: "Could not connect to Ignite server..."};
   }
-}
+};
 
 export default serverRequest;

@@ -91,7 +91,7 @@ const ProjectTreeView = (props: ProjectTreeViewProps) => {
     let parents = [] as string[];
     findNodeByPath(props.data.children, result, newPath, parents);
     const firstResult = result[0];
-    if (result) {
+    if (firstResult) {
       const nodeId = firstResult.id;
       setSelectedItems(nodeId);
       if (!expandedItems.includes(nodeId)) {
@@ -120,11 +120,13 @@ const ProjectTreeView = (props: ProjectTreeViewProps) => {
     let result = [] as TreeNodeType[];
     findNodeById(props.data, result, nodeId);
     const firstResult = result[0];
-    setCurrentContext(firstResult.path);
-    setSelectedItems(nodeId);
-    serverRequest("find", { path: firstResult.path }).then((resp) => {
-      if (resp.data) setSelectedEntity(resp.data);
-    });
+    if (firstResult) {
+      setCurrentContext(firstResult.path);
+      setSelectedItems(nodeId);
+      serverRequest("find", { path: firstResult.path }).then((resp) => {
+        if (resp.data) setSelectedEntity(resp.data);
+      });
+    }
   };
 
   const handleNodeToggle = (e: React.SyntheticEvent<Element, Event>, nodeIds: string[]) => {

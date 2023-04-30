@@ -24,14 +24,14 @@ import BuildFileURL from "../../services/BuildFileURL";
 import { CopyToClipboard, ShowInExplorer } from "../ContextActions";
 
 interface AssetTileProps extends TileProps {
-  entity: AssetVersion;
-  onSelected?: (entity: AssetVersion) => void;
+  entity: IgniteAssetVersion;
+  onSelected?: (entity: IgniteAssetVersion) => void;
   refreshContext?: () => void;
   onContextMenu?: () => void;
   handleContextMenuSelection: (action: string, data: any) => void;
 }
 
-const AssetTile = (props: AssetTileProps) => {
+const AssetTile = (props: IgniteAssetTileProps) => {
   const { currentContext } = useContext(ContextContext) as ContextContextType;
   const { config } = useContext(ConfigContext) as ConfigContextType;
   const { enqueueSnackbar } = useSnackbar();
@@ -80,7 +80,7 @@ const AssetTile = (props: AssetTileProps) => {
     contextItems.splice(2, 0, vaultExportItem);
   }
 
-  function details() {
+  const details = () => {
     return (
       <>
         <Typography style={{ position: "absolute", bottom: "5px", left: "10px" }}>
@@ -88,7 +88,7 @@ const AssetTile = (props: AssetTileProps) => {
         </Typography>
       </>
     );
-  }
+  };
 
   const handleDragStart = (e: React.DragEvent) => {
     e.dataTransfer.setData("text/plain", props.entity.uri);
