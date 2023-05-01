@@ -19,9 +19,9 @@ import styles from "./DragOverlay.module.css";
 
 interface DragOverlayProps {
   text: string;
-  error: string;
-  variant: Variant;
-  style: React.CSSProperties;
+  error?: string;
+  variant?: Variant;
+  style?: React.CSSProperties;
 }
 
 const DragOverlay = ({ text, error, variant = "h3", style = {} }: DragOverlayProps) => {

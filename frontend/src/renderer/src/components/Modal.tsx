@@ -40,7 +40,7 @@ type ModalProps = React.PropsWithChildren<{
   autoFocus?: boolean;
 }>;
 
-const Modal = ({ maxWidth = "xs", ...props }: ModalProps) => {
+const Modal = ({ maxWidth = "false", ...props }: ModalProps) => {
   useEffect(() => {
     if (!props.open || !props.focusRef) return;
     const timeout = setTimeout(() => {

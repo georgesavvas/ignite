@@ -16,15 +16,15 @@ import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
 import LinearProgress from "@mui/material/LinearProgress";
 import Typography from "@mui/material/Typography";
-import { AssetVersion, InputChangeEvent } from "@renderer/types/common";
+import { IgniteAssetVersion, InputChangeEvent } from "@renderer/types/common";
 import { useSnackbar } from "notistack";
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import DataPlaceholder from "../../components/DataPlaceholder";
 import { ConfigContext, ConfigContextType } from "../../contexts/ConfigContext";
 import BuildFileURL from "../../services/BuildFileURL";
 import { DeleteDir, RenameDir, VaultExport } from "../ContextActions";
-import PageBar from "../PageBar";
+import PageBar from "../Explorer/PageBar";
 import AssetTile from "./AssetTile";
 import styles from "./Browser.module.css";
 import FilterBar from "./FilterBar";
@@ -93,7 +93,7 @@ const Browser = (props: BrowserProps) => {
     );
   }, [
     props.loadedData,
-    props.selectedEntity.path,
+    props.selectedEntity?.path,
     explorerSettings.currentViewType,
     explorerSettings.currentTileSize,
   ]);

@@ -7,24 +7,16 @@
   box-sizing: border-box;
   overflow: hidden;
   gap: 3px;
-  border: solid red 2px;
 }
 
 .tileContainer {
   flex-grow: 1;
-  height: 100%;
   display: grid;
-  overflow-y: auto;
   gap: 3px;
   padding: 0 5px;
-}
-
-.layoutHelper {
-  flex-grow: 100;
 }
 
 .helperTextContainer {
   display: flex;
   padding-left: 10px;
-  /* padding-top: 5px; */
 }

@@ -43,8 +43,8 @@ const buttons = (props: ButtonProps) => {
           {props.title}
         </Typography>
       ) : null}
-      <AddIcon component="div" className={styles.button} onClick={props.onAdd} />
-      <RemoveIcon component="div" className={styles.button} onClick={props.onRemove} />
+      <AddIcon className={styles.button} onClick={props.onAdd} />
+      <RemoveIcon className={styles.button} onClick={props.onRemove} />
     </div>
   );
 };

@@ -14,7 +14,7 @@
 
 import AddIcon from "@mui/icons-material/Add";
 import Typography from "@mui/material/Typography";
-import { ClickEvent, Directory } from "@renderer/types/common";
+import { ClickEvent, IgniteDirectory } from "@renderer/types/common";
 import { useSnackbar } from "notistack";
 
 import Tile, { TileProps } from "../../components/Tile";

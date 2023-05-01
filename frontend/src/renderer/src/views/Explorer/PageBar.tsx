@@ -14,15 +14,15 @@
 
 import Pagination, { PaginationProps } from "@mui/material/Pagination";
 import Slider, { SliderProps } from "@mui/material/Slider";
-
-import IgnTextField from "../components/IgnTextField";
 import { InputChangeEvent } from "@renderer/types/common";
+
+import IgnTextField from "../../components/IgnTextField";
 import styles from "./PageBar.module.css";
 
 interface PageBarProps {
   pages: number;
   onChange: PaginationProps["onChange"];
-  tilesPerPage?: number;
+  tilesPerPage: number;
   onTilesPerPageChange: (e: InputChangeEvent) => void;
   tileSize: number;
   onTileSizeChange: SliderProps["onChange"];
@@ -40,7 +40,7 @@ const PageBar = (props: PageBarProps) => {
             min: 0,
             style: { textAlign: "center" },
           }}
-          defaultValue={props.tilesPerPage}
+          value={props.tilesPerPage}
           style={{ width: 55 }}
           variant="outlined"
           onChange={props.onTilesPerPageChange}

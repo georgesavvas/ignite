@@ -14,7 +14,7 @@
 
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
-import { Directory, InputChangeEvent } from "@renderer/types/common";
+import { IgniteDirectory, InputChangeEvent } from "@renderer/types/common";
 import { useSnackbar } from "notistack";
 import React, { useContext, useEffect, useRef, useState } from "react";
 

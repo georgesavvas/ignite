@@ -12,26 +12,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ClickEvent, IgniteEntity } from "@renderer/types/common";
-import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
-import { DataGrid, GridCellParams, GridRowParams } from "@mui/x-data-grid";
-import { useContext, useMemo, useState } from "react";
-
-import AssetTile from "./AssetTile";
-import DataPlaceholder from "../../components/DataPlaceholder";
-import DirectoryTile from "./DirectoryTile";
 import { Typography } from "@mui/material";
-import URI from "../../components/URI";
+import { DataGrid, GridCellParams, GridRowParams } from "@mui/x-data-grid";
+import {
+  ClickEvent,
+  IgniteAssetVersion,
+  IgniteDirectory,
+  IgniteEntity,
+  IgniteScene,
+} from "@renderer/types/common";
+import { useContext, useMemo, useState } from "react";
 import { useEffect } from "react";
 
+import DataPlaceholder from "../../components/DataPlaceholder";
+import URI from "../../components/URI";
+import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
+import AssetTile from "./AssetTile";
+import DirectoryTile from "./DirectoryTile";
+
+type RowEntity = IgniteAssetVersion | IgniteDirectory | IgniteScene;
+
 interface RowViewProps {
-  data: IgniteEntity[];
+  data: RowEntity[];
   selectedEntityPath: string;
   resultType: "dynamic" | "tasks" | "assets" | "scenes";
   onContextMenu: () => void;
   handleContextMenuSelection: () => void;
   tileSize: number;
-  onSelected: (entity: IgniteEntity) => void;
+  onSelected: (entity: RowEntity) => void;
   page: number;
   pageSize: number;
 }
@@ -48,10 +56,10 @@ const RowView = (props: RowViewProps) => {
   }, [props.data]);
 
   const renderEntity = (params: GridCellParams) => {
-    const entity = params.value as Entity;
+    const entity = params.value as RowEntity;
     const handleDragStart = (e: React.DragEvent) => {
       e.dataTransfer.setData("text/plain", entity.uri);
-      e.dataTransfer.setData("ignite/kind", entity.kind);
+      e.dataTransfer.setData("ignite/kind", entity.dir_kind);
       e.dataTransfer.setData("ignite/path", entity.path);
       e.dataTransfer.setData("ignite/uri", entity.uri);
     };
@@ -233,15 +241,15 @@ const RowView = (props: RowViewProps) => {
     return props.data.map((entity, index) => {
       return {
         id: index,
-        thumbnail: IgniteEntity,
-        name: IgniteEntity.name,
-        dir_kind: IgniteEntity.dir_kind,
-        dcc: IgniteEntity.dcc,
-        version: IgniteEntity.version,
-        uri: IgniteEntity.uri,
-        context: IgniteEntity.context,
-        creationTime: IgniteEntity.creation_time,
-        modificationTime: IgniteEntity.modification_time,
+        thumbnail: entity,
+        name: entity.name,
+        dir_kind: entity.dir_kind,
+        dcc: entity.dcc,
+        version: entity.version,
+        uri: entity.uri,
+        context: entity.context,
+        creationTime: entity.creation_time,
+        modificationTime: entity.modification_time,
       };
     });
   };

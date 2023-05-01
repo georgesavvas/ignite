@@ -182,7 +182,7 @@ const Vault = (props: VaultProps) => {
   };
 
   return (
-    <Modal open={props.open} onClose={props.onClose} title="Vault" fullWidth fullHeight>
+    <Modal open={props.open} onClose={props.onClose} title="Vault" fullHeight>
       <ReflexContainer orientation="vertical" className={styles.container}>
         <ReflexElement
           flex={flexRatios["vault.collections"]}
