@@ -198,7 +198,7 @@ async def get_contents(request: Request):
     end = start + limit
     to_return = data[start:end]
     for i, d in enumerate(to_return):
-        d["result_id"] = i 
+        d["result_id"] = i
     return {
         "ok": True,
         "pages": {
@@ -229,7 +229,7 @@ async def get_tasks(request: Request):
     end = start + limit
     to_return = data[start:end]
     for i, d in enumerate(to_return):
-        d["result_id"] = i 
+        d["result_id"] = i
     return {
         "ok": True,
         "pages": {
@@ -262,7 +262,7 @@ async def get_assets(request: Request):
     end = start + limit
     to_return = data[start:end]
     for i, d in enumerate(to_return):
-        d["result_id"] = i 
+        d["result_id"] = i
     return {
         "ok": True,
         "pages": {
@@ -307,7 +307,7 @@ async def get_assetversions(request: Request):
     end = start + limit
     to_return = data[start:end]
     for i, d in enumerate(to_return):
-        d["result_id"] = i 
+        d["result_id"] = i
     return {
         "ok": True,
         "pages": {

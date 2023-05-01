@@ -12,36 +12,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ConfigContext, ConfigContextType } from "../../contexts/ConfigContext";
-import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
-import ContextMenu, { ContextMenuType, handleContextMenu } from "../../components/ContextMenu";
-import { CopyToClipboard, ShowInExplorer, VaultExport, VaultImport } from "../ContextActions";
-import { CreateDir, DeleteDir, RenameDir } from "../ContextActions";
+import Divider from "@mui/material/Divider";
+import LinearProgress from "@mui/material/LinearProgress";
+import Typography from "@mui/material/Typography";
 import { EnqueueSnackbar, IgniteComponent, IgniteEntity } from "@renderer/types/common";
-import { EntityContext, EntityContextType } from "../../contexts/EntityContext";
+import { debounce } from "lodash";
+import { useSnackbar } from "notistack";
 import React, { ChangeEvent, ClipboardEvent, useContext, useEffect, useState } from "react";
 
-import AssetTile from "./AssetTile";
-import BuildFileURL from "../../services/BuildFileURL";
-import { DIRCONTEXTOPTIONS } from "../../constants/directoryContextOptions";
+import ContextMenu, { ContextMenuType, handleContextMenu } from "../../components/ContextMenu";
 import DataPlaceholder from "../../components/DataPlaceholder";
-import DccSelector from "../DccSelector";
-import DirectoryTile from "./DirectoryTile";
-import Divider from "@mui/material/Divider";
 import DragOverlay from "../../components/DragOverlay";
-import ExplorerBar from "./ExplorerBar";
-import LinearProgress from "@mui/material/LinearProgress";
 import Modal from "../../components/Modal";
-import PageBar from "../PageBar";
-import RowView from "./RowView";
-import SceneDrop from "./SceneDrop";
-import Typography from "@mui/material/Typography";
-import { debounce } from "lodash";
+import { DIRCONTEXTOPTIONS } from "../../constants/directoryContextOptions";
+import { ConfigContext, ConfigContextType } from "../../contexts/ConfigContext";
+import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
+import { EntityContext, EntityContextType } from "../../contexts/EntityContext";
+import BuildFileURL from "../../services/BuildFileURL";
+import serverRequest from "../../services/serverRequest";
 import loadExplorerSettings from "../../utils/loadExplorerSettings";
 import saveExplorerSettings from "../../utils/saveExplorerSettings";
-import serverRequest from "../../services/serverRequest";
+import { CopyToClipboard, ShowInExplorer, VaultExport, VaultImport } from "../ContextActions";
+import { CreateDir, DeleteDir, RenameDir } from "../ContextActions";
+import DccSelector from "../DccSelector";
+import AssetTile from "./AssetTile";
+import DirectoryTile from "./DirectoryTile";
 import styles from "./Explorer.module.css";
-import { useSnackbar } from "notistack";
+import ExplorerBar from "./ExplorerBar";
+import PageBar from "./PageBar";
+import RowView from "./RowView";
+import SceneDrop from "./SceneDrop";
 
 const debounced = debounce((fn: () => void) => fn(), 500);
 
@@ -557,25 +557,22 @@ const Explorer = () => {
         onDrop={handleDrop}
         onDragEnd={handleDragEnd}
         onDragOver={handleDragOver}
-        style={{ position: "relative", height: "100%" }}
+        onContextMenu={(e) => handleContextMenu(e, contextMenu, setContextMenu)}
+        style={{
+          position: "relative",
+          height: "100%",
+          overflow: "auto",
+        }}
       >
         {dropData.visible ? <DragOverlay text="Create asset" error={dropData.error} /> : null}
         {getView()}
       </div>
-      <div
-        className={styles.layoutHelper}
-        onContextMenu={(e) => handleContextMenu(e, contextMenu, setContextMenu)}
-        onPaste={handlePaste}
-        onDragLeave={handleDragEnd}
-        onDrop={handleDrop}
-        onDragEnd={handleDragEnd}
-        onDragOver={handleDragOver}
-      />
       <Divider />
       <PageBar
         pages={pages.total}
         onChange={handlePageChange}
         tileSize={explorerSettings.currentTileSize}
+        tilesPerPage={explorerSettings.tilesPerPage}
         onTilesPerPageChange={(e) => handleTilesPerPageChange(e.target.value)}
         onTileSizeChange={(e) => handleTileSizeChange(e.target.value)}
       />

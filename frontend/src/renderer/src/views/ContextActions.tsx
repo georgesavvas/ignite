@@ -36,7 +36,7 @@ export const CopyToClipboard = (text: string, enqueueSnackbar: EnqueueSnackbar) 
 
 export const ShowInExplorer = (filepath: string, enqueueSnackbar: EnqueueSnackbar) => {
   clientRequest("show_in_explorer", { filepath: filepath }).then((resp) => {
-    if (!resp.ok) enqueueSnackbar(resp.msg || "Failed launching scene.", { variant: "error" });
+    if (!resp.ok) enqueueSnackbar(resp.error || "Failed launching scene.", { variant: "error" });
   });
 };
 
@@ -73,7 +73,7 @@ export const setReprForParent = (repr: string, enqueueSnackbar: EnqueueSnackbar)
   };
   serverRequest("set_repr_for_parent", data).then((resp) => {
     if (resp.ok) enqueueSnackbar(`Repr set for ${resp.data}`, { variant: "success" });
-    else enqueueSnackbar(resp.msg || `Couldn't set repr for ${resp.data}`, { variant: "error" });
+    else enqueueSnackbar(resp.error || `Couldn't set repr for ${resp.data}`, { variant: "error" });
   });
 };
 
@@ -182,7 +182,7 @@ export const VaultImport = ({
     setLoading(true);
     serverRequest("vault_import", { ...data, name: nameValue }).then((resp) => {
       if (resp.ok) enqueueSnackbar("Done", { variant: "success" });
-      else enqueueSnackbar(resp.msg || "An error occurred...", { variant: "error" });
+      else enqueueSnackbar(resp.error || "An error occurred...", { variant: "error" });
       if (fn) fn();
     });
     onClose();
@@ -317,7 +317,9 @@ export const RenameDir = ({ data, open = false, onClose, enqueueSnackbar, fn }: 
       else {
         let reason = "";
         if (resp.error) reason = ` - ${resp.error}`;
-        enqueueSnackbar(resp.msg || `Couldn't rename ${data.kind}${reason}.`, { variant: "error" });
+        enqueueSnackbar(resp.error || `Couldn't rename ${data.kind}${reason}.`, {
+          variant: "error",
+        });
       }
       if (fn) fn();
     });
@@ -396,7 +398,9 @@ export const ChangeTaskType = (props: ChangeTaskTypeProps) => {
         else {
           let reason = "";
           if (resp.error) reason = ` - ${resp.error}`;
-          enqueueSnackbar(resp.msg || `Couldn't change task type${reason}.`, { variant: "error" });
+          enqueueSnackbar(resp.error || `Couldn't change task type${reason}.`, {
+            variant: "error",
+          });
         }
         if (fn) fn();
         onClose();
@@ -493,7 +497,7 @@ export const CreateDir = ({ data, open = false, onClose, enqueueSnackbar, fn }: 
   const handleOnCreate = (data: any) => {
     setLoading(true);
     serverRequest("create_dirs", data).then((resp) => {
-      enqueueSnackbar(resp.msg || resp.text, { variant: resp.ok ? "success" : "error" });
+      enqueueSnackbar(resp.error || resp.text, { variant: resp.ok ? "success" : "error" });
       if (fn) fn();
     });
     setLoading(false);

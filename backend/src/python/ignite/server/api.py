@@ -36,7 +36,7 @@ RULE_TEMPLATES_PATH = USER_CONFIG_PATH / "rule_templates.yaml"
 
 
 def create_project(name: str):
-    if not utils.validate_dirname(name): 
+    if not utils.validate_dirname(name):
         return False, "invalid project name"
     if list(Path(CONFIG["root"]).glob(name)):
         return False, "already exists"
@@ -295,7 +295,7 @@ def create_dirs(path, method, dirs):
             created += 1
             continue
         if not hasattr(entity, method):
-            LOGGER.warning(entity, "has no method", method)
+            LOGGER.error(f"{entity} has no method {method}")
             continue
         getattr(entity, method)(dir_name)
         created += 1

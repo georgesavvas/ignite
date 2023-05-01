@@ -177,7 +177,7 @@ class Directory():
         utils.ensure_directory(path)
         utils.create_anchor(path, anchor)
         return path
-    
+
     def create_task(self, name, task_type="generic"):
         from ignite.server.entities.task import Task
 
@@ -187,13 +187,13 @@ class Directory():
             LOGGER.error(f"Task creation failed: {path}")
             return
         task.set_task_type(task_type)
-    
+
     def create_shot(self, name):
         self.create_dir(name, "shot")
 
     def create_build(self, name):
         path = self.create_dir(name, "build")
-    
+
     def create_sequence(self, name):
         path = self.create_dir(name, "sequence")
 
@@ -270,14 +270,14 @@ class Directory():
     def set_tags(self, tags):
         self.update_config({"tags": tags})
         return tags
-    
+
     def add_tags(self, tags):
         existing = self.get_tags()
         existing += tags
         existing = list(set(existing))
         self.update_config({"tags": existing})
         return existing
-    
+
     def remove_tags(self, tags=[], all=False):
         existing = self.get_tags()
         if all:

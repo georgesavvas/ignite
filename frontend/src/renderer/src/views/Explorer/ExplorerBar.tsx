@@ -37,7 +37,7 @@ import NewAsset from "./NewAsset";
 const style = {
   display: "flex",
   justifyContent: "space-between",
-  padding: "1px",
+  // padding: "1px",
   alignItems: "center",
   gap: "5px",
 };

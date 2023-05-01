@@ -20,6 +20,7 @@ from pathlib import Path, PurePath
 import yaml
 from ignite.server import utils
 from ignite.server.constants import ANCHORS
+from ignite.server.entities.group import Group
 from ignite.server.entities.directory import Directory
 from ignite.server.utils import CONFIG
 from ignite.logger import get_logger
@@ -36,8 +37,15 @@ class Project(Directory):
         self.project = self.name
         self.short_name = ""
 
-    def create_dir(self, name, recursive=False):
-        raise NotImplemented("create_dir not allowed for projects.")
+    def create_group(self, name):
+        from ignite.server.entities.task import Task
+
+        path = self.create_dir(name, "group")
+        group = Group(path=path)
+        if not group:
+            LOGGER.error(f"Group creation failed: {path}")
+            return
+        return group
 
     def initialise(self) -> None:
         dirs = (".config", "common", "global", "rnd", "assets", "shots")
@@ -72,14 +80,14 @@ class Project(Directory):
             setattr(self, f"{d}_path", dir_path)
         self.uri = utils.get_uri(path)
         self.load_from_config()
-    
+
     def set_short_name(self, name):
-        if not utils.validate_dirname(name): 
+        if not utils.validate_dirname(name):
             raise Exception(
                 f"Invalid name, only alphanumeric and underscores allowed: {name}"
             )
         self.short_name = name
-    
+
     def update_config(self, data):
         config = {
             "short_name": self.short_name
