@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { Typography } from "@mui/material";
 import { render, screen } from "@testing-library/react";
+import { vi } from "vitest";
 
 import DynamicList from "./DynamicList";
 
@@ -23,5 +25,33 @@ describe("DynamicList", () => {
     const title = screen.getByText("hello");
 
     expect(title).toBeInTheDocument();
+  });
+
+  it("Renders content", () => {
+    render(
+      <DynamicList>
+        <Typography>one</Typography>
+        <Typography>two</Typography>
+        <Typography>three</Typography>
+      </DynamicList>
+    );
+
+    const one = screen.getByText("one");
+    const two = screen.getByText("two");
+    const three = screen.getByText("three");
+
+    expect(one).toBeInTheDocument();
+    expect(two).toBeInTheDocument();
+    expect(three).toBeInTheDocument();
+  });
+
+  it("Add/Remove content", () => {
+    const onAdd = vi.fn();
+    const onRemove = vi.fn();
+
+    render(<DynamicList onAdd={onAdd} onRemove={onRemove} />);
+
+    expect(onAdd.mock.calls.length).toBe(1);
+    expect(onRemove.mock.calls.length).toBe(1);
   });
 });
