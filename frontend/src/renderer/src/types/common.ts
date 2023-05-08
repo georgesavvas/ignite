@@ -1,6 +1,6 @@
 import { OptionsObject, SnackbarKey } from "notistack";
-
 import React from "react";
+import { HandlerProps } from "react-reflex";
 
 export type UnknownEvent = React.ChangeEvent<unknown>;
 
@@ -37,7 +37,7 @@ export interface IgniteDirectory {
     | "sequence"
     | "shot"
     | "task";
-  thumbnail: IgniteComponent;
+  thumbnail?: IgniteComponent;
   anchor: string;
   project: string;
   tags: string[];
@@ -48,6 +48,7 @@ export interface IgniteDirectory {
   creation_time: string;
   modification_time: string;
   task?: string;
+  icon?: string;
 }
 
 export type IgniteAttribute = {
@@ -85,7 +86,7 @@ export interface IgniteScene extends IgniteDirectory {
   vsn: string;
   attributes: any;
   comment: string;
-  thumbnail: IgniteComponent;
+  thumbnail?: IgniteComponent;
   extension: string;
   task: string;
 }
@@ -94,10 +95,11 @@ export interface IgniteComponent {
   name: string;
   filename: string;
   path: string;
+  path_nr: string;
   ext: string;
   static: boolean;
-  first_frame: string;
-  last_frame: string;
+  first_frame: number;
+  last_frame: number;
   frames: string[];
   uri: string;
   dir_kind: "scene";
@@ -107,16 +109,13 @@ export interface IgniteComponent {
 
 export type CrateType = {
   id?: string;
-  entities?: IgniteEntity[];
+  entities?: IgniteEntity[] | IgniteComponent[];
   label: string;
 };
 
-export type IgniteEntity =
-  | IgniteDirectory
-  | IgniteAsset
-  | IgniteAssetVersion
-  | IgniteScene
-  | IgniteComponent;
+export type IgniteEntity = IgniteDirectory | IgniteAsset | IgniteAssetVersion | IgniteScene;
+
+export type CrateEntity = IgniteEntity | IgniteComponent;
 
 export type DccType = {
   scenes: string[];
@@ -125,6 +124,14 @@ export type DccType = {
   path: string;
   keywords: string[];
 };
+
+export interface WebSocketWithInterval extends WebSocket {
+  interval?: NodeJS.Timer;
+}
+
+export interface SaveReflexLayoutProps extends HandlerProps {
+  domElement: HTMLElement;
+}
 
 // React.ComponentType<SvgIconProps>
 

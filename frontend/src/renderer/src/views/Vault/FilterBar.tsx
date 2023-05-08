@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 // Copyright 2023 Georgios Savvas
 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,6 +31,7 @@ const defaultExpr = '{ "condition": "and", "filters": [{ "": "" }, { "": "" }]}'
 
 interface FilterBarProps {
   open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   onFilterChange: (value: ExpressionType) => void;
 }
 

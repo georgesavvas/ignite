@@ -17,15 +17,15 @@ import { useSnackbar } from "notistack";
 import { useState } from "react";
 
 import { CopyToClipboard } from "../views/ContextActions";
-import ContextMenu, { handleContextMenu } from "./ContextMenu";
+import ContextMenu, { ContextMenuType, handleContextMenu } from "./ContextMenu";
 import styles from "./Path.module.css";
 
-interface PathProps {
+export interface PathProps {
   path: string;
 }
 
 const Path = (props: PathProps) => {
-  const [contextMenu, setContextMenu] = useState(null);
+  const [contextMenu, setContextMenu] = useState<ContextMenuType | null>(null);
   const { enqueueSnackbar } = useSnackbar();
 
   const contextItems = [

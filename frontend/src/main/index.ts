@@ -12,17 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { BrowserWindow, Menu, Tray, app, dialog, ipcMain, protocol, shell } from "electron";
 import { ChildProcess, spawn } from "child_process";
-// require("v8-compile-cache");
-import { electronApp, is, optimizer } from "@electron-toolkit/utils";
-
-import { autoUpdater } from "electron-updater";
-import axios from "axios";
 import fs from "fs";
-import getPort from "get-port";
 import os from "os";
 import path from "path";
+
+// require("v8-compile-cache");
+import { electronApp, is, optimizer } from "@electron-toolkit/utils";
+import axios from "axios";
+import { BrowserWindow, Menu, Tray, app, dialog, ipcMain, protocol, shell } from "electron";
+import { autoUpdater } from "electron-updater";
+import getPort from "get-port";
 import uuid4 from "uuid4";
 
 autoUpdater.channel = "alpha";
@@ -44,12 +44,6 @@ interface Platforms {
   darwin: string;
   linux: string;
 }
-
-const iconPaths: Platforms = {
-  win32: "/media/desktop_icon/win/icon.ico",
-  darwin: "/media/desktop_icon/mac/icon.icns",
-  linux: "/media/desktop_icon/linux/icon.png",
-};
 
 const backendPaths: Platforms = {
   win32: "IgniteBackend.exe",
@@ -83,6 +77,12 @@ const backendPath = path.join(
   appPath,
   process.env.NODE_ENV === "dev" ? backendPathDev : backendPaths[platformName]
 );
+
+const iconPaths: Platforms = {
+  win32: "public/media/desktop_icon/win/icon.ico",
+  darwin: "public/media/desktop_icon/mac/icon.icns",
+  linux: "public/media/desktop_icon/linux/icon.png",
+};
 
 const clientRequest = async (method: string, data?: object): Promise<ClientResponse> => {
   console.log(`http://localhost:${port}/api/v1/${method}`);
@@ -180,7 +180,7 @@ const createWindow = (show = true): BrowserWindow => {
     width: 1280,
     height: 720,
     show: show,
-    icon: path.join(__dirname, iconPaths[platformName]),
+    icon: iconPaths[platformName],
     backgroundColor: "#141414",
     webPreferences: {
       nodeIntegration: false,
@@ -289,7 +289,7 @@ const createSplash = (): BrowserWindow => {
       contextIsolation: true,
       preload: path.join(__dirname, "../preload/index.js"),
     },
-    icon: path.join(__dirname, iconPaths[platformName]),
+    icon: iconPaths[platformName],
   });
   win.loadFile(`${publicPath}/splash.html`);
   autoUpdater.on("checking-for-update", () => {
@@ -384,8 +384,9 @@ if (!gotTheLock) {
     });
 
     // TODO: Might have to disable tray on macos as it's not succeeding.
-    if (tray === null) {
-      tray = new Tray(`${publicPath}/media/icon.png`);
+    console.log("tray", tray);
+    if (!tray) {
+      tray = new Tray(iconPaths[platformName]);
       const contextMenu = Menu.buildFromTemplate([
         { label: "Show", click: () => window.show() },
         {

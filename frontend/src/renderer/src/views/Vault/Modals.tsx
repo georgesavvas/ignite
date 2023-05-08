@@ -12,18 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { Button } from "@mui/material";
 import TextField from "@mui/material/TextField";
+import { EnqueueSnackbar } from "@renderer/types/common";
 import { useEffect, useRef, useState } from "react";
 
 import IgnButton from "../../components/IgnButton";
 import Modal from "../../components/Modal";
 import serverRequest from "../../services/serverRequest";
-import FilterBuilder from "./FilterBuilder";
+import FilterBuilder, { ExpressionType } from "./FilterBuilder";
 
-interface EditCollProps {}
+interface EditCollProps {
+  data: { expression?: any; path: string; name: string };
+  open: boolean;
+  onClose: () => void;
+  enqueueSnackbar: EnqueueSnackbar;
+  fn: () => void;
+}
 
 export const EditColl = ({ data, open = false, onClose, enqueueSnackbar, fn }: EditCollProps) => {
-  const [filterData, setFilterData] = useState({});
+  const [filterData, setFilterData] = useState<{ [key: string]: ExpressionType }>({});
 
   useEffect(() => {
     if (data.expression) setFilterData({ ...data["expression"] });
@@ -64,7 +72,21 @@ export const EditColl = ({ data, open = false, onClose, enqueueSnackbar, fn }: E
   );
 };
 
-export const RenameColl = ({ data, open = false, onClose, enqueueSnackbar, fn }) => {
+interface RenameCollProps {
+  data: { expression?: any; path: string; name: string };
+  open: boolean;
+  onClose: () => void;
+  enqueueSnackbar: EnqueueSnackbar;
+  fn: () => void;
+}
+
+export const RenameColl = ({
+  data,
+  open = false,
+  onClose,
+  enqueueSnackbar,
+  fn,
+}: RenameCollProps) => {
   const [nameValue, setNameValue] = useState("");
   const textFieldRef = useRef();
 
@@ -111,7 +133,21 @@ export const RenameColl = ({ data, open = false, onClose, enqueueSnackbar, fn })
   );
 };
 
-export const DeleteColl = ({ data, open = false, onClose, enqueueSnackbar, fn }) => {
+interface DeleteCollProps {
+  data: { expression?: any; path: string; name: string };
+  open: boolean;
+  onClose: () => void;
+  enqueueSnackbar: EnqueueSnackbar;
+  fn: () => void;
+}
+
+export const DeleteColl = ({
+  data,
+  open = false,
+  onClose,
+  enqueueSnackbar,
+  fn,
+}: DeleteCollProps) => {
   const handleConfirm = () => {
     serverRequest("delete_collection", { data: data }).then((resp) => {
       if (resp.ok) enqueueSnackbar("Successfully deleted!", { variant: "success" });
@@ -124,7 +160,12 @@ export const DeleteColl = ({ data, open = false, onClose, enqueueSnackbar, fn })
   return (
     <Modal
       open={open}
-      onButtonClicked={handleConfirm}
+      buttons={[
+        <Button key="confirm" type="submit">
+          Confirm
+        </Button>,
+      ]}
+      onFormSubmit={handleConfirm}
       onClose={onClose}
       text={`This will permanently delete the ${data.name} collection!`}
       title="Are you sure?"
@@ -133,7 +174,21 @@ export const DeleteColl = ({ data, open = false, onClose, enqueueSnackbar, fn })
   );
 };
 
-export const CreateColl = ({ data, open = false, onClose, enqueueSnackbar, fn }) => {
+interface CreateCollProps {
+  data: { expression?: any; path: string; name: string };
+  open: boolean;
+  onClose: () => void;
+  enqueueSnackbar: EnqueueSnackbar;
+  fn: () => void;
+}
+
+export const CreateColl = ({
+  data,
+  open = false,
+  onClose,
+  enqueueSnackbar,
+  fn,
+}: CreateCollProps) => {
   const [nameValue, setNameValue] = useState("");
   const textFieldRef = useRef();
 
@@ -153,16 +208,14 @@ export const CreateColl = ({ data, open = false, onClose, enqueueSnackbar, fn })
   return (
     <Modal
       open={open}
-      buttonLabel="Create"
       focusRef={textFieldRef}
       maxWidth="sm"
-      closeButton
       onClose={onClose}
       onFormSubmit={handleConfirm}
       title="Create"
       buttons={[
         <IgnButton key="create" type="submit">
-          Confirm
+          Create
         </IgnButton>,
       ]}
     >

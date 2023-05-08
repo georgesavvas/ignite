@@ -77,7 +77,7 @@ const ProjectTreeView = (props: ProjectTreeViewProps) => {
         return;
       }
       for (var i = 0; i < Object.keys(object).length; i++) {
-        const child = object[Object.keys(object)[i] as keyof TreeNodeType];
+        const child = object[Object.keys(object)[i] as keyof TreeNodeType] as TreeNodeType;
         if (child !== null && typeof child === "object") {
           if (value.includes(child.path)) parents.push(child.id);
           findNodeByPath(child, result, value, parents);
@@ -107,7 +107,7 @@ const ProjectTreeView = (props: ProjectTreeViewProps) => {
         return;
       }
       for (var i = 0; i < Object.keys(object).length; i++) {
-        const child = object[Object.keys(object)[i] as keyof TreeNodeType];
+        const child = object[Object.keys(object)[i] as keyof TreeNodeType] as TreeNodeType;
         if (child !== null && typeof child === "object") {
           findNodeById(child, result, value);
         }

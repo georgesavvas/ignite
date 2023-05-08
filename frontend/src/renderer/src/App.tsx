@@ -13,74 +13,27 @@
 // limitations under the License.
 
 import "react-reflex/styles.css";
+
 import "./App.css";
 
-import { ThemeProvider, createTheme } from "@mui/material/styles";
+import darkScrollbar from "@mui/material/darkScrollbar";
+import GlobalStyles from "@mui/material/GlobalStyles";
+import { ThemeProvider } from "@mui/material/styles";
+import Typography from "@mui/material/Typography";
+import { SnackbarProvider } from "notistack";
+import { ErrorBoundary } from "react-error-boundary";
 
-import { ClickEvent } from "./types/common";
+import IgnButton from "./components/IgnButton";
 import { ConfigProvider } from "./contexts/ConfigContext";
 import { ContextProvider } from "./contexts/ContextContext";
 import { CrateProvider } from "./contexts/CrateContext";
 import { EntityProvider } from "./contexts/EntityContext";
-import { ErrorBoundary } from "react-error-boundary";
-import GlobalStyles from "@mui/material/GlobalStyles";
-import Home from "./views/Home";
-import IgnButton from "./components/IgnButton";
-import { SnackbarProvider } from "notistack";
-import Typography from "@mui/material/Typography";
 import { VaultProvider } from "./contexts/VaultContext";
-import darkScrollbar from "@mui/material/darkScrollbar";
+import { igniteTheme } from "./theme";
+import { ClickEvent } from "./types/common";
+import Home from "./views/Home";
 
 // import BuildFileURL from "./services/BuildFileURL";
-
-declare module "@mui/material/styles" {
-  interface Palette {
-    ignite: Palette["primary"];
-    lightgrey: Palette["primary"];
-  }
-
-  interface PaletteOptions {
-    ignite: PaletteOptions["primary"];
-    lightgrey: PaletteOptions["primary"];
-  }
-}
-
-declare module "@mui/material" {
-  interface ButtonPropsColorOverrides {
-    ignite: true;
-    lightgrey: true;
-  }
-  interface LinearProgressPropsColorOverrides {
-    ignite: true;
-  }
-  interface CheckboxPropsColorOverrides {
-    ignite: true;
-  }
-  interface SwitchPropsColorOverrides {
-    ignite: true;
-  }
-  interface CircularProgressPropsColorOverrides {
-    ignite: true;
-  }
-}
-
-const darkTheme = createTheme({
-  palette: {
-    mode: "dark",
-    ignite: {
-      main: "rgb(252, 140, 3)",
-    },
-    lightgrey: {
-      main: "rgb(211,211,211)",
-    },
-  },
-  typography: {
-    fontSize: 12.5,
-    allVariants: {
-      color: "lightgrey",
-    },
-  },
-});
 
 // BuildFileURL("");
 
@@ -104,7 +57,7 @@ const ErrorFallback = ({ error, resetErrorBoundary }: ErrorFallbackProps) => {
 
 const App = (): JSX.Element => {
   return (
-    <ThemeProvider theme={darkTheme}>
+    <ThemeProvider theme={igniteTheme}>
       <GlobalStyles styles={{ ...darkScrollbar() }} />
       <div className="App">
         <ErrorBoundary FallbackComponent={ErrorFallback}>

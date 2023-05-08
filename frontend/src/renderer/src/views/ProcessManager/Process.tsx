@@ -22,8 +22,7 @@ import ReplayIcon from "@mui/icons-material/Replay";
 import WatchLaterOutlinedIcon from "@mui/icons-material/WatchLaterOutlined";
 import Divider from "@mui/material/Divider";
 import Typography from "@mui/material/Typography";
-import { Directory } from "@renderer/types/common";
-import React from "react";
+import { IgniteDirectory } from "@renderer/types/common";
 
 import clientRequest from "../../services/clientRequest";
 import styles from "./Process.module.css";

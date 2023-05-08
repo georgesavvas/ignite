@@ -17,7 +17,7 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import Typography from "@mui/material/Typography";
-import { AssetVersion } from "@renderer/types/common";
+import { IgniteAssetVersion, SaveReflexLayoutProps } from "@renderer/types/common";
 import { useSnackbar } from "notistack";
 import { useContext, useEffect, useState } from "react";
 import { HandlerProps, ReflexContainer, ReflexElement, ReflexSplitter } from "react-reflex";
@@ -74,7 +74,7 @@ interface AssetDetailsProps {
   setSelectedEntity: (entity: IgniteAssetVersion) => void;
 }
 
-const AssetDetails = (props: IgniteAssetDetailsProps) => {
+const AssetDetails = (props: AssetDetailsProps) => {
   const [flexRatios, setFlexRatios] = useState(defaultFlexRations);
   const { config } = useContext(ConfigContext) as ConfigContextType;
   const [selectedCompName, setSelectedCompName] = useState("");
@@ -133,7 +133,7 @@ const AssetDetails = (props: IgniteAssetDetailsProps) => {
   };
 
   const handleResized = (data: HandlerProps) => {
-    saveReflexLayout(data);
+    saveReflexLayout(data as SaveReflexLayoutProps);
   };
 
   const getComp = (compName: string) => {

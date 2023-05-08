@@ -13,45 +13,38 @@
 // limitations under the License.
 
 import { Typography } from "@mui/material";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render } from "@testing-library/react";
 import { vi } from "vitest";
 
-import DynamicList from "./DynamicList";
+import DynamicList, { DynamicListProps } from "./DynamicList";
+
+const makeSut = (props: Partial<DynamicListProps>) => {
+  return render(
+    <DynamicList {...props}>
+      <Typography>alpha</Typography>
+      <Typography>beta</Typography>
+      <Typography>gamma</Typography>
+    </DynamicList>
+  );
+};
 
 describe("DynamicList", () => {
-  it("Renders title", () => {
-    render(<DynamicList title="hello" />);
+  it("Renders title/content", () => {
+    const { getByText } = makeSut({ title: "list_title" });
 
-    const title = screen.getByText("hello");
-
-    expect(title).toBeInTheDocument();
-  });
-
-  it("Renders content", () => {
-    render(
-      <DynamicList>
-        <Typography>one</Typography>
-        <Typography>two</Typography>
-        <Typography>three</Typography>
-      </DynamicList>
-    );
-
-    const one = screen.getByText("one");
-    const two = screen.getByText("two");
-    const three = screen.getByText("three");
-
-    expect(one).toBeInTheDocument();
-    expect(two).toBeInTheDocument();
-    expect(three).toBeInTheDocument();
+    expect(getByText(/list_title/)).toBeInTheDocument();
+    expect(getByText(/beta/)).toBeInTheDocument();
   });
 
   it("Add/Remove content", () => {
     const onAdd = vi.fn();
     const onRemove = vi.fn();
+    const { getByTestId } = makeSut({ onAdd: onAdd, onRemove: onRemove });
 
-    render(<DynamicList onAdd={onAdd} onRemove={onRemove} />);
+    fireEvent.click(getByTestId("list-btn-add"));
+    expect(onAdd).toHaveBeenCalled();
 
-    expect(onAdd.mock.calls.length).toBe(1);
-    expect(onRemove.mock.calls.length).toBe(1);
+    fireEvent.click(getByTestId("list-btn-remove"));
+    expect(onRemove).toHaveBeenCalled();
   });
 });

@@ -35,7 +35,7 @@ interface AssetProps {
   id: string;
 }
 
-const Asset = ({ data, id }: IgniteAssetProps) => {
+const Asset = ({ data, id }: AssetProps) => {
   return (
     <div className={`${styles.assetContainer} ${data.valid ? "" : styles.invalid}`}>
       <Typography variant="h6">{data.name}</Typography>
@@ -71,7 +71,7 @@ const Output = (props: OutputProps) => {
           ? props.assets.map((child, index) => (
               <Asset data={child} key={index} id={"asset-" + index} />
             ))
-          : null}
+          : undefined}
       </DynamicList>
     </div>
   );

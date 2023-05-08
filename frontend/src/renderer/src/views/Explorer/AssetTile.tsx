@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import Typography from "@mui/material/Typography";
-import { AssetVersion } from "@renderer/types/common";
+import { IgniteAssetVersion } from "@renderer/types/common";
 import { useSnackbar } from "notistack";
 import { useContext } from "react";
 
@@ -25,14 +25,12 @@ import { setReprForParent, setReprForProject } from "../ContextActions";
 
 interface AssetTileProps extends TileProps {
   entity: IgniteAssetVersion;
-  onSelected?: (entity: IgniteAssetVersion) => void;
   viewType?: "dynamic" | "tasks" | "assets" | "scenes";
   refreshContext?: () => void;
-  onContextMenu: () => void;
   handleContextMenuSelection: (action: string, data: any) => void;
 }
 
-const AssetTile = (props: IgniteAssetTileProps) => {
+const AssetTile = (props: AssetTileProps) => {
   const { enqueueSnackbar } = useSnackbar();
   const { addToCrate } = useContext(CrateContext) as CrateContextType;
   const { currentContext, setCurrentContext } = useContext(ContextContext) as ContextContextType;

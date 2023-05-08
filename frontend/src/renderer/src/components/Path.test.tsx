@@ -12,8 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { render, screen } from "@testing-library/react";
+import { render } from "@testing-library/react";
+import { SnackbarProvider } from "notistack";
 
-import Path from "./Path";
+import { ConfigProvider } from "../contexts/ConfigContext";
+import { ContextProvider } from "../contexts/ContextContext";
+import Path, { PathProps } from "./Path";
 
-describe("Path", () => {});
+const makeSut = (props: PathProps) => {
+  return render(
+    <SnackbarProvider>
+      <ConfigProvider>
+        <ContextProvider>
+          <Path {...props} />
+        </ContextProvider>
+      </ConfigProvider>
+    </SnackbarProvider>
+  );
+};
+
+describe("Path", () => {
+  it("renders correctly", async () => {
+    const { getByText } = makeSut({
+      path: "/test/path/string",
+    });
+    expect(getByText("/test/path/string")).toBeInTheDocument();
+  });
+});

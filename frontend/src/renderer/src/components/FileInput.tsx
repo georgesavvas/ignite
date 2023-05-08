@@ -14,21 +14,23 @@
 
 /* eslint-disable react/no-unknown-property */
 
-import TextField, { TextFieldProps } from "@mui/material/TextField";
+import { TextFieldProps } from "@mui/material/TextField";
 import { ClickEvent, InputChangeEvent } from "@renderer/types/common";
+import React from "react";
 
 import styles from "./FileInput.module.css";
 import IgnButton from "./IgnButton";
+import IgnTextField from "./IgnTextField";
 
-type FileInputProps = React.PropsWithChildren<{
+export type FileInputProps = React.PropsWithChildren<{
   id?: string;
   margin?: string;
   className?: string;
   label?: string;
-  size: string;
+  size?: string;
   fullWidth?: boolean;
   disabled?: boolean;
-  onChange?: (e: InputChangeEvent, value: string) => void;
+  onChange?: (e: InputChangeEvent | ClickEvent, value: string) => void;
   multiline?: boolean;
   style?: React.CSSProperties;
   value?: any;
@@ -44,7 +46,7 @@ export const FileInput = (props: FileInputProps) => {
 
   const handleChange = (e: InputChangeEvent) => {
     if (!props.onChange) return;
-    props.onChange(e, e.target.value);
+    if (e.target instanceof HTMLInputElement) props.onChange(e, e.target.value);
   };
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
@@ -68,7 +70,7 @@ export const FileInput = (props: FileInputProps) => {
 
   return (
     <div className={styles.container} style={{ ...style, ...props.style }}>
-      <TextField
+      <IgnTextField
         {...(other as TextFieldProps)}
         value={props.value}
         onChange={handleChange}

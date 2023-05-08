@@ -24,12 +24,12 @@ import { setReprForParent, setReprForProject } from "../ContextActions";
 
 interface ComponentTileProps {
   entity: IgniteComponent;
-  onContextMenu: () => void;
+  onContextMenu: (action: string, data: any) => void;
 }
 
 const ComponentTile = (props: ComponentTileProps) => {
   const { enqueueSnackbar } = useSnackbar();
-  const { currentContext, setCurrentContext } = useContext(ContextContext) as ContextContextType;
+  const { currentContext } = useContext(ContextContext) as ContextContextType;
 
   const thumbnailWidth = "100%";
   const currentPath = currentContext.path_nr.replace(currentContext.project + "/", "");
@@ -52,11 +52,11 @@ const ComponentTile = (props: ComponentTileProps) => {
       fn: () => CopyToClipboard(props.entity.path, enqueueSnackbar),
       divider: true,
     },
-    {
-      label: "Go to task",
-      fn: () => setCurrentContext(props.entity.task),
-      divider: true,
-    },
+    // {
+    //   label: "Go to task",
+    //   fn: () => setCurrentContext(props.entity.task),
+    //   divider: true,
+    // },
     {
       label: "Add to Vault",
       fn: () => props.onContextMenu("vaultImport", dirData),
@@ -80,15 +80,15 @@ const ComponentTile = (props: ComponentTileProps) => {
       fn: () => ShowInExplorer(props.entity.path, enqueueSnackbar),
       divider: true,
     },
-    {
-      label: "Rename asset",
-      fn: () =>
-        props.onContextMenu("rename", {
-          name: props.entity.name,
-          kind: "asset",
-          path: props.entity.asset,
-        }),
-    },
+    // {
+    //   label: "Rename asset",
+    //   fn: () =>
+    //     props.onContextMenu("rename", {
+    //       name: props.entity.name,
+    //       kind: "asset",
+    //       path: props.entity.asset,
+    //     }),
+    // },
     {
       label: "Delete asset version",
       fn: () => props.onContextMenu("delete", dirData),
@@ -103,9 +103,6 @@ const ComponentTile = (props: ComponentTileProps) => {
         </Typography>
         <Typography style={{ position: "absolute", bottom: "5px", left: "10px" }}>
           {props.entity.name}
-        </Typography>
-        <Typography style={{ position: "absolute", bottom: "5px", right: "10px" }}>
-          {props.entity.version}
         </Typography>
       </>
     );

@@ -12,8 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { render, screen } from "@testing-library/react";
+import { ThemeProvider } from "@mui/material/styles";
+import { render } from "@testing-library/react";
+import { vi } from "vitest";
 
-import FileInput from "./FileInput";
+import { igniteTheme } from "../theme";
+import FileInput, { FileInputProps } from "./FileInput";
 
-describe("FileInput", () => {});
+const makeSut = (props: FileInputProps) => {
+  return render(
+    <ThemeProvider theme={igniteTheme}>
+      <FileInput {...props} />
+    </ThemeProvider>
+  );
+};
+
+describe("FileInput", () => {
+  it("renders correctly", () => {
+    const { getByDisplayValue, getByText } = makeSut({
+      label: "field_label",
+      value: "path_placeholder",
+      onChange: vi.fn(),
+    });
+    expect(getByDisplayValue(/path_placeholder/)).toBeInTheDocument();
+    expect(getByText("...")).toBeInTheDocument();
+  });
+});

@@ -43,6 +43,7 @@ class Directory():
         self.dir_kind = dir_kind
         self.context = ""
         self._repr = None
+        self.thumbnail = None
         self.protected = False
         self.path = ""
         if path:
@@ -126,7 +127,7 @@ class Directory():
 
     def as_dict(self):
         default = ["path", "protected", "dir_kind", "anchor", "project", "tags",
-            "name", "context", "group"]
+            "name", "context", "group", "thumbnail"]
         default_nr = ["path"]
         d = {}
         for s in default:

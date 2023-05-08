@@ -74,6 +74,15 @@ const defaultExplorerSettings = {
   },
 };
 
+export type QueryType = {
+  latest: -1 | 1;
+  sort: {
+    field: string;
+    reverse: boolean;
+    label: string;
+  };
+};
+
 const defaultQuery = {
   latest: 1,
   sort: {
@@ -81,7 +90,7 @@ const defaultQuery = {
     reverse: true,
     label: "Date (Newest first)",
   },
-};
+} as QueryType;
 
 const Explorer = () => {
   const { config } = useContext(ConfigContext) as ConfigContextType;

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Entity } from "@renderer/types/common";
+import { IgniteEntity } from "@renderer/types/common";
 import { PropsWithChildren, createContext, useState } from "react";
 
 export type EntityContextType = {
@@ -23,7 +23,7 @@ export type EntityContextType = {
 export const EntityContext = createContext<EntityContextType | undefined>(undefined);
 
 export const EntityProvider = ({ children }: PropsWithChildren) => {
-  const [selectedEntity, setSelectedEntity] = useState<Entity>({} as Entity);
+  const [selectedEntity, setSelectedEntity] = useState<IgniteEntity>({} as IgniteEntity);
   return (
     <EntityContext.Provider value={{ selectedEntity, setSelectedEntity }}>
       {children}

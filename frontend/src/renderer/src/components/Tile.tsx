@@ -13,7 +13,13 @@
 // limitations under the License.
 
 import { SvgIconProps } from "@mui/material";
-import { ClickEvent, ContextItem, IgniteDirectory, IgniteEntity } from "@renderer/types/common";
+import {
+  ClickEvent,
+  ContextItem,
+  IgniteComponent,
+  IgniteDirectory,
+  IgniteEntity,
+} from "@renderer/types/common";
 import { useContext, useRef, useState } from "react";
 
 import { ConfigContext, ConfigContextType } from "../contexts/ConfigContext";
@@ -28,9 +34,9 @@ export type TileProps = React.PropsWithChildren<{
   thumbnail?: string;
   noBorder?: boolean;
   selected?: boolean;
-  onSelected?: (entity: IgniteEntity) => void;
+  onSelected?: (entity: IgniteEntity | IgniteComponent) => void;
   thumbnailWidth?: string;
-  entity: IgniteDirectory;
+  entity: IgniteEntity | IgniteComponent;
   onClick?: (e: ClickEvent) => void;
   contextItems?: ContextItem[];
   noInfo?: boolean;
@@ -49,8 +55,9 @@ export const Tile = (props: TileProps) => {
   const ThumbComp = props.thumbnailComp;
   const overlay = props.noOverlay === undefined ? true : !props.noOverlay;
 
-  let isStatic = props.thumbnail !== undefined || ThumbComp;
-  if (!isStatic && !props.entity.thumbnail.path.includes("####")) isStatic = true;
+  let isStatic = props.thumbnail !== undefined || !!ThumbComp;
+  if (!isStatic && !(props.entity as IgniteDirectory).thumbnail?.path.includes("####"))
+    isStatic = true;
 
   const tileStyle = {
     borderStyle: props.noBorder ? "none" : "solid",
@@ -80,7 +87,8 @@ export const Tile = (props: TileProps) => {
   };
 
   const getSeqThumbnail = () => {
-    const thumbnail = props.entity.thumbnail;
+    const thumbnail = (props.entity as IgniteDirectory).thumbnail;
+    if (!thumbnail || thumbnail === null) return;
     const hasThumbnail = thumbnail?.path;
     let thumbnailPath = thumbnail.path;
     if (hasThumbnail && !thumbnail.static) {
@@ -112,6 +120,7 @@ export const Tile = (props: TileProps) => {
         />
       ) : null}
       <div
+        data-testid="tile-container"
         className={styles.tile}
         style={tileStyle}
         onClick={handleClick}
@@ -124,6 +133,7 @@ export const Tile = (props: TileProps) => {
           <img src={thumbnailURL} className={styles.thumbnail} style={thumbnailStyle} />
         ) : null}
         <div
+          data-testid="tile-hoverarea"
           className={styles.hoverArea}
           onMouseMove={isStatic ? undefined : handleMouseMove}
           ref={hoverArea}

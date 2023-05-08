@@ -13,11 +13,12 @@
 // limitations under the License.
 
 import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
+import { Typography } from "@mui/material";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import React from "react";
-import RemoveIcon from "@mui/icons-material/Remove";
-import { Typography } from "@mui/material";
+
 import styles from "./DynamicList.module.css";
 
 const createListItem = (child: React.ReactNode, index: number, dense?: boolean) => {
@@ -42,13 +43,17 @@ const buttons = (props: ButtonProps) => {
           {props.title}
         </Typography>
       ) : null}
-      <AddIcon className={styles.button} onClick={props.onAdd} />
-      <RemoveIcon className={styles.button} onClick={props.onRemove} />
+      <AddIcon data-testid="list-btn-add" className={styles.button} onClick={props.onAdd} />
+      <RemoveIcon
+        data-testid="list-btn-remove"
+        className={styles.button}
+        onClick={props.onRemove}
+      />
     </div>
   );
 };
 
-interface DynamicListProps {
+export interface DynamicListProps {
   noButtons?: boolean;
   onScroll?: React.UIEventHandler<HTMLUListElement>;
   style?: React.CSSProperties;
@@ -57,7 +62,7 @@ interface DynamicListProps {
   onRemove?: () => void;
   dense?: boolean;
   innerRef?: any;
-  children?: React.ReactNode | React.ReactNode[];
+  children?: React.ReactNode[];
 }
 
 const DynamicList = (props: DynamicListProps) => {

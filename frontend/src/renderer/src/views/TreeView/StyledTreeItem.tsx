@@ -1,4 +1,5 @@
 import TreeItem, { TreeItemProps, treeItemClasses } from "@mui/lab/TreeItem";
+import { SvgIcon } from "@mui/material";
 import Box, { BoxProps } from "@mui/material/Box";
 import { styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
@@ -11,17 +12,14 @@ import { DIRCONTEXTOPTIONS } from "../../constants/directoryContextOptions";
 import { CopyToClipboard, ShowInExplorer } from "../ContextActions";
 
 type DirectoryDataType = {
-  id: string;
+  id?: string;
   path: string;
   kind: keyof typeof DIRCONTEXTOPTIONS;
   name: string;
   handleClick: (action: string, data: any) => void;
 };
 
-const getGenericContextItems = (
-  data: IgniteDirectoryDataType,
-  enqueueSnackbar: EnqueueSnackbar
-) => {
+const getGenericContextItems = (data: DirectoryDataType, enqueueSnackbar: EnqueueSnackbar) => {
   return [
     {
       label: "Copy path",
@@ -44,7 +42,7 @@ const getGenericContextItems = (
   ];
 };
 
-const getSpecificContextItems = (data: IgniteDirectoryDataType) => {
+const getSpecificContextItems = (data: DirectoryDataType) => {
   const kindOptions = DIRCONTEXTOPTIONS[data.kind];
   const namedOptions =
     (kindOptions && kindOptions[data.name as keyof typeof kindOptions]) || kindOptions.default;
@@ -140,12 +138,12 @@ export const StyledTreeItem = (props: StyledTreeItemProps) => {
       />
       <StyledTreeItemRoot
         label={
-          <Box
+          <div
             onContextMenu={(e) => handleContextMenu(e, contextMenu, setContextMenu)}
-            sx={{ display: "flex", alignItems: "center", p: 0.1, pr: 0.8 }}
+            style={{ display: "flex", alignItems: "center", padding: 0.1, paddingRight: 0.8 }}
           >
             <Box
-              component={LabelIcon}
+              component={LabelIcon as typeof SvgIcon}
               color="inherit"
               sx={{ height: "20px", width: "20px", mr: 1 }}
             />
@@ -158,12 +156,12 @@ export const StyledTreeItem = (props: StyledTreeItemProps) => {
             <Typography variant="caption" color="rgb(100,100,100)">
               {labelInfo}
             </Typography>
-          </Box>
+          </div>
         }
-        style={{
-          "--tree-view-color": color,
-          "--tree-view-bg-color": bgColor,
-        }}
+        // style={{
+        //   "--tree-view-color": color,
+        //   "--tree-view-bg-color": bgColor,
+        // }}
         {...other}
       />
     </div>

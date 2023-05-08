@@ -15,7 +15,7 @@
 import fetch from "./fetch";
 
 const clientRequest = async (method: string, data?: { [key: string]: any }) => {
-  const address = await window.services.get_env("IGNITE_CLIENT_ADDRESS");
+  const address = await window.services?.get_env("IGNITE_CLIENT_ADDRESS");
   if (!address) {
     // console.log("Invalid client address, aborting...");
     return;

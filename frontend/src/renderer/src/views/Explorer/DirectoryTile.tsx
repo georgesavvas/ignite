@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Box } from "@mui/material";
+import { Box, SvgIcon } from "@mui/material";
 import Typography from "@mui/material/Typography";
 import { DCCINFO } from "@renderer/constants/dccInfo";
 import { DIRCONTEXTOPTIONS } from "@renderer/constants/directoryContextOptions";
@@ -44,11 +44,9 @@ const isDirectoryScene = (entity: IgniteDirectory | IgniteScene): entity is Igni
 
 interface DirectoryTileProps extends TileProps {
   entity: IgniteDirectory | IgniteScene;
-  onSelected?: (entity: IgniteDirectory) => void;
   viewType?: "dynamic" | "tasks" | "assets" | "scenes";
   refreshContext?: () => void;
-  onContextMenu: () => void;
-  handleContextMenuSelection: (action: string, data: any) => void;
+  handleContextMenuSelection?: (action: string, data: any) => void;
 }
 
 const DirectoryTile = (props: DirectoryTileProps) => {
@@ -70,7 +68,7 @@ const DirectoryTile = (props: DirectoryTileProps) => {
   };
 
   const getGenericContextItems = (entity: IgniteDirectory | IgniteScene) => {
-    return [
+    const contextItems = [
       {
         label: "Copy path",
         fn: () => CopyToClipboard(entity.path, enqueueSnackbar),
@@ -103,20 +101,31 @@ const DirectoryTile = (props: DirectoryTileProps) => {
         fn: () => setReprForParent(entity.path, enqueueSnackbar),
         divider: true,
       },
-      {
-        label: `Rename ${entity.dir_kind}`,
-        fn: () => props.handleContextMenuSelection("rename", dirData),
-      },
-      {
-        label: `Delete ${entity.dir_kind}`,
-        fn: () => props.handleContextMenuSelection("delete", dirData),
-        divider: true,
-      },
     ];
+    if (props.handleContextMenuSelection) {
+      const fn = props.handleContextMenuSelection;
+      const extraItems = [
+        {
+          label: "Rename",
+          fn: () => fn("rename", dirData),
+          disabled: props.entity.protected,
+        },
+        {
+          label: "Delete",
+          fn: () => fn("delete", dirData),
+          disabled: props.entity.protected,
+          divider: true,
+        },
+      ];
+      contextItems.push(...extraItems);
+    }
+    return contextItems;
   };
 
   const getSpecificContextItems = (entity: IgniteDirectory | IgniteScene) => {
+    if (!props.handleContextMenuSelection) return [];
     if (!DIRCONTEXTOPTIONS[entity.dir_kind as keyof typeof DIRCONTEXTOPTIONS]) return [];
+    const fn = props.handleContextMenuSelection;
     const kindOptions = DIRCONTEXTOPTIONS[entity.dir_kind as keyof typeof DIRCONTEXTOPTIONS];
     const namedOptions =
       kindOptions[entity.name as keyof typeof kindOptions] || kindOptions.default;
@@ -125,7 +134,7 @@ const DirectoryTile = (props: DirectoryTileProps) => {
       value: contextOption.name,
       dir_path: entity.path,
       fn: () =>
-        props.handleContextMenuSelection("create", {
+        fn("create", {
           ...entity,
           method: contextOption.name,
           kind: contextOption.dir_kind,
@@ -147,7 +156,7 @@ const DirectoryTile = (props: DirectoryTileProps) => {
 
   let Icon =
     props.entity.icon && props.entity.icon in DIRECTORYICONS
-      ? DIRECTORYICONS[props.entity.icon]
+      ? DIRECTORYICONS[props.entity.icon as keyof typeof DIRECTORYICONS]
       : undefined;
 
   const getBadge = () => {
@@ -162,8 +171,11 @@ const DirectoryTile = (props: DirectoryTileProps) => {
       color: "rgb(150, 150, 150)",
     } as React.CSSProperties;
     if (isScene && sceneIcon) return <img src={sceneIcon} style={style} />;
-    return <Box component={Icon} style={style} />;
+    return <Box component={Icon as typeof SvgIcon} style={style} />;
   };
+
+  let version = "";
+  if ("version" in props.entity) version = props.entity.version as string;
 
   const details = () => {
     return (
@@ -175,7 +187,7 @@ const DirectoryTile = (props: DirectoryTileProps) => {
           {name}
         </Typography>
         <Typography style={{ position: "absolute", bottom: "5px", right: "10px" }}>
-          {props.entity.version}
+          {version}
         </Typography>
         {getBadge()}
       </>
@@ -187,7 +199,7 @@ const DirectoryTile = (props: DirectoryTileProps) => {
   if (isScene) {
     const goToTaskItem = {
       label: "Go to task",
-      fn: () => setCurrentContext(props.entity.task),
+      fn: () => setCurrentContext(props.entity.task || ""),
       divider: true,
     };
     contextItems.splice(2, 0, goToTaskItem);
@@ -217,7 +229,7 @@ const DirectoryTile = (props: DirectoryTileProps) => {
       <Tile
         {...props}
         thumbnail={hasThumbnail ? undefined : getThumbnailUrl()}
-        thumbnailComp={hasThumbnail ? null : Icon}
+        thumbnailComp={hasThumbnail ? undefined : (Icon as React.ComponentType)}
         thumbnailWidth={thumbnailWidth}
         onClick={handleClick}
         contextItems={contextItems}

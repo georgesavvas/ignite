@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { WebSocketWithInterval } from "@renderer/types/common";
 import { PropsWithChildren, createContext, useContext, useEffect, useState } from "react";
 
 import BuildFileURL from "../services/BuildFileURL";
@@ -43,9 +44,9 @@ const createAssetUpdatesSocket = (sessionID: string, address: string) => {
   return serverSocket("asset_updates", sessionID, address);
 };
 
-const destroySocket = (socket: WebSocket) => {
+const destroySocket = (socket: WebSocketWithInterval) => {
   if (!socket) return;
-  if (socket.interval) socket.interval.clear();
+  if (socket.interval) clearInterval(socket.interval);
   socket.close();
 };
 
@@ -77,8 +78,8 @@ export const ContextProvider = ({ children }: PropsWithChildren) => {
   }, [config.serverDetails, config.ready]);
 
   useEffect(() => {
-    if (!config.lostConnection) refresh();
-  }, [config.lostConnection]);
+    if (config.connection) refresh();
+  }, [config.connection]);
 
   const handleContextChange = async (path: string) => {
     if (!path) return false;

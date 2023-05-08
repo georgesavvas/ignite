@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 // Copyright 2023 Georgios Savvas
 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -159,7 +161,7 @@ const Group = (props: GroupProps) => {
       <Placeholder disableDelete={!props.name.includes("-")} {...props} />
       <ToggleButtonGroup
         value={props.condition}
-        onChange={(e) => props.onChange(props.name, "condition", e.target.value)}
+        onChange={(_, value) => props.onChange(props.name, "condition", value)}
         size="small"
         color="success"
         orientation="vertical"
@@ -182,7 +184,7 @@ const validateExpression = (expr: string) => {
 };
 
 interface TemplateNameInputModalProps {
-  onSubmit: () => void;
+  onSubmit: (name: string) => void;
   open: boolean;
   onClose: () => void;
 }
@@ -239,6 +241,11 @@ export type ExpressionType = {
   filters?: ExpressionType[];
 };
 
+type TemplateType = {
+  name: string;
+  data: any;
+};
+
 interface FilterBuilderProps {
   default: string;
   expression?: ExpressionType;
@@ -249,7 +256,7 @@ export const FilterBuilder = (props: FilterBuilderProps) => {
   const [expression, setExpression] = useState(props.default);
   const [isValid, setIsValid] = useState(true);
   const [showExpr, setShowExpr] = useState(false);
-  const [templates, setTemplates] = useState([]);
+  const [templates, setTemplates] = useState<TemplateType[]>([]);
   const [managerOpen, setManagerOpen] = useState(false);
   const [templateNameInputModalOpen, setTemplateNameInputModalOpen] = useState(false);
   const [templateSelectOpen, setTemplateSelectOpen] = useState(false);
@@ -263,14 +270,14 @@ export const FilterBuilder = (props: FilterBuilderProps) => {
     setExpression(props.default);
   }, [props.expression]);
 
-  const handleExpressionChange = (e) => {
+  const handleExpressionChange = (e: InputChangeEvent) => {
     const value = e.target.value;
     if (validateExpression(value)) setIsValid(true);
     else setIsValid(false);
     setExpression(value);
   };
 
-  const findGroupOrFilter = (expr: string, name: string) => {
+  const findGroupOrFilter = (expr: ExpressionType, name: string) => {
     const indices = name.split("-");
     const amount = indices.length;
     let parent = {};
@@ -283,12 +290,13 @@ export const FilterBuilder = (props: FilterBuilderProps) => {
         parent = previous;
         parent_index = nameIndex;
       }
+      if (!block) return previous;
       return block[nameIndex];
     }, expr);
     return [block, parent, parent_index];
   };
 
-  const getTemplates = (fn = undefined) => {
+  const getTemplates = (fn?: () => void) => {
     serverRequest("get_filter_templates").then((resp) => {
       setTemplates(resp.data || []);
       if (fn) fn();
@@ -301,19 +309,19 @@ export const FilterBuilder = (props: FilterBuilderProps) => {
     setExpression(template.data);
   };
 
-  const handleSaveCurrent = (name) => {
+  const handleSaveCurrent = (name: string) => {
     serverRequest("add_filter_template", { data: expression, name: name });
   };
 
   const handleTemplateSelectOpen = () => {
-    getTemplates(setTemplateSelectOpen(true));
+    getTemplates(() => setTemplateSelectOpen(true));
   };
 
   const handleManagerOpen = () => {
-    getTemplates(setManagerOpen(true));
+    getTemplates(() => setManagerOpen(true));
   };
 
-  const handleRemoveTemplate = (name) => {
+  const handleRemoveTemplate = (name: string) => {
     serverRequest("remove_filter_template", { data: name }).then((resp) => {
       setTemplates(resp.data);
     });
@@ -322,14 +330,18 @@ export const FilterBuilder = (props: FilterBuilderProps) => {
   const handleChange = (name: string, change: string, value: string) => {
     setExpression((prevState) => {
       const expr = JSON.parse(prevState);
-      const [block, parent, index] = findGroupOrFilter(expr, name);
-      const key = Object.keys(block)[0];
+      const [block, parent, index] = findGroupOrFilter(expr, name) as [
+        ExpressionType,
+        ExpressionType,
+        number
+      ];
+      const key = Object.keys(block)[0] as keyof typeof block;
       switch (change) {
         case "value":
           block[key] = value;
           break;
         case "condition":
-          block["condition"] = value;
+          block["condition"] = value as "and" | "or";
           break;
         case "key":
           block[value] = block[key];

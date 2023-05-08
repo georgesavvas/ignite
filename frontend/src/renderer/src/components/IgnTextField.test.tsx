@@ -12,8 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { render, screen } from "@testing-library/react";
+import { TextFieldProps } from "@mui/material";
+import { render } from "@testing-library/react";
 
 import IgnTextField from "./IgnTextField";
 
-describe("IgnTextField", () => {});
+const makeSut = (props: TextFieldProps) => {
+  return render(<IgnTextField {...props} />);
+};
+
+describe("IgnTextField", () => {
+  it("renders correctly", async () => {
+    const { getByDisplayValue, getAllByText } = makeSut({
+      label: "field_label",
+      value: "field_value",
+    });
+    expect(getByDisplayValue(/field_value/)).toBeInTheDocument();
+    expect(getAllByText(/field_label/)[0]).toBeInTheDocument();
+  });
+});

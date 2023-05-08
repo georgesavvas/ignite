@@ -14,15 +14,10 @@
 
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
-import {
-  AssetVersion,
-  ClickEvent,
-  IgniteAction,
-  IgniteActions,
-  IgniteComponent,
-} from "@renderer/types/common";
+import { CrateContext, CrateContextType } from "@renderer/contexts/CrateContext";
+import { ClickEvent, IgniteAction, IgniteActions, IgniteComponent } from "@renderer/types/common";
 import { useSnackbar } from "notistack";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 
 import ContextMenu, { ContextMenuType, handleContextMenu } from "../../components/ContextMenu";
 import { EXTENSIONTYPES } from "../../constants/extensionTypes";
@@ -35,16 +30,15 @@ import styles from "./Component.module.css";
 interface ComponentProps {
   selectedComp?: IgniteComponent;
   entity: IgniteComponent;
-  onSelect: (name: string) => void;
+  onSelect?: (name: string) => void;
   actions?: IgniteActions;
-  addToCrate: (components: IgniteComponent[]) => void;
-  handleContextMenuSelection: (action: string, data: any) => void;
-  style: React.CSSProperties;
-  asset: IgniteAssetVersion;
+  handleContextMenuSelection?: (action: string, data: any) => void;
+  style?: React.CSSProperties;
 }
 
 const Component = (props: ComponentProps) => {
   const { enqueueSnackbar } = useSnackbar();
+  const { addToCrate } = useContext(CrateContext) as CrateContextType;
   const [contextMenu, setContextMenu] = useState<ContextMenuType | null>(null);
 
   const containerStyle = {
@@ -55,7 +49,7 @@ const Component = (props: ComponentProps) => {
   };
 
   const handleClick = (e: ClickEvent) => {
-    props.onSelect(e.currentTarget.id);
+    if (props.onSelect) props.onSelect(e.currentTarget.id);
   };
 
   const handleCopy = (e: ClickEvent | undefined, path: string) => {
@@ -86,21 +80,28 @@ const Component = (props: ComponentProps) => {
     },
     {
       label: "Add to crate",
-      fn: () => props.addToCrate([props.entity]),
-      divider: true,
-    },
-    {
-      label: "Rename",
-      fn: () => props.handleContextMenuSelection("rename", dirData),
-      disabled: props.entity.protected,
-    },
-    {
-      label: "Delete",
-      fn: () => props.handleContextMenuSelection("delete", dirData),
-      disabled: props.entity.protected,
+      fn: () => addToCrate([props.entity]),
       divider: true,
     },
   ];
+
+  if (props.handleContextMenuSelection) {
+    const fn = props.handleContextMenuSelection;
+    const extraItems = [
+      {
+        label: "Rename",
+        fn: () => fn("rename", dirData),
+        disabled: props.entity.protected,
+      },
+      {
+        label: "Delete",
+        fn: () => fn("delete", dirData),
+        disabled: props.entity.protected,
+        divider: true,
+      },
+    ];
+    contextItems.push(...extraItems);
+  }
 
   const data = {
     kind: "component",

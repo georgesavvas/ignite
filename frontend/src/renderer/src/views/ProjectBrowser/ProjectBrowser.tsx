@@ -14,7 +14,12 @@
 
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
-import { IgniteDirectory, InputChangeEvent } from "@renderer/types/common";
+import {
+  IgniteComponent,
+  IgniteDirectory,
+  IgniteEntity,
+  InputChangeEvent,
+} from "@renderer/types/common";
 import { useSnackbar } from "notistack";
 import React, { useContext, useEffect, useRef, useState } from "react";
 
@@ -41,7 +46,7 @@ interface BrowserProps {
   modalData: ModalDataType;
   handleContextMenuSelection: (action: string, data: any) => void;
   onRefresh: () => void;
-  onProjectSelect: (entity: IgniteDirectory) => void;
+  onProjectSelect: (entity: IgniteEntity | IgniteComponent) => void;
   onNewProjectClicked: () => void;
 }
 
@@ -127,7 +132,7 @@ export const ProjectBrowser = (props: ProjectBrowserProps) => {
     setModalData(data);
   };
 
-  const handleProjectSelect = (entity: IgniteDirectory) => {
+  const handleProjectSelect = (entity: IgniteDirectory | IgniteComponent) => {
     if (entity.name !== currentContext.project) {
       setProject(entity.name, setCurrentContext);
     }

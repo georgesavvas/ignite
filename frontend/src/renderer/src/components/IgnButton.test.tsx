@@ -12,8 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { render, screen } from "@testing-library/react";
+import { ButtonProps } from "@mui/material";
+import { ThemeProvider } from "@mui/material/styles";
+import { render } from "@testing-library/react";
 
+import { igniteTheme } from "../theme";
 import IgnButton from "./IgnButton";
 
-describe("IgnButton", () => {});
+const makeSut = (props: ButtonProps) => {
+  return render(
+    <ThemeProvider theme={igniteTheme}>
+      <IgnButton {...props} color="ignite" />
+    </ThemeProvider>
+  );
+};
+
+describe("IgnButton", () => {
+  it("renders correctly", () => {
+    const { getByText } = makeSut({
+      children: "button_label",
+    });
+    expect(getByText(/button_label/)).toBeInTheDocument();
+  });
+});

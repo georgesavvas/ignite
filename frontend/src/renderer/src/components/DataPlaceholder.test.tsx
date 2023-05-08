@@ -12,8 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { render, screen } from "@testing-library/react";
+import { render } from "@testing-library/react";
 
-import DataPlaceholder from "./DataPlaceholder";
+import DataPlaceholder, { DataPlaceholderProps } from "./DataPlaceholder";
 
-describe("DataPlaceholder", () => {});
+const makeSut = (props: DataPlaceholderProps) => {
+  return render(<DataPlaceholder {...props} />);
+};
+
+describe("DataPlaceholder", () => {
+  it("Renders text", () => {
+    const { getByText } = makeSut({
+      text: "placeholder_text",
+    });
+    expect(getByText(/placeholder_text/)).toBeInTheDocument();
+  });
+});

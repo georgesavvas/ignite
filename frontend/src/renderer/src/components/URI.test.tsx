@@ -12,8 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { render, screen } from "@testing-library/react";
+import { render } from "@testing-library/react";
+import { SnackbarProvider } from "notistack";
 
-import URI from "./URI";
+import { ConfigProvider } from "../contexts/ConfigContext";
+import { ContextProvider } from "../contexts/ContextContext";
+import URI, { URIProps } from "./URI";
 
-describe("URI", () => {});
+const makeSut = (props: URIProps) => {
+  return render(
+    <SnackbarProvider>
+      <ConfigProvider>
+        <ContextProvider>
+          <URI {...props} />
+        </ContextProvider>
+      </ConfigProvider>
+    </SnackbarProvider>
+  );
+};
+
+describe("URI", () => {
+  it("renders correctly", async () => {
+    const { getByText } = makeSut({
+      uri: "test:uri:string",
+    });
+    expect(getByText(/test:uri:string/)).toBeInTheDocument();
+  });
+});

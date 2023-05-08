@@ -37,7 +37,7 @@ interface RowViewProps {
   selectedEntityPath: string;
   resultType: "dynamic" | "tasks" | "assets" | "scenes";
   onContextMenu: () => void;
-  handleContextMenuSelection: () => void;
+  handleContextMenuSelection: (action: string, data: any) => void;
   tileSize: number;
   onSelected: (entity: RowEntity) => void;
   page: number;
@@ -68,7 +68,6 @@ const RowView = (props: RowViewProps) => {
         return useMemo(
           () => (
             <DirectoryTile
-              onContextMenu={props.onContextMenu}
               handleContextMenuSelection={props.handleContextMenuSelection}
               entity={entity}
               noInfo
@@ -86,7 +85,7 @@ const RowView = (props: RowViewProps) => {
             <AssetTile
               onContextMenu={props.onContextMenu}
               handleContextMenuSelection={props.handleContextMenuSelection}
-              entity={entity}
+              entity={entity as IgniteAssetVersion}
               noInfo
               noBorder
               noOverlay
@@ -239,18 +238,21 @@ const RowView = (props: RowViewProps) => {
 
   const getRows = () => {
     return props.data.map((entity, index) => {
-      return {
+      const data = {
         id: index,
         thumbnail: entity,
         name: entity.name,
         dir_kind: entity.dir_kind,
-        dcc: entity.dcc,
-        version: entity.version,
         uri: entity.uri,
+        dcc: "",
+        version: "",
         context: entity.context,
         creationTime: entity.creation_time,
         modificationTime: entity.modification_time,
       };
+      if ("dcc" in entity) data.dcc = entity.dcc;
+      if ("version" in entity) data.version = entity.version;
+      return data;
     });
   };
 
@@ -265,7 +267,7 @@ const RowView = (props: RowViewProps) => {
     props.onSelected(params.row.thumbnail);
   };
 
-  const handleRowContextMenu = (e: ClickEvent) => {
+  const handleRowContextMenu = (e: any) => {
     // Bit ugly but upon right click on any point on a row, it finds the
     // thumbnail element and triggers onContextMenu()
     e.preventDefault();
@@ -289,8 +291,8 @@ const RowView = (props: RowViewProps) => {
             onContextMenu: handleRowContextMenu,
           },
         }}
-        page={props.page - 1}
-        pageSize={props.pageSize}
+        // page={props.page - 1}
+        // pageSize={props.pageSize}
         rows={getRows()}
         sx={{
           border: "none",
@@ -312,11 +314,10 @@ const RowView = (props: RowViewProps) => {
             outline: "none",
           },
           "& .thumbnailColumn": {
-            padding: "1px 0px",
+            padding: "2px",
           },
         }}
         rowHeight={props.tileSize * 9}
-        // getRowHeight={() => "auto"}
         columnHeaderHeight={0}
         hideFooter
         selectionModel={selectionModel}
