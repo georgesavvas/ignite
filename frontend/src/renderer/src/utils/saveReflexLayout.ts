@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { HandlerProps } from "react-reflex";
+import { SaveReflexLayoutProps } from "@renderer/types/common";
+
 import loadReflexLayout from "./loadReflexLayout";
 
-const saveReflexLayout = ({ domElement, component }: HandlerProps) => {
+const saveReflexLayout = ({ domElement, component }: SaveReflexLayoutProps) => {
   const existing = loadReflexLayout();
   const name = component.props.name as string;
   const data = { [name]: [domElement.offsetWidth, domElement.offsetHeight] };

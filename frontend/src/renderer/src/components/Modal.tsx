@@ -23,7 +23,7 @@ import { ReactNode, useEffect } from "react";
 
 import styles from "./Modal.module.css";
 
-type ModalProps = React.PropsWithChildren<{
+export type ModalProps = React.PropsWithChildren<{
   title?: string;
   text?: string;
   open: boolean;
@@ -34,13 +34,13 @@ type ModalProps = React.PropsWithChildren<{
   fullWidth?: boolean;
   onFormSubmit?: () => void;
   onClose: () => void;
-  maxWidth?: Breakpoint;
+  maxWidth?: Breakpoint | false;
   buttons?: ReactNode[];
   style?: React.CSSProperties;
   autoFocus?: boolean;
 }>;
 
-const Modal = ({ maxWidth = "false", ...props }: ModalProps) => {
+const Modal = ({ maxWidth = false, ...props }: ModalProps) => {
   useEffect(() => {
     if (!props.open || !props.focusRef) return;
     const timeout = setTimeout(() => {

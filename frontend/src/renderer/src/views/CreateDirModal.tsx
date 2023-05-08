@@ -19,9 +19,9 @@ import Button from "@mui/material/Button";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
-import Select from "@mui/material/Select";
+import Select, { SelectProps } from "@mui/material/Select";
 import Stack from "@mui/material/Stack";
-import TextField from "@mui/material/TextField";
+import TextField, { TextFieldProps } from "@mui/material/TextField";
 import { InputChangeEvent } from "@renderer/types/common";
 import { useEffect, useState } from "react";
 
@@ -41,14 +41,15 @@ interface DirProps {
   index: number;
   id: string;
   onRemove: (index: number) => void;
-  onChange: (e: InputChangeEvent) => void;
+  onChange: TextFieldProps["onChange"];
 }
 
 const Dir = (props: DirProps) => {
-  const kind = props.data.kind;
-  const types = KINDTYPES[kind]?.sort((a: string, b: string) => a[1].localeCompare(b[1]));
+  const kind = props.data.kind as keyof typeof KINDTYPES;
+  const types = KINDTYPES[kind]?.sort((a: string[], b: string[]) => a[1].localeCompare(b[1]));
 
-  const Icon = DIRECTORYICONS[props.dir.type ? `${kind}_${props.dir.type}` : kind];
+  const dirKind = props.dir.type ? `${kind}_${props.dir.type}` : kind;
+  const Icon = DIRECTORYICONS[dirKind as keyof typeof DIRECTORYICONS];
 
   return (
     <Stack direction="row" gap={1} style={{ width: "100%" }}>
@@ -67,7 +68,7 @@ const Dir = (props: DirProps) => {
             label="Type"
             value={props.dir.type}
             name={"type-" + props.index}
-            onChange={props.onChange}
+            onChange={props.onChange as SelectProps["onChange"]}
           >
             {types.map((data: string[]) => (
               <MenuItem key={data[0]} value={data[0]}>
@@ -165,7 +166,7 @@ const ShotRange = (props: ShotRange) => {
   );
 };
 
-interface CreateDirModalProps {
+export interface CreateDirModalProps {
   data: any;
   open: boolean;
   loading: boolean;

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import Divider from "@mui/material/Divider";
+import { SaveReflexLayoutProps } from "@renderer/types/common";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { HandlerProps, ReflexContainer, ReflexElement, ReflexSplitter } from "react-reflex";
 
@@ -90,13 +91,13 @@ export const Home = () => {
   };
 
   const handleResized = useCallback((data: HandlerProps) => {
-    saveReflexLayout(data);
+    saveReflexLayout(data as SaveReflexLayoutProps);
   }, []);
 
   return (
     <div className={styles.container}>
       {waitBackendOpen ? <WaitingForBackendOverlay /> : null}
-      {config.lostConnection ? <LostConnectionOverlay /> : null}
+      {!config.connection ? <LostConnectionOverlay /> : null}
       <Welcome open={welcomeOpen} onClose={() => setWelcomeOpen(false)} />
       <div className={styles.topBar}>
         <TopBar />

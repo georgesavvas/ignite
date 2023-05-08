@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { AssetVersion } from "@renderer/types/common";
+import { IgniteAssetVersion, SaveReflexLayoutProps } from "@renderer/types/common";
 import { debounce } from "lodash";
 import { useContext, useEffect, useState } from "react";
 import { DndProvider } from "react-dnd";
@@ -73,7 +73,7 @@ const Vault = (props: VaultProps) => {
   const [loadedData, setLoadedData] = useState([]);
   const [pages, setPages] = useState<PagesType>({ total: 1, current: 1, results: 0 });
   const [tilesPerPage, setTilesPerPage] = useState(50);
-  const [selectedEntity, setSelectedEntity] = useState<AssetVersion>();
+  const [selectedEntity, setSelectedEntity] = useState<IgniteAssetVersion>();
   const { config } = useContext(ConfigContext) as ConfigContextType;
   const { vaultContext } = useContext(VaultContext) as VaultContextType;
 
@@ -157,7 +157,7 @@ const Vault = (props: VaultProps) => {
   };
 
   const handleResized = (data: HandlerProps) => {
-    saveReflexLayout(data);
+    saveReflexLayout(data as SaveReflexLayoutProps);
   };
 
   const handleQueryChange = (newQuery: QueryType) => {

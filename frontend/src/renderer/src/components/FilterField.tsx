@@ -15,9 +15,10 @@
 import FormControl from "@mui/material/FormControl";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import Typography from "@mui/material/Typography";
+
 import styles from "./FilterField.module.css";
 
-interface FilterFieldProps {
+export interface FilterFieldProps {
   filterValue: string;
   setFilterValue: (value: string) => void;
   children?: React.ReactNode | React.ReactNode[];
@@ -34,7 +35,7 @@ const FilterField = ({ filterValue, setFilterValue, children }: FilterFieldProps
           placeholder="Filter"
           value={filterValue}
           onChange={(e) => setFilterValue(e.target.value || "")}
-          color={filterValue ? "error" : ""}
+          color={filterValue ? "error" : "primary"}
         />
         {!filterValue ? null : (
           <Typography

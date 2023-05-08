@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-export const validateDirName = value => {
+export const validateDirName = (value: string) => {
   return value.replace(/[\W_]+/g, "_");
 };

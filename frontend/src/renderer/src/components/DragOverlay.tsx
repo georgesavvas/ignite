@@ -17,7 +17,7 @@ import Typography from "@mui/material/Typography";
 
 import styles from "./DragOverlay.module.css";
 
-interface DragOverlayProps {
+export interface DragOverlayProps {
   text: string;
   error?: string;
   variant?: Variant;

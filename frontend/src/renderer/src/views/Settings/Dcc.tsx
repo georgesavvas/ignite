@@ -40,7 +40,7 @@ const placeholder_config = {
 type DccChangeEventType = {
   index: number;
   field?: string;
-  value?: string | string[];
+  value?: string;
 };
 
 const Dcc = () => {
@@ -79,10 +79,14 @@ const Dcc = () => {
 
   const handleDccModify = (data: DccChangeEventType) => {
     setDcc((prev) => {
-      if (!data.field) return prev;
+      if (!data.field || data.value === undefined) return prev;
       let dcc_copy = [...prev];
       let index_copy = { ...dcc_copy[data.index] };
-      index_copy[data.field] = data.value;
+      if (["exts", "scenes"].includes(data.field)) {
+        index_copy[data.field] = data.value.trim().split(",");
+      } else {
+        index_copy[data.field] = data.value;
+      }
       dcc_copy[data.index] = index_copy;
       return dcc_copy;
     });
@@ -101,9 +105,6 @@ const Dcc = () => {
     const target_id = parseInt(s[1]);
     const target_field = s[0];
     let value = e.target.value;
-    if (["exts", "scenes"].includes(target_field)) {
-      value = value.trim().split(",");
-    }
     const data = {
       index: target_id,
       field: target_field,

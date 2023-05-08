@@ -15,7 +15,7 @@
 import fetch from "./fetch";
 
 const serverRequest = async (method: string, data?: any) => {
-  const address = await window.services.get_env("IGNITE_SERVER_ADDRESS");
+  const address = await window.services?.get_env("IGNITE_SERVER_ADDRESS");
   if (!address) {
     // console.log("Invalid server address, aborting...");
     return;

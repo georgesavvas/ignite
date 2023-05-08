@@ -48,7 +48,7 @@ type UsageDataType = {
 export const SystemResources = () => {
   const [usageData, setUsageData] = useState<UsageDataType>({ cpu: 0, mem: 0 });
 
-  window.services.onResourceUsage((_, data: UsageDataType) => {
+  window.services.onResourceUsage((_: any, data: UsageDataType) => {
     setUsageData(data);
   });
 

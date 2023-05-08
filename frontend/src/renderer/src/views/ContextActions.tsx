@@ -43,7 +43,7 @@ export const ShowInExplorer = (filepath: string, enqueueSnackbar: EnqueueSnackba
 export const clearRepr = (
   target: string,
   enqueueSnackbar: EnqueueSnackbar,
-  refresh: () => void
+  refresh?: () => void
 ) => {
   const data = {
     target: target,
@@ -52,7 +52,7 @@ export const clearRepr = (
   serverRequest("set_repr", data).then((resp) => {
     if (resp.ok) {
       enqueueSnackbar("Done", { variant: "success" });
-      refresh();
+      if (refresh) refresh();
     } else enqueueSnackbar(resp.msg || "Couldn't clear repr", { variant: "error" });
   });
 };

@@ -21,7 +21,7 @@ import { CopyToClipboard } from "../views/ContextActions";
 import ContextMenu, { ContextMenuType, handleContextMenu } from "./ContextMenu";
 import styles from "./URI.module.css";
 
-interface URIProps {
+export interface URIProps {
   uri: string;
   style?: React.CSSProperties;
 }
@@ -56,7 +56,6 @@ const URI = (props: URIProps) => {
           noWrap
           color="ignite"
           style={{
-            // color: "rgb(252, 140, 3)",
             direction: "rtl",
             textAlign: "left",
           }}

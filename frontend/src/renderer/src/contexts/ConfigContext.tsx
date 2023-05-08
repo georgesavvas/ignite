@@ -40,7 +40,6 @@ export type Config = {
   connection: boolean;
   ready: boolean;
   write: boolean;
-  lostConnection?: false;
 };
 
 type SetConfig = (
@@ -145,6 +144,7 @@ export const ConfigProvider = ({ children }: PropsWithChildren) => {
   }, [config.serverDetails, config.access, config.dccConfig]);
 
   const setupConfig = () => {
+    if (!window.services) return;
     console.log("CONFIG SETUP");
     const clientData = clientRequest("get_config");
     const clientAddress = window.services.get_env("IGNITE_CLIENT_ADDRESS");

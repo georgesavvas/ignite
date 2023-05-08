@@ -87,7 +87,7 @@ export const ProcessManager = () => {
     if (socket) return;
     window.services.get_env("IGNITE_SESSION_ID").then((resp: any) => {
       const websocketConfig = {
-        onmessage: (e) => {
+        onmessage: (e: any) => {
           const data = JSON.parse(e.data).data;
           setProcesses((prev) => {
             const existing = [...prev];

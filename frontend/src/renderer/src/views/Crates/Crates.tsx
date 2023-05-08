@@ -15,7 +15,14 @@
 import AddIcon from "@mui/icons-material/Add";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { OutlinedInput } from "@mui/material";
-import { CrateType, Entity, InputChangeEvent } from "@renderer/types/common";
+import {
+  CrateEntity,
+  CrateType,
+  IgniteAssetVersion,
+  IgniteComponent,
+  IgniteEntity,
+  InputChangeEvent,
+} from "@renderer/types/common";
 import { useContext, useEffect, useState } from "react";
 
 import IgnButton from "../../components/IgnButton";
@@ -28,17 +35,25 @@ import styles from "./Crates.module.css";
 interface CrateProps {
   id?: string;
   index: number;
-  entities?: IgniteEntity[];
-  handleContextMenu?: (e: React.MouseEvent<HTMLElement>, crate: CrateType) => void;
+  entities?: CrateEntity[];
+  handleContextMenu?: (e: React.MouseEvent<HTMLElement | SVGSVGElement>, crate: CrateType) => void;
 }
 
+const entityIsAssetVersion = (entity: CrateEntity): entity is IgniteAssetVersion => {
+  return ["asset", "assetversion"].includes(entity.dir_kind);
+};
+
+const entityIsComponent = (entity: CrateEntity): entity is IgniteComponent => {
+  return entity.dir_kind === "component";
+};
+
 const Crate = (props: CrateProps) => {
-  const crateFromProps: () => CrateType = () => {
+  const crateFromProps = () => {
     return {
       id: props.id,
       entities: props.entities,
       label: `Crate ${props.index + 1}`,
-    };
+    } as CrateType;
   };
   const { floating, dropFloating, addCrate } = useContext(CrateContext) as CrateContextType;
   const [crate, setCrate] = useState<CrateType>(crateFromProps());
@@ -56,12 +71,11 @@ const Crate = (props: CrateProps) => {
     dropFloating(crate.id);
   };
 
-  const getEntityCrate = (entity: IgniteEntity) => {
-    console.log(entity.uri);
-    if (["asset", "assetversion"].includes(entity.dir_kind)) {
+  const getEntityCrate = (entity: IgniteEntity | IgniteComponent) => {
+    if (entityIsAssetVersion(entity)) {
       return <AssetTile key={entity.uri} entity={entity} noOverlay noInfo />;
-    } else if (entity.dir_kind === "component") {
-      return <Component key={entity.uri} entity={entity} noOverlay noInfo />;
+    } else if (entityIsComponent(entity)) {
+      return <Component key={entity.uri} entity={entity} />;
     }
     return <DirectoryTile key={entity.uri} entity={entity} noOverlay noInfo />;
   };
@@ -78,7 +92,7 @@ const Crate = (props: CrateProps) => {
       </div>
     );
 
-  const handleContextMenu = (e: React.MouseEvent<HTMLElement>) => {
+  const handleContextMenu = (e: React.MouseEvent<HTMLElement | SVGSVGElement>) => {
     if (!props.handleContextMenu) return;
     props.handleContextMenu(e, crate);
   };
@@ -110,7 +124,7 @@ const Crate = (props: CrateProps) => {
 };
 
 interface CratesProps {
-  handleContextMenu: (e: React.MouseEvent<HTMLElement>, crate: CrateType) => void;
+  handleContextMenu: (e: React.MouseEvent<HTMLElement | SVGSVGElement>, crate: CrateType) => void;
 }
 
 const Crates = (props: CratesProps) => {

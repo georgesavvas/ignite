@@ -12,17 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
-import { CrateContext, CrateContextType } from "../../contexts/CrateContext";
-import { DeleteDir, RenameDir } from "../ContextActions";
 import { IgniteActions, IgniteAssetVersion, IgniteComponent } from "@renderer/types/common";
+import { useSnackbar } from "notistack";
 import { useContext, useEffect, useState } from "react";
 
-import Component from "./Component";
 import FilterField from "../../components/FilterField";
+import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
 import clientRequest from "../../services/clientRequest";
+import { DeleteDir, RenameDir } from "../ContextActions";
+import Component from "./Component";
 import styles from "./ComponentList.module.css";
-import { useSnackbar } from "notistack";
 
 interface ComponentList {
   project: string;
@@ -35,7 +34,6 @@ interface ComponentList {
 const ComponentList = (props: ComponentList) => {
   const [actions, setActions] = useState<IgniteActions>();
   const [filterValue, setFilterValue] = useState("");
-  const { addToCrate } = useContext(CrateContext) as CrateContextType;
   const { refresh } = useContext(ContextContext) as ContextContextType;
   const { enqueueSnackbar } = useSnackbar();
   const [modalData, setModalData] = useState({ renameOpen: false, deleteOpen: false });
@@ -77,13 +75,11 @@ const ComponentList = (props: ComponentList) => {
             <Component
               key={index}
               entity={comp}
-              addToCrate={addToCrate}
               onSelect={props.onSelect}
               selectedComp={props.selectedComp}
               actions={actions}
               style={hide ? { display: "none" } : {}}
               handleContextMenuSelection={handleContextMenuSelection}
-              asset={props.asset}
             />
           );
         })}

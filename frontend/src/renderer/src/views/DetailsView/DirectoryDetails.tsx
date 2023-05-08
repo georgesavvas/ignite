@@ -16,7 +16,7 @@ import { Divider } from "@mui/material";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import { Directory } from "@renderer/types/common";
+import { IgniteDirectory } from "@renderer/types/common";
 import React, { useContext, useEffect, useState } from "react";
 
 import Path from "../../components/Path";
@@ -52,7 +52,7 @@ interface DirectoryDetailsProps {
   entity: IgniteDirectory;
 }
 
-const DirectoryDetails = (props: IgniteDirectoryDetailsProps) => {
+const DirectoryDetails = (props: DirectoryDetailsProps) => {
   const [reprValue, setReprValue] = useState("");
   const [reptEdit, setReptEdit] = useState(false);
   const { refresh } = useContext(ContextContext) as ContextContextType;

@@ -12,8 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { render, screen } from "@testing-library/react";
+import { Button } from "@mui/material";
+import { render } from "@testing-library/react";
+import { vi } from "vitest";
 
-import Modal from "./Modal";
+import Modal, { ModalProps } from "./Modal";
 
-describe("Modal", () => {});
+const makeSut = (props: ModalProps) => {
+  return render(<Modal {...props} />);
+};
+
+describe("Modal", () => {
+  it("renders correctly", async () => {
+    const { getByText } = makeSut({
+      open: true,
+      onClose: vi.fn(),
+      title: "modal_title",
+      buttons: [<Button>first_button</Button>, <Button>second_button</Button>],
+    });
+    expect(getByText(/modal_title/)).toBeInTheDocument();
+    expect(getByText(/first_button/)).toBeInTheDocument();
+    expect(getByText(/second_button/)).toBeInTheDocument();
+  });
+});

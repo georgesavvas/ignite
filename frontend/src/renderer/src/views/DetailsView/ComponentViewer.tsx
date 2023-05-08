@@ -16,31 +16,29 @@
 
 import { Typography } from "@mui/material";
 import Slider from "@mui/material/Slider";
-import { grid } from "@mui/system";
-import { Center, OrbitControls, useTexture } from "@react-three/drei";
+import { Center, OrbitControls } from "@react-three/drei";
 import { Canvas, useLoader, useThree } from "@react-three/fiber";
+import { IgniteComponent } from "@renderer/types/common";
 import React, { Suspense, useContext, useState } from "react";
 import * as THREE from "three";
 import { EXRLoader } from "three/examples/jsm/loaders/EXRLoader.js";
 import { TextureLoader } from "three/src/loaders/TextureLoader";
 
 import DataPlaceholder from "../../components/DataPlaceholder";
-import { ConfigContext } from "../../contexts/ConfigContext";
+import { Config, ConfigContext, ConfigContextType } from "../../contexts/ConfigContext";
 import BuildFileURL from "../../services/BuildFileURL";
 import { clamp } from "../../utils/math";
 
 // import {USDZLoader} from "../../utils/threejsDev/USDLoader";
 
 const style = {
-  // border: "solid red 1px",
-  // aspectRatio: 16 / 9,
   backgroundColor: "rgb(30,30,30)",
   position: "relative",
   height: "100%",
   width: "100%",
   boxSizing: "border-box",
-  display: grid,
-};
+  display: "grid",
+} as React.CSSProperties;
 
 // const ImgViewer = (props) => {
 //   return (
@@ -58,9 +56,9 @@ const sliderContainerStyle = {
   right: "30px",
   bottom: "30px",
   zIndex: 1,
-};
+} as React.CSSProperties;
 
-const Scene = ({ path }) => {
+const Scene = ({ path }: { path: string }) => {
   path = path || "src/assets/no_icon.png";
   const isExr = path.includes(".exr");
   const loader = isExr ? EXRLoader : TextureLoader;
@@ -89,11 +87,16 @@ const Scene = ({ path }) => {
   );
 };
 
-const EXRViewer = (props) => {
+interface EXRViewerProps {
+  comp: IgniteComponent;
+  config: Config;
+}
+
+const EXRViewer = (props: EXRViewerProps) => {
   const [progress, setProgress] = useState(0.5);
   const comp = props.comp;
 
-  const handleFrameChange = (value) => {
+  const handleFrameChange = (value: number) => {
     const new_progress = (value - comp.first_frame) / (comp.last_frame - comp.first_frame);
     setProgress(new_progress);
   };
@@ -124,14 +127,14 @@ const EXRViewer = (props) => {
       >
         {comp.frames.length > 0 ? (
           <Slider
-            defaultValue={comp.first}
+            defaultValue={comp.first_frame}
             valueLabelDisplay="auto"
             track={false}
             step={1}
-            onChange={(e, value) => handleFrameChange(value)}
+            onChange={(_, value) => handleFrameChange(value as number)}
             marks
             min={parseInt(comp.frames[0])}
-            max={parseInt(comp.frames.at(-1))}
+            max={parseInt(comp.frames.at(-1) || "0")}
           />
         ) : null}
       </div>
@@ -187,7 +190,11 @@ const EXRViewer = (props) => {
 //   );
 // }
 
-const VideoViewer = (props) => {
+interface VideoViewerProps {
+  path: string;
+}
+
+const VideoViewer = (props: VideoViewerProps) => {
   return (
     <video
       key={Math.random()}
@@ -202,7 +209,12 @@ const VideoViewer = (props) => {
   );
 };
 
-const GeoViewer = (props) => {
+interface GeoViewerProps {
+  path: string;
+  comp: IgniteComponent;
+}
+
+const GeoViewer = (props: GeoViewerProps) => {
   const loader = props.comp.ext === ".exr" ? EXRLoader : TextureLoader;
   const colorMap = useLoader(loader, props.path);
   return (
@@ -219,7 +231,11 @@ const GeoViewer = (props) => {
   );
 };
 
-const ComponentViewer = (props) => {
+interface ComponentViewerProps {
+  comp?: IgniteComponent;
+}
+
+const ComponentViewer = (props: ComponentViewerProps) => {
   const { config } = useContext(ConfigContext) as ConfigContextType;
 
   const comp = props.comp;
@@ -235,16 +251,17 @@ const ComponentViewer = (props) => {
     path = path.replace("####", frame);
   }
 
-  const getViewer = (comp, path) => {
+  const getViewer = (comp: IgniteComponent | undefined, path: string) => {
+    if (!comp) return null;
     const ext = comp.ext;
     const img = [".jpg", ".jpeg", ".png", ".tif", ".tiff"];
     const exr = [".exr"];
     const vid = [".mp4", ".mov"];
-    const geo = [];
+    const geo = [] as string[];
     // const usd = [".usd", ".usdc", ".usda", ".usdz"];
-    if (img.includes(ext)) return <EXRViewer comp={comp} path={path} config={config} />;
-    else if (exr.includes(ext)) return <EXRViewer comp={comp} path={path} config={config} />;
-    else if (vid.includes(ext)) return <VideoViewer comp={comp} path={path} />;
+    if (img.includes(ext)) return <EXRViewer comp={comp} config={config} />;
+    else if (exr.includes(ext)) return <EXRViewer comp={comp} config={config} />;
+    else if (vid.includes(ext)) return <VideoViewer path={path} />;
     else if (geo.includes(ext)) return <GeoViewer comp={comp} path={path} />;
     // else if (usd.includes(ext)) return <UsdViewer comp={comp} config={config} />;
     else return <Typography>No file preview for {comp.filename}</Typography>;

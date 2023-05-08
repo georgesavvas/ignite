@@ -52,7 +52,7 @@ export const handleContextMenu = (
   );
 };
 
-interface ContextMenuProps {
+export interface ContextMenuProps {
   contextMenu: ContextMenuType | null;
   items: ContextMenuItem[];
   title?: string;
@@ -64,7 +64,7 @@ interface ContextMenuItem {
   divider?: boolean;
   args?: any[];
   disabled?: boolean;
-  fn: () => void;
+  fn: (args?: any[]) => void;
   label: string;
 }
 

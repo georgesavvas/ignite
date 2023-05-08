@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { IgniteAssetVersion, IgniteScene } from "@renderer/types/common";
 import { useContext } from "react";
 
 import DataPlaceholder from "../../components/DataPlaceholder";
@@ -33,9 +34,9 @@ const Details = () => {
   const render = () => {
     switch (selectedEntity.dir_kind) {
       case "assetversion":
-        return <AssetDetails entity={selectedEntity} />;
+        return <AssetDetails entity={selectedEntity as IgniteAssetVersion} />;
       case "scene":
-        return <SceneDetails entity={selectedEntity} />;
+        return <SceneDetails entity={selectedEntity as IgniteScene} />;
       case undefined:
         return <DataPlaceholder text="Nothing selected" />;
       default:

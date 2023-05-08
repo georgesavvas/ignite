@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
 import LinearProgress from "@mui/material/LinearProgress";
 import Typography from "@mui/material/Typography";
@@ -28,12 +27,14 @@ import PageBar from "../Explorer/PageBar";
 import AssetTile from "./AssetTile";
 import styles from "./Browser.module.css";
 import FilterBar from "./FilterBar";
+import { ExpressionType } from "./FilterBuilder";
 import TopBar from "./TopBar";
 import { PagesType } from "./Vault";
 
 const defaultExplorerSettings = {
   currentTileSize: 5,
   tilesPerPage: 50,
+  currentViewType: "dynamic",
 };
 
 type ModalDataType = {
@@ -51,7 +52,7 @@ interface BrowserProps {
   setTilesPerPage: (number: number) => void;
   handleQueryChange: (query: any) => void;
   pages: { total: number; results: number };
-  setPages: (pages: PagesType) => void;
+  setPages: React.Dispatch<React.SetStateAction<PagesType>>;
   isLoading: boolean;
   selectedCollection: string;
   query: any;
@@ -70,7 +71,7 @@ const Browser = (props: BrowserProps) => {
     if (!props.loadedData) return;
     setTiles(
       props.loadedData.map((entity) => {
-        if (entity.path === props.selectedEntity.path) {
+        if (props.selectedEntity && entity.path === props.selectedEntity.path) {
           props.handleEntitySelected(entity);
         }
         entity.path = BuildFileURL(entity.path, config, { pathOnly: true });
@@ -84,7 +85,7 @@ const Browser = (props: BrowserProps) => {
             key={entity.path}
             entity={entity}
             onSelected={props.handleEntitySelected}
-            selected={props.selectedEntity.path === entity.path}
+            selected={props.selectedEntity && props.selectedEntity.path === entity.path}
             refreshContext={props.onRefresh}
             handleContextMenuSelection={handleContextMenuSelection}
           />
@@ -104,20 +105,20 @@ const Browser = (props: BrowserProps) => {
     setModalData(data);
   };
 
-  const handleFilterChange = (data) => {
+  const handleFilterChange = (data: ExpressionType) => {
     props.onFilterChange(data);
   };
 
-  const handlePageChange = (_, value: number) => {
-    props.setPages((prev) => ({ ...prev, current: value }));
+  const handlePageChange = (_: any, value: number) => {
+    props.setPages((prev: PagesType) => ({ ...prev, current: value }));
   };
 
   const handleTilesPerPageChange = (e: InputChangeEvent) => {
     props.setTilesPerPage(parseInt(e.target.value) || 50);
   };
 
-  const handleTileSizeChange = (e: InputChangeEvent) => {
-    setTileSize(e.target.value * 40);
+  const handleTileSizeChange = (value: number) => {
+    setTileSize(value * 40);
   };
 
   const tileContainerStyle = {
@@ -193,9 +194,9 @@ const Browser = (props: BrowserProps) => {
             </Typography>
           </div>
           {props.loadedData && props.loadedData.length ? (
-            <Box className={styles.tileContainer} style={tileContainerStyle}>
-              {Object.keys(tiles).map((k) => tiles[k])}
-            </Box>
+            <div className={styles.tileContainer} style={tileContainerStyle}>
+              {Object.values(tiles)}
+            </div>
           ) : (
             <DataPlaceholder text={props.isLoading ? "Please wait..." : "No results"} />
           )}
@@ -207,8 +208,9 @@ const Browser = (props: BrowserProps) => {
         pages={props.pages?.total}
         onChange={handlePageChange}
         tileSize={explorerSettings.currentTileSize}
+        tilesPerPage={explorerSettings.tilesPerPage}
         onTilesPerPageChange={handleTilesPerPageChange}
-        onTileSizeChange={handleTileSizeChange}
+        onTileSizeChange={(_, value) => handleTileSizeChange(value as number)}
       />
     </div>
   );

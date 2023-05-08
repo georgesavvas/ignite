@@ -14,7 +14,7 @@
 
 import Divider from "@mui/material/Divider";
 import Typography from "@mui/material/Typography";
-import { Scene } from "@renderer/types/common.js";
+import { IgniteScene } from "@renderer/types/common.js";
 
 import Path from "../../components/Path.js";
 import DccSelector from "../DccSelector.jsx";
@@ -28,7 +28,7 @@ interface SceneDetailsProps {
   entity: IgniteScene;
 }
 
-const SceneDetails = (props: IgniteSceneDetailsProps) => {
+const SceneDetails = (props: SceneDetailsProps) => {
   return (
     <div style={style}>
       <div style={{ margin: "5px", overflow: "hidden" }}>

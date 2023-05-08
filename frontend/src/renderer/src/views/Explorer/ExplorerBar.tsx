@@ -21,7 +21,7 @@ import Stack from "@mui/material/Stack";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import Typography from "@mui/material/Typography";
-import { ClickEvent, EnqueueSnackbar, InputChangeEvent } from "@renderer/types/common";
+import { ClickEvent, EnqueueSnackbar } from "@renderer/types/common";
 import { useContext, useEffect, useState } from "react";
 
 import ContextMenu, { ContextMenuType, handleContextMenu } from "../../components/ContextMenu";
@@ -32,6 +32,7 @@ import GridViewIcon from "../../icons/GridViewIcon";
 import RowViewIcon from "../../icons/RowViewIcon";
 import Ingest from "../Ingest/Ingest";
 import ContextBar from "./ContextBar";
+import { QueryType } from "./Explorer";
 import NewAsset from "./NewAsset";
 
 const style = {
@@ -52,7 +53,7 @@ interface ExplorerBarProps {
   onResultTypeChange: (value: string) => void;
   viewType: string;
   onViewTypeChange: (value: string) => void;
-  setQuery: () => void;
+  setQuery: React.Dispatch<React.SetStateAction<QueryType>>;
   onFilterChange: (value: string) => void;
   onNewScene: () => void;
   onLatestChange: () => void;
@@ -73,11 +74,11 @@ const ExplorerBar = (props: ExplorerBarProps) => {
     }
   }, [props.droppedFiles]);
 
-  const handleResultTypeChange = (e: InputChangeEvent, value: string) => {
+  const handleResultTypeChange = (value: string) => {
     if (value !== null) props.onResultTypeChange(value);
   };
 
-  const handleViewTypeChange = (e: InputChangeEvent, value: string) => {
+  const handleViewTypeChange = (value: string) => {
     if (value !== null) props.onViewTypeChange(value);
   };
 
@@ -91,8 +92,8 @@ const ExplorerBar = (props: ExplorerBarProps) => {
   };
 
   const handleSortChange = (field: string, reverse: boolean, label: string) => {
-    props.setQuery((prevState) => ({
-      ...prevState,
+    props.setQuery((prev) => ({
+      ...prev,
       sort: { field: field, reverse: reverse, label: label },
     }));
   };
@@ -157,7 +158,7 @@ const ExplorerBar = (props: ExplorerBarProps) => {
             color="primary"
             value={props.resultType}
             exclusive
-            onChange={handleResultTypeChange}
+            onChange={(_, value) => handleResultTypeChange(value)}
             size="small"
           >
             <ToggleButton value="dynamic" style={{ height: "34.25px" }}>
@@ -175,7 +176,7 @@ const ExplorerBar = (props: ExplorerBarProps) => {
           </ToggleButtonGroup>
           <ToggleButtonGroup
             value={props.viewType}
-            onChange={handleViewTypeChange}
+            onChange={(_, value) => handleViewTypeChange(value)}
             exclusive
             size="small"
           >

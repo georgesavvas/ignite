@@ -12,8 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { render, screen } from "@testing-library/react";
+import { render } from "@testing-library/react";
+import { vi } from "vitest";
 
-import FileInput from "./FileInput";
+import FilterField, { FilterFieldProps } from "./FilterField";
 
-describe("FileInput", () => {});
+const makeSut = (props: FilterFieldProps) => {
+  return render(<FilterField {...props} />);
+};
+
+describe("FilterField", () => {
+  const setFilterValue = vi.fn();
+
+  it("Renders field", () => {
+    const { getByDisplayValue } = makeSut({
+      filterValue: "test_value",
+      setFilterValue: setFilterValue,
+    });
+    expect(getByDisplayValue(/test_value/)).toBeInTheDocument();
+  });
+});

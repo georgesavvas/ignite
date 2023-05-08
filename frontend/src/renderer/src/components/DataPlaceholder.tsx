@@ -35,7 +35,7 @@ const typeStyle = {
   color: "rgb(70, 70, 70)",
 };
 
-interface DataPlaceholderProps {
+export interface DataPlaceholderProps {
   text?: string;
   style?: React.CSSProperties;
   variant?: Variant;
