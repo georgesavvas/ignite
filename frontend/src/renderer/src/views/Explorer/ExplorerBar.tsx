@@ -30,10 +30,10 @@ import IgnButton from "../../components/IgnButton";
 import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
 import GridViewIcon from "../../icons/GridViewIcon";
 import RowViewIcon from "../../icons/RowViewIcon";
-import Ingest from "../Ingest/Ingest";
+import NewAsset from "../../modals/NewAsset";
+// import Ingest from "../Ingest/Ingest";
 import ContextBar from "./ContextBar";
 import { QueryType } from "./Explorer";
-import NewAsset from "./NewAsset";
 
 const style = {
   display: "flex",
@@ -60,7 +60,7 @@ interface ExplorerBarProps {
 }
 
 const ExplorerBar = (props: ExplorerBarProps) => {
-  const [ingestOpen, setIngestOpen] = useState(false);
+  // const [ingestOpen, setIngestOpen] = useState(false);
   const [newAssetOpen, setNewAssetOpen] = useState(false);
   const [filterMenu, setFilterMenu] = useState<ContextMenuType | null>(null);
   const { currentContext, setCurrentContext, refresh } = useContext(
@@ -133,19 +133,19 @@ const ExplorerBar = (props: ExplorerBarProps) => {
     setNewAssetOpen(true);
   };
 
-  const openIngest = () => {
-    setIngestOpen(true);
-  };
+  // const openIngest = () => {
+  //   setIngestOpen(true);
+  // };
 
   return (
     <div style={{ padding: "0 5px 3px 5px", display: "flex", flexDirection: "column" }}>
       <ContextMenu items={filterOptions} contextMenu={filterMenu} setContextMenu={setFilterMenu} />
       <div style={style}>
-        <Ingest
+        {/* <Ingest
           open={ingestOpen}
           onClose={() => setIngestOpen(false)}
           enqueueSnackbar={props.enqueueSnackbar}
-        />
+        /> */}
         <NewAsset
           open={newAssetOpen}
           onClose={() => setNewAssetOpen(false)}
@@ -212,7 +212,7 @@ const ExplorerBar = (props: ExplorerBarProps) => {
           <ArrowUpwardIcon />
         </IgnButton>
         <ContextBar />
-        <IgnButton
+        {/* <IgnButton
           style={{ minWidth: "80px" }}
           color="ignite"
           variant="outlined"
@@ -220,7 +220,7 @@ const ExplorerBar = (props: ExplorerBarProps) => {
           onClick={openIngest}
         >
           Ingest
-        </IgnButton>
+        </IgnButton> */}
         <IgnButton
           style={{ minWidth: "120px" }}
           color="ignite"

@@ -25,6 +25,7 @@ import { HandlerProps, ReflexContainer, ReflexElement, ReflexSplitter } from "re
 
 import ContextMenu, { ContextMenuType } from "../../components/ContextMenu";
 import Path from "../../components/Path";
+import Tags from "../../components/Tags";
 import URI from "../../components/URI";
 import { ConfigContext, ConfigContextType } from "../../contexts/ConfigContext";
 import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
@@ -37,7 +38,6 @@ import { CopyToClipboard } from "../ContextActions";
 import styles from "./AssetDetails.module.css";
 import ComponentList from "./ComponentList";
 import ComponentViewer from "./ComponentViewer";
-import TagContainer from "./TagContainer";
 
 const splitterStyle = {
   borderColor: "rgb(80,80,80)",
@@ -249,11 +249,7 @@ const AssetDetails = (props: AssetDetailsProps) => {
             <Path path={props.entity.path} />
           </div>
           <div style={{ padding: "5px" }}>
-            <TagContainer
-              entityPath={props.entity.path}
-              tags={props.entity.tags}
-              onRefresh={refresh}
-            />
+            <Tags entityPath={props.entity.path} tags={props.entity.tags} onRefresh={refresh} />
           </div>
         </ReflexElement>
         <ReflexSplitter style={splitterStyle} />

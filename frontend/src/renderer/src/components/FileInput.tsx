@@ -78,8 +78,9 @@ export const FileInput = (props: FileInputProps) => {
       />
       <IgnButton
         variant="outlined"
+        size="small"
         onClick={handleFileInput}
-        style={{ height: 37.5, ...buttonStyle }}
+        style={{ ...buttonStyle }}
       >
         {buttonLabel || "..."}
       </IgnButton>

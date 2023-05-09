@@ -20,11 +20,11 @@ import { IgniteDirectory } from "@renderer/types/common";
 import React, { useContext, useEffect, useState } from "react";
 
 import Path from "../../components/Path";
+import Tags from "../../components/Tags";
 import URI from "../../components/URI";
 import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
 import serverRequest from "../../services/serverRequest";
 import Attributes from "./Attributes";
-import TagContainer from "./TagContainer";
 
 const style = {
   width: "100%",
@@ -122,7 +122,7 @@ const DirectoryDetails = (props: DirectoryDetailsProps) => {
             </>
           )}
         </div>
-        <TagContainer entityPath={props.entity.path} tags={props.entity.tags} onRefresh={refresh} />
+        <Tags entityPath={props.entity.path} tags={props.entity.tags} onRefresh={refresh} />
       </div>
       <Attributes entityPath={props.entity.path} attributes={props.entity.attributes} />
     </div>

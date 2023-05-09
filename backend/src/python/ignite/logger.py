@@ -1,15 +1,20 @@
-
 import os
 import logging
-from logging.handlers import TimedRotatingFileHandler
+from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
 
 ENV = os.environ
+IGNITE_PID = str(os.getpid())
 
 
 class EndpointFilter(logging.Filter):
-    def __init__(self, path, *args, **kwargs,):
+    def __init__(
+        self,
+        path,
+        *args,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
         self._path = path
 
@@ -18,7 +23,6 @@ class EndpointFilter(logging.Filter):
 
 
 class LogFormatter(logging.Formatter):
-
     grey = "\x1b[38;21m"
     yellow = "\x1b[33;21m"
     red = "\x1b[31;21m"
@@ -40,14 +44,15 @@ class LogFormatter(logging.Formatter):
         return formatter.format(record)
 
 
-path = Path.home() / ".ignite/logs/ignite.log"
+path = Path.home() / f".ignite/logs/ignite_{IGNITE_PID}.log"
 path.parent.mkdir(exist_ok=True, parents=True)
-file_handler = TimedRotatingFileHandler(
-    path, when="h", interval=1, backupCount=20
-)
+# file_handler = TimedRotatingFileHandler(
+#     path, when="h", interval=1, backupCount=20
+# )
+file_handler = RotatingFileHandler(path, maxBytes=10000, backupCount=20)
 formatter = logging.Formatter(
     "%(asctime)s - %(levelname)-8s - %(name)s - %(funcName)s: %(message)s",
-    datefmt="%d/%m/%Y %H:%M:%S"
+    datefmt="%d/%m/%Y %H:%M:%S",
 )
 file_handler.setFormatter(formatter)
 

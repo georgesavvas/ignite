@@ -19,13 +19,13 @@ import Button from "@mui/material/Button";
 import { EnqueueSnackbar } from "@renderer/types/common";
 import { useContext, useEffect, useState } from "react";
 
-import DynamicList from "../../components/DynamicList";
-import FileInput from "../../components/FileInput";
-import IgnTextField from "../../components/IgnTextField";
-import Modal from "../../components/Modal";
-import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
-import clientRequest from "../../services/clientRequest";
-import TagContainer from "../DetailsView/TagContainer";
+import DynamicList from "../components/DynamicList";
+import FileInput from "../components/FileInput";
+import IgnTextField from "../components/IgnTextField";
+import Modal from "../components/Modal";
+import Tags from "../components/Tags";
+import { ContextContext, ContextContextType } from "../contexts/ContextContext";
+import clientRequest from "../services/clientRequest";
 import styles from "./NewAsset.module.css";
 
 type NewIgniteComponent = {
@@ -144,13 +144,11 @@ const NewAsset = (props: NewAssetProps) => {
     return comp;
   };
 
-  const handleAddTags = (tags: string) => {
-    const processed = tags.split(",").map((tag) => tag.trim());
-    setTags((prev) => Array.from(new Set(prev.concat(processed))));
-  };
-
-  const handleRemoveTag = (tag: string) => {
-    setTags((prev) => prev.filter((t) => t !== tag));
+  const handleTagsChange = (tags: string[]) => {
+    console.log(tags);
+    const processed = tags.map((tag) => tag.trim().replaceAll(/[^\w\s]+/g, "_"));
+    console.log(processed);
+    setTags(Array.from(new Set(processed)));
   };
 
   return (
@@ -175,7 +173,7 @@ const NewAsset = (props: NewAssetProps) => {
             onChange={(e) => setName(e.target.value)}
             style={{ minWidth: "300px", alignSelf: "flex-start" }}
           />
-          <TagContainer tags={tags} onAdd={handleAddTags} onRemove={handleRemoveTag} />
+          <Tags tags={tags} onChange={handleTagsChange} />
         </div>
         <DynamicList title="Components" onAdd={handleCompAdd} onRemove={() => handleCompRemove(-1)}>
           {comps.map((comp, index) => (

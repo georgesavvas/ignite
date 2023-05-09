@@ -36,9 +36,18 @@ class AssetVersion(Directory):
         self.score = 0
         self.tags = set()
         super().__init__(path, dir_kind="assetversion")
-        self.dict_attrs = ["components", "asset", "task", "uri", "tags",
-            "version", "thumbnail", "creation_time", "modification_time",
-            "versions"]
+        self.dict_attrs = [
+            "components",
+            "asset",
+            "task",
+            "uri",
+            "tags",
+            "version",
+            "thumbnail",
+            "creation_time",
+            "modification_time",
+            "versions",
+        ]
         self.nr_attrs = ["asset", "task", "path"]
         self.asset = self.path.parent
         self.version = self.name
@@ -50,7 +59,9 @@ class AssetVersion(Directory):
         self.name = self.path.parent.name
         self.components = []
         self.uri = utils.get_uri(self.asset, self.version_int)
-        self.task = self.asset.parent.parent if "/exports/" in self.path.as_posix() else None
+        self.task = (
+            self.asset.parent.parent if "/exports/" in self.path.as_posix() else None
+        )
         self.context = self.get_context()
         self.fetch_components()
         self._get_score()
@@ -95,9 +106,10 @@ class AssetVersion(Directory):
         self.score = score
 
     def _fetch_versions(self):
-        return sorted([
-            d.name for d in self.asset.iterdir() if d.name.startswith("v")
-        ], reverse=True)
+        return sorted(
+            [d.name for d in self.asset.iterdir() if d.name.startswith("v")],
+            reverse=True,
+        )
 
     def _is_latest(self):
         return self.version == self.versions[0]

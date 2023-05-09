@@ -12,10 +12,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { styled } from "@mui/material/styles";
 import TextField, { TextFieldProps } from "@mui/material/TextField";
 
+const StyledTextField = styled(TextField)<TextFieldProps>(() => ({
+  "& .MuiFormLabel-root:not(.Mui-focused, .MuiFormLabel-filled)": {
+    transform: "translate(10px, 5px) scale(1)",
+  },
+}));
+
 export const IgnTextField = (props: TextFieldProps) => {
-  return <TextField size="small" {...props} />;
+  return (
+    <StyledTextField
+      size="small"
+      // InputLabelProps={
+      //   props.value
+      //     ? {}
+      //     : {
+      //         style: {
+      //           transform: "translate(10px, 5px) scale(1)",
+      //         },
+      //       }
+      // }
+      inputProps={{
+        style: {
+          padding: "5px 8px",
+        },
+      }}
+      {...props}
+    />
+  );
 };
 
 export default IgnTextField;

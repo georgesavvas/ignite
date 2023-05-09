@@ -1,16 +1,16 @@
 .container {
   position: relative;
-  display: flex;
+  /* display: flex; */
   /* justify-content: flex-start;
   align-items: flex-start; */
-  flex-wrap: wrap;
+  /* flex-wrap: wrap; */
   max-width: 100%;
   flex-grow: 1;
-  gap: 5px;
-  padding: 5px;
+  /* gap: 5px; */
+  /* padding: 5px;
   border: solid 1px;
   border-color: rgb(40, 40, 40);
-  border-radius: 5px;
+  border-radius: 5px; */
 }
 
 .tag {
