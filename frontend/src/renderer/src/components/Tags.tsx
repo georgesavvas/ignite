@@ -14,21 +14,20 @@
 
 import AddIcon from "@mui/icons-material/Add";
 import ClearIcon from "@mui/icons-material/Clear";
-import { Button, TextField, Typography } from "@mui/material";
+import { Autocomplete, AutocompleteGetTagProps, TextField, Typography } from "@mui/material";
+import { Chip } from "@mui/material";
 import Tooltip from "@mui/material/Tooltip";
 import { useSnackbar } from "notistack";
-import { useContext, useRef, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import stc from "string-to-color";
 
-import ContextMenu, { ContextMenuType, handleContextMenu } from "../../components/ContextMenu";
-import DataPlaceholder from "../../components/DataPlaceholder";
-import Modal from "../../components/Modal";
-import { ConfigContext, ConfigContextType } from "../../contexts/ConfigContext";
-import BuildFileURL from "../../services/BuildFileURL";
-import serverRequest from "../../services/serverRequest";
-import { hexToHsl } from "../../utils/hexToHsl";
-import { CopyToClipboard } from "../ContextActions";
-import styles from "./TagContainer.module.css";
+import { ConfigContext, ConfigContextType } from "../contexts/ConfigContext";
+import BuildFileURL from "../services/BuildFileURL";
+import serverRequest from "../services/serverRequest";
+import { hexToHsl } from "../utils/hexToHsl";
+import { CopyToClipboard } from "../views/ContextActions";
+import ContextMenu, { ContextMenuType, handleContextMenu } from "./ContextMenu";
+import styles from "./Tags.module.css";
 
 const namedStyles = {
   locked: {
@@ -42,109 +41,79 @@ const namedStyles = {
   },
 };
 
-interface TagContainerProps {
+interface TagsProps {
   tags: string[];
   entityPath?: string;
-  onAdd?: (tags: string) => void;
-  onRemove?: (tag: string) => void;
+  onChange?: (tags: string[]) => void;
   onRefresh?: () => void;
 }
 
-export const TagContainer = (props: TagContainerProps) => {
-  const [newTagsOpen, setNewTagsOpen] = useState(false);
-  const [newTags, setNewTags] = useState("");
+export const Tags = (props: TagsProps) => {
+  const [tagsWarning, setTagsWarning] = useState(false);
   const [contextMenu, setContextMenu] = useState<ContextMenuType | null>(null);
   const { config } = useContext(ConfigContext) as ConfigContextType as ConfigContextType;
   const { enqueueSnackbar } = useSnackbar();
-  const newTagsRef = useRef();
 
   const contextItems = [
     {
       label: "Copy tags",
       fn: () => CopyToClipboard(props.tags.join(","), enqueueSnackbar),
     },
-    {
-      label: "Add tags",
-      fn: () => {
-        setNewTags("");
-        setNewTagsOpen(true);
-      },
-    },
   ];
 
-  const handleAddTags = () => {
-    if (props.onAdd) {
-      props.onAdd(newTags);
-      setNewTagsOpen(false);
+  const handleChange = (_: any, value: string[]) => {
+    if (props.onChange) {
+      props.onChange(value);
+      setTagsWarning(false);
       return;
     }
     const data = {
       path: BuildFileURL(props.entityPath, config, { pathOnly: true, reverse: true }),
-      tags: newTags,
+      tags: value,
     };
-    serverRequest("add_tags", data).then(() => {
+    serverRequest("set_tags", data).then(() => {
       if (props.onRefresh) props.onRefresh();
     });
-    setNewTagsOpen(false);
+    setTagsWarning(false);
   };
 
-  const handleRemoveTag = (tag: string) => {
-    if (props.onRemove) {
-      props.onRemove(tag);
-      setNewTagsOpen(false);
-      return;
-    }
-    const data = {
-      path: BuildFileURL(props.entityPath, config, { pathOnly: true, reverse: true }),
-      tags: tag,
-    };
-    serverRequest("remove_tags", data).then(() => {
-      if (props.onRefresh) props.onRefresh();
-    });
-  };
+  const renderTags = useCallback((tags: string[], getTagProps: AutocompleteGetTagProps) => {
+    return tags.map((tag, index) => (
+      <Chip
+        // key={tag}
+        label={tag}
+        size="small"
+        sx={{ backgroundColor: hexToHsl(stc(tag), 80, 30) }}
+        {...getTagProps({ index })}
+      />
+    ));
+  }, []);
 
   return (
     <>
       <ContextMenu items={contextItems} contextMenu={contextMenu} setContextMenu={setContextMenu} />
-      <Modal
-        open={newTagsOpen}
-        onClose={() => setNewTagsOpen(false)}
-        maxWidth="md"
-        buttons={[
-          <Button key="create" type="submit">
-            Create
-          </Button>,
-        ]}
-        title="Add Tags"
-        onFormSubmit={handleAddTags}
-        focusRef={newTagsRef}
-      >
-        <TextField
-          onChange={(e) => setNewTags(e.target.value)}
-          value={newTags}
-          size="small"
-          fullWidth
-          autoFocus
-          inputRef={newTagsRef}
-        />
-        <Typography variant="caption">Multiple tags can be separated by commas</Typography>
-      </Modal>
       <div
         className={styles.container}
         onContextMenu={(e) => handleContextMenu(e, contextMenu, setContextMenu)}
       >
-        {props.tags.map((tag, index) => (
-          <Tag name={tag} key={index} onDelete={() => handleRemoveTag(tag)} />
-        ))}
-        <NewTags
-          onClick={() => {
-            setNewTags("");
-            setNewTagsOpen(true);
-          }}
+        <Autocomplete
+          multiple
+          size="small"
+          freeSolo
+          options={[]}
+          value={props.tags}
+          onChange={handleChange}
+          fullWidth
+          renderTags={renderTags}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              placeholder="Enter tags..."
+              onChange={(e) => setTagsWarning(e.target.value !== "")}
+              helperText={tagsWarning ? "Press enter to confirm tags" : undefined}
+            />
+          )}
         />
-        {!props.tags.length ? (
-          <DataPlaceholder text="No tags" style={{ padding: 0 }} variant="h5" />
-        ) : null}
       </div>
     </>
   );
@@ -194,4 +163,4 @@ const NewTags = (props: NewTagsProps) => {
   );
 };
 
-export default TagContainer;
+export default Tags;

@@ -13,7 +13,6 @@
 # limitations under the License.
 
 
-import os
 import stat
 import shutil
 from datetime import datetime, timezone
@@ -24,13 +23,19 @@ import yaml
 from ignite.server import api, utils
 from ignite.server.constants import ANCHORS
 from ignite.server.utils import CONFIG, is_dir_of_kind
-from ignite.utils import bytes_to_human_readable, get_logger, is_read_only
+from ignite.utils import (
+    bytes_to_human_readable,
+    get_logger,
+    is_read_only,
+    lock_directory,
+    unlock_directory,
+)
 
 
 LOGGER = get_logger(__name__)
 
 
-class Directory():
+class Directory:
     def __init__(self, path="", dir_kind="directory") -> None:
         self.dict_attrs = ["repr", "attributes", "uri"]
         self.nr_attrs = ["path"]
@@ -57,7 +62,7 @@ class Directory():
                 self.modification_time = datetime.fromtimestamp(
                     stat.st_mtime, tz=timezone.utc
                 )
-                self.size = 0 #stat.st_size
+                self.size = 0  # stat.st_size
             anchor = ANCHORS[dir_kind]
             self.anchor = path / anchor
             self.check_anchor()
@@ -126,8 +131,18 @@ class Directory():
             return self.path.parent
 
     def as_dict(self):
-        default = ["path", "protected", "dir_kind", "anchor", "project", "tags",
-            "name", "context", "group", "thumbnail"]
+        default = [
+            "path",
+            "protected",
+            "dir_kind",
+            "anchor",
+            "project",
+            "tags",
+            "name",
+            "context",
+            "group",
+            "thumbnail",
+        ]
         default_nr = ["path"]
         d = {}
         for s in default:
@@ -146,12 +161,10 @@ class Directory():
         d["size"] = bytes_to_human_readable(self.size)
         try:
             d["creation_time"] = timeago.format(
-                self.creation_time,
-                datetime.now(tz=self.creation_time.tzinfo)
+                self.creation_time, datetime.now(tz=self.creation_time.tzinfo)
             )
             d["modification_time"] = timeago.format(
-                self.modification_time,
-                datetime.now(tz=self.modification_time.tzinfo)
+                self.modification_time, datetime.now(tz=self.modification_time.tzinfo)
             )
             d["creation_ts"] = self.creation_time.timestamp()
             d["modification_ts"] = self.modification_time.timestamp()
@@ -292,40 +305,24 @@ class Directory():
         return existing
 
     def set_protected(self, protected):
-        read_only = (
-            stat.S_IRUSR | stat.S_IXUSR |
-            stat.S_IRGRP | stat.S_IXGRP |
-            stat.S_IROTH | stat.S_IXOTH
-        )
-        read_write = (
-            stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR |
-            stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP |
-            stat.S_IROTH | stat.S_IWOTH | stat.S_IXOTH
-        )
         ok = True
-        # mode = 0o555 if protected else 0o777
-        mode = read_write if not protected else read_only
+        fn = lock_directory if protected else unlock_directory
+
+        # Iterate through directory contents and lock/unlock them
         LOGGER.info("Protecting files" if protected else "Un-protecting files")
         LOGGER.info(f"Changing permissions of files inside {self.path}...")
         for file in self.path.iterdir():
-            LOGGER.debug(f"Changing {file} mode to {oct(mode)}")
-            try:
-                file.chmod(mode)
-            except Exception as e:
-                LOGGER.error(e)
-                ok = False
-                break
+            fn(file)
+
+        # Verify success by checking a single file (the anchor)
         should_be = "555" if protected else "777"
         anchor_mode = oct(self.anchor.stat().st_mode)
         LOGGER.info(f"{self.anchor} mode is now {anchor_mode}")
+
+        # Lock directory if everything ok
         ok = anchor_mode.endswith(should_be)
         if ok:
-            LOGGER.info(f"Changing {self.path} mode to {oct(mode)}")
-            try:
-                self.path.chmod(mode)
-            except Exception as e:
-                LOGGER.error(e)
-                ok = False
+            fn(self.path)
         self_mode = oct(self.path.stat().st_mode)
         LOGGER.info(f"{self.path} mode is now {self_mode}")
         ok = self_mode.endswith(should_be)
@@ -336,19 +333,13 @@ class Directory():
             # if can_access != protected:
             #     return True
             return True
+
         # Something went wrong, revert changes
         LOGGER.warning("Failed, reverting permission changes...")
-        # mode = 0o555 if not protected else 0o777
-        mode = read_only if not protected else read_write
-        LOGGER.info(f"Changing {self.path} mode to {oct(mode)}")
-        self.path.chmod(mode)
+        fn = unlock_directory if protected else lock_directory
+        fn(self.path)
         for file in self.path.iterdir():
-            LOGGER.debug(f"Changing {file} mode to {oct(mode)}")
-            try:
-                file.chmod(mode)
-            except Exception as e:
-                LOGGER.error(e)
-
+            fn(file)
 
     @property
     def attributes(self):
@@ -358,11 +349,13 @@ class Directory():
         parent_attrib_list = []
         while root != parent.as_posix():
             if iter > 20:
-                raise Exception(f"Reached iteration limit when walking directory: {self.path}")
+                raise Exception(
+                    f"Reached iteration limit when walking directory: {self.path}"
+                )
             contents = next(parent.glob(".ign_*.yaml"), None)
             if not contents:
                 parent = parent.parent
-                iter +=1
+                iter += 1
                 continue
             with open(contents, "r") as f:
                 config = yaml.safe_load(f) or {}
@@ -370,7 +363,7 @@ class Directory():
             if dir_attribs:
                 parent_attrib_list.append(dir_attribs)
             parent = parent.parent
-            iter +=1
+            iter += 1
         parent_attrib_list.reverse()
         parent_attribs = {}
         for attribs in parent_attrib_list:
@@ -385,11 +378,13 @@ class Directory():
 
         attributes_formatted = []
         for k, v in attributes.items():
-            attributes_formatted.append({
-                "name": k,
-                "inherited": parent_attribs.get(k, ""),
-                "override": current_attribs.get(k, "")
-            })
+            attributes_formatted.append(
+                {
+                    "name": k,
+                    "inherited": parent_attribs.get(k, ""),
+                    "override": current_attribs.get(k, ""),
+                }
+            )
 
         return attributes_formatted
 

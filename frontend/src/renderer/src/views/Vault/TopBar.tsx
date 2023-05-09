@@ -23,7 +23,7 @@ import ContextMenu, { ContextMenuType, handleContextMenu } from "../../component
 import FilterField from "../../components/FilterField";
 import IgnButton from "../../components/IgnButton";
 import { VaultContext, VaultContextType } from "../../contexts/VaultContext";
-import NewAsset from "../Explorer/NewAsset";
+import NewAsset from "../../modals/NewAsset";
 import Ingest from "../Ingest/Ingest";
 
 const style = {

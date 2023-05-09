@@ -60,9 +60,14 @@ def get_vault_path() -> str:
 
 def get_projects() -> list:
     from ignite.server.entities.project import Project
+
     projects = Path(CONFIG["root"]).iterdir()
     projects = [p for p in projects if not p.name.startswith(".")]
-    projects = [Project(path=p).as_dict() for p in projects if (Path(p) / PROJECT_ANCHOR).exists()]
+    projects = [
+        Project(path=p).as_dict()
+        for p in projects
+        if (Path(p) / PROJECT_ANCHOR).exists()
+    ]
     return projects
 
 
@@ -77,6 +82,7 @@ def get_project(name):
     if not name:
         return None
     from ignite.server.entities.project import Project
+
     path = CONFIG["root"] / name
     if not Path(CONFIG["root"]).is_dir():
         LOGGER.error(f"Invalid root {CONFIG['root']}")
@@ -125,9 +131,12 @@ def get_context_info(path):
             continue
         kind = KINDS[name]
         ancestor_kinds[path.as_posix()] = kind
-        project = path.as_posix().split(
-            CONFIG["root"].as_posix(), 1
-        )[1].lstrip("/").split("/")[0]
+        project = (
+            path.as_posix()
+            .split(CONFIG["root"].as_posix(), 1)[1]
+            .lstrip("/")
+            .split("/")[0]
+        )
         data = {
             "root": CONFIG["root"].as_posix(),
             "name": path.name,
@@ -139,7 +148,7 @@ def get_context_info(path):
             "project": project.strip(),
             "project_path": (CONFIG["root"] / project).as_posix(),
             "dir_kind": kind,
-            "ancestor_kinds": ancestor_kinds
+            "ancestor_kinds": ancestor_kinds,
         }
         return data
     return {}
@@ -233,7 +242,7 @@ def _find_from_path(path):
         "asset": Asset,
         "assetversion": AssetVersion,
         "component": Component,
-        "scene": Scene
+        "scene": Scene,
     }
     path = Path(path)
     is_file = path.is_file()
@@ -437,7 +446,9 @@ def discover_tasks(path, task_types=[], sort=None, as_dict=False):
     return tasks
 
 
-def discover_assets(path, asset_kinds=[], sort=None, as_dict=False, filters={}, single=False):
+def discover_assets(
+    path, asset_kinds=[], sort=None, as_dict=False, filters={}, single=False
+):
     from ignite.server.entities.asset import Asset
 
     def discover(path, l=[]):
@@ -524,7 +535,9 @@ def discover_assets(path, asset_kinds=[], sort=None, as_dict=False, filters={}, 
     return assets
 
 
-def discover_assetversions(path, asset_kinds=[], latest=False, sort=None, filters={}, as_dict=False):
+def discover_assetversions(
+    path, asset_kinds=[], latest=False, sort=None, filters={}, as_dict=False
+):
     assetversions = []
     assets = discover_assets(path, asset_kinds=asset_kinds)
     for asset in assets:
@@ -554,6 +567,7 @@ def discover_scenes(path, dcc=[], latest=False, sort=None, as_dict=False):
     from ignite.server.entities.scene import Scene
 
     path = Path(path)
+
     def discover(path, l=[]):
         name = path.name
         if path.is_dir():
@@ -673,7 +687,9 @@ def register_assetversion(path, tags=None):
     asset_path = PurePath(path).parent
     asset = find(asset_path)
     if not asset:
-        LOGGER.warning(f"Asset anchor was missing (but created) when registering assetversion {path}")
+        LOGGER.warning(
+            f"Asset anchor was missing (but created) when registering assetversion {path}"
+        )
         utils.create_anchor(asset_path, "asset")
     utils.create_anchor(path, "assetversion")
     av = find(path)
@@ -732,6 +748,7 @@ def get_repr(target):
 def get_repr_comp(target):
     anchors = list(ANCHORS.values())
     asset_anchor = ANCHORS["asset"]
+
     def search(path):
         for x in path.iterdir():
             if x.name == asset_anchor:
@@ -758,12 +775,14 @@ def get_repr_comp(target):
             return {}
         return best_av.get_thumbnail()
     target_repr = target_entity.repr
-    path =  Path(utils.uri_to_path(target_repr))
+    path = Path(utils.uri_to_path(target_repr))
     if not path.is_dir():
         LOGGER.error(f"Couldn't resolve {path}")
         return {}
     if path == target_entity.path:
-        LOGGER.error(f"Infinite loop while fetching repr comp of {target_entity.path} - {target_entity.repr}")
+        LOGGER.error(
+            f"Infinite loop while fetching repr comp of {target_entity.path} - {target_entity.repr}"
+        )
         return {}
     repr_asset = search(path)
     if not repr_asset:
@@ -780,12 +799,15 @@ def get_repr_comp(target):
 def delete_entity(path, entity_type):
     entity = find(path)
     if not entity:
-        LOGGER.error(f"Attempted to delete {entity_type} {path} but couldn't"
-            "find it.")
+        LOGGER.error(
+            f"Attempted to delete {entity_type} {path} but couldn't" "find it."
+        )
         return False
     if entity.dir_kind != entity_type:
-        LOGGER.error(f"Attempted to delete {entity.dir_kind} but the entity"
-            "was supposed to be {entity_type}")
+        LOGGER.error(
+            f"Attempted to delete {entity.dir_kind} but the entity"
+            "was supposed to be {entity_type}"
+        )
         return False
     if not hasattr(entity, "delete"):
         return False
@@ -799,10 +821,14 @@ def rename_entity(path, entity_type, new_name):
         LOGGER.error(f"Entity {path} not found.")
         return False, "entity not found"
     if entity.dir_kind != entity_type:
-        LOGGER.error(" ".join(
-            "Attempted to rename", entity.dir_kind,
-            "but the entity was supposed to be", entity_type
-        ))
+        LOGGER.error(
+            " ".join(
+                "Attempted to rename",
+                entity.dir_kind,
+                "but the entity was supposed to be",
+                entity_type,
+            )
+        )
         return False, "wrong entity type"
     if not hasattr(entity, "rename"):
         return False
@@ -816,10 +842,11 @@ def change_task_type(path, new_task_type, new_name):
         LOGGER.error(f"Entity {path} not found.")
         return False, "entity not found"
     if entity.dir_kind != "task":
-        LOGGER.error(" ".join(
-            "Attempted to change task type for an entity of type",
-            entity.dir_kind
-        ))
+        LOGGER.error(
+            " ".join(
+                "Attempted to change task type for an entity of type", entity.dir_kind
+            )
+        )
         return False, "wrong entity type"
     ok = entity.set_task_type(new_task_type)
     if new_name and entity.name != new_name:
@@ -828,17 +855,21 @@ def change_task_type(path, new_task_type, new_name):
     return ok, ""
 
 
-def add_tags(path, tags):
-    tags_processed = [tag.strip() for tag in tags.split(",")]
+def set_tags(path, tags):
     entity = find(path)
-    entity.add_tags(tags_processed)
+    entity.set_tags(tags)
+    return True
+
+
+def add_tags(path, tags):
+    entity = find(path)
+    entity.add_tags(tags)
     return True
 
 
 def remove_tags(path, tags, all=False):
-    tags_processed = [tag.strip() for tag in tags.split(",")]
     entity = find(path)
-    entity.remove_tags(tags_processed, all=all)
+    entity.remove_tags(tags, all=all)
     return True
 
 
@@ -866,10 +897,7 @@ def get_rule_templates():
 
 def add_rule_template(data, name):
     rule_templates = get_rule_templates()
-    template = {
-        "data": data,
-        "name": name
-    }
+    template = {"data": data, "name": name}
     rule_templates.append(template)
     return write_rule_templates(rule_templates)
 
@@ -911,7 +939,9 @@ def vault_import(source, name):
         register_asset(vault_entity_path)
         vault_entity = find(vault_entity_path)
     if vault_entity.dir_kind != "asset":
-        LOGGER.error(f"Target entity {vault_entity_path} kind is {vault_entity.dir_kind}, expected asset")
+        LOGGER.error(
+            f"Target entity {vault_entity_path} kind is {vault_entity.dir_kind}, expected asset"
+        )
         return
     dest = vault_entity.next_path
     shutil.copytree(source, dest)
@@ -950,6 +980,7 @@ def set_scene_comment(path, comment):
 
 def set_directory_protected(path, protected):
     from ignite.server.entities.assetversion import AssetVersion
+
     entity = AssetVersion(path)
     if not entity:
         return

@@ -2,20 +2,20 @@
     display: flex;
     justify-content: center;
     padding: 5px;
-    background-color: rgb(30, 30, 30);
+    /* background-color: rgb(30, 30, 30); */
     border-radius: 3px;
     flex-grow: 1;
 }
 
 .clearButton {
     position: absolute;
-    right: 0px;
+    right: 2px;
     top: 0px;
     cursor: pointer;
-    color: rgb(100, 100, 100);
-    padding: 7px 10px;
+    color: rgb(120, 120, 120) !important;
+    padding: 2px 6px;
 }
 
 .clearButton:hover {
-    color: rgb(200, 200, 200);
+    color: rgb(200, 200, 200) !important;
 }

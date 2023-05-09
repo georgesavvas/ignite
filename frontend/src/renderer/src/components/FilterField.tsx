@@ -36,6 +36,12 @@ const FilterField = ({ filterValue, setFilterValue, children }: FilterFieldProps
           value={filterValue}
           onChange={(e) => setFilterValue(e.target.value || "")}
           color={filterValue ? "error" : "primary"}
+          style={{ backgroundColor: "rgb(30, 30, 30)" }}
+          inputProps={{
+            style: {
+              padding: "4px 8px",
+            },
+          }}
         />
         {!filterValue ? null : (
           <Typography

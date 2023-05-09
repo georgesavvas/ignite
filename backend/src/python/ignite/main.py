@@ -102,12 +102,9 @@ async def ping():
 
 
 import subprocess
+
 if __name__ == "__main__":
-    config = uvicorn.Config(
-        f"{__name__}:app",
-        host=SERVER_HOST,
-        port=int(SERVER_PORT)
-    )
+    config = uvicorn.Config(f"{__name__}:app", host=SERVER_HOST, port=int(SERVER_PORT))
     server = uvicorn.Server(config=config)
     LOGGER.info(f"*** Launching server at {SERVER_HOST}:{SERVER_PORT}")
     LOGGER.info(f"PID {PID}")

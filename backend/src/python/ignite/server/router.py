@@ -34,9 +34,7 @@ ENV = os.environ
 
 
 api_version = ENV["IGNITE_API_VERSION"]
-router = APIRouter(
-    prefix=f"/api/{api_version}"
-)
+router = APIRouter(prefix=f"/api/{api_version}")
 
 
 @router.get("/get_projects_root")
@@ -135,15 +133,11 @@ async def find_multiple(request: Request):
     data = result.get(data)
     if type(data) == "list":
         entities = [api.find(path) for path in data]
-        data = [
-            entity.as_dict() for entity in entities if hasattr(entity, "as_dict")
-        ]
+        data = [entity.as_dict() for entity in entities if hasattr(entity, "as_dict")]
     elif type(data) == "dict":
         entities = {path: api.find(path) for path in data.keys()}
         data = {
-            k: entity.as_dict()
-            for k, entity in entities
-            if hasattr(entity, "as_dict")
+            k: entity.as_dict() for k, entity in entities if hasattr(entity, "as_dict")
         }
     return {"ok": True, "data": data}
 
@@ -186,13 +180,13 @@ async def get_contents(request: Request):
         result.get("path", ""),
         latest=query.get("latest", 0),
         sort=query.get("sort"),
-        as_dict=True
+        as_dict=True,
     )
     data = utils.query_filter(data, query)
     limit = int(result.get("limit", 20))
     total = len(data)
     print(f"{total} results")
-    pages = int(math.ceil(total/limit))
+    pages = int(math.ceil(total / limit))
     page = result.get("page", 1)
     start = (page - 1) * limit
     end = start + limit
@@ -206,7 +200,7 @@ async def get_contents(request: Request):
             "current": page,
         },
         "result_amount": total,
-        "data": to_return
+        "data": to_return,
     }
 
 
@@ -215,15 +209,11 @@ async def get_tasks(request: Request):
     result = await request.json()
     log_request(result)
     query = result.get("query", {})
-    data = api.discover_tasks(
-        result.get("path"),
-        sort=query.get("sort"),
-        as_dict=True
-    )
+    data = api.discover_tasks(result.get("path"), sort=query.get("sort"), as_dict=True)
     data = utils.query_filter(data, query)
     limit = result.get("limit", 20)
     total = len(data)
-    pages = int(math.ceil(total/limit))
+    pages = int(math.ceil(total / limit))
     page = result.get("page", 1)
     start = (page - 1) * limit
     end = start + limit
@@ -237,7 +227,7 @@ async def get_tasks(request: Request):
             "current": page,
         },
         "result_amount": total,
-        "data": to_return
+        "data": to_return,
     }
 
 
@@ -251,12 +241,12 @@ async def get_assets(request: Request):
         # latest=query.get("latest", 0),
         sort=query.get("sort"),
         filters=query.get("filters"),
-        as_dict=True
+        as_dict=True,
     )
     data = utils.query_filter(data, query)
     limit = result.get("limit", 20)
     total = len(data)
-    pages = int(math.ceil(total/limit))
+    pages = int(math.ceil(total / limit))
     page = result.get("page", 1)
     start = (page - 1) * limit
     end = start + limit
@@ -265,13 +255,9 @@ async def get_assets(request: Request):
         d["result_id"] = i
     return {
         "ok": True,
-        "pages": {
-            "total": pages,
-            "current": page,
-            "results": total
-        },
+        "pages": {"total": pages, "current": page, "results": total},
         "result_amount": total,
-        "data": to_return
+        "data": to_return,
     }
 
 
@@ -296,12 +282,12 @@ async def get_assetversions(request: Request):
         latest=query.get("latest", 0),
         sort=query.get("sort"),
         as_dict=True,
-        filters=query.get("filters", {})
+        filters=query.get("filters", {}),
     )
     data = utils.query_filter(data, query)
     limit = result.get("limit", 20)
     total = len(data)
-    pages = int(math.ceil(total/limit))
+    pages = int(math.ceil(total / limit))
     page = result.get("page", 1)
     start = (page - 1) * limit
     end = start + limit
@@ -310,13 +296,9 @@ async def get_assetversions(request: Request):
         d["result_id"] = i
     return {
         "ok": True,
-        "pages": {
-            "total": pages,
-            "current": page,
-            "results": total
-        },
+        "pages": {"total": pages, "current": page, "results": total},
         "result_amount": total,
-        "data": to_return
+        "data": to_return,
     }
 
 
@@ -329,12 +311,12 @@ async def get_scenes(request: Request):
         result.get("path"),
         latest=query.get("latest", 0),
         sort=query.get("sort"),
-        as_dict=True
+        as_dict=True,
     )
     data = utils.query_filter(data, query)
     limit = result.get("limit", 20)
     total = len(data)
-    pages = int(math.ceil(total/limit))
+    pages = int(math.ceil(total / limit))
     page = result.get("page", 1)
     start = (page - 1) * limit
     end = start + limit
@@ -343,13 +325,9 @@ async def get_scenes(request: Request):
         d["result_id"] = i
     return {
         "ok": True,
-        "pages": {
-            "total": pages,
-            "current": page,
-            "results": total
-        },
+        "pages": {"total": pages, "current": page, "results": total},
         "result_amount": total,
-        "data": to_return
+        "data": to_return,
     }
 
 
@@ -503,6 +481,20 @@ async def change_task_type(request: Request):
     return {"ok": ok}
 
 
+@router.post("/set_tags")
+async def set_tags(request: Request):
+    result = await request.json()
+    log_request(result)
+    path = result.get("path", "")
+    tags = result.get("tags", [])
+    if not path or not tags:
+        return error("invalid_data")
+    ok = api.set_tags(path, tags)
+    if not ok:
+        return error("generic_error")
+    return {"ok": ok}
+
+
 @router.post("/add_tags")
 async def add_tags(request: Request):
     result = await request.json()
@@ -562,10 +554,7 @@ async def asset_updates(websocket: WebSocket, session_id: str):
 @router.get("/get_filter_templates")
 async def get_filters():
     data = vault_api.get_filter_templates()
-    return {
-        "ok": True,
-        "data": data
-    }
+    return {"ok": True, "data": data}
 
 
 @router.post("/add_filter_template")
@@ -577,10 +566,7 @@ async def add_filter(request: Request):
     if not name or not data:
         return {"ok": False}
     data = vault_api.add_filter_template(data, name)
-    return {
-        "ok": True,
-        "data": data
-    }
+    return {"ok": True, "data": data}
 
 
 @router.post("/remove_filter_template")
@@ -589,10 +575,7 @@ async def remove_filter(request: Request):
     log_request(result)
     data = result.get("data", {})
     data = vault_api.remove_filter_template(data)
-    return {
-        "ok": True,
-        "data": data
-    }
+    return {"ok": True, "data": data}
 
 
 @router.post("/rename_collection")
@@ -601,10 +584,7 @@ async def rename_collection(request: Request):
     log_request(result)
     data = result.get("data", {})
     data = vault_api.rename_collection(data)
-    return {
-        "ok": True,
-        "data": data
-    }
+    return {"ok": True, "data": data}
 
 
 @router.post("/edit_collection")
@@ -613,10 +593,7 @@ async def edit_collection(request: Request):
     log_request(result)
     data = result.get("data", {})
     data = vault_api.edit_collection(data)
-    return {
-        "ok": True,
-        "data": data
-    }
+    return {"ok": True, "data": data}
 
 
 @router.post("/write_collections")
@@ -625,19 +602,13 @@ async def write_collections(request: Request):
     log_request(result)
     data = result.get("data", {})
     data = vault_api.write_collections(data)
-    return {
-        "ok": True,
-        "data": data
-    }
+    return {"ok": True, "data": data}
 
 
 @router.get("/get_filter_templates")
 async def get_filter_templates():
     data = vault_api.get_filter_templates()
-    return {
-        "ok": True,
-        "data": data
-    }
+    return {"ok": True, "data": data}
 
 
 @router.post("/add_rule_template")
@@ -650,10 +621,7 @@ async def add_rule_template(request: Request):
         LOGGER.error(f"name {name} data {data}")
         return {"ok": False}
     data = vault_api.add_rule_template(data, name)
-    return {
-        "ok": True,
-        "data": data
-    }
+    return {"ok": True, "data": data}
 
 
 @router.post("/remove_rule_template")
@@ -662,10 +630,7 @@ async def remove_rule_template(request: Request):
     log_request(result)
     data = result.get("data", {})
     data = vault_api.remove_rule_template(data)
-    return {
-        "ok": True,
-        "data": data
-    }
+    return {"ok": True, "data": data}
 
 
 @router.post("/get_collections")
@@ -674,10 +639,7 @@ async def get_collections(request: Request):
     log_request(result)
     user = result.get("user")
     data = vault_api.get_collections(user, "all")
-    return {
-        "ok": True,
-        "data": data
-    }
+    return {"ok": True, "data": data}
 
 
 @router.post("/create_collection")
@@ -686,10 +648,7 @@ async def create_collection(request: Request):
     log_request(result)
     data = result.get("data", {})
     data = vault_api.create_collection(data)
-    return {
-        "ok": True,
-        "data": data
-    }
+    return {"ok": True, "data": data}
 
 
 @router.post("/delete_collection")
@@ -698,10 +657,7 @@ async def delete_collection(request: Request):
     log_request(result)
     data = result.get("data", {})
     data = vault_api.delete_collection(data)
-    return {
-        "ok": True,
-        "data": data
-    }
+    return {"ok": True, "data": data}
 
 
 @router.post("/reorder_collection")
@@ -716,10 +672,7 @@ async def reorder_collection(request: Request):
 @router.get("/get_rule_templates")
 async def get_rule_templates():
     data = api.get_rule_templates()
-    return {
-        "ok": True,
-        "data": data
-    }
+    return {"ok": True, "data": data}
 
 
 @router.post("/add_rule_template")
@@ -732,10 +685,7 @@ async def add_rule_template(request: Request):
         logging.error(f"name {name} data {data}")
         return {"ok": False}
     data = api.add_rule_template(data, name)
-    return {
-        "ok": True,
-        "data": data
-    }
+    return {"ok": True, "data": data}
 
 
 @router.post("/remove_rule_template")
@@ -744,19 +694,13 @@ async def remove_rule_template(request: Request):
     log_request(result)
     data = result.get("data", {})
     data = api.remove_rule_template(data)
-    return {
-        "ok": True,
-        "data": data
-    }
+    return {"ok": True, "data": data}
 
 
 @router.get("/get_vault_asset_names")
 async def get_vault_asset_names():
     data = api.get_vault_asset_names()
-    return {
-        "ok": True,
-        "data": data
-    }
+    return {"ok": True, "data": data}
 
 
 @router.post("/vault_import")

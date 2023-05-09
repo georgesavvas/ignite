@@ -14,6 +14,7 @@
 
 
 import os
+import stat
 import re
 import shutil
 from pathlib import PurePath, Path
@@ -27,6 +28,25 @@ ENV = os.environ
 CONFIG_PATH = Path(ENV["IGNITE_CONFIG_PATH"])
 USER_CONFIG_PATH = Path(ENV["IGNITE_USER_CONFIG_PATH"])
 LOGGER = get_logger(__name__)
+READ_ONLY = (
+    stat.S_IRUSR
+    | stat.S_IXUSR
+    | stat.S_IRGRP
+    | stat.S_IXGRP
+    | stat.S_IROTH
+    | stat.S_IXOTH
+)
+READ_WRITE = (
+    stat.S_IRUSR
+    | stat.S_IWUSR
+    | stat.S_IXUSR
+    | stat.S_IRGRP
+    | stat.S_IWGRP
+    | stat.S_IXGRP
+    | stat.S_IROTH
+    | stat.S_IWOTH
+    | stat.S_IXOTH
+)
 
 
 def log_request(request):
@@ -76,12 +96,12 @@ def bytes_to_human_readable(size, suffix="B"):
 def mount_root(app, config):
     projects_root = config["root"]
     if not projects_root or not Path(projects_root).is_dir():
-        LOGGER.warning(f"Projects root {projects_root} does not exist, skipping mounting...")
+        LOGGER.warning(
+            f"Projects root {projects_root} does not exist, skipping mounting..."
+        )
         return
     LOGGER.debug(f"Attempting to mount {projects_root}")
-    app.mount(
-        "/files", StaticFiles(directory=projects_root), name="projects_root"
-    )
+    app.mount("/files", StaticFiles(directory=projects_root), name="projects_root")
     LOGGER.debug("Mounted on /files")
 
 
@@ -172,6 +192,35 @@ def ensure_clean_name(name):
     return re.sub(r"[^\w]", name, "_")
 
 
+def lock_directory(path):
+    file = Path(path)
+    LOGGER.debug(f"Changing {file} mode to {oct(READ_ONLY)}")
+    try:
+        file.chmod(READ_ONLY)
+        return True
+    except Exception as e:
+        LOGGER.error(e)
+        return False
+
+
+def unlock_directory(path):
+    file = Path(path)
+    LOGGER.debug(f"Changing {file} mode to {oct(READ_WRITE)}")
+    try:
+        file.chmod(READ_WRITE)
+        return True
+    except Exception as e:
+        LOGGER.error(e)
+        return False
+
+
+READ_ONLY_BITS = ["444", "555"]
+
+
 def is_read_only(path):
     # return not os.access(path, os.W_OK)
-    return oct(Path(path).stat().st_mode).endswith("555")
+    file_perms = oct(Path(path).stat().st_mode)
+    for bit in READ_ONLY_BITS:
+        if file_perms.endswith(bit):
+            return True
+    return False

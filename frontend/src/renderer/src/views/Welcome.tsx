@@ -130,15 +130,8 @@ const Welcome = (props: WelcomeProps) => {
               disabled={access.remote}
               value={access.projectsDir || ""}
               onChange={(_: any, value: string) => handleAccessChange("projectsDir", value)}
-              buttonStyle={{ marginTop: "4px" }}
             >
-              <IgnButton
-                color="ignite"
-                size="medium"
-                onClick={() => handleSave()}
-                sx={{ height: "37.5px", marginTop: "4px" }}
-                disabled={!canSave}
-              >
+              <IgnButton color="ignite" onClick={() => handleSave()} disabled={!canSave}>
                 Save
               </IgnButton>
             </FileInput>
@@ -161,6 +154,7 @@ const Welcome = (props: WelcomeProps) => {
                 onClick={handleNewProject}
                 loading={projectLoading}
                 variant="outlined"
+                size="small"
               >
                 Create
               </LoadingButton>
