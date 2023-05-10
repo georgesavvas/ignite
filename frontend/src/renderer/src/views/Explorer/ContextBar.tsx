@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import Breadcrumbs from "@mui/material/Breadcrumbs";
-import { ClickEvent } from "@renderer/types/common";
-import { useSnackbar } from "notistack";
+import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
 import { useContext, useEffect, useState } from "react";
 
-import IgnTextField from "../../components/IgnTextField";
-import { DIRECTORYICONS } from "../../constants";
-import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
-import styles from "./ContextBar.module.css";
+import Breadcrumbs from "@mui/material/Breadcrumbs";
+import { ClickEvent } from "@renderer/types/common";
 import ContextBarLink from "./ContextBarLink";
+import { DIRECTORYICONS } from "../../constants";
+import IgnTextField from "../../components/IgnTextField";
+import styles from "./ContextBar.module.css";
+import { useSnackbar } from "notistack";
 
 export const ContextBar = () => {
   const { currentContext, setCurrentContext } = useContext(ContextContext) as ContextContextType;
@@ -39,7 +39,7 @@ export const ContextBar = () => {
     setCurrentContext(value).then((success) => {
       if (!success) {
         enqueueSnackbar("Path not found", { variant: "error" });
-        setContextPath(currentContext.path);
+        setContextPath(currentContext.path || "");
       }
     });
   };
@@ -51,7 +51,7 @@ export const ContextBar = () => {
     setIsTextField(true);
   };
 
-  const handleBlur = (e: React.FocusEvent) => {
+  const handleBlur = (e: React.FocusEvent | React.KeyboardEvent) => {
     const { target } = e;
     if (!(target instanceof HTMLTextAreaElement)) return;
     const value = target.value;
@@ -62,7 +62,7 @@ export const ContextBar = () => {
   const getSectionPaths = () => {
     if (!currentContext.posix) return {};
     let sectionPaths = {} as { [key: string]: string };
-    const sections = currentContext.path_nr
+    const sections = (currentContext.path_nr || "")
       .replace("/scenes/", "/")
       .replace("/exports/", "/")
       .split("/");
@@ -83,7 +83,7 @@ export const ContextBar = () => {
           variant="outlined"
           value={contextPath}
           onChange={(e) => setContextPath(e.target.value)}
-          onKeyPress={(e) => (e.key === "Enter" ? handleBlur(e as React.FocusEvent) : null)}
+          onKeyPress={(e) => (e.key === "Enter" ? handleBlur(e) : null)}
           onBlur={handleBlur}
           autoFocus
         />
@@ -91,8 +91,8 @@ export const ContextBar = () => {
         <Breadcrumbs>
           {Object.keys(sectionPaths).map((section, index) => {
             const path = sectionPaths[section];
-            const kind = currentContext.ancestor_kinds[path] || "directory";
-            const Icon = DIRECTORYICONS[kind];
+            const kind = currentContext.ancestor_kinds?.[path] || "directory";
+            const Icon = DIRECTORYICONS[kind as keyof typeof DIRECTORYICONS];
             return (
               <ContextBarLink
                 setCurrentContext={setCurrentContext}

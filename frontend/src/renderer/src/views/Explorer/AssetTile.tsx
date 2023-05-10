@@ -12,22 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import Typography from "@mui/material/Typography";
-import { IgniteAssetVersion } from "@renderer/types/common";
-import { useSnackbar } from "notistack";
-import { useContext } from "react";
-
-import Tile, { TileProps } from "../../components/Tile";
 import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
-import { CrateContext, CrateContextType } from "../../contexts/CrateContext";
 import { CopyToClipboard, ShowInExplorer } from "../ContextActions";
+import { CrateContext, CrateContextType } from "../../contexts/CrateContext";
+import Tile, { TileProps } from "../../components/Tile";
 import { setReprForParent, setReprForProject } from "../ContextActions";
+
+import { IgniteAssetVersion } from "@renderer/types/common";
+import Typography from "@mui/material/Typography";
+import { useContext } from "react";
+import { useSnackbar } from "notistack";
 
 interface AssetTileProps extends TileProps {
   entity: IgniteAssetVersion;
   viewType?: "dynamic" | "tasks" | "assets" | "scenes";
   refreshContext?: () => void;
-  handleContextMenuSelection: (action: string, data: any) => void;
+  handleContextMenuSelection?: (action: string, data: any) => void;
 }
 
 const AssetTile = (props: AssetTileProps) => {
@@ -38,7 +38,8 @@ const AssetTile = (props: AssetTileProps) => {
   const hasThumbnail = props.entity.thumbnail && props.entity.thumbnail.filename;
   const thumbnailWidth = hasThumbnail ? "100%" : "50%";
   const currentPath = currentContext.path_nr?.replace(currentContext.project + "/", "");
-  let contextPath = props.entity.context.replace(currentPath, "");
+  let contextPath = props.entity.context;
+  if (currentPath) contextPath = contextPath.replace(currentPath, "");
   if (contextPath.startsWith("/")) contextPath = contextPath.slice(1);
 
   const dirData = {
@@ -61,10 +62,6 @@ const AssetTile = (props: AssetTileProps) => {
       label: "Go to task",
       fn: () => setCurrentContext(props.entity.task),
       divider: true,
-    },
-    {
-      label: "Add to Vault",
-      fn: () => props.handleContextMenuSelection("vaultImport", dirData),
     },
     // {
     //   label: "Import new version from Vault",
@@ -90,32 +87,42 @@ const AssetTile = (props: AssetTileProps) => {
       fn: () => addToCrate([props.entity]),
       divider: true,
     },
-    {
-      label: "Rename asset",
-      disabled: props.entity.protected,
-      fn: () =>
-        props.handleContextMenuSelection("rename", {
-          name: props.entity.name,
-          kind: "asset",
-          path: props.entity.asset,
-        }),
-    },
-    {
-      label: "Delete asset (all versions)",
-      disabled: props.entity.protected,
-      fn: () =>
-        props.handleContextMenuSelection("delete", {
-          name: props.entity.name,
-          kind: "asset",
-          path: props.entity.asset,
-        }),
-    },
-    {
-      label: "Delete asset version",
-      disabled: props.entity.protected,
-      fn: () => props.handleContextMenuSelection("delete", dirData),
-    },
   ];
+  if (props.handleContextMenuSelection) {
+    const fn = props.handleContextMenuSelection;
+    contextItems.splice(3, 0, {
+      label: "Add to Vault",
+      fn: () => fn("vaultImport", dirData),
+    });
+    const extraItems = [
+      {
+        label: "Rename asset",
+        disabled: props.entity.protected,
+        fn: () =>
+          fn("rename", {
+            name: props.entity.name,
+            kind: "asset",
+            path: props.entity.asset,
+          }),
+      },
+      {
+        label: "Delete asset (all versions)",
+        disabled: props.entity.protected,
+        fn: () =>
+          fn("delete", {
+            name: props.entity.name,
+            kind: "asset",
+            path: props.entity.asset,
+          }),
+      },
+      {
+        label: "Delete asset version",
+        disabled: props.entity.protected,
+        fn: () => fn("delete", dirData),
+      },
+    ];
+    contextItems.push(...extraItems);
+  }
 
   const details = () => {
     return (
