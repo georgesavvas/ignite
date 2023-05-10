@@ -12,38 +12,55 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import Divider from "@mui/material/Divider";
-import LinearProgress from "@mui/material/LinearProgress";
-import Typography from "@mui/material/Typography";
-import { EnqueueSnackbar, IgniteComponent, IgniteEntity } from "@renderer/types/common";
-import { debounce } from "lodash";
-import { useSnackbar } from "notistack";
-import React, { ChangeEvent, ClipboardEvent, useContext, useEffect, useState } from "react";
-
-import ContextMenu, { ContextMenuType, handleContextMenu } from "../../components/ContextMenu";
-import DataPlaceholder from "../../components/DataPlaceholder";
-import DragOverlay from "../../components/DragOverlay";
-import Modal from "../../components/Modal";
-import { DIRCONTEXTOPTIONS } from "../../constants/directoryContextOptions";
 import { ConfigContext, ConfigContextType } from "../../contexts/ConfigContext";
 import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
-import { EntityContext, EntityContextType } from "../../contexts/EntityContext";
-import BuildFileURL from "../../services/BuildFileURL";
-import serverRequest from "../../services/serverRequest";
-import loadExplorerSettings from "../../utils/loadExplorerSettings";
-import saveExplorerSettings from "../../utils/saveExplorerSettings";
+import ContextMenu, { ContextMenuType, handleContextMenu } from "../../components/ContextMenu";
 import { CopyToClipboard, ShowInExplorer, VaultExport, VaultImport } from "../ContextActions";
 import { CreateDir, DeleteDir, RenameDir } from "../ContextActions";
-import DccSelector from "../DccSelector";
+import {
+  EnqueueSnackbar,
+  IgniteAssetVersion,
+  IgniteComponent,
+  IgniteEntity,
+} from "@renderer/types/common";
+import { EntityContext, EntityContextType } from "../../contexts/EntityContext";
+import React, { ChangeEvent, ClipboardEvent, useContext, useEffect, useState } from "react";
+
 import AssetTile from "./AssetTile";
+import BuildFileURL from "../../services/BuildFileURL";
+import { DIRCONTEXTOPTIONS } from "../../constants/directoryContextOptions";
+import DataPlaceholder from "../../components/DataPlaceholder";
+import DccSelector from "../DccSelector";
 import DirectoryTile from "./DirectoryTile";
-import styles from "./Explorer.module.css";
+import Divider from "@mui/material/Divider";
+import DragOverlay from "../../components/DragOverlay";
 import ExplorerBar from "./ExplorerBar";
+import LinearProgress from "@mui/material/LinearProgress";
+import Modal from "../../components/Modal";
 import PageBar from "./PageBar";
 import RowView from "./RowView";
 import SceneDrop from "./SceneDrop";
+import Typography from "@mui/material/Typography";
+import { debounce } from "lodash";
+import loadExplorerSettings from "../../utils/loadExplorerSettings";
+import saveExplorerSettings from "../../utils/saveExplorerSettings";
+import serverRequest from "../../services/serverRequest";
+import styles from "./Explorer.module.css";
+import { useSnackbar } from "notistack";
 
 const debounced = debounce((fn: () => void) => fn(), 500);
+
+export type ResultType = "dynamic" | "tasks" | "assets" | "scenes";
+
+export type ViewType = "current" | "grid" | "row";
+
+export interface ExplorerSettings {
+  currentResultType: ResultType;
+  currentViewType: ViewType;
+  currentTileSize: number;
+  tilesPerPage: number;
+  saved: { [key in ResultType]: { [key in ViewType]: number | string } };
+}
 
 const defaultExplorerSettings = {
   currentResultType: "dynamic",
@@ -72,7 +89,7 @@ const defaultExplorerSettings = {
       current: "grid",
     },
   },
-};
+} as ExplorerSettings;
 
 export type QueryType = {
   latest: -1 | 1;
@@ -92,17 +109,21 @@ const defaultQuery = {
   },
 } as QueryType;
 
+const entityIsAssetVersion = (entity: IgniteEntity): entity is IgniteAssetVersion => {
+  return entity.dir_kind === "assetversion";
+};
+
 const Explorer = () => {
   const { config } = useContext(ConfigContext) as ConfigContextType;
   const [isLoading, setIsLoading] = useState(true);
   const [loadedData, setLoadedData] = useState([]);
   const [pages, setPages] = useState({ total: 1, current: 1 });
   const [query, setQuery] = useState(defaultQuery);
-  const savedExplorerSettings = loadExplorerSettings();
+  const savedExplorerSettings = loadExplorerSettings() as ExplorerSettings;
   const [explorerSettings, setExplorerSettings] = useState(
     savedExplorerSettings || defaultExplorerSettings
   );
-  const [tiles, setTiles] = useState([]);
+  const [tiles, setTiles] = useState<JSX.Element[]>([]);
   const [modalData, setModalData] = useState({});
   const [dropData, setDropData] = useState({ visible: false });
   const { selectedEntity, setSelectedEntity } = useContext(EntityContext) as EntityContextType;
@@ -164,49 +185,49 @@ const Explorer = () => {
     );
     if (fetchedSelected) setSelectedEntity(fetchedSelected);
     if (explorerSettings.currentViewType !== "grid") return;
-    const _tiles = loadedData.reduce((obj, entity: IgniteEntity) => {
-      entity.path = BuildFileURL(entity.path, config, { pathOnly: true });
-      if (entity.components) {
-        entity.components.forEach((comp: IgniteComponent) => {
-          comp.path = BuildFileURL(comp.path, config, { pathOnly: true });
-        });
-      }
-      if (entity.task) {
-        entity.task = BuildFileURL(entity.task, config, { pathOnly: true });
-      }
-      if (entity.scene) {
-        entity.scene = BuildFileURL(entity.scene, config, { pathOnly: true });
-      }
-      if (entity.dir_kind === "assetversion") {
-        obj[entity.result_id] = (
-          <AssetTile
-            key={entity.path}
-            entity={entity}
-            onSelected={handleEntitySelection}
-            refreshContext={refresh}
-            size={explorerSettings.currentTileSize * 40}
-            viewType={explorerSettings.currentViewType}
-            selected={selectedEntity.path === entity.path}
-            handleContextMenuSelection={handleContextMenuSelection}
-          />
-        );
-      } else {
-        obj[entity.result_id] = (
-          <DirectoryTile
-            key={entity.path}
-            entity={entity}
-            onSelected={handleEntitySelection}
-            selected={selectedEntity.path === entity.path}
-            handleContextMenuSelection={handleContextMenuSelection}
-            size={explorerSettings.currentTileSize * 40}
-            refreshContext={refresh}
-            viewType={explorerSettings.currentViewType}
-          />
-        );
-      }
-      return obj;
-    }, {});
-    setTiles(_tiles);
+    setTiles(
+      loadedData.map((entity: IgniteEntity) => {
+        entity.path = BuildFileURL(entity.path, config, { pathOnly: true });
+        if ("components" in entity && entity.components) {
+          entity.components.forEach((comp: IgniteComponent) => {
+            comp.path = BuildFileURL(comp.path, config, { pathOnly: true });
+          });
+        }
+        if (entity.task) {
+          entity.task = BuildFileURL(entity.task, config, { pathOnly: true });
+        }
+        if ("scene" in entity && entity.scene) {
+          entity.scene = BuildFileURL(entity.scene, config, { pathOnly: true });
+        }
+        if (entityIsAssetVersion(entity)) {
+          return (
+            <AssetTile
+              key={entity.path}
+              entity={entity}
+              onSelected={handleEntitySelection}
+              refreshContext={refresh}
+              size={explorerSettings.currentTileSize * 40}
+              viewType={explorerSettings.currentViewType}
+              selected={selectedEntity.path === entity.path}
+              handleContextMenuSelection={handleContextMenuSelection}
+            />
+          );
+        } else {
+          return (
+            <DirectoryTile
+              key={entity.path}
+              entity={entity}
+              onSelected={handleEntitySelection}
+              selected={selectedEntity.path === entity.path}
+              handleContextMenuSelection={handleContextMenuSelection}
+              size={explorerSettings.currentTileSize * 40}
+              refreshContext={refresh}
+              viewType={explorerSettings.currentViewType}
+            />
+          );
+        }
+      })
+    );
   }, [
     loadedData,
     selectedEntity.path,
@@ -267,7 +288,7 @@ const Explorer = () => {
     const currentViewType = explorerSettings.currentViewType;
     setExplorerSettings((prev: typeof defaultExplorerSettings) => {
       const saved = prev.saved;
-      saved[currentResultType as keyof typeof saved][currentViewType] = value;
+      saved[currentResultType][currentViewType] = value;
       return {
         ...prev,
         currentTileSize: value,

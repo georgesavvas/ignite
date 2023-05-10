@@ -99,7 +99,7 @@ export const ContextBar = () => {
                 icon={Icon}
                 path={path}
                 key={index}
-                root={currentContext.root}
+                root={currentContext.root || ""}
               >
                 {section}
               </ContextBarLink>

@@ -12,22 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { SvgIconProps } from "@mui/material";
-import Link from "@mui/material/Link";
+import ContextMenu, { ContextMenuType, handleContextMenu } from "../../components/ContextMenu";
+
 import { ClickEvent } from "@renderer/types/common";
+import { CopyToClipboard } from "../ContextActions";
+import Link from "@mui/material/Link";
+import { SvgIconProps } from "@mui/material";
+import openExplorer from "../../utils/openExplorer";
 import { useSnackbar } from "notistack";
 import { useState } from "react";
-
-import ContextMenu, { ContextMenuType, handleContextMenu } from "../../components/ContextMenu";
-import openExplorer from "../../utils/openExplorer";
-import { CopyToClipboard } from "../ContextActions";
 
 interface ContextBarLinkProps {
   root: string;
   path: string;
   icon: React.ComponentType<SvgIconProps>;
   setCurrentContext: (path: string) => void;
-  children: React.ReactNode[];
+  children: React.ReactNode | React.ReactNode[];
 }
 
 const ContextBarLink = (props: ContextBarLinkProps) => {

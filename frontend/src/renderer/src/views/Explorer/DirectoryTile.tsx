@@ -13,19 +13,20 @@
 // limitations under the License.
 
 import { Box, SvgIcon } from "@mui/material";
-import Typography from "@mui/material/Typography";
+import { ClickEvent, IgniteDirectory, IgniteScene } from "@renderer/types/common";
+import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
+import { CopyToClipboard, ShowInExplorer, clearRepr } from "../ContextActions";
+import { CrateContext, CrateContextType } from "../../contexts/CrateContext";
+import React, { useContext } from "react";
+import Tile, { TileProps } from "../../components/Tile";
+import { setReprForParent, setReprForProject } from "../ContextActions";
+
 import { DCCINFO } from "@renderer/constants/dccInfo";
 import { DIRCONTEXTOPTIONS } from "@renderer/constants/directoryContextOptions";
 import { DIRECTORYICONS } from "@renderer/constants/directoryIcons";
-import { ClickEvent, IgniteDirectory, IgniteScene } from "@renderer/types/common";
+import Typography from "@mui/material/Typography";
+import { ViewType } from "./Explorer";
 import { useSnackbar } from "notistack";
-import React, { useContext } from "react";
-
-import Tile, { TileProps } from "../../components/Tile";
-import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
-import { CrateContext, CrateContextType } from "../../contexts/CrateContext";
-import { CopyToClipboard, ShowInExplorer, clearRepr } from "../ContextActions";
-import { setReprForParent, setReprForProject } from "../ContextActions";
 
 const folderIcon = new URL("@assets/folder_icon.png", import.meta.url).href;
 const dccUnknownIcon = new URL("@assets/dcc/unknown.png", import.meta.url).href;
@@ -44,7 +45,7 @@ const isDirectoryScene = (entity: IgniteDirectory | IgniteScene): entity is Igni
 
 interface DirectoryTileProps extends TileProps {
   entity: IgniteDirectory | IgniteScene;
-  viewType?: "dynamic" | "tasks" | "assets" | "scenes";
+  viewType?: ViewType;
   refreshContext?: () => void;
   handleContextMenuSelection?: (action: string, data: any) => void;
 }
