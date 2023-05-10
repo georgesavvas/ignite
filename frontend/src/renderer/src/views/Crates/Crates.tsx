@@ -12,9 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import AddIcon from "@mui/icons-material/Add";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { OutlinedInput } from "@mui/material";
+import { CrateContext, CrateContextType } from "../../contexts/CrateContext";
 import {
   CrateEntity,
   CrateType,
@@ -25,11 +23,13 @@ import {
 } from "@renderer/types/common";
 import { useContext, useEffect, useState } from "react";
 
-import IgnButton from "../../components/IgnButton";
-import { CrateContext, CrateContextType } from "../../contexts/CrateContext";
-import Component from "../DetailsView/Component";
+import AddIcon from "@mui/icons-material/Add";
 import AssetTile from "../Explorer/AssetTile";
+import Component from "../DetailsView/Component";
 import DirectoryTile from "../Explorer/DirectoryTile";
+import IgnButton from "../../components/IgnButton";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import { OutlinedInput } from "@mui/material";
 import styles from "./Crates.module.css";
 
 interface CrateProps {

@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ThemeProvider } from "@mui/material/styles";
-import { render, screen } from "@testing-library/react";
-import { vi } from "vitest";
-
-import { igniteTheme } from "../theme";
 import CreateDirModal, { CreateDirModalProps } from "./CreateDirModal";
+
+import { ThemeProvider } from "@mui/material/styles";
+import { igniteTheme } from "../theme";
+import { render } from "@testing-library/react";
+import { vi } from "vitest";
 
 const makeSut = (props: CreateDirModalProps) => {
   return render(

@@ -12,24 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { WebSocketWithInterval } from "@renderer/types/common";
+import { ConfigContext, ConfigContextType } from "./ConfigContext";
 import { PropsWithChildren, createContext, useContext, useEffect, useState } from "react";
 
 import BuildFileURL from "../services/BuildFileURL";
+import { WebSocketWithInterval } from "@renderer/types/common";
 import serverRequest from "../services/serverRequest";
 import { serverSocket } from "../services/serverWebSocket";
-import { ConfigContext, ConfigContextType } from "./ConfigContext";
 
 type Context = {
-  root: string;
-  name: string;
-  path: string;
-  posix: string;
-  path_nr: string;
-  dir_kind: string;
-  project: string;
-  parent: string;
-  ancestor_kinds: { [key: string]: string };
+  update: number;
+  root?: string;
+  name?: string;
+  path?: string;
+  posix?: string;
+  path_nr?: string;
+  dir_kind?: string;
+  project?: string;
+  parent?: string;
+  ancestor_kinds?: { [key: string]: string };
 };
 
 export type ContextContextType = {
@@ -52,7 +53,7 @@ const destroySocket = (socket: WebSocketWithInterval) => {
 
 export const ContextProvider = ({ children }: PropsWithChildren) => {
   const { config } = useContext(ConfigContext) as ConfigContextType;
-  const [currentContext, setCurrentContext] = useState({ update: 0 });
+  const [currentContext, setCurrentContext] = useState<Context>({ update: 0 });
   const [socket, setSocket] = useState<WebSocket | undefined>();
 
   useEffect(() => {
@@ -66,9 +67,10 @@ export const ContextProvider = ({ children }: PropsWithChildren) => {
     const sessionID = window.services.get_env("IGNITE_SESSION_ID");
     const serverAddress = window.services.get_env("IGNITE_SERVER_ADDRESS");
     Promise.all([sessionID, serverAddress]).then((resp) => {
-      const ws = createAssetUpdatesSocket(resp[0], resp[1]);
-      ws.onmessage = (data: string) => console.log("ASSET_UPDATES RECEIVED:", data);
-      setSocket(ws);
+      Promise.resolve(createAssetUpdatesSocket(resp[0], resp[1])).then((ws) => {
+        ws.onmessage = (data) => console.log("ASSET_UPDATES RECEIVED:", data);
+        setSocket(ws);
+      });
     });
     return () => {
       if (!socket) return;

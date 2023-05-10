@@ -12,22 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import AddIcon from "@mui/icons-material/Add";
-import ClearIcon from "@mui/icons-material/Clear";
-import { Autocomplete, AutocompleteGetTagProps, TextField, Typography } from "@mui/material";
-import { Chip } from "@mui/material";
-import Tooltip from "@mui/material/Tooltip";
-import { useSnackbar } from "notistack";
-import { useCallback, useContext, useState } from "react";
-import stc from "string-to-color";
-
+import { Autocomplete, AutocompleteGetTagProps, TextField } from "@mui/material";
 import { ConfigContext, ConfigContextType } from "../contexts/ConfigContext";
-import BuildFileURL from "../services/BuildFileURL";
-import serverRequest from "../services/serverRequest";
-import { hexToHsl } from "../utils/hexToHsl";
-import { CopyToClipboard } from "../views/ContextActions";
 import ContextMenu, { ContextMenuType, handleContextMenu } from "./ContextMenu";
+import { useCallback, useContext, useState } from "react";
+
+import BuildFileURL from "../services/BuildFileURL";
+import { Chip } from "@mui/material";
+import { CopyToClipboard } from "../views/ContextActions";
+import { hexToHsl } from "../utils/hexToHsl";
+import serverRequest from "../services/serverRequest";
+import stc from "string-to-color";
 import styles from "./Tags.module.css";
+import { useSnackbar } from "notistack";
 
 const namedStyles = {
   locked: {
@@ -78,15 +75,21 @@ export const Tags = (props: TagsProps) => {
   };
 
   const renderTags = useCallback((tags: string[], getTagProps: AutocompleteGetTagProps) => {
-    return tags.map((tag, index) => (
-      <Chip
-        // key={tag}
-        label={tag}
-        size="small"
-        sx={{ backgroundColor: hexToHsl(stc(tag), 80, 30) }}
-        {...getTagProps({ index })}
-      />
-    ));
+    return tags.map((tag, index) => {
+      let style = {} as React.CSSProperties;
+      if (namedStyles[tag as keyof typeof namedStyles])
+        style = namedStyles[tag as keyof typeof namedStyles];
+      else style = { backgroundColor: hexToHsl(stc(tag), 80, 30) };
+      return (
+        <Chip
+          // key={tag}
+          label={tag}
+          size="small"
+          sx={style}
+          {...getTagProps({ index })}
+        />
+      );
+    });
   }, []);
 
   return (
@@ -116,50 +119,6 @@ export const Tags = (props: TagsProps) => {
         />
       </div>
     </>
-  );
-};
-
-interface TagProps {
-  name: string;
-  onDelete: (name: string) => void;
-}
-
-const Tag = (props: TagProps) => {
-  let style = {} as React.CSSProperties;
-  if (namedStyles[props.name as keyof typeof namedStyles])
-    style = namedStyles[props.name as keyof typeof namedStyles];
-  else style = { backgroundColor: hexToHsl(stc(props.name), 80, 30) };
-
-  const limit = 30;
-  const nameFormatted =
-    props.name.length < limit ? props.name : props.name.substring(0, limit) + "...";
-
-  return (
-    <div className={styles.tag} style={style}>
-      <Typography>{nameFormatted}</Typography>
-      <ClearIcon className={styles.clearIcon} onClick={() => props.onDelete(props.name)} />
-    </div>
-  );
-};
-
-interface NewTagsProps {
-  onClick: () => void;
-}
-
-const NewTags = (props: NewTagsProps) => {
-  return (
-    <Tooltip title="Add Tags">
-      <div
-        onContextMenu={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-        }}
-        className={styles.tagEdit}
-        onClick={props.onClick}
-      >
-        <AddIcon />
-      </div>
-    </Tooltip>
   );
 };
 

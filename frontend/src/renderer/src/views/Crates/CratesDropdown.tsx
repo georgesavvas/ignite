@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { CrateType } from "@renderer/types/common";
-import { useContext, useState } from "react";
-
 import ContextMenu, { ContextMenuType, handleContextMenu } from "../../components/ContextMenu";
 import { CrateContext, CrateContextType } from "../../contexts/CrateContext";
-import clientRequest from "../../services/clientRequest";
+import { useContext, useState } from "react";
+
+import { CrateType } from "@renderer/types/common";
 import Crates from "./Crates";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import clientRequest from "../../services/clientRequest";
 import styles from "./CratesDropdown.module.css";
 
 const CratesDropdown = () => {
@@ -69,8 +69,11 @@ const CratesDropdown = () => {
     },
   ];
 
-  const handleContextMenu_ = (e: React.MouseEvent<HTMLElement>, crate: CrateType) => {
-    handleContextMenu(e, contextMenu, setContextMenu, crate);
+  const handleContextMenu_ = (
+    e: React.MouseEvent<HTMLElement | SVGSVGElement>,
+    crate: CrateType
+  ) => {
+    handleContextMenu(e as React.MouseEvent<HTMLElement>, contextMenu, setContextMenu, crate);
   };
 
   return (
