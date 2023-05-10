@@ -20,12 +20,13 @@ import { setReprForParent, setReprForProject } from "../ContextActions";
 
 import { IgniteAssetVersion } from "@renderer/types/common";
 import Typography from "@mui/material/Typography";
+import { ViewType } from "./Explorer";
 import { useContext } from "react";
 import { useSnackbar } from "notistack";
 
 interface AssetTileProps extends TileProps {
   entity: IgniteAssetVersion;
-  viewType?: "dynamic" | "tasks" | "assets" | "scenes";
+  viewType?: ViewType;
   refreshContext?: () => void;
   handleContextMenuSelection?: (action: string, data: any) => void;
 }
