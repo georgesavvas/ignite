@@ -23,7 +23,6 @@ from ignite.logger import get_logger
 
 
 LOGGER = get_logger(__name__)
-LOGGER.info("\n\n\n****************\nLAUNCHING IGNITE\n****************")
 
 
 if getattr(sys, "frozen", False):
@@ -42,7 +41,7 @@ else:
 
 
 api_v = "v1"
-LOGGER.info(f"Setting IGNITE_API_VERSION to {api_v}")
+LOGGER.debug(f"Setting IGNITE_API_VERSION to {api_v}")
 ENV["IGNITE_API_VERSION"] = api_v
 HOME = Path.home()
 
@@ -50,14 +49,14 @@ HOME = Path.home()
 ignite_root = Path(DIR)
 if __file__.endswith(".py"):
     ignite_root = Path(DIR).parent.parent.parent.parent
-LOGGER.info(f"Setting IGNITE_ROOT to {ignite_root}")
+LOGGER.debug(f"Setting IGNITE_ROOT to {ignite_root}")
 ENV["IGNITE_ROOT"] = str(ignite_root)
 
 
 USER_CONFIG_PATH = HOME / ".ignite"
 if not USER_CONFIG_PATH.exists():
     USER_CONFIG_PATH.mkdir(parents=True, exist_ok=True)
-LOGGER.info(f"Setting IGNITE_USER_CONFIG_PATH to {USER_CONFIG_PATH}")
+LOGGER.debug(f"Setting IGNITE_USER_CONFIG_PATH to {USER_CONFIG_PATH}")
 ENV["IGNITE_USER_CONFIG_PATH"] = str(USER_CONFIG_PATH)
 
 
@@ -82,54 +81,60 @@ def ensure_config(filepath, default={}):
 
 
 SERVER_USER_CONFIG_PATH = USER_CONFIG_PATH / "server_config.yaml"
-ensure_config(SERVER_USER_CONFIG_PATH, {
-    "server_address": "0.0.0.0:9070",
-    "root": str(HOME / "projects"),
-    "vault_name": "__vault__"
-})
+ensure_config(
+    SERVER_USER_CONFIG_PATH,
+    {
+        "server_address": "0.0.0.0:9070",
+        "root": str(HOME / "projects"),
+        "vault_name": "__vault__",
+    },
+)
 
-LOGGER.info(f"Setting IGNITE_SERVER_USER_CONFIG_PATH to {SERVER_USER_CONFIG_PATH}")
-LOGGER.info(f"Setting IGNITE_SERVER_ROOT to {DIR}")
+LOGGER.debug(f"Setting IGNITE_SERVER_USER_CONFIG_PATH to {SERVER_USER_CONFIG_PATH}")
+LOGGER.debug(f"Setting IGNITE_SERVER_ROOT to {DIR}")
 ENV["IGNITE_SERVER_USER_CONFIG_PATH"] = str(SERVER_USER_CONFIG_PATH)
 ENV["IGNITE_SERVER_ROOT"] = DIR
 
 
 default_project_dir = str(HOME / "projects")
 CLIENT_CONFIG_PATH = USER_CONFIG_PATH / "client_config.yaml"
-ensure_config(CLIENT_CONFIG_PATH, {
-    "root": default_project_dir,
-    "dcc_config": [],
-    "server_details": {
-        "address": "localhost:9070",
-        "password": "",
+ensure_config(
+    CLIENT_CONFIG_PATH,
+    {
+        "root": default_project_dir,
+        "dcc_config": [],
+        "server_details": {
+            "address": "localhost:9070",
+            "password": "",
+        },
+        "access": {
+            "projects_root": default_project_dir,
+            "remote": False,
+            "server_projects_root": default_project_dir,
+        },
     },
-    "access": {
-        "projects_root": default_project_dir,
-        "remote": False,
-        "server_projects_root": default_project_dir
-    }
-})
-LOGGER.info(f"Setting IGNITE_CLIENT_CONFIG_PATH to {CLIENT_CONFIG_PATH}")
+)
+LOGGER.debug(f"Setting IGNITE_CLIENT_CONFIG_PATH to {CLIENT_CONFIG_PATH}")
 ENV["IGNITE_CLIENT_CONFIG_PATH"] = str(CLIENT_CONFIG_PATH)
 
 
 CONFIG_PATH = ignite_root / "config"
-LOGGER.info(f"Setting IGNITE_CONFIG_PATH to {CONFIG_PATH}")
+LOGGER.debug(f"Setting IGNITE_CONFIG_PATH to {CONFIG_PATH}")
 ENV["IGNITE_CONFIG_PATH"] = str(CONFIG_PATH)
 
 
 dcc = CONFIG_PATH / "dcc"
-LOGGER.info(f"Setting IGNITE_DCC to {dcc}")
+LOGGER.debug(f"Setting IGNITE_DCC to {dcc}")
 ENV["IGNITE_DCC"] = str(dcc)
 
 
 ocio = dcc / "ocio/config-aces-cg.ocio"
-LOGGER.info(f"Setting OCIO to {ocio}")
+LOGGER.debug(f"Setting OCIO to {ocio}")
 ENV["OCIO"] = str(ocio)
 
 
 tools = ignite_root / "tools" / OS_NAME
-LOGGER.info(f"Setting IGNITE_TOOLS to {tools}")
+LOGGER.debug(f"Setting IGNITE_TOOLS to {tools}")
 ENV["IGNITE_TOOLS"] = str(tools)
 
 
