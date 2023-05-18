@@ -12,28 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { ConfigContext, ConfigContextType } from "../../contexts/ConfigContext";
+import ContextMenu, { ContextMenuType } from "../../components/ContextMenu";
+import { HandlerProps, ReflexContainer, ReflexElement, ReflexSplitter } from "react-reflex";
+import { IgniteAssetVersion, SaveReflexLayoutProps } from "@renderer/types/common";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
+import { VaultContext, VaultContextType } from "../../contexts/VaultContext";
+import { useContext, useEffect, useState } from "react";
+
+import BuildFileURL from "../../services/BuildFileURL";
+import ComponentList from "../DetailsView/ComponentList";
+import ComponentViewer from "../DetailsView/ComponentViewer";
+import { CopyToClipboard } from "../ContextActions";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
-import Select, { SelectChangeEvent } from "@mui/material/Select";
-import Typography from "@mui/material/Typography";
-import { IgniteAssetVersion, SaveReflexLayoutProps } from "@renderer/types/common";
-import { useSnackbar } from "notistack";
-import { useContext, useEffect, useState } from "react";
-import { HandlerProps, ReflexContainer, ReflexElement, ReflexSplitter } from "react-reflex";
-
-import ContextMenu, { ContextMenuType } from "../../components/ContextMenu";
 import Path from "../../components/Path";
 import Tags from "../../components/Tags";
-import { ConfigContext, ConfigContextType } from "../../contexts/ConfigContext";
-import { VaultContext, VaultContextType } from "../../contexts/VaultContext";
-import BuildFileURL from "../../services/BuildFileURL";
-import serverRequest from "../../services/serverRequest";
+import Typography from "@mui/material/Typography";
 import loadReflexLayout from "../../utils/loadReflexLayout";
 import saveReflexLayout from "../../utils/saveReflexLayout";
-import { CopyToClipboard } from "../ContextActions";
-import ComponentList from "../DetailsView/ComponentList";
-import ComponentViewer from "../DetailsView/ComponentViewer";
+import serverRequest from "../../services/serverRequest";
+import { useSnackbar } from "notistack";
 
 const splitterStyle = {
   borderColor: "rgb(80,80,80)",
@@ -69,7 +69,7 @@ const compExtensionPreviewPriority = [
   ".exr",
 ];
 
-interface AssetDetailsProps {
+export interface AssetDetailsProps {
   entity: IgniteAssetVersion;
   setSelectedEntity: (entity: IgniteAssetVersion) => void;
 }

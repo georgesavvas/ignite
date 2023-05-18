@@ -58,7 +58,9 @@ const DirectoryTile = (props: DirectoryTileProps) => {
   const isScene = isDirectoryScene(props.entity);
   let sceneIcon = isDirectoryScene(props.entity) ? getDccIcon(props.entity.dcc) : undefined;
   const thumbnailWidth = sceneIcon || hasThumbnail ? "100%" : "30%";
-  const currentPath = currentContext.path_nr?.replace(currentContext.project + "/", "");
+  let currentPath = "";
+  if (currentContext.path_nr)
+    currentPath = currentContext.path_nr.replace(currentContext.project + "/", "");
   let contextPath = props.entity.context.replace(currentPath, "");
   if (contextPath.startsWith("/")) contextPath = contextPath.slice(1);
 

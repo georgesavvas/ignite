@@ -12,15 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import Typography from "@mui/material/Typography";
-import { useState } from "react";
-import { useEffect } from "react";
-import { useXarrow } from "react-xarrows";
-
 import DynamicList from "../../components/DynamicList";
 import IgnButton from "../../components/IgnButton";
 import IgnTextField from "../../components/IgnTextField";
+import Typography from "@mui/material/Typography";
 import styles from "./Files.module.css";
+import { useEffect } from "react";
+import { useState } from "react";
+import { useXarrow } from "react-xarrows";
 
 interface FileProps {
   filepath: string;
@@ -101,7 +100,7 @@ const Files = (props: FilesProps) => {
           ? props.files.map((child, index) => (
               <File filepath={child} key={index} number={index} id={"file-" + index} />
             ))
-          : null}
+          : undefined}
       </DynamicList>
     </div>
   );

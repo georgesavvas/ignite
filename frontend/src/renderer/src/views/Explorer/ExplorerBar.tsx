@@ -12,28 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { ClickEvent, EnqueueSnackbar } from "@renderer/types/common";
+import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
+import ContextMenu, { ContextMenuType, handleContextMenu } from "../../components/ContextMenu";
+import { useContext, useEffect, useState } from "react";
+
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
-import SortIcon from "@mui/icons-material/Sort";
 import Checkbox from "@mui/material/Checkbox";
+// import Ingest from "../Ingest/Ingest";
+import ContextBar from "./ContextBar";
+import FilterField from "../../components/FilterField";
 import FormControlLabel from "@mui/material/FormControlLabel";
+import GridViewIcon from "../../icons/GridViewIcon";
 import IconButton from "@mui/material/IconButton";
+import IgnButton from "../../components/IgnButton";
+import NewAsset from "../../modals/NewAsset";
+import { QueryType } from "./Explorer";
+import RowViewIcon from "../../icons/RowViewIcon";
+import SortIcon from "@mui/icons-material/Sort";
 import Stack from "@mui/material/Stack";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import Typography from "@mui/material/Typography";
-import { ClickEvent, EnqueueSnackbar } from "@renderer/types/common";
-import { useContext, useEffect, useState } from "react";
-
-import ContextMenu, { ContextMenuType, handleContextMenu } from "../../components/ContextMenu";
-import FilterField from "../../components/FilterField";
-import IgnButton from "../../components/IgnButton";
-import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
-import GridViewIcon from "../../icons/GridViewIcon";
-import RowViewIcon from "../../icons/RowViewIcon";
-import NewAsset from "../../modals/NewAsset";
-// import Ingest from "../Ingest/Ingest";
-import ContextBar from "./ContextBar";
-import { QueryType } from "./Explorer";
 
 const style = {
   display: "flex",
@@ -83,7 +83,7 @@ const ExplorerBar = (props: ExplorerBarProps) => {
   };
 
   const handleGoBack = () => {
-    setCurrentContext(currentContext.parent);
+    setCurrentContext(currentContext.parent || "");
   };
 
   const handleFilterChange = (value: string) => {

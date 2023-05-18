@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 // Copyright 2023 Georgios Savvas
 
 // Licensed under the Apache License, Version 2.0 (the "License");

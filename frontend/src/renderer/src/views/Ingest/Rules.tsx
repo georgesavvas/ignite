@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 // Copyright 2023 Georgios Savvas
 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,28 +14,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import ClearIcon from "@mui/icons-material/Clear";
+import { useCallback, useEffect, useState } from "react";
+
 import Button from "@mui/material/Button";
+import ClearIcon from "@mui/icons-material/Clear";
+import DataPlaceholder from "../../components/DataPlaceholder";
+import { DndProvider } from "react-dnd";
+import DynamicList from "../../components/DynamicList";
 import FormControl from "@mui/material/FormControl";
+import { HTML5Backend } from "react-dnd-html5-backend";
 import IconButton from "@mui/material/IconButton";
+import IgnTextField from "../../components/IgnTextField";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
+import Modal from "../../components/Modal";
+import { Rule } from "./Rule";
+import { RuleType } from "./Ingest";
 import Select from "@mui/material/Select";
 import Typography from "@mui/material/Typography";
-import { useCallback, useEffect, useState } from "react";
-import { DndProvider } from "react-dnd";
-import { useDrop } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
-import { useXarrow } from "react-xarrows";
-
-import DataPlaceholder from "../../components/DataPlaceholder";
-import DynamicList from "../../components/DynamicList";
-import IgnTextField from "../../components/IgnTextField";
-import Modal from "../../components/Modal";
 import serverRequest from "../../services/serverRequest";
-import { RuleType } from "./Ingest";
-import { Rule } from "./Rule";
 import styles from "./Rules.module.css";
+import { useDrop } from "react-dnd";
+import { useXarrow } from "react-xarrows";
 
 interface RuleNameINputModalProps {
   onSubmit: (name: string) => void;

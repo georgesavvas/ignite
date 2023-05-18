@@ -13,31 +13,31 @@
 // limitations under the License.
 
 import { CircularProgress, Tooltip } from "@mui/material";
+import { ConfigContext, ConfigContextType } from "../../contexts/ConfigContext";
+import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
+import ContextMenu, { ContextMenuType } from "../../components/ContextMenu";
+import { EntityContext, EntityContextType } from "../../contexts/EntityContext";
+import { HandlerProps, ReflexContainer, ReflexElement, ReflexSplitter } from "react-reflex";
+import { IgniteAssetVersion, SaveReflexLayoutProps } from "@renderer/types/common";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
+import { useContext, useEffect, useState } from "react";
+
+import BuildFileURL from "../../services/BuildFileURL";
+import ComponentList from "./ComponentList";
+import ComponentViewer from "./ComponentViewer";
+import { CopyToClipboard } from "../ContextActions";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
-import Select, { SelectChangeEvent } from "@mui/material/Select";
-import Typography from "@mui/material/Typography";
-import { IgniteAssetVersion, SaveReflexLayoutProps } from "@renderer/types/common";
-import { useSnackbar } from "notistack";
-import { useContext, useEffect, useState } from "react";
-import { HandlerProps, ReflexContainer, ReflexElement, ReflexSplitter } from "react-reflex";
-
-import ContextMenu, { ContextMenuType } from "../../components/ContextMenu";
 import Path from "../../components/Path";
 import Tags from "../../components/Tags";
+import Typography from "@mui/material/Typography";
 import URI from "../../components/URI";
-import { ConfigContext, ConfigContextType } from "../../contexts/ConfigContext";
-import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
-import { EntityContext, EntityContextType } from "../../contexts/EntityContext";
-import BuildFileURL from "../../services/BuildFileURL";
-import serverRequest from "../../services/serverRequest";
 import loadReflexLayout from "../../utils/loadReflexLayout";
 import saveReflexLayout from "../../utils/saveReflexLayout";
-import { CopyToClipboard } from "../ContextActions";
+import serverRequest from "../../services/serverRequest";
 import styles from "./AssetDetails.module.css";
-import ComponentList from "./ComponentList";
-import ComponentViewer from "./ComponentViewer";
+import { useSnackbar } from "notistack";
 
 const splitterStyle = {
   borderColor: "rgb(80,80,80)",
@@ -259,7 +259,7 @@ const AssetDetails = (props: AssetDetailsProps) => {
           onStopResize={handleResized}
         >
           <ComponentList
-            project={currentContext.project}
+            project={currentContext.project || ""}
             components={props.entity.components}
             selectedComp={selectedComp}
             onSelect={setSelectedCompName}
