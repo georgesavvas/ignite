@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import Typography from "@mui/material/Typography";
-import { IgniteComponent } from "@renderer/types/common";
-import { useSnackbar } from "notistack";
-import { useContext } from "react";
-
-import Tile from "../../components/Tile";
 import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
 import { CopyToClipboard, ShowInExplorer } from "../ContextActions";
 import { setReprForParent, setReprForProject } from "../ContextActions";
+
+import { IgniteComponent } from "@renderer/types/common";
+import Tile from "../../components/Tile";
+import Typography from "@mui/material/Typography";
+import { useContext } from "react";
+import { useSnackbar } from "notistack";
 
 interface ComponentTileProps {
   entity: IgniteComponent;
@@ -32,7 +32,9 @@ const ComponentTile = (props: ComponentTileProps) => {
   const { currentContext } = useContext(ContextContext) as ContextContextType;
 
   const thumbnailWidth = "100%";
-  const currentPath = currentContext.path_nr.replace(currentContext.project + "/", "");
+  let currentPath = "";
+  if (currentContext.path_nr)
+    currentPath = currentContext.path_nr.replace(currentContext.project + "/", "");
   let contextPath = props.entity.context.replace(currentPath, "");
   if (contextPath.startsWith("/")) contextPath = contextPath.slice(1);
 
