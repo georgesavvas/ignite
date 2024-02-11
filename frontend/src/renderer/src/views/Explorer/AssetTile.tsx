@@ -28,6 +28,7 @@ interface AssetTileProps extends TileProps {
   entity: IgniteAssetVersion;
   viewType?: ViewType;
   refreshContext?: () => void;
+  onContextMenu?: () => void;
   handleContextMenuSelection?: (action: string, data: any) => void;
 }
 

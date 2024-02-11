@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 // Copyright 2023 Georgios Savvas
 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,26 +14,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import ClearIcon from "@mui/icons-material/Clear";
+import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
+import { EnqueueSnackbar, InputChangeEvent } from "@renderer/types/common";
+import { ReflexContainer, ReflexElement, ReflexSplitter } from "react-reflex";
+import Xarrow, { Xwrapper, useXarrow } from "react-xarrows";
+import { useContext, useEffect, useState } from "react";
+
 import Button from "@mui/material/Button";
+import ClearIcon from "@mui/icons-material/Clear";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
-import LinearProgress from "@mui/material/LinearProgress";
-import { EnqueueSnackbar, InputChangeEvent } from "@renderer/types/common";
-import debounce from "lodash.debounce";
-import { useContext, useEffect, useState } from "react";
-import { ReflexContainer, ReflexElement, ReflexSplitter } from "react-reflex";
-import Xarrow, { Xwrapper, useXarrow } from "react-xarrows";
-
-import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
-import clientRequest from "../../services/clientRequest";
-import loadReflexLayout from "../../utils/loadReflexLayout";
-import saveReflexLayout from "../../utils/saveReflexLayout";
 import Files from "./Files";
-import styles from "./Ingest.module.css";
+import LinearProgress from "@mui/material/LinearProgress";
 import Output from "./Output";
 import Rules from "./Rules";
+import clientRequest from "../../services/clientRequest";
+import debounce from "lodash.debounce";
+import loadReflexLayout from "../../utils/loadReflexLayout";
+import saveReflexLayout from "../../utils/saveReflexLayout";
+import styles from "./Ingest.module.css";
 
 const splitterStyle = {
   borderStyle: "solid",

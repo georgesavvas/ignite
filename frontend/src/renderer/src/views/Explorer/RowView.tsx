@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Typography } from "@mui/material";
-import { DataGrid, GridCellParams, GridRowParams } from "@mui/x-data-grid";
 import {
   ClickEvent,
   IgniteAssetVersion,
@@ -21,14 +19,16 @@ import {
   IgniteEntity,
   IgniteScene,
 } from "@renderer/types/common";
-import { useContext, useMemo, useState } from "react";
-import { useEffect } from "react";
-
-import DataPlaceholder from "../../components/DataPlaceholder";
-import URI from "../../components/URI";
 import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
+import { DataGrid, GridCellParams, GridRowParams, GridRowSelectionModel } from "@mui/x-data-grid";
+import { useContext, useMemo, useState } from "react";
+
 import AssetTile from "./AssetTile";
+import DataPlaceholder from "../../components/DataPlaceholder";
 import DirectoryTile from "./DirectoryTile";
+import { Typography } from "@mui/material";
+import URI from "../../components/URI";
+import { useEffect } from "react";
 
 type RowEntity = IgniteAssetVersion | IgniteDirectory | IgniteScene;
 
@@ -46,7 +46,7 @@ interface RowViewProps {
 
 const RowView = (props: RowViewProps) => {
   const { setCurrentContext } = useContext(ContextContext) as ContextContextType;
-  const [selectionModel, setSelectionModel] = useState<number[]>([]);
+  const [selectionModel, setSelectionModel] = useState<GridRowSelectionModel>([]);
 
   useEffect(() => {
     const selectedIndex = props.data.findIndex(
@@ -320,15 +320,15 @@ const RowView = (props: RowViewProps) => {
         rowHeight={props.tileSize * 9}
         columnHeaderHeight={0}
         hideFooter
-        selectionModel={selectionModel}
-        onSelectionModelChange={setSelectionModel}
+        rowSelectionModel={selectionModel}
+        onRowSelectionModelChange={setSelectionModel}
         columns={addSpecificColumns(columns)}
         components={{
           NoRowsOverlay: () => <DataPlaceholder text="No data" />,
         }}
-        options={{
-          customHeadRender: () => null,
-        }}
+        // options={{
+        //   customHeadRender: () => null,
+        // }}
       />
     </div>
   );

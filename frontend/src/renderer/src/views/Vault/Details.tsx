@@ -12,19 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from "react";
+import AssetDetails, { AssetDetailsProps } from "./AssetDetails";
 
 import DataPlaceholder from "../../components/DataPlaceholder";
-import AssetDetails from "./AssetDetails";
 
 const style = {
   width: "100%",
   height: "100%",
   display: "flex",
   flexDirection: "column",
-};
+} as React.CSSProperties;
 
-const Details = (props) => {
+const Details = (props: AssetDetailsProps) => {
   const entity = props.entity;
 
   return (
