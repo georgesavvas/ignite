@@ -75,7 +75,7 @@ const publicPath = "public/";
 const backendPathDev = "../backend/src/python/main.py";
 const backendPath = path.join(
   appPath,
-  process.env.NODE_ENV === "dev" ? backendPathDev : backendPaths[platformName]
+  process.env.NODE_ENV === "dev" ? backendPathDev : backendPaths[platformName],
 );
 
 const iconPaths: Platforms = {
@@ -372,7 +372,7 @@ if (!gotTheLock) {
         });
         if (proc) return true;
         return false;
-      }
+      },
     );
 
     ipcMain.handle("check_backend", async (): Promise<void> => {

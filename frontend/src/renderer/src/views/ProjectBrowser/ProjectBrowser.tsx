@@ -64,7 +64,7 @@ const Browser = (props: BrowserProps) => {
           onRefresh={props.onRefresh}
           onSelected={props.onProjectSelect}
         />
-      ))
+      )),
     );
   }, [props]);
 
@@ -90,7 +90,7 @@ interface ProjectBrowserProps {
 
 export const ProjectBrowser = (props: ProjectBrowserProps) => {
   const { currentContext, setCurrentContext, refresh } = useContext(
-    ContextContext
+    ContextContext,
   ) as ContextContextType;
   const [newProjectOpen, setNewProjectOpen] = useState(false);
   const [newProjectName, setNewProjectName] = useState("");

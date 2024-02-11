@@ -107,7 +107,11 @@ import subprocess
 if __name__ == "__main__":
     LOGGER.info("\n\n\n****************\nLAUNCHING IGNITE\n****************")
     config = uvicorn.Config(
-        f"{__name__}:app", host=SERVER_HOST, port=int(SERVER_PORT), workers=4
+        f"{__name__}:app",
+        host=SERVER_HOST,
+        port=int(SERVER_PORT),
+        workers=4,
+        reload=True,
     )
     server = uvicorn.Server(config=config)
     LOGGER.info(f"*** Launching server at {SERVER_HOST}:{SERVER_PORT}")

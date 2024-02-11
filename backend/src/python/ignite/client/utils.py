@@ -44,17 +44,14 @@ DCC = Path(ENV["IGNITE_DCC"])
 CONFIG_PATH = Path(ENV["IGNITE_CONFIG_PATH"])
 
 SOCKET_MANAGER = SocketManager()
-PROCESS_MANAGER = ProcessManager(
-    SOCKET_MANAGER,
-    USER_CONFIG_PATH / "processes.json"
-)
+PROCESS_MANAGER = ProcessManager(SOCKET_MANAGER, USER_CONFIG_PATH / "processes.json")
 
 
 def get_config(formatted=True) -> dict:
     path = CLIENT_CONFIG_PATH
     if not os.path.isfile(path):
         raise Exception(f"Config file not found: {path}")
-    LOGGER.debug(f"Reading config from {path}")    
+    LOGGER.debug(f"Reading config from {path}")
     with open(path, "r") as f:
         config = yaml.safe_load(f)
     if formatted:
@@ -62,7 +59,7 @@ def get_config(formatted=True) -> dict:
             "root": PurePath(config["root"]),
             "dcc_config": config.get("dcc_config", []),
             "server_details": config["server_details"],
-            "access": config["access"]
+            "access": config["access"],
         }
     return config
 
@@ -76,10 +73,7 @@ ENV["IGNITE_SERVER_PASSWORD"] = IGNITE_SERVER_PASSWORD
 
 
 def is_server_local():
-    local = (
-        "0.0.0.0",
-        "localhost"
-    )
+    local = ("0.0.0.0", "localhost")
     for s in local:
         if IGNITE_SERVER_ADDRESS.startswith(s):
             return True
@@ -122,7 +116,7 @@ def set_config(data):
 
     with open(CLIENT_CONFIG_PATH, "w") as f:
         yaml.safe_dump(config, f)
-    
+
     CONFIG.update(get_config())
 
     root_changed = old_config.get("root") != config["root"]
@@ -156,15 +150,11 @@ def replace_vars(d, projects_root=None, dcc={}, scene={}):
         if is_server_local():
             fetched_projects_root = server_api.get_projects_root()
         else:
-            fetched_projects_root = server_request("get_projects_root").get(
-                "data", ""
-            )
+            fetched_projects_root = server_request("get_projects_root").get("data", "")
     vars = {
         "os": OS_NAME,
         "dcc": str(DCC),
-        "projects_root": (
-            projects_root or fetched_projects_root
-        )
+        "projects_root": (projects_root or fetched_projects_root),
     }
     if dcc:
         vars["version"] = get_dcc_version(dcc)
@@ -194,7 +184,7 @@ def get_generic_env(projects_root=None):
         "IGNITE_SERVER_ADDRESS": IGNITE_SERVER_ADDRESS,
         "IGNITE_CLIENT_ADDRESS": IGNITE_CLIENT_ADDRESS,
         "IGNITE_TOOLS": ENV["IGNITE_TOOLS"],
-        "IGNITE_API_VERSION": ENV["IGNITE_API_VERSION"]
+        "IGNITE_API_VERSION": ENV["IGNITE_API_VERSION"],
     }
     env.update(replace_vars(GENERIC_ENV, projects_root=projects_root))
     return env
@@ -218,10 +208,10 @@ def get_task_env(path):
         "TASK": task.get("name", ""),
         "EXPORTS": task.get("exports", ""),
         "CACHE": task.get("cache", ""),
-        "SCENES": task.get("scenes", "")
+        "SCENES": task.get("scenes", ""),
     }
     for attrib in task.get("attributes", []):
-        name = attrib['name'].upper().replace(" ", "")
+        name = attrib["name"].upper().replace(" ", "")
         env[f"IGNITE_ATTRIB_{name}"] = attrib["override"] or attrib["inherited"]
     return env
 
@@ -239,12 +229,7 @@ def get_dcc_env(dcc, projects_root=None, scene={}):
         env["VERSION"] = str(scene.get("version"))
         env["VS"] = str(scene.get("version"))
         env["VSN"] = str(scene.get("vsn"))
-    return replace_vars(
-        env,
-        projects_root=projects_root,
-        dcc=dcc,
-        scene=scene
-    )
+    return replace_vars(env, projects_root=projects_root, dcc=dcc, scene=scene)
 
 
 def get_env(task="", dcc={}, scene={}):
@@ -287,7 +272,7 @@ def discover_dcc():
             "scenes": data["scenes"],
             "exts": data["exts"],
             "name": data["label"],
-            "path": path
+            "path": path,
         }
         config.append(dcc)
     return config
@@ -311,11 +296,7 @@ def launch_dcc(dcc, dcc_name, scene):
     else:
         return
 
-    os_cmd = {
-        "win": [],
-        "darwin": ["open", "-a"],
-        "linux": []
-    }
+    os_cmd = {"win": [], "darwin": ["open", "-a"], "linux": []}
     cmd = os_cmd[OS_NAME]
     cmd += [dcc_config["path"]]
     cmd.append(scene)
@@ -337,11 +318,7 @@ def get_launch_cmd(dcc, task, scene):
             break
     else:
         return
-    os_cmd = {
-        "win": [],
-        "darwin": ["open", "-a"],
-        "linux": []
-    }
+    os_cmd = {"win": [], "darwin": ["open", "-a"], "linux": []}
     dcc_exec, *args = dcc_config["path"].split(" -", 1)
     if args:
         args[0] = "-" + args[0]
@@ -349,8 +326,8 @@ def get_launch_cmd(dcc, task, scene):
     cmd += [dcc_exec]
     data = {
         "cmd": cmd[0],
-        "args": [scene] if not args else [scene] + args,
-        "env": env
+        "args": [scene] if not args else args + [scene],
+        "env": env,
     }
     return data
 
@@ -384,10 +361,7 @@ def copy_default_scene(task, dcc):
     dest.mkdir(parents=True, exist_ok=True)
     LOGGER.info(f"Copying default scene {src} to {dest}")
     shutil.copy2(src, dest)
-    data = {
-        "path": str(dest),
-        "dir_kind": "scene"
-    }
+    data = {"path": str(dest), "dir_kind": "scene"}
     if is_server_local():
         server_api.register_directory(str(dest), "scene")
     else:
@@ -429,14 +403,10 @@ def get_explorer_cmd(filepath):
     cmds = {
         "win": ["explorer.exe", filepath],
         "darwin": ["open", filepath],
-        "linux": ["xdg-open", filepath]
+        "linux": ["xdg-open", filepath],
     }
     cmd = cmds[OS_NAME]
-    data = {
-        "cmd": cmd[0],
-        "args": cmd[1:],
-        "env": {}
-    }
+    data = {"cmd": cmd[0], "args": cmd[1:], "env": {}}
     return data
 
 
@@ -454,8 +424,16 @@ def get_action_files(root=None, project=None):
     path = CONFIG_PATH / "actions"
     paths = get_config_paths("actions", root=root, project=project)
     files = {}
-    entities = ("common", "crate", "task", "build" "group", "scene", "asset",
-    "assetversion", "component")
+    entities = (
+        "common",
+        "crate",
+        "task",
+        "build" "group",
+        "scene",
+        "asset",
+        "assetversion",
+        "component",
+    )
     for path in paths:
         for entity in entities:
             entity_path = path / entity
@@ -484,9 +462,8 @@ def discover_actions(project=None):
             entity_action = {
                 "label": module.LABEL,
                 "source": file.as_posix(),
-                "exts": module.EXTENSIONS
-                    if hasattr(module, "EXTENSIONS") else None,
-                "module_path": module.__file__
+                "exts": module.EXTENSIONS if hasattr(module, "EXTENSIONS") else None,
+                "module_path": module.__file__,
             }
             actions[entity][file.name] = entity_action
     return actions

@@ -14,11 +14,11 @@
 
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import TreeItem, { treeItemClasses } from "@mui/lab/TreeItem";
-import TreeView from "@mui/lab/TreeView";
 import Box from "@mui/material/Box";
 import { styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
+import { TreeView } from "@mui/x-tree-view";
+import { TreeItem, treeItemClasses } from "@mui/x-tree-view";
 import { useSnackbar } from "notistack";
 import PropTypes from "prop-types";
 import React, { memo, useEffect, useRef, useState } from "react";
