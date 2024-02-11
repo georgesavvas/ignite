@@ -55,7 +55,7 @@ const Welcome = (props: WelcomeProps) => {
 
   useEffect(() => {
     const configAccess = _.omit(config.access, ["remote"]);
-    const same = _.isEqual(access, config.access);
+    const same = _.isEqual(access, configAccess);
     console.log("Comparing access", access, configAccess, "same", same);
     setCanSave(!same);
   }, [access]);

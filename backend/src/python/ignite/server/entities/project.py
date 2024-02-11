@@ -48,18 +48,14 @@ class Project(Directory):
         return group
 
     def initialise(self) -> None:
-        dirs = (".config", "common", "global", "rnd", "assets", "shots")
+        dirs = (".config", "global", "rnd", "assets", "shots")
         for d in dirs:
             path = self.path / d
             utils.ensure_directory(path)
             if d in ("global", "rnd", "assets", "shots"):
                 utils.create_anchor(path, GROUP_ANCHOR)
         if not Path(self.anchor).exists():
-            config = {
-                "status": "open",
-                "short_name": "",
-                "created": time.time()
-            }
+            config = {"status": "open", "short_name": "", "created": time.time()}
             with open(self.anchor, "w") as f:
                 yaml.safe_dump(config, f)
         else:
@@ -89,9 +85,7 @@ class Project(Directory):
         self.short_name = name
 
     def update_config(self, data):
-        config = {
-            "short_name": self.short_name
-        }
+        config = {"short_name": self.short_name}
         config.update(data)
         super().update_config(config)
 
@@ -138,7 +132,9 @@ class Project(Directory):
                     d["children"].append(child_d)
                     walk_project(x, child_d, _id)
                 del d["anchor"]
-                d["children"] = [child for child in d["children"] if child and child["dir_kind"]]
+                d["children"] = [
+                    child for child in d["children"] if child and child["dir_kind"]
+                ]
                 d["icon"] = d["dir_kind"]
                 if d["task_type"]:
                     d["icon"] = d["icon"] + "_" + d["task_type"]
@@ -151,7 +147,9 @@ class Project(Directory):
                 return {node["name"]}
             child_strings = set()
             for child in node["children"]:
-                child_strings.update(get_filter_strings(child, set(node["filter_strings"])))
+                child_strings.update(
+                    get_filter_strings(child, set(node["filter_strings"]))
+                )
             node["filter_strings"].update(child_strings)
             return set(node["filter_strings"])
 

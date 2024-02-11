@@ -14,7 +14,7 @@
 
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import TreeView from "@mui/lab/TreeView";
+import { TreeView } from "@mui/x-tree-view";
 import { useSnackbar } from "notistack";
 import { useContext, useEffect, useState } from "react";
 
@@ -61,7 +61,7 @@ const ProjectTreeView = (props: ProjectTreeViewProps) => {
   const [modalData, setModalData] = useState<ModalDataType>({});
   const [selectedItems, setSelectedItems] = useState("root");
   const { currentContext, setCurrentContext, refresh } = useContext(
-    ContextContext
+    ContextContext,
   ) as ContextContextType;
   const { enqueueSnackbar } = useSnackbar();
 
@@ -70,7 +70,7 @@ const ProjectTreeView = (props: ProjectTreeViewProps) => {
       object: TreeNodeType,
       result: TreeNodeType[],
       value: string,
-      parents: string[]
+      parents: string[],
     ) => {
       if (object.path && object.path === value) {
         result.push(object);

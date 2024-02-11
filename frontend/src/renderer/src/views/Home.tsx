@@ -45,7 +45,7 @@ const defaultFlexRations = {
 export const Home = () => {
   const [flexRatios, setFlexRatios] = useState(defaultFlexRations);
   const [waitBackendOpen, setWaitBackendOpen] = useState(true);
-  const [welcomeOpen, setWelcomeOpen] = useState(true);
+  const [welcomeOpen, setWelcomeOpen] = useState(false);
   const { config } = useContext(ConfigContext) as ConfigContextType;
 
   useEffect(() => {

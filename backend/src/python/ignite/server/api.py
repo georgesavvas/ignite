@@ -66,7 +66,7 @@ def get_projects() -> list:
     projects = [
         Project(path=p).as_dict()
         for p in projects
-        if (Path(p) / PROJECT_ANCHOR).exists()
+        if os.path.isfile((Path(p) / PROJECT_ANCHOR))
     ]
     return projects
 
@@ -454,8 +454,9 @@ def discover_assets(
     def discover(path, l=[]):
         name = path.name
         if path.is_dir():
-            LOGGER.debug(f"Checking if {path} is an asset...")
-            contents = sorted(list(path.iterdir()))
+            # LOGGER.debug(f"Checking if {path} is an asset...")
+            contents = list(path.glob(".ign_*"))
+            contents += utils.get_directories(path)
             d = {}
             d["name"] = name
             d["path"] = str(path)
@@ -465,16 +466,16 @@ def discover_assets(
                 LOGGER.debug(f"Processing {x}")
                 name = x.name
                 if name in (".config", "common"):
-                    LOGGER.debug("Ignoring cause it's reserved")
+                    # LOGGER.debug("Ignoring cause it's reserved")
                     continue
                 if name in KINDS:
                     kind = KINDS[name]
                     d["dir_kind"] = kind
                     d["anchor"] = x
-                    LOGGER.debug(f"{x} is an anchor ({kind})")
+                    # LOGGER.debug(f"{x} is an anchor ({kind})")
                     continue
                 if name.startswith("."):
-                    LOGGER.debug("Ignoring cause it starts with a .")
+                    # LOGGER.debug("Ignoring cause it starts with a .")
                     continue
                 elif not d["dir_kind"]:
                     parent1 = path.parent
@@ -487,14 +488,15 @@ def discover_assets(
                         # Probably an asset
                         d["dir_kind"] = "asset"
                         utils.create_delayed_anchor(path, "asset")
-                    elif d["name"] not in ("exports", "scenes"):
+                    elif d["name"] not in ("exports",):
                         # We should ignore
                         LOGGER.debug("Ignoring cause it has no anchor")
                         return []
                 if d["dir_kind"] == "asset" and d["anchor"]:
-                    with open(d["anchor"], "r") as f:
-                        config = yaml.safe_load(f)
-                        config = config or {}
+                    break
+                    # with open(d["anchor"], "r") as f:
+                    #     config = yaml.safe_load(f)
+                    #     config = config or {}
                 if single and l:
                     return l
                 discover(x, l)

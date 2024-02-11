@@ -1,8 +1,8 @@
-import TreeItem, { TreeItemProps, treeItemClasses } from "@mui/lab/TreeItem";
 import { SvgIcon } from "@mui/material";
 import Box, { BoxProps } from "@mui/material/Box";
 import { styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
+import { TreeItem, TreeItemProps, treeItemClasses } from "@mui/x-tree-view";
 import { EnqueueSnackbar } from "@renderer/types/common";
 import { useSnackbar } from "notistack";
 import { useState } from "react";

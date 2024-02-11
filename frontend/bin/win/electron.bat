@@ -1,4 +1,4 @@
 title "Electron"
 cd %0\..\.. && ^
-npm run electron
+npm run dev
 PAUSE

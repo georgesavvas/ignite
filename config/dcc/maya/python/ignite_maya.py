@@ -43,7 +43,7 @@ class IgnExportDialogue(QtWidgets.QDialog):
             ".abc": "alembic",
             ".usd": "USD Export",
             ".usdc": "USD Export",
-            ".usda": "USD Export"
+            ".usda": "USD Export",
         }
         filetype_combo = QtWidgets.QComboBox()
         filetype_combo.addItems(filetypes)
@@ -99,7 +99,7 @@ class IgnExportDialogue(QtWidgets.QDialog):
         layout.addWidget(buttons_frame)
         self.layout = layout
         self.setLayout(layout)
-    
+
     def onExportClicked(self):
         name = self.name_field.text()
         version = self.version_field.text()
@@ -138,10 +138,7 @@ def create_menu():
             parent=menu,
             command=lambda arg: save_next(),
         )
-        cmds.menuItem(
-            parent=menu,
-            divider=True
-        )
+        cmds.menuItem(parent=menu, divider=True)
         cmds.menuItem(
             label="Set Scene Comment",
             parent=menu,
@@ -157,10 +154,7 @@ def create_menu():
             parent=menu,
             command=lambda arg: scene_preview(),
         )
-        cmds.menuItem(
-            parent=menu,
-            divider=True
-        )
+        cmds.menuItem(parent=menu, divider=True)
         cmds.menuItem(
             label="Export All",
             parent=menu,
@@ -181,9 +175,9 @@ def save_next():
     current = Path(cmds.file(q=True, sn=True))
     version = int(current.parts[-2].lstrip("v"))
     version += 1
-    next_v = str(version).zfill(3)
+    next_v = f"v{str(version).zfill(3)}"
     filename = current.name
-    new_dir = current.parent.parent / f"v{next_v}"
+    new_dir = current.parent.parent / next_v
     new_dir.mkdir(exist_ok=False)
     new_filepath = new_dir / filename
     cmds.file(rename=str(new_filepath))
@@ -197,16 +191,10 @@ def scene_comment():
     save()
     path = cmds.file(q=True, sn=True)
     text, ok = QtWidgets.QInputDialog().getText(
-        maya_window(),
-        "QInputDialog().getText()",
-        "Comment",
-        QtWidgets.QLineEdit.Normal
+        maya_window(), "QInputDialog().getText()", "Comment", QtWidgets.QLineEdit.Normal
     )
     if ok and text:
-        data = {
-            "path": path,
-            "comment": text
-        }
+        data = {"path": path, "comment": text}
         ignite.server_request("set_scene_comment", data)
         cmds.inViewMessage(msg="Done", f=True, fot=3)
         return
@@ -214,23 +202,18 @@ def scene_comment():
 
 
 def playblast(path, frange):
-    frame_settings = {
-        "startTime": frange[0],
-        "endTime": frange[1]
-    }
+    frame_settings = {"startTime": frange[0], "endTime": frange[1]}
     if len(frange) == 3 and frange[2] > 1:
         frames = list(range(frange[0], frange[1], frange[2]))
         print(f"Playblast frames: {frames}")
-        frame_settings = {
-            "frame": frames
-        }
+        frame_settings = {"frame": frames}
     cmds.setAttr("defaultRenderGlobals.imageFormat", 8)
     cmds.playblast(
         filename=path,
         forceOverwrite=True,
         format="image",
         viewer=False,
-        **frame_settings
+        **frame_settings,
     )
 
 
@@ -308,7 +291,7 @@ def export_usd(path, range=None, ext="usd", all=True):
         "exportInstances=1",
         "exportVisibility=1",
         "mergeTransformAndShape=1",
-        "stripNamespaces=0"
+        "stripNamespaces=0",
     ]
     flags = {
         "force": True,
@@ -320,27 +303,27 @@ def export_usd(path, range=None, ext="usd", all=True):
         "constraints": True,
         "expressions": True,
         "exportAll": all,
-        "exportSelected": not all
+        "exportSelected": not all,
     }
     export(path, **flags)
 
 
 def export_alembic(
-        path,
-        range=None,
-        uvs=True,
-        color_sets=True,
-        face_sets=True,
-        visibility=True,
-        uv_sets=True,
-        worldspace=True,
-        all=True,
-        root=None
-    ):
+    path,
+    range=None,
+    uvs=True,
+    color_sets=True,
+    face_sets=True,
+    visibility=True,
+    uv_sets=True,
+    worldspace=True,
+    all=True,
+    root=None,
+):
     # TODO set map1 as current uvset, step, custom attributes, strip namespaces,
     # eulerFilter
     if not all and not root:
-        selection = cmds.ls(sl=True,long=True)
+        selection = cmds.ls(sl=True, long=True)
         if not selection:
             cmds.inViewMessage(msg="Nothing selected", f=True, fot=3)
             return
@@ -375,6 +358,7 @@ def post_export():
 def export_all():
     def fn(path, filetype):
         export(path, filetype, all=True)
+
     d = IgnExportDialogue("Ignite Export All", fn=fn)
     d.show()
 
@@ -382,10 +366,13 @@ def export_all():
 def export_selection():
     def fn(path, filetype):
         export(path, filetype, all=False)
+
     d = IgnExportDialogue("Ignite Export Selection", fn=fn)
     d.show()
 
 
 if __name__ == "__main__":
-    d = IgnExportDialogue("Ignite Export All", fn=lambda path, filetype: print(path, filetype))
+    d = IgnExportDialogue(
+        "Ignite Export All", fn=lambda path, filetype: print(path, filetype)
+    )
     d.show()

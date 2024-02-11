@@ -9,6 +9,7 @@ export const KINDTYPES = {
     ["rig", "Rig"],
     ["asset", "Asset"],
     ["shot", "Shot"],
-    ["fx", "FX"]
-  ]
+    ["fx", "FX"],
+    ["matchmove", "Matchmove"],
+  ],
 };

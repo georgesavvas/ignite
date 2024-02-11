@@ -15,9 +15,9 @@ def save_next():
         hou.ui.displayMessage("Could not detect version in filepath...")
         return
     version += 1
-    next_v = str(version).zfill(3)
+    next_v = f"v{str(version).zfill(3)}"
     filename = current.name
-    new_dir = current.parent.parent / f"v{next_v}"
+    new_dir = current.parent.parent / next_v
     new_dir.mkdir(exist_ok=False)
     new_filepath = new_dir / filename
     hou.hipFile.save(str(new_filepath))
@@ -32,18 +32,11 @@ def scene_comment():
     choice, text = hou.ui.readInput("Comment")
     editor = hou.ui.paneTabOfType(hou.paneTabType.NetworkEditor)
     if choice >= 0:
-        data = {
-            "path": path,
-            "comment": text
-        }
+        data = {"path": path, "comment": text}
         ignite.server_request("set_scene_comment", data)
         editor.flashMessage(image=None, message="Done", duration=3)
     else:
-        editor.flashMessage(
-            image=None,
-            message="Failed to set comment",
-            duration=3
-        )
+        editor.flashMessage(image=None, message="Failed to set comment", duration=3)
 
 
 def scene_preview():
