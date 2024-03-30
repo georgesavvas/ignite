@@ -74,7 +74,7 @@ class Scene(Directory):
         path_str = self.path.as_posix()
         root = CONFIG["root"].as_posix()
         if not path_str.startswith(root):
-            raise Exception(f"Invalid project dir: {path}")
+            raise Exception(f"Path outside root: {path}")
         if not Path(path).is_dir():
             raise Exception(f"Invalid path: {path}")
         split = path_str.split(root)
@@ -91,21 +91,19 @@ class Scene(Directory):
                 self.vsn = int(self.version.lstrip("v"))
                 break
 
-        extensions = []
-        ext_dcc = {}
-        for dcc, exts in DCC_EXTENSIONS.items():
-            extensions += exts
-            for ext in exts:
-                ext_dcc[ext] = dcc
-
         ext = self.scene.suffix[1:]
+        self.dcc = ""
+        for dcc, exts in DCC_EXTENSIONS.items():
+            if ext in exts:
+                self.dcc = dcc
+                break
+
         self.extension = ext
         self.task = path.parent.parent
-        self.dcc = ext_dcc.get(ext, "")
         self.context = self.get_context()
         self.uri = get_uri(path)
         self.load_from_config()
-    
+
     def is_valid(self):
         if not self.task or not self.version or not self.task or not self.extension:
             return False
@@ -124,12 +122,12 @@ class Scene(Directory):
         version = int(self.version.lstrip("v"))
         version += 1
         return str(version).zfill(3)
-    
+
     def next_filepath(self):
         next_v = self.next_version()
         filename = self.scene.name
         return self.path / next_v / filename
-    
+
     def get_thumbnail(self):
         exts = (".jpg", ".jpeg", ".png", ".tif", ".tiff")
         thumb = None

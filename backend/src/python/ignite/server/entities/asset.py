@@ -16,15 +16,22 @@
 from pathlib import Path
 
 import yaml
-from ignite.utils import symlink_points_to
+from ignite.utils import symlink_points_to, lock_directory, unlock_directory
 from ignite.server.entities.directory import Directory
 
 
 class Asset(Directory):
     def __init__(self, path="") -> None:
         super().__init__(path, dir_kind="asset")
-        self.dict_attrs = ["versions", "latest_v", "best_v", "next_path",
-            "creation_time", "modification_time", "uri"]
+        self.dict_attrs = [
+            "versions",
+            "latest_v",
+            "best_v",
+            "next_path",
+            "creation_time",
+            "modification_time",
+            "uri",
+        ]
         self.nr_attrs = ["path"]
         self._versions = []
         self._assetversions = []
@@ -39,7 +46,7 @@ class Asset(Directory):
         if not self._avs_fetched:
             self._fetch_versions()
         return self._versions
-    
+
     @property
     def assetversions(self):
         if not self._avs_fetched:
@@ -57,13 +64,13 @@ class Asset(Directory):
         if not self._latest_av:
             self._get_latest_version()
         return self._latest_av
-    
+
     @property
     def best_v(self):
         if not self._best_v:
             self._get_best_version()
         return self._best_v
-    
+
     @property
     def best_av(self):
         if not self._best_av:
@@ -89,7 +96,7 @@ class Asset(Directory):
             self._latest_v = versions[0]
             self._latest_av = assetversions[0]
         self._avs_fetched = True
-    
+
     def _get_latest_version(self):
         from ignite.server.entities.assetversion import AssetVersion
 
@@ -132,16 +139,16 @@ class Asset(Directory):
             return "v" + str(version).zfill(3)
         else:
             return "v001"
-    
+
     @property
     def next_path(self):
         next_v = self.next_version
         return self.path / next_v
 
     def post_write(self):
-        pass
-        # Disabled for now until there's a solution to Windows asking for UAC
         self.check_symlinks()
+        # Disabled for now until there's a solution to Windows asking for UAC
+        # Re-enabled for testing
 
     def check_symlinks(self):
         path = Path(self.path)
@@ -155,10 +162,12 @@ class Asset(Directory):
         best_ok = symlink_points_to(best, best_target) if best_exists else False
         if latest_target and not latest_ok:
             if latest_exists:
+                unlock_directory(latest)
                 latest.unlink()
             latest.symlink_to(latest_target, target_is_directory=True)
         if best_target and not best_ok:
             if best_exists:
+                unlock_directory(best)
                 best.unlink()
             best.symlink_to(best_target, target_is_directory=True)
 
@@ -171,12 +180,10 @@ class Asset(Directory):
         latest_av = self.latest_av
         if latest_av:
             filter_string += "".join(latest_av.tags or [])
-            filter_string += "".join(
-                [c["name"] for c in latest_av.components or []]
-            )
+            filter_string += "".join([c["name"] for c in latest_av.components or []])
         d["filter_string"] = filter_string
         return d
-    
+
     def get_tags(self):
         with open(self.anchor, "r") as f:
             config = yaml.safe_load(f) or {}
@@ -187,7 +194,7 @@ class Asset(Directory):
         asset_tags[version] = tags
         self.update_config({"tags": asset_tags})
         return asset_tags[version]
-    
+
     def add_tags(self, version, tags):
         asset_tags = self.get_tags()
         existing = asset_tags.get(version, [])
@@ -195,7 +202,7 @@ class Asset(Directory):
         asset_tags[version] = list(set(existing))
         self.update_config({"tags": asset_tags})
         return asset_tags[version]
-    
+
     def remove_tags(self, version, tags=[], all=False):
         asset_tags = self.get_tags()
         existing = asset_tags.get(version, [])

@@ -1,0 +1,22 @@
+.container {
+  margin: 0px;
+  padding: 0px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  gap: 3px;
+}
+
+.tileContainer {
+  flex-grow: 1;
+  display: grid;
+  gap: 3px;
+  padding: 0 5px;
+}
+
+.helperTextContainer {
+  display: flex;
+  padding-left: 10px;
+}

@@ -58,13 +58,14 @@ path.mkdir(parents=True, exist_ok=True)
 port_file = path / "ignite.port"
 pid_file = path / "ignite.pid"
 if port_file.exists() or pid_file.exists():
-    LOGGER.warning(f"Last shutdown was not clean")
-port_file.write_text(SERVER_PORT)
-pid_file.write_text(PID)
+    LOGGER.warning(f"Second instance or last shutdown was not clean")
 
 
 @app.on_event("startup")
 def startup_event():
+    LOGGER.debug("Writing PID and port files...")
+    port_file.write_text(SERVER_PORT)
+    pid_file.write_text(PID)
     uvicorn_error_logger = logging.getLogger("uvicorn.error")
     uvicorn_access_logger = logging.getLogger("uvicorn.access")
     setup_logger(uvicorn_error_logger)
@@ -75,7 +76,7 @@ def startup_event():
 
 @app.on_event("shutdown")
 def shutdown_event():
-    LOGGER.info("Cleaning up...")
+    LOGGER.debug("Cleaning up...")
     if port_file.exists():
         port_file.unlink()
     else:
@@ -102,11 +103,15 @@ async def ping():
 
 
 import subprocess
+
 if __name__ == "__main__":
+    LOGGER.info("\n\n\n****************\nLAUNCHING IGNITE\n****************")
     config = uvicorn.Config(
         f"{__name__}:app",
         host=SERVER_HOST,
-        port=int(SERVER_PORT)
+        port=int(SERVER_PORT),
+        workers=4,
+        reload=True,
     )
     server = uvicorn.Server(config=config)
     LOGGER.info(f"*** Launching server at {SERVER_HOST}:{SERVER_PORT}")

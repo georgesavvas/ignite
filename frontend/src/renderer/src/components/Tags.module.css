@@ -1,0 +1,46 @@
+.container {
+  position: relative;
+  /* display: flex; */
+  /* justify-content: flex-start;
+  align-items: flex-start; */
+  /* flex-wrap: wrap; */
+  max-width: 100%;
+  flex-grow: 1;
+  /* gap: 5px; */
+  /* padding: 5px;
+  border: solid 1px;
+  border-color: rgb(40, 40, 40);
+  border-radius: 5px; */
+}
+
+.tag {
+  border-radius: 5px;
+  padding: 3px 8px;
+  background-color: whitesmoke;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  /* width: max-content; */
+}
+
+.tagEdit {
+  border-radius: 5px;
+  padding: 3px;
+  background-color: rgb(0, 150, 50);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.clearIcon {
+  cursor: pointer;
+  font-size: 20px !important;
+  opacity: 0.3;
+}
+
+.clearIcon:hover {
+  opacity: 1;
+}

@@ -26,11 +26,11 @@ def save_next():
     current = get_filename()
     version = int(current.parts[-2].lstrip("v"))
     version += 1
-    next_v = str(version).zfill(3)
+    next_v = "v" + str(version).zfill(3)
     filename = os.path.basename(current)
     new_dir = os.path.dirname(current)
     new_dir = os.path.dirname(new_dir)
-    new_dir = os.path.join(new_dir, "v" + next_v)
+    new_dir = os.path.join(new_dir, next_v)
     os.makedirs(exist_ok=True)
     new_filepath = os.path.join(new_dir, filename)
     print("Saving at", new_filepath)

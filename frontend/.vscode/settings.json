@@ -1,22 +1,12 @@
 {
-    "cSpell.words": [
-        "curveness",
-        "ignitevfx",
-        "notistack",
-        "onreorder",
-        "Scroller",
-        "setdroppreviewdata",
-        "valtio",
-        "Xarrow",
-        "xarrows",
-        "Xwrapper"
-    ],
-    "cSpell.customDictionaries": {
-        "custom-dictionary-folder-frontend": {
-            "name": "custom-dictionary-folder-frontend",
-            "path": "${workspaceFolder:frontend}/.cspell/custom-dictionary-folder-frontend.txt",
-            "addWords": true,
-            "scope": "folder"
-        }
-    }
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "prettier.configPath": ".prettierrc.yaml"
 }

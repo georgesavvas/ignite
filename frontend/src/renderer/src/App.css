@@ -1,0 +1,38 @@
+body, html {
+  font-family: Roboto;
+}
+
+.App {
+  background-color: rgb(20, 20, 20);
+  color: lightgrey;
+  height: 100vh;
+  width: 100vw;
+  box-sizing: border-box;
+  margin: 0px;
+  padding: 0px;
+  font-size: 10px;
+}
+
+.errorFallback {
+  height: 100vh;
+  display: flex;
+  gap: 20px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: whitesmoke;
+}
+
+.errorContainer {
+  margin-top: 30px;
+  padding: 10px;
+  background-color: rgb(30, 30, 30);
+}
+
+pre {
+  font-size: 16px;
+}
+
+div {
+  box-sizing: border-box;
+}

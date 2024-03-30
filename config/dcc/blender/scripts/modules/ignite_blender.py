@@ -1,4 +1,3 @@
-
 from pathlib import Path
 
 import ignite
@@ -18,9 +17,9 @@ def save_next():
     current = Path(current_filepath())
     version = int(current.parts[-2].lstrip("v"))
     version += 1
-    next_v = str(version).zfill(3)
+    next_v = f"v{str(version).zfill(3)}"
     filename = current.name
-    new_dir = current.parent.parent / f"v{next_v}"
+    new_dir = current.parent.parent / next_v
     new_dir.mkdir(exist_ok=False)
     new_filepath = new_dir / filename
     bpy.ops.wm.save_as_mainfile(filepath=str(new_filepath))

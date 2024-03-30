@@ -30,14 +30,18 @@ SERVER_CONFIG_PATH = os.environ["IGNITE_SERVER_USER_CONFIG_PATH"]
 
 KINDS = {v: k for k, v in ANCHORS.items()}
 URI_TEMPLATE = parse.compile("ign:{project}:{group}:{context}:{task}:{name}@{version}")
-URI_TEMPLATE_COMP = parse.compile("ign:{project}:{group}:{context}:{task}:{name}@{version}#{comp}")
-URI_TEMPLATE_UNVERSIONED = parse.compile("ign:{project}:{group}:{context}:{task}:{name}")
+URI_TEMPLATE_COMP = parse.compile(
+    "ign:{project}:{group}:{context}:{task}:{name}@{version}#{comp}"
+)
+URI_TEMPLATE_UNVERSIONED = parse.compile(
+    "ign:{project}:{group}:{context}:{task}:{name}"
+)
 
 
 def get_config(formatted=True) -> dict:
     if not os.path.isfile(SERVER_CONFIG_PATH):
         raise Exception(f"Config file not found: {SERVER_CONFIG_PATH}")
-    LOGGER.info(f"Reading config from {SERVER_CONFIG_PATH}...")    
+    LOGGER.info(f"Reading config from {SERVER_CONFIG_PATH}...")
     with open(SERVER_CONFIG_PATH, "r") as f:
         config = yaml.safe_load(f)
     paths = ("root",)
@@ -48,7 +52,7 @@ def get_config(formatted=True) -> dict:
         return {
             "root": root,
             "server_address": config.get("server_address"),
-            "vault": root / config["vault_name"]
+            "vault": root / config["vault_name"],
         }
     return config
 
@@ -155,9 +159,11 @@ def get_uri(path, version_override=None):
         entity_kind = get_dir_kind(path)
     if not entity_kind:
         return ""
-    splt = path_str.split(
-        CONFIG["root"].as_posix(), 1
-    )[1].replace("/exports", "").split("/")[1:]
+    splt = (
+        path_str.split(CONFIG["root"].as_posix(), 1)[1]
+        .replace("/exports", "")
+        .split("/")
+    )
     i = len(splt)
     project = splt[0]
     group = splt[1] if i > 1 else None
@@ -233,12 +239,12 @@ def get_dir_type(path, dir_type):
     path = Path(path)
     parent = path
     iter = 1
-    while root in parent.as_posix():
+    while root != parent.as_posix():
         contents = [c.name for c in parent.iterdir()]
         if anchor in contents:
             return parent
         parent = parent.parent
-        iter +=1
+        iter += 1
         if iter > 20:
             raise Exception(f"Reached iteration limit when walking directory: {path}")
     return ""
@@ -272,7 +278,7 @@ def uri_to_path(uri):
     if not result:
         amount = uri.count(":")
         pattern_split = "ign:{project}:{group}:{context}:{task}".split(":")
-        pattern = ":".join(pattern_split[:amount + 1])
+        pattern = ":".join(pattern_split[: amount + 1])
         result = parse.parse(pattern, uri)
     if not result:
         LOGGER.error(f"Failed to parse {uri}")
@@ -318,3 +324,9 @@ def is_dir_of_kind(path, kind):
     path = Path(path)
     anchor = ANCHORS[kind]
     return (path / anchor).is_file()
+
+
+def get_directories(path):
+    # if hasattr(path, "__iter__"):
+    #     return [Path(entry.path) for entry in path if entry.is_dir()]
+    return [Path(entry.path) for entry in os.scandir(path) if entry.is_dir()]

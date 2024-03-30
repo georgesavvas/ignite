@@ -173,6 +173,15 @@ async def ingest_asset(request: Request):
     return {"ok": ok}
 
 
+@router.post("/ingest_scene")
+async def ingest_scene(request: Request):
+    result = await request.json()
+    log_request(result)
+    data = result.get("data", {})
+    ok = api.ingest_scene(data)
+    return {"ok": ok}
+
+
 @router.post("/get_actions")
 async def get_actions(request: Request):
     result = await request.json()

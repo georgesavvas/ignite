@@ -20,6 +20,7 @@ from pathlib import Path, PurePath
 import yaml
 from ignite.server import utils
 from ignite.server.constants import ANCHORS
+from ignite.server.entities.group import Group
 from ignite.server.entities.directory import Directory
 from ignite.server.utils import CONFIG
 from ignite.logger import get_logger
@@ -36,22 +37,25 @@ class Project(Directory):
         self.project = self.name
         self.short_name = ""
 
-    def create_dir(self, name, recursive=False):
-        raise NotImplemented("create_dir not allowed for projects.")
+    def create_group(self, name):
+        from ignite.server.entities.task import Task
+
+        path = self.create_dir(name, "group")
+        group = Group(path=path)
+        if not group:
+            LOGGER.error(f"Group creation failed: {path}")
+            return
+        return group
 
     def initialise(self) -> None:
-        dirs = (".config", "common", "global", "rnd", "assets", "shots")
+        dirs = (".config", "global", "rnd", "assets", "shots")
         for d in dirs:
             path = self.path / d
             utils.ensure_directory(path)
             if d in ("global", "rnd", "assets", "shots"):
                 utils.create_anchor(path, GROUP_ANCHOR)
         if not Path(self.anchor).exists():
-            config = {
-                "status": "open",
-                "short_name": "",
-                "created": time.time()
-            }
+            config = {"status": "open", "short_name": "", "created": time.time()}
             with open(self.anchor, "w") as f:
                 yaml.safe_dump(config, f)
         else:
@@ -70,19 +74,18 @@ class Project(Directory):
         for d in dirs:
             dir_path = path / d
             setattr(self, f"{d}_path", dir_path)
+        self.uri = utils.get_uri(path)
         self.load_from_config()
-    
+
     def set_short_name(self, name):
-        if not utils.validate_dirname(name): 
+        if not utils.validate_dirname(name):
             raise Exception(
                 f"Invalid name, only alphanumeric and underscores allowed: {name}"
             )
         self.short_name = name
-    
+
     def update_config(self, data):
-        config = {
-            "short_name": self.short_name
-        }
+        config = {"short_name": self.short_name}
         config.update(data)
         super().update_config(config)
 
@@ -129,7 +132,9 @@ class Project(Directory):
                     d["children"].append(child_d)
                     walk_project(x, child_d, _id)
                 del d["anchor"]
-                d["children"] = [child for child in d["children"] if child and child["dir_kind"]]
+                d["children"] = [
+                    child for child in d["children"] if child and child["dir_kind"]
+                ]
                 d["icon"] = d["dir_kind"]
                 if d["task_type"]:
                     d["icon"] = d["icon"] + "_" + d["task_type"]
@@ -142,7 +147,9 @@ class Project(Directory):
                 return {node["name"]}
             child_strings = set()
             for child in node["children"]:
-                child_strings.update(get_filter_strings(child, set(node["filter_strings"])))
+                child_strings.update(
+                    get_filter_strings(child, set(node["filter_strings"]))
+                )
             node["filter_strings"].update(child_strings)
             return set(node["filter_strings"])
 

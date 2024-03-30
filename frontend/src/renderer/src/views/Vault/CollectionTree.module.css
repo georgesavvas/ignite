@@ -1,0 +1,28 @@
+.container {
+    box-sizing: border-box;
+    /* height: 100%; */
+    /* padding: 10px; */
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+}
+
+.treeContainer {
+    box-sizing: border-box;
+    overflow-y: auto;
+    height: 100%;
+}
+
+.filterBar {
+    display: flex;
+    justify-content: center;
+    padding-bottom: 10px;
+}
+
+.dropPreview {
+    border: solid 2px rgb(79, 140, 180);
+    position: fixed;
+    border-radius: 5px;
+    transition-property: height top;
+    transition-duration: 0.1s;
+}

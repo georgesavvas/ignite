@@ -338,6 +338,37 @@ def ingest_asset(data):
     return True
 
 
+def ingest_scene(data):
+    scene_path = Path(data["scene"])
+    task_path = Path(data["task"])
+    if is_server_local():
+        task = server_api.find(task_path.as_posix())
+        task_dict = task.as_dict() if hasattr(task, "as_dict") else {}
+    else:
+        task_dict = utils.server_request(
+            "find", {"path": task_path.as_posix()}
+        ).get("data")
+    if not task_dict:
+        LOGGER.error(f"Couldn't get task {task_path}")
+        return
+    dest = task_dict.get("next_scene")
+    os.makedirs(dest)
+    new_scene = dest / scene_path.with_stem("scene").name
+    LOGGER.info(f"Ingesting scene {scene_path} to {new_scene}")
+    shutil.copyfile(scene_path, new_scene)
+    if is_server_local():
+        ok = server_api.register_scene(dest)
+        if not ok:
+            print("Failed.")
+            return
+    else:
+        resp = utils.server_request("register_scene", {"path": dest})
+        if not resp.get("ok"):
+            print("Failed.")
+            return
+    return new_scene
+
+
 def get_actions(project=None):
     return utils.discover_actions(project)
 

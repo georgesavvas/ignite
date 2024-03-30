@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-import os
+import stat
 import shutil
 from datetime import datetime, timezone
 from pathlib import Path
@@ -23,13 +23,19 @@ import yaml
 from ignite.server import api, utils
 from ignite.server.constants import ANCHORS
 from ignite.server.utils import CONFIG, is_dir_of_kind
-from ignite.utils import bytes_to_human_readable, get_logger, is_read_only
+from ignite.utils import (
+    bytes_to_human_readable,
+    get_logger,
+    is_read_only,
+    lock_directory,
+    unlock_directory,
+)
 
 
 LOGGER = get_logger(__name__)
 
 
-class Directory():
+class Directory:
     def __init__(self, path="", dir_kind="directory") -> None:
         self.dict_attrs = ["repr", "attributes", "uri"]
         self.nr_attrs = ["path"]
@@ -42,6 +48,7 @@ class Directory():
         self.dir_kind = dir_kind
         self.context = ""
         self._repr = None
+        self.thumbnail = None
         self.protected = False
         self.path = ""
         if path:
@@ -55,7 +62,7 @@ class Directory():
                 self.modification_time = datetime.fromtimestamp(
                     stat.st_mtime, tz=timezone.utc
                 )
-                self.size = 0 #stat.st_size
+                self.size = 0  # stat.st_size
             anchor = ANCHORS[dir_kind]
             self.anchor = path / anchor
             self.check_anchor()
@@ -124,8 +131,18 @@ class Directory():
             return self.path.parent
 
     def as_dict(self):
-        default = ["path", "protected", "dir_kind", "anchor", "project", "tags",
-            "name", "context", "group"]
+        default = [
+            "path",
+            "protected",
+            "dir_kind",
+            "anchor",
+            "project",
+            "tags",
+            "name",
+            "context",
+            "group",
+            "thumbnail",
+        ]
         default_nr = ["path"]
         d = {}
         for s in default:
@@ -144,12 +161,10 @@ class Directory():
         d["size"] = bytes_to_human_readable(self.size)
         try:
             d["creation_time"] = timeago.format(
-                self.creation_time,
-                datetime.now(tz=self.creation_time.tzinfo)
+                self.creation_time, datetime.now(tz=self.creation_time.tzinfo)
             )
             d["modification_time"] = timeago.format(
-                self.modification_time,
-                datetime.now(tz=self.modification_time.tzinfo)
+                self.modification_time, datetime.now(tz=self.modification_time.tzinfo)
             )
             d["creation_ts"] = self.creation_time.timestamp()
             d["modification_ts"] = self.modification_time.timestamp()
@@ -176,7 +191,7 @@ class Directory():
         utils.ensure_directory(path)
         utils.create_anchor(path, anchor)
         return path
-    
+
     def create_task(self, name, task_type="generic"):
         from ignite.server.entities.task import Task
 
@@ -186,13 +201,13 @@ class Directory():
             LOGGER.error(f"Task creation failed: {path}")
             return
         task.set_task_type(task_type)
-    
+
     def create_shot(self, name):
         self.create_dir(name, "shot")
 
     def create_build(self, name):
         path = self.create_dir(name, "build")
-    
+
     def create_sequence(self, name):
         path = self.create_dir(name, "sequence")
 
@@ -242,20 +257,23 @@ class Directory():
 
     def rename(self, new_name):
         path = Path(self.path)
-        path.rename(path.parent / new_name)
-        self.__init__(path, self.dir_kind)
+        path = path.rename(path.parent / new_name)
+        self.path = path
+        self.anchor = path / self.anchor.name
+        self.load_from_path()
         return path.name == new_name
 
     def delete(self):
-        LOGGER.warning(f"About to delete {self.path}")
+        path = Path(self.path)
+        LOGGER.warning(f"About to delete {path}")
         try:
-            shutil.rmtree(self.path)
+            shutil.rmtree(path)
         except Exception as e:
             LOGGER.error("Failed.")
             LOGGER.error(e)
             return False
         LOGGER.warning("Success.")
-        return not self.path.exists()
+        return not path.exists()
 
     def get_tags(self):
         return self.tags
@@ -266,14 +284,14 @@ class Directory():
     def set_tags(self, tags):
         self.update_config({"tags": tags})
         return tags
-    
+
     def add_tags(self, tags):
         existing = self.get_tags()
         existing += tags
         existing = list(set(existing))
         self.update_config({"tags": existing})
         return existing
-    
+
     def remove_tags(self, tags=[], all=False):
         existing = self.get_tags()
         if all:
@@ -288,39 +306,40 @@ class Directory():
 
     def set_protected(self, protected):
         ok = True
-        mode = 0o444 if protected else 0o777
-        for file in self.path.iterdir():
-            LOGGER.info(f"Changing {file} mode to {mode}")
-            try:
-                file.chmod(mode)
-            except Exception as e:
-                LOGGER.error(e)
-                ok = False
-                break
-        if ok:
-            LOGGER.info(f"Changing {self.path} mode to {mode}")
-            try:
-                self.path.chmod(mode)
-            except Exception as e:
-                LOGGER.error(e)
-                ok = False
-        if ok:
-            can_access = os.access(self.anchor, os.W_OK)
-            LOGGER.debug(f"Anchor access: {can_access}")
-            if can_access != protected:
-                return True
-        # Something went wrong, revert changes
-        LOGGER.warning("Reverting permission changes...")
-        mode = 0o444 if not protected else 0o777
-        LOGGER.info(f"Changing {self.path} mode to {mode}")
-        self.path.chmod(mode)
-        for file in self.path.iterdir():
-            LOGGER.info(f"Changing {file} mode to {mode}")
-            try:
-                file.chmod(mode)
-            except Exception as e:
-                LOGGER.error(e)
+        fn = lock_directory if protected else unlock_directory
 
+        # Iterate through directory contents and lock/unlock them
+        LOGGER.info("Protecting files" if protected else "Un-protecting files")
+        LOGGER.info(f"Changing permissions of files inside {self.path}...")
+        for file in self.path.iterdir():
+            fn(file)
+
+        # Verify success by checking a single file (the anchor)
+        should_be = "555" if protected else "777"
+        anchor_mode = oct(self.anchor.stat().st_mode)
+        LOGGER.info(f"{self.anchor} mode is now {anchor_mode}")
+
+        # Lock directory if everything ok
+        ok = anchor_mode.endswith(should_be)
+        if ok:
+            fn(self.path)
+        self_mode = oct(self.path.stat().st_mode)
+        LOGGER.info(f"{self.path} mode is now {self_mode}")
+        ok = self_mode.endswith(should_be)
+        if ok:
+            # Doesn't work anymore as the backend runs as root
+            # can_access = os.access(self.anchor, os.W_OK)
+            # LOGGER.debug(f"Anchor access: {can_access}")
+            # if can_access != protected:
+            #     return True
+            return True
+
+        # Something went wrong, revert changes
+        LOGGER.warning("Failed, reverting permission changes...")
+        fn = unlock_directory if protected else lock_directory
+        fn(self.path)
+        for file in self.path.iterdir():
+            fn(file)
 
     @property
     def attributes(self):
@@ -328,11 +347,15 @@ class Directory():
         parent = Path(self.path.parent)
         iter = 1
         parent_attrib_list = []
-        while root in parent.as_posix():
+        while root != parent.as_posix():
+            if iter > 20:
+                raise Exception(
+                    f"Reached iteration limit when walking directory: {self.path}"
+                )
             contents = next(parent.glob(".ign_*.yaml"), None)
             if not contents:
                 parent = parent.parent
-                iter +=1
+                iter += 1
                 continue
             with open(contents, "r") as f:
                 config = yaml.safe_load(f) or {}
@@ -340,9 +363,7 @@ class Directory():
             if dir_attribs:
                 parent_attrib_list.append(dir_attribs)
             parent = parent.parent
-            iter +=1
-            if iter > 20:
-                raise Exception(f"Reached iteration limit when walking directory: {self.path}")
+            iter += 1
         parent_attrib_list.reverse()
         parent_attribs = {}
         for attribs in parent_attrib_list:
@@ -357,11 +378,13 @@ class Directory():
 
         attributes_formatted = []
         for k, v in attributes.items():
-            attributes_formatted.append({
-                "name": k,
-                "inherited": parent_attribs.get(k, ""),
-                "override": current_attribs.get(k, "")
-            })
+            attributes_formatted.append(
+                {
+                    "name": k,
+                    "inherited": parent_attribs.get(k, ""),
+                    "override": current_attribs.get(k, ""),
+                }
+            )
 
         return attributes_formatted
 

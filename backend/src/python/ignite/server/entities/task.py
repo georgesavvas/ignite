@@ -16,9 +16,10 @@
 from pathlib import Path, PurePath
 
 from ignite.server import utils
-from ignite.server.constants import ANCHORS, DCC_EXTENSIONS
+from ignite.server.constants import ANCHORS
 from ignite.server.entities.asset import Asset
 from ignite.server.entities.directory import Directory
+from ignite.client.utils import get_dcc_scenes
 
 
 class Task(Directory):
@@ -47,6 +48,7 @@ class Task(Directory):
         self.task_type = task_type
         config = {"task_type": task_type}
         self.update_config(config)
+        return True
 
     def as_dict(self):
         d = super().as_dict()
@@ -60,7 +62,7 @@ class Task(Directory):
         anchors = kinds.keys()
         extensions = []
         ext_dcc = {}
-        for dcc, exts in DCC_EXTENSIONS.items():
+        for dcc, exts in get_dcc_scenes().items():
             extensions += exts
             for ext in exts:
                 ext_dcc[ext] = dcc
