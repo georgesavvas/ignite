@@ -123,7 +123,7 @@ const Component = (props: ComponentProps) => {
       Object.values(props.actions).map((action) => ({
         label: action.label,
         fn: () => handleAction(action),
-      }))
+      })),
     );
   }
 

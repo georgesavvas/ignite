@@ -327,5 +327,6 @@ def is_dir_of_kind(path, kind):
 
 
 def get_directories(path):
-    directories = [Path(entry.path) for entry in os.scandir(path) if entry.is_dir()]
-    return directories
+    # if hasattr(path, "__iter__"):
+    #     return [Path(entry.path) for entry in path if entry.is_dir()]
+    return [Path(entry.path) for entry in os.scandir(path) if entry.is_dir()]

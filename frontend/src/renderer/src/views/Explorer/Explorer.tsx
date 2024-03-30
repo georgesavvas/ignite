@@ -12,41 +12,41 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ConfigContext, ConfigContextType } from "../../contexts/ConfigContext";
-import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
-import ContextMenu, { ContextMenuType, handleContextMenu } from "../../components/ContextMenu";
-import { CopyToClipboard, ShowInExplorer, VaultExport, VaultImport } from "../ContextActions";
-import { CreateDir, DeleteDir, RenameDir } from "../ContextActions";
+import Divider from "@mui/material/Divider";
+import LinearProgress from "@mui/material/LinearProgress";
+import Typography from "@mui/material/Typography";
 import {
   EnqueueSnackbar,
   IgniteAssetVersion,
   IgniteComponent,
   IgniteEntity,
 } from "@renderer/types/common";
-import { EntityContext, EntityContextType } from "../../contexts/EntityContext";
+import { debounce } from "lodash";
+import { useSnackbar } from "notistack";
 import React, { ChangeEvent, ClipboardEvent, useContext, useEffect, useState } from "react";
 
-import AssetTile from "./AssetTile";
-import BuildFileURL from "../../services/BuildFileURL";
-import { DIRCONTEXTOPTIONS } from "../../constants/directoryContextOptions";
+import ContextMenu, { ContextMenuType, handleContextMenu } from "../../components/ContextMenu";
 import DataPlaceholder from "../../components/DataPlaceholder";
-import DccSelector from "../DccSelector";
-import DirectoryTile from "./DirectoryTile";
-import Divider from "@mui/material/Divider";
 import DragOverlay from "../../components/DragOverlay";
-import ExplorerBar from "./ExplorerBar";
-import LinearProgress from "@mui/material/LinearProgress";
 import Modal from "../../components/Modal";
+import { DIRCONTEXTOPTIONS } from "../../constants/directoryContextOptions";
+import { ConfigContext, ConfigContextType } from "../../contexts/ConfigContext";
+import { ContextContext, ContextContextType } from "../../contexts/ContextContext";
+import { EntityContext, EntityContextType } from "../../contexts/EntityContext";
+import BuildFileURL from "../../services/BuildFileURL";
+import serverRequest from "../../services/serverRequest";
+import loadExplorerSettings from "../../utils/loadExplorerSettings";
+import saveExplorerSettings from "../../utils/saveExplorerSettings";
+import { CopyToClipboard, ShowInExplorer, VaultExport, VaultImport } from "../ContextActions";
+import { CreateDir, DeleteDir, RenameDir } from "../ContextActions";
+import DccSelector from "../DccSelector";
+import AssetTile from "./AssetTile";
+import DirectoryTile from "./DirectoryTile";
+import styles from "./Explorer.module.css";
+import ExplorerBar from "./ExplorerBar";
 import PageBar from "./PageBar";
 import RowView from "./RowView";
 import SceneDrop from "./SceneDrop";
-import Typography from "@mui/material/Typography";
-import { debounce } from "lodash";
-import loadExplorerSettings from "../../utils/loadExplorerSettings";
-import saveExplorerSettings from "../../utils/saveExplorerSettings";
-import serverRequest from "../../services/serverRequest";
-import styles from "./Explorer.module.css";
-import { useSnackbar } from "notistack";
 
 const debounced = debounce((fn: () => void) => fn(), 500);
 
@@ -121,7 +121,7 @@ const Explorer = () => {
   const [query, setQuery] = useState(defaultQuery);
   const savedExplorerSettings = loadExplorerSettings() as ExplorerSettings;
   const [explorerSettings, setExplorerSettings] = useState(
-    savedExplorerSettings || defaultExplorerSettings
+    savedExplorerSettings || defaultExplorerSettings,
   );
   const [tiles, setTiles] = useState<JSX.Element[]>([]);
   const [modalData, setModalData] = useState({});
@@ -181,7 +181,7 @@ const Explorer = () => {
   useEffect(() => {
     if (!loadedData) return;
     const fetchedSelected = loadedData.find(
-      (entity: IgniteEntity) => entity.path === selectedEntity.path
+      (entity: IgniteEntity) => entity.path === selectedEntity.path,
     );
     if (fetchedSelected) setSelectedEntity(fetchedSelected);
     if (explorerSettings.currentViewType !== "grid") return;
@@ -226,7 +226,7 @@ const Explorer = () => {
             />
           );
         }
-      })
+      }),
     );
   }, [
     loadedData,
@@ -462,8 +462,8 @@ const Explorer = () => {
   };
 
   const fileInDCCConfig = (file: File) => {
-    return config.dccConfig.some((dcc) =>
-      dcc.scenes.some((ext: string) => file.path.endsWith(`.${ext.trim()}`))
+    return config.dccConfig.some(
+      (dcc) => dcc.scenes?.some((ext: string) => file.path.endsWith(`.${ext.trim()}`)),
     );
   };
 

@@ -264,7 +264,12 @@ const ComponentViewer = (props: ComponentViewerProps) => {
     else if (vid.includes(ext)) return <VideoViewer path={path} />;
     else if (geo.includes(ext)) return <GeoViewer comp={comp} path={path} />;
     // else if (usd.includes(ext)) return <UsdViewer comp={comp} config={config} />;
-    else return <Typography>No file preview for {comp.filename}</Typography>;
+    else
+      return (
+        <Typography style={{ textAlign: "center", margin: "auto" }}>
+          No file preview for {comp.filename}
+        </Typography>
+      );
   };
 
   return <div style={style}>{getViewer(props.comp, path)}</div>;

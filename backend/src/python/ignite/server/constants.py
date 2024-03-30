@@ -1,39 +1,24 @@
 TOOLS = {
-    "oiiotool": {
-        "win": "oiiotool.exe",
-        "darwin": "oiiotool",
-        "linux": "oiiotool"
-    },
-    "ffmpeg": {
-        "win": "ffmpeg.exe",
-        "darwin": "ffmpeg",
-        "linux": "ffmpeg"
-    }
+    "oiiotool": {"win": "oiiotool.exe", "darwin": "oiiotool", "linux": "oiiotool"},
+    "ffmpeg": {"win": "ffmpeg.exe", "darwin": "ffmpeg", "linux": "ffmpeg"},
 }
 
-OS_NAMES = {
-    "Windows": "win",
-    "Darwin": "darwin",
-    "Linux": "linux"
-}
+OS_NAMES = {"Windows": "win", "Darwin": "darwin", "Linux": "linux"}
 
-TAG_WEIGHTS = {
-    "approved": 1,
-    "deprecated": -1000
-}
+TAG_WEIGHTS = {"approved": 1, "deprecated": -1000}
 
 MP4_CONFIG = (
-        '-start_number {sframe}',
-        '-r {fps}',
-        '-i {filepath}',
-        '-f image2',
-        '-c:v libx264',
-        '-vf scale=720:-2',
-        '-profile:v main',
-        '-crf 10',
-        '-vendor ap10',
-        '{output}',
-    )
+    "-start_number {sframe}",
+    "-r {fps}",
+    "-i {filepath}",
+    "-f image2",
+    "-c:v libx264",
+    "-vf scale=720:-2",
+    "-profile:v main",
+    "-crf 10",
+    "-vendor ap10",
+    "{output}",
+)
 
 ANCHORS = {
     "project": ".ign_project.yaml",
@@ -45,19 +30,17 @@ ANCHORS = {
     "task": ".ign_task.yaml",
     "asset": ".ign_asset.yaml",
     "scene": ".ign_scene.yaml",
-    "assetversion": ".ign_assetversion.yaml"
+    "assetversion": ".ign_assetversion.yaml",
 }
 
 DCC_EXTENSIONS = {
-    "houdini": ["hip", "hipnc"],
+    "houdini": ["hip", "hipnc", "hiplc"],
     "maya": ["ma", "mb"],
     "nuke": ["nk"],
     "natron": ["ntp"],
     "substance_designer": ["sbs", "sbsar", "sbsasm"],
     "substance_painter": ["toc", "spp"],
-    "blender": ["blend"]
+    "blender": ["blend"],
 }
 
-COMP_TYPES = {
-    "usd": ["usd", "usdz", "usdc", "usda"]
-}
+COMP_TYPES = {"usd": ["usd", "usdz", "usdc", "usda"]}

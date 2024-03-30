@@ -5,33 +5,39 @@ from fnmatch import fnmatch
 PRESETS = {
     "*": {
         "karma": {
+            "f1": r"$FSTART",
+            "f2": r"$FEND",
             "picture": r"${EXPORTS}/${OS}/${VS}/main_acescg.$F4.exr",
-            "camera": "/cameras/camMain"
+            "camera": "/cameras/camMain",
         },
         "ifd": {
+            "f1": r"$FSTART",
+            "f2": r"$FEND",
             "vm_picture": r"${EXPORTS}/${OS}/${VS}/main_acescg.$F4.exr",
             "vm_tmpsharedstorage": r"$CACHE/ifds/storage/${VS}",
-            "camera": "/obj/camMain"
+            "camera": "/obj/camMain",
         },
-        "geometry": {
-            "sopoutput": r"${EXPORTS}/${OS}/${VS}/main.$F4.bgeo.sc"
-        },
-        "comp": {
-            "copoutput": r"${EXPORTS}/${OS}/${VS}/main_acescg.$F4.exr"
-        },
+        "geometry": {"sopoutput": r"${EXPORTS}/${OS}/${VS}/main.$F4.bgeo.sc"},
+        "comp": {"copoutput": r"${EXPORTS}/${OS}/${VS}/main_acescg.$F4.exr"},
         "opengl": {
-            "camera": r"${EXPORTS}/${OS}/${VS}/main_acescg.$F4.exr",
-            "picture": r"${EXPORTS}/${OS}/${VS}/main_acescg.$F4.exr"
+            "f1": r"$FSTART",
+            "f2": r"$FEND",
+            "camera": "/obj/camMain",
+            "picture": r"${EXPORTS}/${OS}/${VS}/main_acescg.$F4.exr",
+            "bgimage": '`chs("../../camMain/vm_background")`',
         },
-        "dop": {
-            "dopoutput": r"$CACHE/sim/${VS}/$OS.$SF.sim"
-        },
+        "dop": {"dopoutput": r"$CACHE/sim/${VS}/$OS.$SF.sim"},
         "reference": {
             "primpath": "/root",
             "primkind": "assembly",
             "reftype": "payload",
-            "handlemissingfiles": "ignore"
-        }
+            "handlemissingfiles": "ignore",
+        },
+        "filecache": {
+            "basedir": r"$EXPORTS",
+            "versionstr": 'v`padzero(3, ch("version"))`',
+            "cachename": 'main`chs("framestr")``chs("filetype")`',
+        },
     }
 }
 

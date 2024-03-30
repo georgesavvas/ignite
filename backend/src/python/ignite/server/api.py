@@ -405,40 +405,27 @@ def get_task(path):
 def discover_tasks(path, task_types=[], sort=None, as_dict=False):
     from ignite.server.entities.task import Task
 
-    def discover(path, l=[], ignore=[]):
-        name = path.name
-        if path.is_dir():
-            d = {}
-            d["name"] = name
-            d["path"] = path
-            d["dir_kind"] = ""
-            d["task_type"] = ""
-            d["anchor"] = None
-            for x in sorted(list(path.iterdir())):
-                name = x.name
-                if name in (".config", "common"):
-                    continue
-                if name in KINDS:
-                    d["dir_kind"] = KINDS[name]
-                    d["anchor"] = x
-                    continue
-                if name.startswith("."):
-                    continue
-                elif not d["dir_kind"]:
-                    return []
-                if d["dir_kind"] == "task" and d["anchor"]:
-                    with open(d["anchor"], "r") as f:
-                        config = yaml.safe_load(f)
-                        config = config or {}
-                        d["task_type"] = config.get("task_type")
-                discover(x, l)
-            if d["dir_kind"] == "task" and not path in ignore:
-                if not task_types or d["task_type"] in task_types:
-                    l.append(d)
-        return l
-
+    data = []
     path = Path(path)
-    data = discover(path, ignore=[path])
+    task_anchors = path.glob("**/.ign_task.yaml")
+    for anchor in task_anchors:
+        if anchor.parent == path:
+            continue
+        name = anchor.parent.name
+        d = {}
+        d["name"] = name
+        d["path"] = anchor.parent
+        d["dir_kind"] = "task"
+        d["task_type"] = ""
+        d["anchor"] = anchor
+        if name in KINDS:
+            d["dir_kind"] = KINDS[name]
+        with open(anchor, "r") as f:
+            config = yaml.safe_load(f)
+            config = config or {}
+            d["task_type"] = config.get("task_type")
+        if not task_types or d["task_type"] in task_types:
+            data.append(d)
     tasks = [Task(path=task["path"]) for task in data]
     if as_dict:
         tasks = [t.as_dict() for t in tasks]
@@ -518,7 +505,9 @@ def discover_assets(
             del asset["latest_av"]
         return assets
 
-    data = discover(Path(path))
+    tasks = [task.parent for task in Path(path).glob("**/.ign_task.yaml")]
+    data = []
+    [discover(Path(path), data) for path in tasks]
     assets = [Asset(path=asset["path"]) for asset in data]
     if as_dict:
         assets = [a.as_dict() for a in assets]

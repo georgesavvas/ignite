@@ -1,6 +1,6 @@
 GENERIC_ENV = {
     "PROJECTS_ROOT": "{projects_root}",
-    "OCIO": "{dcc}/ocio/config-aces-cg.ocio"
+    "OCIO": "{dcc}/ocio/config-aces-cg.ocio",
 }
 
 
@@ -13,53 +13,47 @@ DCC_ENVS = {
         "HOUDINI_MENU_PATH": "{dcc}/houdini;&",
         "HOUDINI_OTLSCAN_PATH": "&;{dcc}/houdini/hda",
         "HOUDINI_PYTHON_PANEL_PATH": "{dcc}/houdini/python_panels;&",
-        "PXR_PLUGINPATH_NAME": "{dcc}/houdini/dso/{version}/{os}/resources"
+        "PXR_PLUGINPATH_NAME": "{dcc}/houdini/dso/{version}/{os}/resources",
     },
     "maya": {
         "PYTHONPATH": "{dcc}/maya/python;{dcc}/common/python",
         "MAYA_SHELF_PATH": "{dcc}/maya/shelf",
         "MAYA_SCRIPT_PATH": "{dcc}/maya/scripts",
         "MAYA_PLUG_IN_PATH": "{dcc}/maya/plug-ins",
-        "MAYA_PROJECT": "{task}"
+        "MAYA_PROJECT": "{task}",
     },
     "nuke": {
         "PYTHONPATH": "{dcc}/nuke/python;{dcc}/common/python",
         "NUKE_PATH": "{dcc}/nuke;{dcc}/nuke/scripts;{dcc}/nuke/gizmos",
-        "HIERO_PLUGIN_PATH": "{dcc}/hiero"
+        "HIERO_PLUGIN_PATH": "{dcc}/hiero",
     },
     "mari": {
         "PYTHONPATH": "{dcc}/mari/python;{dcc}/common/python",
-        "MARI_SCRIPT_PATH": "{dcc}/mari/scripts"
+        "MARI_SCRIPT_PATH": "{dcc}/mari/scripts",
     },
     "natron": {
         "PYTHONPATH": "{dcc}/natron/python;{dcc}/common/python",
-        "NATRON_PLUGIN_PATH": "{dcc}/natron/Plugins"
+        "NATRON_PLUGIN_PATH": "{dcc}/natron/Plugins",
     },
     "blender": {
         "PYTHONPATH": "{dcc}/blender/python;{dcc}/common/python",
-        "BLENDER_USER_SCRIPTS": "{dcc}/blender/scripts"
+        "BLENDER_USER_SCRIPTS": "{dcc}/blender/scripts",
     },
     "substance_designer": {
         "PYTHONPATH": "{dcc}/substance_designer/python;{dcc}/common/python",
-        "SBS_DESIGNER_PYTHON_PATH":  "{dcc}/substance_designer/plugins"
+        "SBS_DESIGNER_PYTHON_PATH": "{dcc}/substance_designer/plugins",
     },
     "substance_painter": {
         "PYTHONPATH": "{dcc}/substance_painter/python;{dcc}/common/python",
-        "SUBSTANCE_PAINTER_PLUGINS_PATH":  "{dcc}/substance_painter/plugins"
-    }
+        "SUBSTANCE_PAINTER_PLUGINS_PATH": "{dcc}/substance_painter/plugins",
+    },
 }
 
 
-DCC_LOCATIONS = {
-    "houdini": ""
-}
+DCC_LOCATIONS = {"houdini": ""}
 
 
-OS_NAMES = {
-    "Windows": "win",
-    "Darwin": "darwin",
-    "Linux": "linux"
-}
+OS_NAMES = {"Windows": "win", "Darwin": "darwin", "Linux": "linux"}
 
 
 DCC_DISCOVERY = {
@@ -68,20 +62,16 @@ DCC_DISCOVERY = {
         "scenes": [],
         "exts": ["exr", "jpg", "jpeg", "png", "tif", "tiff", "tga"],
         "paths": {
-            "win": [
-                "C:/Program Files/DJV2/bin/djv.exe"
-            ],
+            "win": ["C:/Program Files/DJV2/bin/djv.exe"],
             "darwin": [
                 "",
             ],
-            "linux": [
-                ""
-            ]
-        }
+            "linux": [""],
+        },
     },
     "houdinifx": {
         "label": "Houdini FX",
-        "scenes": ["hip", "hipnc"],
+        "scenes": ["hip", "hipnc", "hiplc"],
         "exts": [],
         "args": "-n",
         "paths": {
@@ -91,14 +81,12 @@ DCC_DISCOVERY = {
             "darwin": [
                 "/Applications/Houdini/Houdini*.*.*/Frameworks/Houdini.framework/Versions/Current/Resources/bin/houdini",
             ],
-            "linux": [
-                "/opt/hfs*.*.*/bin/houdini"
-            ]
-        }
+            "linux": ["/opt/hfs*.*.*/bin/houdini"],
+        },
     },
     "houdinicore": {
         "label": "Houdini Core",
-        "scenes": ["hip", "hipnc"],
+        "scenes": ["hip", "hipnc", "hiplc"],
         "exts": [],
         "args": "-n",
         "paths": {
@@ -108,15 +96,13 @@ DCC_DISCOVERY = {
             "darwin": [
                 "/Applications/Houdini/Houdini*.*.*/Frameworks/Houdini.framework/Versions/Current/Resources/bin/houdinicore"
             ],
-            "linux": [
-                "/opt/hfs*.*.*/bin/houdinicore"
-            ]
-        }
+            "linux": ["/opt/hfs*.*.*/bin/houdinicore"],
+        },
     },
     "hython": {
         "label": "Hython",
         "scenes": [],
-        "exts": ["hip", "hipnc"],
+        "exts": ["hip", "hipnc", "hiplc"],
         "paths": {
             "win": [
                 "C:/Program Files/Side Effects Software/Houdini *.*.*/bin/hython.exe"
@@ -124,42 +110,28 @@ DCC_DISCOVERY = {
             "darwin": [
                 "/Applications/Houdini/Houdini*.*.*/Frameworks/Houdini.framework/Versions/Current/Resources/bin/hython"
             ],
-            "linux": [
-                "/opt/hfs*.*.*/bin/hython"
-            ]
-        }
+            "linux": ["/opt/hfs*.*.*/bin/hython"],
+        },
     },
     "maya": {
         "label": "Maya",
         "scenes": ["ma", "mb"],
         "exts": [],
         "paths": {
-            "win": [
-                "C:/Program Files/Autodesk/Maya*/bin/maya.exe"
-            ],
-            "darwin": [
-                "/Applications/Autodesk/Maya*/bin/maya"
-            ],
-            "linux": [
-                "/usr/autodesk/Maya*/bin/maya"
-            ]
-        }
+            "win": ["C:/Program Files/Autodesk/Maya*/bin/maya.exe"],
+            "darwin": ["/Applications/Autodesk/Maya*/bin/maya"],
+            "linux": ["/usr/autodesk/Maya*/bin/maya"],
+        },
     },
     "nuke": {
         "label": "Nuke",
         "scenes": ["nk", "nuke", "nkple"],
         "exts": [],
         "paths": {
-            "win": [
-                "C:/Program Files/Nuke*.*/Nuke*.*.exe"
-            ],
-            "darwin": [
-                "/Applications/Nuke*.*/Nuke*.*"
-            ],
-            "linux": [
-                ""
-            ]
-        }
+            "win": ["C:/Program Files/Nuke*.*/Nuke*.*.exe"],
+            "darwin": ["/Applications/Nuke*.*/Nuke*.*"],
+            "linux": [""],
+        },
     },
     "nukex": {
         "label": "NukeX",
@@ -167,16 +139,10 @@ DCC_DISCOVERY = {
         "exts": [],
         "args": "--nukex",
         "paths": {
-            "win": [
-                "C:/Program Files/Nuke*.*/Nuke*.*.exe"
-            ],
-            "darwin": [
-                "/Applications/Nuke*.*/Nuke*.*"
-            ],
-            "linux": [
-                ""
-            ]
-        }
+            "win": ["C:/Program Files/Nuke*.*/Nuke*.*.exe"],
+            "darwin": ["/Applications/Nuke*.*/Nuke*.*"],
+            "linux": [""],
+        },
     },
     "nukestudio": {
         "label": "Nuke Studio",
@@ -184,16 +150,10 @@ DCC_DISCOVERY = {
         "exts": [],
         "args": "--studio",
         "paths": {
-            "win": [
-                "C:/Program Files/Nuke*.*/Nuke*.*.exe"
-            ],
-            "darwin": [
-                "/Applications/Nuke*.*/Nuke*.*"
-            ],
-            "linux": [
-                ""
-            ]
-        }
+            "win": ["C:/Program Files/Nuke*.*/Nuke*.*.exe"],
+            "darwin": ["/Applications/Nuke*.*/Nuke*.*"],
+            "linux": [""],
+        },
     },
     "blender": {
         "label": "Blender",
@@ -206,40 +166,28 @@ DCC_DISCOVERY = {
             "darwin": [
                 "/*/blender/*.*/blender",
             ],
-            "linux": [
-                "/*/blender/*.*/blender"
-            ]
-        }
+            "linux": ["/*/blender/*.*/blender"],
+        },
     },
     "natron": {
         "label": "Natron",
         "scenes": ["nps", "npt"],
         "exts": [],
         "paths": {
-            "win": [
-                "C:/Program Files/Natron/bin/Natron.exe"
-            ],
-            "darwin": [
-                "/*/Natron/bin/Natron"
-            ],
-            "linux": [
-                "/*/Natron/bin/Natron"
-            ]
-        }
+            "win": ["C:/Program Files/Natron/bin/Natron.exe"],
+            "darwin": ["/*/Natron/bin/Natron"],
+            "linux": ["/*/Natron/bin/Natron"],
+        },
     },
     "photoshop": {
         "label": "Photoshop",
         "scenes": ["psd"],
         "exts": ["exr", "jpg", "jpeg", "png", "tif", "tiff", "tga"],
         "paths": {
-            "win": [
-                "C:/Program Files/Adobe/Adobe Photoshop */Photoshop.exe"
-            ],
-            "darwin": [
-                "/Applications/Adobe Photoshop */Adobe Photoshop *"
-            ],
-            "linux": []
-        }
+            "win": ["C:/Program Files/Adobe/Adobe Photoshop */Photoshop.exe"],
+            "darwin": ["/Applications/Adobe Photoshop */Adobe Photoshop *"],
+            "linux": [],
+        },
     },
     "aftereffects": {
         "label": "After Effects",
@@ -249,11 +197,9 @@ DCC_DISCOVERY = {
             "win": [
                 "C:/Program Files/Adobe/Adobe After Effects */Adobe After Effects *"
             ],
-            "darwin": [
-                "/Applications/Adobe After Effects */Adobe After Effects *"
-            ],
-            "linux": []
-        }
+            "darwin": ["/Applications/Adobe After Effects */Adobe After Effects *"],
+            "linux": [],
+        },
     },
     "premiere": {
         "label": "Premiere",
@@ -263,25 +209,19 @@ DCC_DISCOVERY = {
             "win": [
                 "C:/Program Files/Adobe/Adobe Premiere Pro */Adobe Premiere Pro.exe"
             ],
-            "darwin": [
-                "/Applications/Adobe Premiere Pro */Adobe Premiere Pro *"
-            ],
-            "linux": []
-        }
+            "darwin": ["/Applications/Adobe Premiere Pro */Adobe Premiere Pro *"],
+            "linux": [],
+        },
     },
     "illustrator": {
         "label": "Illustrator",
         "scenes": ["ai", "eps"],
         "exts": ["svg"],
         "paths": {
-            "win": [
-                "C:/Program Files/Adobe/Adobe Illustrator */Adobe Illustrator *"
-            ],
-            "darwin": [
-                "/Applications/Adobe Illustrator */Adobe Illustrator *"
-            ],
-            "linux": []
-        }
+            "win": ["C:/Program Files/Adobe/Adobe Illustrator */Adobe Illustrator *"],
+            "darwin": ["/Applications/Adobe Illustrator */Adobe Illustrator *"],
+            "linux": [],
+        },
     },
     "designer": {
         "label": "Designer",
@@ -290,15 +230,11 @@ DCC_DISCOVERY = {
         "paths": {
             "win": [
                 "C:/Program Files/Allegorithmic/Substance Designer/Substance Designer.exe",
-                "C:/Program Files/Adobe/Substance Designer/Substance Designer.exe"
+                "C:/Program Files/Adobe/Substance Designer/Substance Designer.exe",
             ],
-            "darwin": [
-                "/Applications/Adobe Substance 3D Designer.app/Designer"
-            ],
-            "linux": [
-                "/opt/Adobe/Adobe_Substance_3D_Designer/Designer"
-            ]
-        }
+            "darwin": ["/Applications/Adobe Substance 3D Designer.app/Designer"],
+            "linux": ["/opt/Adobe/Adobe_Substance_3D_Designer/Designer"],
+        },
     },
     "painter": {
         "label": "Painter",
@@ -307,15 +243,11 @@ DCC_DISCOVERY = {
         "paths": {
             "win": [
                 "C:/Program Files/Allegorithmic/Substance Painter/Substance Painter.exe",
-                "C:/Program Files/Adobe/Substance Painter/Substance Painter.exe"
+                "C:/Program Files/Adobe/Substance Painter/Substance Painter.exe",
             ],
-            "darwin": [
-                "/Applications/Adobe Substance 3D Painter.app/Painter"
-            ],
-            "linux": [
-                "/opt/Adobe/Adobe_Substance_3D_Painter/Painter"
-            ]
-        }
+            "darwin": ["/Applications/Adobe Substance 3D Painter.app/Painter"],
+            "linux": ["/opt/Adobe/Adobe_Substance_3D_Painter/Painter"],
+        },
     },
     "vscode": {
         "label": "VS Code",
@@ -328,18 +260,10 @@ DCC_DISCOVERY = {
             "darwin": [
                 "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/Code"
             ],
-            "linux": []
-        }
-    }
+            "linux": [],
+        },
+    },
 }
 
 
-DCC_VERSIONS = [
-    {
-        "name": "houdini",
-        "versions": {
-            "19.5": ["19.5."],
-            "19.0": ["19.0."]
-        }
-    }
-]
+DCC_VERSIONS = [{"name": "houdini", "versions": {"19.5": ["19.5."], "19.0": ["19.0."]}}]

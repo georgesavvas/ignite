@@ -83,3 +83,20 @@ def scene_thumbnail():
 
     editor = hou.ui.paneTabOfType(hou.paneTabType.NetworkEditor)
     editor.flashMessage(image=None, message="Done", duration=3)
+
+
+def multiparm(node, parm_name, index):
+    """Returns a multi parm."""
+
+    if not parm_name.endswith("_"):
+        parm_name += "_"
+    parm_name = "{}{}".format(parm_name, str(index))
+    return node.parm(parm_name)
+
+
+def user_print(message, s=2):
+    """Flashes a message on the network editor."""
+
+    pane_tab = hou.ui.paneTabOfType(hou.paneTabType.NetworkEditor)
+    if pane_tab.type().name() == "NetworkEditor":
+        pane_tab.flashMessage(None, message, s)

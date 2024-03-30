@@ -25,10 +25,20 @@ from ignite.server import utils
 LOGGER = get_logger(__name__)
 
 
-class Component():
+class Component:
     def __init__(self, path=None) -> None:
-        self.dict_attrs = ["name", "filename", "path", "ext", "static",
-            "first_frame", "last_frame", "frames", "uri", "dir_kind"]
+        self.dict_attrs = [
+            "name",
+            "filename",
+            "path",
+            "ext",
+            "static",
+            "first_frame",
+            "last_frame",
+            "frames",
+            "uri",
+            "dir_kind",
+        ]
         self.nr_attrs = ["path"]
         self.name = ""
         self.filename = ""
@@ -43,7 +53,7 @@ class Component():
         self.clique_collection = None
         if path:
             self.load_from_path(path)
-        
+
     def load_from_path(self, path):
         if type(path) == clique.collection.Collection:
             self.load_from_clique_collection(path)
@@ -65,7 +75,7 @@ class Component():
                 LOGGER.error(f"Couldn't create component from {path}")
             return
         self.load_from_string(path)
-    
+
     def load_from_string(self, s):
         path = PurePath(s)
         self.name = path.stem
@@ -73,7 +83,10 @@ class Component():
         self.path = path.as_posix()
         self.uri = utils.get_uri(self.path)
         self.path_nr = utils.get_nr(path)
-        self.ext = path.suffix
+        if self.path.endswith(".bgeo.sc"):
+            self.ext = ".bgeo.sc"
+        else:
+            self.ext = path.suffix
         self.static = True
         self.first_frame = 0
         self.last_frame = 0
@@ -127,7 +140,7 @@ class Component():
         first = sequence_files[0]
         frame = first.stem.split(".")[-1]
         return not first.stem == f"{new_name}.{frame}"
-    
+
     def delete(self):
         LOGGER.warning(f"Attempting to delete {self.path}")
         try:
