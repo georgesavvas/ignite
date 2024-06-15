@@ -45,7 +45,7 @@ export type Config = {
 type SetConfig = (
   setting: "serverDetails" | "access" | "dccConfig",
   data: ServerDetails | Access | DccConfig,
-  operation?: "modify" | "add" | "remove"
+  operation?: "modify" | "add" | "remove",
 ) => void;
 
 export type ConfigContextType = {
@@ -74,7 +74,7 @@ const placeholder_config = {
 
 export const ConfigProvider = ({ children }: PropsWithChildren) => {
   const serverIsLocal = useRef(true);
-  const intervalRef = useRef<NodeJS.Timer | undefined>();
+  const intervalRef = useRef<ReturnType<typeof setInterval>>();
   const { enqueueSnackbar } = useSnackbar();
   const [config, setConfig] = useState<Config>({
     serverDetails: serverDetailsDefault,
@@ -235,7 +235,7 @@ export const ConfigProvider = ({ children }: PropsWithChildren) => {
       existing_paths.push(existing.path);
     });
     const filtered = data.filter(
-      (new_config: GenericObject) => !existing_paths.includes(new_config.path)
+      (new_config: GenericObject) => !existing_paths.includes(new_config.path),
     );
     return [...config, ...filtered];
   };
@@ -294,7 +294,7 @@ export const ConfigProvider = ({ children }: PropsWithChildren) => {
   const handleSetConfig = (
     setting: "serverDetails" | "access" | "dccConfig",
     data: ServerDetails | Access | DccConfig,
-    operation: "add" | "remove" | "modify" = "modify"
+    operation: "add" | "remove" | "modify" = "modify",
   ) => {
     switch (setting) {
       case "serverDetails": {

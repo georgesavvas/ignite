@@ -21,26 +21,33 @@ import { TreeView } from "@mui/x-tree-view";
 import { TreeItem, treeItemClasses } from "@mui/x-tree-view";
 import { useSnackbar } from "notistack";
 import PropTypes from "prop-types";
-import React, { memo, useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { useDrag, useDrop } from "react-dnd";
 
 import ContextMenu, { handleContextMenu } from "../../components/ContextMenu";
 import FilterField from "../../components/FilterField";
 import serverRequest from "../../services/serverRequest";
 import { CopyToClipboard } from "../ContextActions";
+import { TreeNodeType } from "../TreeView/ProjectTreeView";
+import StyledTreeItem from "../TreeView/StyledTreeItem";
 import styles from "./CollectionTree.module.css";
 import { CreateColl, DeleteColl, EditColl, RenameColl } from "./Modals";
 
-const findNodeByPath = (object, result, value, parents) => {
+const findNodeByPath = (
+  object: TreeNodeType,
+  result: TreeNodeType[],
+  value: string,
+  parents: string[],
+) => {
   if (object.path && object.path === value) {
     result.push(object);
     return;
   }
   for (var i = 0; i < Object.keys(object).length; i++) {
-    const child = object[Object.keys(object)[i]];
+    const child = object[Object.keys(object)[i] as keyof TreeNodeType] as TreeNodeType;
     if (child !== null && typeof child === "object") {
       if (value.includes(child.path)) parents.push(child.id);
-      findNodeByPath(object[Object.keys(object)[i]], result, value, parents);
+      findNodeByPath(child, result, value, parents);
     }
   }
 };
@@ -97,120 +104,6 @@ const getContextItems = (data, enqueueSnackbar) => {
       fn: () => CopyToClipboard(data.name, enqueueSnackbar),
     },
   ];
-};
-
-const StyledTreeItem = memo((props) => {
-  const [contextMenu, setContextMenu] = useState(null);
-  const { enqueueSnackbar } = useSnackbar();
-  const ref = useRef(null);
-
-  const [, drop] = useDrop({
-    accept: "collection",
-    collect(monitor) {
-      return {
-        handlerId: monitor.getHandlerId(),
-      };
-    },
-    hover() {
-      if (!ref.current) {
-        return;
-      }
-      const hoverBoundingRect = ref.current?.getBoundingClientRect();
-      props.custom.setdroppreviewdata({
-        opacity: 1,
-        top: hoverBoundingRect.top - 2,
-        left: hoverBoundingRect.left - 5,
-        height: hoverBoundingRect.height,
-        width: hoverBoundingRect.width,
-      });
-    },
-    drop(item) {
-      if (!ref.current) {
-        return;
-      }
-      props.custom.onreorder(item.path, props.path, 0);
-    },
-  });
-
-  const [, drag] = useDrag(() => ({
-    type: "collection",
-    item: () => {
-      return { path: props.path };
-    },
-    end: () => {
-      props.custom.setdroppreviewdata({ opacity: 0 });
-    },
-    collect: (monitor) => ({
-      isDragging: !!monitor.isDragging(),
-    }),
-  }));
-  drag(drop(ref));
-
-  const { bgColor, color, labelInfo, handleContextMenuSelection, name, ...other } = props;
-
-  const handleClick = (action, data) => {
-    handleContextMenuSelection(action, data);
-    handleClose();
-  };
-
-  const handleClose = () => {
-    setContextMenu(null);
-  };
-
-  const itemData = {
-    path: props.path,
-    dynamic: props.dynamic,
-    name: name,
-    expression: props.expression,
-    user: props.user,
-    scope: props.scope,
-    handleClick: handleClick,
-  };
-
-  let contextItems = getContextItems(itemData, enqueueSnackbar);
-
-  const onContextMenu = (e) => {
-    e.stopPropagation();
-    handleContextMenu(e, contextMenu, setContextMenu);
-  };
-
-  return (
-    <div>
-      <ContextMenu items={contextItems} contextMenu={contextMenu} setContextMenu={setContextMenu} />
-      <StyledTreeItemRoot
-        label={
-          <Box
-            onContextMenu={onContextMenu}
-            ref={ref}
-            sx={{ display: "flex", alignItems: "center", p: 0.1, pr: 0.8 }}
-          >
-            <Typography
-              variant="body2"
-              sx={{ textAlign: "left", fontWeight: "inherit", flexGrow: 1 }}
-            >
-              {name}
-            </Typography>
-            <Typography variant="caption" color="rgb(100,100,100)">
-              {labelInfo}
-            </Typography>
-          </Box>
-        }
-        style={{
-          "--tree-view-color": color,
-          "--tree-view-bg-color": bgColor,
-        }}
-        {...other}
-      />
-    </div>
-  );
-});
-
-StyledTreeItem.propTypes = {
-  bgColor: PropTypes.string,
-  color: PropTypes.string,
-  labelIcon: PropTypes.elementType,
-  labelInfo: PropTypes.string,
-  name: PropTypes.string.isRequired,
 };
 
 const CollectionTree = (props) => {
@@ -294,13 +187,13 @@ const CollectionTree = (props) => {
     return (
       <StyledTreeItem
         key={nodes.path}
-        nodeId={nodes.path}
+        id={nodes.path}
         name={nodes.name}
         labelInfo={nodes.dir_kind}
         path={nodes.path}
         expression={nodes.expression}
         handleContextMenuSelection={handleContextMenuSelection}
-        style={hide ? { display: "none" } : null}
+        style={hide ? { display: "none" } : undefined}
         onFocusCapture={(e) => e.stopPropagation()}
         custom={{ setdroppreviewdata: setDropPreviewData, onreorder: handleReOrder }}
         user={props.user}

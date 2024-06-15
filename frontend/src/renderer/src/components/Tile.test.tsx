@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import "@testing-library/jest-dom";
+
 import { IgniteDirectory } from "@renderer/types/common";
 import { render } from "@testing-library/react";
 import { SnackbarProvider } from "notistack";
@@ -25,7 +27,7 @@ const makeSut = (props: TileProps) => {
       <ConfigProvider>
         <Tile {...props} />
       </ConfigProvider>
-    </SnackbarProvider>
+    </SnackbarProvider>,
   );
 };
 

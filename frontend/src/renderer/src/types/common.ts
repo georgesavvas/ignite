@@ -126,7 +126,7 @@ export type DccType = {
 };
 
 export interface WebSocketWithInterval extends WebSocket {
-  interval?: NodeJS.Timer;
+  interval?: ReturnType<typeof setInterval>;
 }
 
 export interface SaveReflexLayoutProps extends HandlerProps {

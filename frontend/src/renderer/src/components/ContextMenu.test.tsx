@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import "@testing-library/jest-dom";
+
 import { fireEvent, render } from "@testing-library/react";
 import { vi } from "vitest";
 
@@ -66,6 +68,6 @@ describe("ContextMenu", () => {
       setContextMenu: setContextMenu,
     });
     fireEvent.click(getByRole("menuitem"));
-    expect(itemFn).toHaveBeenCalledOnce();
+    expect(itemFn).toHaveBeenCalledTimes(1);
   });
 });

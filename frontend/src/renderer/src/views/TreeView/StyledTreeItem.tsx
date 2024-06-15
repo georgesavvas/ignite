@@ -2,7 +2,8 @@ import { SvgIcon } from "@mui/material";
 import Box, { BoxProps } from "@mui/material/Box";
 import { styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
-import { TreeItem, TreeItemProps, treeItemClasses } from "@mui/x-tree-view";
+import { treeItemClasses } from "@mui/x-tree-view";
+import { TreeItem2, TreeItem2Props } from "@mui/x-tree-view/TreeItem2";
 import { EnqueueSnackbar } from "@renderer/types/common";
 import { useSnackbar } from "notistack";
 import { useState } from "react";
@@ -59,7 +60,7 @@ const getSpecificContextItems = (data: DirectoryDataType) => {
   }));
 };
 
-const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
+const StyledTreeItemRoot = styled(TreeItem2)(({ theme }) => ({
   color: theme.palette.text.secondary,
   [`& .${treeItemClasses.content}`]: {
     color: theme.palette.text.secondary,
@@ -82,7 +83,7 @@ const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
     },
   },
 }));
-interface StyledTreeItemProps extends TreeItemProps {
+interface StyledTreeItemProps extends TreeItem2Props {
   bgColor?: string;
   labelIcon: BoxProps["component"];
   labelInfo: string;

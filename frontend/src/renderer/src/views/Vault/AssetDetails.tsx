@@ -12,28 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ConfigContext, ConfigContextType } from "../../contexts/ConfigContext";
-import ContextMenu, { ContextMenuType } from "../../components/ContextMenu";
-import { HandlerProps, ReflexContainer, ReflexElement, ReflexSplitter } from "react-reflex";
-import { IgniteAssetVersion, SaveReflexLayoutProps } from "@renderer/types/common";
-import Select, { SelectChangeEvent } from "@mui/material/Select";
-import { VaultContext, VaultContextType } from "../../contexts/VaultContext";
-import { useContext, useEffect, useState } from "react";
-
-import BuildFileURL from "../../services/BuildFileURL";
-import ComponentList from "../DetailsView/ComponentList";
-import ComponentViewer from "../DetailsView/ComponentViewer";
-import { CopyToClipboard } from "../ContextActions";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
+import Typography from "@mui/material/Typography";
+import { IgniteAssetVersion, SaveReflexLayoutProps } from "@renderer/types/common";
+import { useSnackbar } from "notistack";
+import { useContext, useEffect, useState } from "react";
+import { HandlerProps, ReflexContainer, ReflexElement, ReflexSplitter } from "react-reflex";
+
+import ContextMenu, { ContextMenuType } from "../../components/ContextMenu";
 import Path from "../../components/Path";
 import Tags from "../../components/Tags";
-import Typography from "@mui/material/Typography";
+import { ConfigContext, ConfigContextType } from "../../contexts/ConfigContext";
+import { VaultContext, VaultContextType } from "../../contexts/VaultContext";
+import BuildFileURL from "../../services/BuildFileURL";
+import serverRequest from "../../services/serverRequest";
 import loadReflexLayout from "../../utils/loadReflexLayout";
 import saveReflexLayout from "../../utils/saveReflexLayout";
-import serverRequest from "../../services/serverRequest";
-import { useSnackbar } from "notistack";
+import { CopyToClipboard } from "../ContextActions";
+import ComponentList from "../DetailsView/ComponentList";
+import ComponentViewer from "../DetailsView/ComponentViewer";
 
 const splitterStyle = {
   borderColor: "rgb(80,80,80)",
@@ -70,8 +70,9 @@ const compExtensionPreviewPriority = [
 ];
 
 export interface AssetDetailsProps {
-  entity: IgniteAssetVersion;
+  entity?: IgniteAssetVersion;
   setSelectedEntity: (entity: IgniteAssetVersion) => void;
+  onRefresh: () => void;
 }
 
 const AssetDetails = (props: AssetDetailsProps) => {
@@ -123,7 +124,7 @@ const AssetDetails = (props: AssetDetailsProps) => {
 
   const handleVersionChange = (e: SelectChangeEvent<string>) => {
     const version = e.target.value;
-    const path = BuildFileURL(`${props.entity.asset}/${version}`, config, {
+    const path = BuildFileURL(`${props.entity?.asset}/${version}`, config, {
       reverse: true,
       pathOnly: true,
     });
@@ -137,7 +138,7 @@ const AssetDetails = (props: AssetDetailsProps) => {
   };
 
   const getComp = (compName: string) => {
-    return props.entity.components.find((comp) => comp.filename === compName);
+    return props.entity?.components.find((comp) => comp.filename === compName);
   };
 
   const selectedComp = getComp(selectedCompName);
@@ -145,7 +146,7 @@ const AssetDetails = (props: AssetDetailsProps) => {
   const contextItems = [
     {
       label: "Copy tags",
-      fn: () => CopyToClipboard(props.entity.tags.join(", "), enqueueSnackbar),
+      fn: () => CopyToClipboard(props.entity?.tags.join(", ") || "", enqueueSnackbar),
     },
     // {
     //   label: "Add tags",
@@ -174,21 +175,25 @@ const AssetDetails = (props: AssetDetailsProps) => {
             <div style={{ display: "flex", alignItems: "center", minHeight: "50px" }}>
               <FormControl size="small" style={versionSelectStyle}>
                 <InputLabel>Version</InputLabel>
-                <Select value={props.entity.version} label="Version" onChange={handleVersionChange}>
-                  {props.entity.versions.map((ver) => (
+                <Select
+                  value={props.entity?.version}
+                  label="Version"
+                  onChange={handleVersionChange}
+                >
+                  {props.entity?.versions.map((ver) => (
                     <MenuItem key={ver} value={ver}>
                       {ver}
                     </MenuItem>
                   ))}
                 </Select>
               </FormControl>
-              <Typography variant="h5">{props.entity.name}</Typography>
+              <Typography variant="h5">{props.entity?.name}</Typography>
             </div>
-            <Path path={props.entity.path} />
+            <Path path={props.entity?.path || ""} />
           </div>
           <Tags
-            entityPath={props.entity.path}
-            tags={props.entity.tags || []}
+            entityPath={props.entity?.path}
+            tags={props.entity?.tags || []}
             onRefresh={refreshVault}
           />
         </ReflexElement>
@@ -200,7 +205,7 @@ const AssetDetails = (props: AssetDetailsProps) => {
         >
           <ComponentList
             project={"__vault__"}
-            components={props.entity.components || []}
+            components={props.entity?.components || []}
             selectedComp={selectedComp}
             onSelect={setSelectedCompName}
             asset={props.entity}

@@ -14,7 +14,7 @@
 
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { TreeView } from "@mui/x-tree-view";
+import { SimpleTreeView } from "@mui/x-tree-view/SimpleTreeView";
 import { useSnackbar } from "notistack";
 import { useContext, useEffect, useState } from "react";
 
@@ -149,7 +149,7 @@ const ProjectTreeView = (props: ProjectTreeViewProps) => {
     return (
       <StyledTreeItem
         key={nodes.id}
-        nodeId={nodes.id}
+        itemId={nodes.id}
         labelText={nodes.name}
         labelIcon={DIRECTORYICONS[nodes.icon] || DIRECTORYICONS.directory}
         labelInfo={nodes.dir_kind}
@@ -195,14 +195,12 @@ const ProjectTreeView = (props: ProjectTreeViewProps) => {
         fn={refresh}
       />
       <div className={styles.treeContainer}>
-        <TreeView
+        <SimpleTreeView
           aria-label="file system navigator"
-          defaultCollapseIcon={<ExpandMoreIcon />}
-          defaultExpandIcon={<ChevronRightIcon />}
-          onNodeSelect={handleNodeSelect}
-          onNodeToggle={handleNodeToggle}
-          expanded={expandedItems}
-          selected={selectedItems}
+          onItemSelectionToggle={handleNodeSelect}
+          onExpandedItemsChange={handleNodeToggle}
+          expandedItems={expandedItems}
+          selectedItems={selectedItems}
           sx={{
             flexGrow: 1,
             maxWidth: 800,
@@ -213,7 +211,7 @@ const ProjectTreeView = (props: ProjectTreeViewProps) => {
           {renderTree(props.data) || (
             <DataPlaceholder text="No results" style={{ height: "90%", width: "90%" }} />
           )}
-        </TreeView>
+        </SimpleTreeView>
       </div>
     </div>
   );

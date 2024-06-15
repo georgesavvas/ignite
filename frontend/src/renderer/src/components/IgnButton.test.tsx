@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import "@testing-library/jest-dom";
+
 import { ButtonProps } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
 import { render } from "@testing-library/react";
@@ -23,7 +25,7 @@ const makeSut = (props: ButtonProps) => {
   return render(
     <ThemeProvider theme={igniteTheme}>
       <IgnButton {...props} color="ignite" />
-    </ThemeProvider>
+    </ThemeProvider>,
   );
 };
 

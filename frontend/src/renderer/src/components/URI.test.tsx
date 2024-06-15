@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import "@testing-library/jest-dom";
+
 import { render } from "@testing-library/react";
 import { SnackbarProvider } from "notistack";
 
@@ -27,7 +29,7 @@ const makeSut = (props: URIProps) => {
           <URI {...props} />
         </ContextProvider>
       </ConfigProvider>
-    </SnackbarProvider>
+    </SnackbarProvider>,
   );
 };
 

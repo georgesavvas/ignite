@@ -12,18 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import CreateDirModal, { CreateDirModalProps } from "./CreateDirModal";
+import "@testing-library/jest-dom";
 
 import { ThemeProvider } from "@mui/material/styles";
-import { igniteTheme } from "../theme";
 import { render } from "@testing-library/react";
 import { vi } from "vitest";
+
+import { igniteTheme } from "../theme";
+import CreateDirModal, { CreateDirModalProps } from "./CreateDirModal";
 
 const makeSut = (props: CreateDirModalProps) => {
   return render(
     <ThemeProvider theme={igniteTheme}>
       <CreateDirModal {...props} />
-    </ThemeProvider>
+    </ThemeProvider>,
   );
 };
 

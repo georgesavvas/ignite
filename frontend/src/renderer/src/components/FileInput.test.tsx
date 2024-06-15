@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import "@testing-library/jest-dom";
+
 import { ThemeProvider } from "@mui/material/styles";
 import { render } from "@testing-library/react";
 import { vi } from "vitest";
@@ -23,7 +25,7 @@ const makeSut = (props: FileInputProps) => {
   return render(
     <ThemeProvider theme={igniteTheme}>
       <FileInput {...props} />
-    </ThemeProvider>
+    </ThemeProvider>,
   );
 };
 
